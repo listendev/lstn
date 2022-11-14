@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,8 +20,11 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
+
+const defaultCommand = "in"
 
 var cfgFile string
 
@@ -43,7 +46,14 @@ to quickly create a Cobra application.`,
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	err := rootCmd.Execute()
+	// Fallback to the default subcommand when the user doesn't specify one explicitly.
+	c, _, err := rootCmd.Find(os.Args[1:])
+	if err == nil && c.Use == rootCmd.Use && c.Flags().Parse(os.Args[1:]) != pflag.ErrHelp {
+		args := append([]string{defaultCommand}, os.Args[1:]...)
+		rootCmd.SetArgs(args)
+	}
+
+	err = rootCmd.Execute()
 	if err != nil {
 		os.Exit(1)
 	}
@@ -60,7 +70,7 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// rootCmd.Flags().BoolP("example", "e", false, "Help message for example")
 }
 
 // initConfig reads in config file and ENV variables if set.
