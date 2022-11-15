@@ -20,6 +20,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/listendev/lstn/pkg/npm"
 	"github.com/listendev/lstn/pkg/validate"
 	"github.com/spf13/cobra"
 )
@@ -47,14 +48,20 @@ to quickly create a Cobra application.`,
 			return fmt.Errorf("couldn't get to know on which directory you want me to listen in")
 		}
 		// Check that the target directory contains a package.json file
-		packageJSONErrors := validate.Singleton.Var(filepath.Join(targetDir, "package.json"), "file,json")
-		// NOTE > In the future, we can fallback to detect other package managers here rather than erroring out
+		packageJSONErrors := validate.Singleton.Var(filepath.Join(targetDir, "package.json"), "file")
+		// NOTE > In the future, we can try to detect other package managers here rather than erroring out
 		if packageJSONErrors != nil {
 			return fmt.Errorf("couldn't find a package.json in %s", targetDir)
 		}
 
-		fmt.Println("in called", args)
-		return nil
+		fmt.Println("REMOVE ME - in called", args)
+		packageLockJSON, err := npm.GeneratePackageLock(targetDir)
+
+		fmt.Println(string(packageLockJSON))
+
+		// TODO(leodido) > complete
+
+		return err
 	},
 }
 
