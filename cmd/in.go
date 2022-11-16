@@ -70,7 +70,7 @@ to quickly create a Cobra application.`,
 		}
 
 		ctx := context.Background()
-		packagesWithShasum, err := packageLockJSON.QueryShasums(ctx, time.Second*3)
+		packagesWithShasum, err := packageLockJSON.QueryShasums(ctx, time.Second*20)
 		if err != nil {
 			return err
 		}
@@ -80,7 +80,9 @@ to quickly create a Cobra application.`,
 
 		spew.Dump(packagesWithShasum)
 
-		// TODO(leodido) > complete
+		// TODO > encode the package-lock.JSON in base64
+		// TODO > POST the endpoint
+		// TODO > show the results
 
 		return nil
 	},
