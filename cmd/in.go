@@ -16,10 +16,13 @@ limitations under the License.
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/listendev/lstn/pkg/npm"
 	"github.com/listendev/lstn/pkg/validate"
 	"github.com/spf13/cobra"
@@ -54,14 +57,32 @@ to quickly create a Cobra application.`,
 			return fmt.Errorf("couldn't find a package.json in %s", targetDir)
 		}
 
-		fmt.Println("REMOVE ME - in called", args)
-		packageLockJSON, err := npm.GeneratePackageLock(targetDir)
+		// Get the package-lock.json file contents
+		packageLockJSONBytes, err := npm.GeneratePackageLock(targetDir)
+		if err != nil {
+			return err
+		}
 
-		fmt.Println(string(packageLockJSON))
+		// Unmarshal the package-lock.json file contents to a struct
+		packageLockJSON, err := npm.NewPackageLockJSONFrom(packageLockJSONBytes)
+		if err != nil {
+			return err
+		}
+
+		ctx := context.Background()
+		packagesWithShasum, err := packageLockJSON.QueryShasums(ctx, time.Second*3)
+		if err != nil {
+			return err
+		}
+		if len(packagesWithShasum) != len(packageLockJSON.Deps()) {
+			return fmt.Errorf("couldn't find all the dependencies as per package-lock.json file")
+		}
+
+		spew.Dump(packagesWithShasum)
 
 		// TODO(leodido) > complete
 
-		return err
+		return nil
 	},
 }
 
