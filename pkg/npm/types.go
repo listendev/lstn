@@ -9,16 +9,11 @@ import (
 	"time"
 )
 
-type packageLockDependency struct {
-	Version  string `json:"version"`
-	Resolved string `json:"resolved"`
-}
-
 type packageLockJSON struct {
 	Name            string                           `json:"name"`
 	Version         string                           `json:"version"`
 	LockfileVersion int                              `json:"lockfileVersion"`
-	Dependencies    map[string]packageLockDependency `json:"dependencies"`
+	Dependencies    map[string]PackageLockDependency `json:"dependencies"`
 }
 
 type dep struct {
@@ -113,13 +108,23 @@ func (deps depsFlow) each(ctx context.Context, numWorkers int, fn eachDepCallbac
 
 type PackageLockJSON interface {
 	QueryShasums(ctx context.Context, timeout time.Duration) ([]*Package, error)
-	// Dependencies() // TODO
+	Deps() map[string]PackageLockDependency
+}
+
+type PackageLockDependency struct {
+	Version  string `json:"version"`
+	Resolved string `json:"resolved"`
 }
 
 type Package struct {
 	Name    string
 	Version string
 	Shasum  string
+}
+
+// Deps gets you the package lock dependencies.
+func (p *packageLockJSON) Deps() map[string]PackageLockDependency {
+	return p.Dependencies
 }
 
 // QueryShasums concurrently queries the NPM registry to get the shasums
