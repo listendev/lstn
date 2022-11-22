@@ -19,10 +19,16 @@ import (
 // It assumes that the input directory exists and it already contains
 // a package.json file.
 func generatePackageLock(dir string) ([]byte, error) {
-	// Get the npm executable
-	exe, err := getNPM()
+	// Get the npm command
+	npmPackageLockOnly, err := getNPMPackageLockOnly()
 	if err != nil {
-		return []byte{}, err
+		// Fallback to npm via nvm
+		npmPackageLockOnlyFromNVM, nvmErr := getNPMPackageLockOnlyFromNVM()
+		if nvmErr != nil {
+			// FIXME > return more errors or a generic one
+			return []byte{}, err
+		}
+		npmPackageLockOnly = npmPackageLockOnlyFromNVM
 	}
 
 	// Create temporary directory
@@ -44,7 +50,6 @@ func generatePackageLock(dir string) ([]byte, error) {
 
 	// Generate the package-lock.json file
 	// TODO(leodido) > Show progress?
-	npmPackageLockOnly := exec.Command(exe, "install", "--package-lock-only", "--no-audit")
 	npmPackageLockOnly.Dir = tmp
 	if err := npmPackageLockOnly.Run(); err != nil {
 		return []byte{}, fmt.Errorf("couldn't generate the package-lock.json file")
@@ -54,48 +59,82 @@ func generatePackageLock(dir string) ([]byte, error) {
 	return packageLockJSON, nil
 }
 
-// getNPM returns the absolute path of the npm executable.
-//
-// It checks that the npm version is >= 6.x too.
-func getNPM() (string, error) {
-	// Is it possible (also likely) that npm is lazyloaded (eg., nvm)
-	// In such a scenario we have to force its resolution
-
-	// FIXME > See the output of `which npm` on a clean shell when it is installed via nvm with lazy load on
-
-	// Check the system has the npm executable
-	exe, err := exec.LookPath("npm")
-	if err != nil {
-		return "", fmt.Errorf("couldn't find the npm executable")
-	}
-
+func checkNPMVersion(c *exec.Cmd, constraint string) error {
 	// Obtain the npm version
-	npmVersionCmd := exec.Command(exe, "--version")
+	npmVersionCmd := c
 	npmVersionOut, err := npmVersionCmd.CombinedOutput()
 	if err != nil {
-		return "", fmt.Errorf("couldn't get the npm version")
+		return fmt.Errorf("couldn't get the npm version")
 	}
 	npmVersionString := string(bytes.Trim(npmVersionOut, "\n"))
 
 	// Check the npm version is valid
 	npmVersionErrors := validate.Singleton.Var(npmVersionString, "semver")
 	if npmVersionErrors != nil {
-		return "", fmt.Errorf("couldn't validate the npm version string")
+		return fmt.Errorf("couldn't validate the npm version string")
 	}
 	npmVersion, err := semver.NewVersion(npmVersionString)
 	if err != nil {
-		return "", fmt.Errorf("couldn't get a valid npm version")
+		return fmt.Errorf("couldn't get a valid npm version")
 	}
 
 	// Check the npm is at least version 6.x
-	npmVersionConstraint, err := semver.NewConstraint(">= 6.x")
+	npmVersionConstraint, err := semver.NewConstraint(constraint)
 	if err != nil {
-		return "", fmt.Errorf("couldn't compare the npm version")
+		return fmt.Errorf("couldn't compare the npm version")
 	}
 	npmVersionValid, _ := npmVersionConstraint.Validate(npmVersion)
 	if !npmVersionValid {
-		return "", fmt.Errorf("we do not support npm version < 6.x")
+		return fmt.Errorf("the npm version is not %s", constraint)
+	}
+	return nil
+}
+
+// getNPMPackageLockOnly returns the command to generate the package-lock.json file.
+//
+// It also checks that:
+// - the npm executable is available in the PATH
+// - its version is greater or equal than version "6.x".
+func getNPMPackageLockOnly() (*exec.Cmd, error) {
+	// Check the system has the npm executable
+	exe, err := exec.LookPath("npm")
+	if err != nil {
+		return nil, fmt.Errorf("couldn't find the npm executable in the PATH")
 	}
 
-	return exe, nil
+	npmVersionCmd := exec.Command(exe, "--version")
+	if err := checkNPMVersion(npmVersionCmd, ">= 6.x"); err != nil {
+		return nil, err
+	}
+
+	return exec.Command(exe, "install", "--package-lock-only", "--no-audit"), nil
+}
+
+// getNPMPackageLockOnlyFromNVM return the command to generate the package-lock.json file
+// when the npm executable is behind nvm.
+//
+// In fact, it is likely that npm is not in the PATH because nvm is lazy-loading it.
+//
+// It also checks that:
+// - the npm version is greater or equal than version "6.x".
+func getNPMPackageLockOnlyFromNVM() (*exec.Cmd, error) {
+	nvmDir := os.Getenv("NVM_DIR")
+	if nvmDir == "" {
+		return nil, fmt.Errorf("couldn't detect the nvm directory")
+	}
+
+	cmdline := fmt.Sprintf("source %s/nvm.sh", nvmDir)
+
+	nvmNoUse := os.Getenv("NVM_NO_USE")
+	if nvmNoUse == "true" {
+		cmdline += " --no-use"
+	}
+
+	// Obtain the npm version
+	npmVersionCmd := exec.Command("bash", "-c", fmt.Sprintf("%s && npm --version", cmdline))
+	if err := checkNPMVersion(npmVersionCmd, ">= 6.x"); err != nil {
+		return nil, err
+	}
+
+	return exec.Command("bash", "-c", fmt.Sprintf("%s && npm install --package-lock-only --no-audit", cmdline)), nil
 }
