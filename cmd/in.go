@@ -22,7 +22,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/listendev/lstn/pkg/npm"
 	"github.com/listendev/lstn/pkg/validate"
 	"github.com/spf13/cobra"
@@ -72,7 +71,7 @@ to quickly create a Cobra application.`,
 			return fmt.Errorf("couldn't find all the dependencies as per package-lock.json file")
 		}
 
-		spew.Dump(packagesWithShasum)
+		// spew.Dump(packagesWithShasum)
 
 		return nil
 	},
