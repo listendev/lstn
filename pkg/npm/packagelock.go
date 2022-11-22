@@ -11,14 +11,14 @@ import (
 	"github.com/listendev/lstn/pkg/validate"
 )
 
-// GeneratePackageLock generates a package-lock.json by executing npm
+// generatePackageLock generates a package-lock.json by executing npm
 // against the package.json file in the dir directory.
 //
 // It returns the package-lock.json file as a byte array.
 //
 // It assumes that the input directory exists and it already contains
 // a package.json file.
-func GeneratePackageLock(dir string) ([]byte, error) {
+func generatePackageLock(dir string) ([]byte, error) {
 	// Get the npm executable
 	exe, err := getNPM()
 	if err != nil {
@@ -58,6 +58,11 @@ func GeneratePackageLock(dir string) ([]byte, error) {
 //
 // It checks that the npm version is >= 6.x too.
 func getNPM() (string, error) {
+	// Is it possible (also likely) that npm is lazyloaded (eg., nvm)
+	// In such a scenario we have to force its resolution
+
+	// FIXME > See the output of `which npm` on a clean shell when it is installed via nvm with lazy load on
+
 	// Check the system has the npm executable
 	exe, err := exec.LookPath("npm")
 	if err != nil {

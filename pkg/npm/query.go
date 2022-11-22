@@ -29,7 +29,7 @@ func errorOut(input error, format string, a ...any) error {
 
 // requestShasum queries the NPM registry to obtain the shasum of the input package version.
 // TODO > backoff/retry strategy?
-func requestShasum(ctx context.Context, name, version string) (*Package, error) {
+func requestShasum(ctx context.Context, name, version string) (*packageInfo, error) {
 	url := fmt.Sprintf("%s/%s/%s", npmRegistryBaseURL, name, version)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
@@ -49,5 +49,5 @@ func requestShasum(ctx context.Context, name, version string) (*Package, error) 
 		return nil, errorOut(err, "couldn't decode the NPM registry response")
 	}
 
-	return &Package{Shasum: ret.Dist.Shasum, Name: name, Version: version}, nil
+	return &packageInfo{shasum: ret.Dist.Shasum, name: name, version: version}, nil
 }
