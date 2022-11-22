@@ -57,20 +57,14 @@ to quickly create a Cobra application.`,
 			return fmt.Errorf("couldn't find a package.json in %s", targetDir)
 		}
 
-		// Get the package-lock.json file contents
-		packageLockJSONBytes, err := npm.GeneratePackageLock(targetDir)
-		if err != nil {
-			return err
-		}
-
 		// Unmarshal the package-lock.json file contents to a struct
-		packageLockJSON, err := npm.NewPackageLockJSONFrom(packageLockJSONBytes)
+		packageLockJSON, err := npm.NewPackageLockJSONFrom(targetDir)
 		if err != nil {
 			return err
 		}
 
 		ctx := context.Background()
-		packagesWithShasum, err := packageLockJSON.QueryShasums(ctx, time.Second*20)
+		packagesWithShasum, err := packageLockJSON.Shasums(ctx, time.Second*20)
 		if err != nil {
 			return err
 		}
@@ -79,10 +73,6 @@ to quickly create a Cobra application.`,
 		}
 
 		spew.Dump(packagesWithShasum)
-
-		// TODO > encode the package-lock.JSON in base64
-		// TODO > POST the endpoint
-		// TODO > show the results
 
 		return nil
 	},
