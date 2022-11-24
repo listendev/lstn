@@ -56,6 +56,20 @@ to quickly create a Cobra application.`,
 				return fmt.Errorf("couldn't obtain options for the in subcommand")
 			}
 
+			if errors := inOpts.Validate(); errors != nil {
+				ret := "invalid options"
+				for _, e := range errors {
+					ret += "\n       "
+					ret += e.Error()
+				}
+				return fmt.Errorf(ret)
+			}
+
+			// Transform the config options values
+			if err := inOpts.Transform(c.Context()); err != nil {
+				return err
+			}
+
 			// Obtain the target directory that we want to listen in
 			targetDir, err := getTargetDirectory(args)
 			if err != nil {
