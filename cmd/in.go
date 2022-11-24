@@ -22,6 +22,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
+	"github.com/listendev/lstn/pkg/listen"
 	"github.com/listendev/lstn/pkg/npm"
 	"github.com/listendev/lstn/pkg/validate"
 	"github.com/spf13/cobra"
@@ -43,7 +45,7 @@ to quickly create a Cobra application.`,
   lstn in sub/dir`,
 	Args:              validateInArgs, // Executes before RunE
 	ValidArgsFunction: activeHelpIn,
-	RunE: func(cmd *cobra.Command, args []string) error {
+	RunE: func(c *cobra.Command, args []string) error {
 		// Obtain the target directory that we want to listen in
 		targetDir, err := getTargetDirectory(args)
 		if err != nil {
@@ -71,7 +73,12 @@ to quickly create a Cobra application.`,
 			return fmt.Errorf("couldn't find all the dependencies as per package-lock.json file")
 		}
 
-		// spew.Dump(packagesWithShasum)
+		req := &listen.Request{
+			PackageLockJSON: packageLockJSON,
+			Packages:        packagesWithShasum,
+		}
+
+		spew.Dump(listen.Listen(ctx, req, true))
 
 		return nil
 	},
