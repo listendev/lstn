@@ -1,18 +1,20 @@
 package flags
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"reflect"
 
 	"github.com/creasty/defaults"
+	"github.com/listendev/lstn/pkg/transform"
 	"github.com/listendev/lstn/pkg/validate"
 )
 
 type ConfigOptions struct {
 	LogLevel string `default:"info" name:"log level" flag:"loglevel"`                     // TODO > validator
 	Timeout  int    `default:"60" name:"timeout" flag:"timeout" validate:"number,min=30"` // TODO ? make uint
-	Endpoint string `default:"http://127.0.0.1:3000" flag:"endpoint" name:"endpoint" validate:"url"`
+	Endpoint string `default:"http://127.0.0.1:3000" flag:"endpoint" name:"endpoint" validate:"url" transform:"tsuffix=/"`
 }
 
 func NewConfigOptions() *ConfigOptions {
@@ -39,6 +41,13 @@ func (o *ConfigOptions) Validate() []error {
 		return all
 	}
 
+	return nil
+}
+
+func (o *ConfigOptions) Transform(ctx context.Context) error {
+	if err := transform.Singleton.Struct(ctx, o); err != nil {
+		return fmt.Errorf("couldn't transform configuration options properly")
+	}
 	return nil
 }
 
