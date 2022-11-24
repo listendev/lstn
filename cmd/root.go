@@ -22,13 +22,12 @@ import (
 	"strings"
 
 	"github.com/listendev/lstn/cmd/flags"
+	"github.com/listendev/lstn/cmd/in"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 )
-
-const defaultCommand = "in"
 
 var (
 	cfgFile string
@@ -99,7 +98,7 @@ to quickly create a Cobra application.`,
 		if errors := cfgOpts.Validate(); errors != nil {
 			ret := "invalid configuration options/flags"
 			for _, e := range errors {
-				ret += "\n       --"
+				ret += "\n       "
 				ret += e.Error()
 			}
 			return fmt.Errorf(ret)
@@ -116,34 +115,23 @@ to quickly create a Cobra application.`,
 	// Run: func(cmd *cobra.Command, args []string) { },
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
+// Boot adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
-	// Fallback to the default subcommand when the user doesn't specify one explicitly.
-	c, _, err := rootCmd.Find(os.Args[1:])
-	if err == nil && c.Use == rootCmd.Use && c.Flags().Parse(os.Args[1:]) != pflag.ErrHelp {
-		args := append([]string{defaultCommand}, os.Args[1:]...)
-		rootCmd.SetArgs(args)
-	}
+func Boot() {
+	// Setup the context
+	ctx := context.Background()
 
-	err = rootCmd.Execute()
+	// Obtain the configuration options
+	cfgOpts, err := flags.NewConfigOptions()
 	if err != nil {
 		os.Exit(1)
 	}
-}
 
-func init() {
-	cfgOpts := flags.NewConfigOptions()
-
-	cobra.OnInitialize(initConfig)
-
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here, will be global for your application.
+	// Cobra supports persistent flags, which, if defined here, will be global to the whole application
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", cfgFile, "config file (default is $HOME/.lstn.yaml)")
 	rootCmd.MarkPersistentFlagFilename("config", "yaml")
 
-	// Cobra also supports local flags, which will only run when this action is called directly.
-	// TODO > Make these persistent?
+	// Cobra also supports local flags, which will only run when this action is called directly
 	rootCmd.PersistentFlags().StringVar(&cfgOpts.LogLevel, "loglevel", cfgOpts.LogLevel, "log level")
 	rootCmd.PersistentFlags().IntVar(&cfgOpts.Timeout, "timeout", cfgOpts.Timeout, "timeout in seconds")
 	rootCmd.PersistentFlags().StringVar(&cfgOpts.Endpoint, "endpoint", cfgOpts.Endpoint, "the listen.dev endpoint emitting the verdicts")
@@ -152,8 +140,31 @@ func init() {
 	viper.BindPFlags(rootCmd.Flags())
 
 	// Pass the configuration options through the context
-	ctx := context.WithValue(context.Background(), pkgcontext.ConfigKey, cfgOpts)
-	rootCmd.SetContext(ctx)
+	ctx = context.WithValue(ctx, pkgcontext.ConfigKey, cfgOpts)
+
+	// Setup the `in` subcommand
+	inCmd, err := in.New(ctx)
+	if err != nil {
+		os.Exit(1)
+	}
+	rootCmd.AddCommand(inCmd)
+
+	// Fallback to the default subcommand when the user doesn't specify one explicitly.
+	c, _, err := rootCmd.Find(os.Args[1:])
+	if err == nil && c.Use == rootCmd.Use && c.Flags().Parse(os.Args[1:]) != pflag.ErrHelp {
+		args := append([]string{inCmd.Name()}, os.Args[1:]...)
+		rootCmd.SetArgs(args)
+	}
+
+	// Time to listen!
+	err = rootCmd.ExecuteContext(ctx)
+	if err != nil {
+		os.Exit(1)
+	}
+}
+
+func init() {
+	cobra.OnInitialize(initConfig)
 }
 
 // initConfig reads in config file and ENV variables if set
@@ -179,7 +190,7 @@ func initConfig() {
 
 	// If a config file is found, read it in
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+		fmt.Fprintln(os.Stderr, "Using config file: ", viper.ConfigFileUsed())
 	} else {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 			// Config file not found, ignore...

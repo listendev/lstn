@@ -15,8 +15,10 @@ limitations under the License.
 */
 package main
 
-import "github.com/listendev/lstn/cmd"
+import (
+	"github.com/listendev/lstn/cmd"
+)
 
 func main() {
-	cmd.Execute()
+	cmd.Boot()
 }
