@@ -95,6 +95,7 @@ to quickly create a Cobra application.`,
 			}
 		})
 
+		// Validate the config options
 		if errors := cfgOpts.Validate(); errors != nil {
 			ret := "invalid configuration options/flags"
 			for _, e := range errors {
@@ -102,6 +103,11 @@ to quickly create a Cobra application.`,
 				ret += e.Error()
 			}
 			return fmt.Errorf(ret)
+		}
+
+		// Transform the config options values
+		if err := cfgOpts.Transform(c.Context()); err != nil {
+			return err
 		}
 
 		return nil
