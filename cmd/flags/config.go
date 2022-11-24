@@ -1,54 +1,56 @@
+/*
+Copyright © 2022 The listen.dev team <engineering@garnet.ai>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package flags
 
 import (
 	"context"
 	"fmt"
-	"log"
 	"reflect"
 
 	"github.com/creasty/defaults"
-	"github.com/listendev/lstn/pkg/transform"
-	"github.com/listendev/lstn/pkg/validate"
 )
 
 type ConfigOptions struct {
 	LogLevel string `default:"info" name:"log level" flag:"loglevel"`                     // TODO > validator
 	Timeout  int    `default:"60" name:"timeout" flag:"timeout" validate:"number,min=30"` // TODO ? make uint
 	Endpoint string `default:"http://127.0.0.1:3000" flag:"endpoint" name:"endpoint" validate:"url" transform:"tsuffix=/"`
+
+	baseOptions
 }
 
-func NewConfigOptions() *ConfigOptions {
+func NewConfigOptions() (*ConfigOptions, error) {
 	o := &ConfigOptions{}
 
 	if err := defaults.Set(o); err != nil {
-		log.Fatal("error setting configuration defaults")
+		return nil, fmt.Errorf("error setting configuration defaults")
 	}
 
-	return o
+	return o, nil
+}
+
+func (o *ConfigOptions) Validate() []error {
+	return o.baseOptions.Validate(o)
+}
+
+func (o *ConfigOptions) Transform(ctx context.Context) error {
+	return o.baseOptions.Transform(ctx, o)
 }
 
 func (o *ConfigOptions) GetField(name string) reflect.Value {
 	return reflect.ValueOf(o).Elem().FieldByName(name)
-}
-
-func (o *ConfigOptions) Validate() []error {
-	if err := validate.Singleton.Struct(o); err != nil {
-		all := []error{}
-		for _, e := range err.(validate.ValidationErrors) {
-			all = append(all, fmt.Errorf(e.Translate(validate.Translator)))
-		}
-
-		return all
-	}
-
-	return nil
-}
-
-func (o *ConfigOptions) Transform(ctx context.Context) error {
-	if err := transform.Singleton.Struct(ctx, o); err != nil {
-		return fmt.Errorf("couldn't transform configuration options properly")
-	}
-	return nil
 }
 
 func GetConfigFlagsNames() map[string]string {
