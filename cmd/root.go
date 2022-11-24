@@ -16,10 +16,12 @@ limitations under the License.
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strings"
 
+	"github.com/listendev/lstn/cmd/flags"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -27,7 +29,12 @@ import (
 
 const defaultCommand = "in"
 
-var cfgFile string
+var (
+	cfgFile   string
+	configKey contextKey = "cfg"
+)
+
+type contextKey string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -39,8 +46,69 @@ examples and usage of using your application. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
+	PersistentPreRunE: func(c *cobra.Command, args []string) error {
+		cfgOpts, ok := c.Context().Value(configKey).(*flags.ConfigOptions)
+		if !ok {
+			return fmt.Errorf("couldn't obtain configuration options")
+		}
+
+		// Obtain the mapping flag name -> struct field name
+		configFlagsNames := flags.GetConfigFlagsNames()
+		// Obtain the mapping flag name -> default value
+		configFlagsDefaults := flags.GetConfigFlagsDefaults()
+
+		c.Flags().VisitAll(func(f *pflag.Flag) {
+			flagName := f.Name
+			// Only for configuration flags...
+			fieldName, ok := configFlagsNames[flagName]
+			if ok {
+				v := cfgOpts.GetField(fieldName)
+				if v.IsValid() {
+					switch v.Interface().(type) {
+					case int:
+						// Store the flag value (it equals to the default when no flag)
+						flagValue, _ := c.Flags().GetInt(flagName)
+						// Set the value coming from environment variable or config file (viper)
+						value := viper.GetInt64(flagName)
+						if value != 0 && fmt.Sprintf("%d", value) != configFlagsDefaults[flagName] {
+							v.SetInt(value)
+						}
+						// Flag value takes precedence nevertheless
+						// Re-set the field when the flag value was not equal to the default value
+						if fmt.Sprintf("%d", flagValue) != configFlagsDefaults[flagName] {
+							v.SetInt(int64(flagValue))
+						}
+					case string:
+						// Store the flag value (it equals to the default when no flag)
+						flagValue, _ := c.Flags().GetString(flagName)
+						// Set the value coming from environment variable or config file (viper)
+						value := viper.GetString(flagName)
+						if value != "" && value != configFlagsDefaults[flagName] {
+							v.SetString(value)
+						}
+						// Flag value takes precedence nevertheless
+						// Re-set the field when the flag value was not equal to the default value
+						if flagValue != configFlagsDefaults[flagName] {
+							v.SetString(flagValue)
+						}
+					default:
+					}
+				}
+			}
+		})
+
+		if errors := cfgOpts.Validate(); errors != nil {
+			ret := "invalid configuration options/flags"
+			for _, e := range errors {
+				ret += "\n       --"
+				ret += e.Error()
+			}
+			return fmt.Errorf(ret)
+		}
+
+		return nil
+	},
+	// Uncomment the following line if your application has an action associated with it
 	// Run: func(cmd *cobra.Command, args []string) { },
 }
 
@@ -61,31 +129,42 @@ func Execute() {
 }
 
 func init() {
+	cfgOpts := flags.NewConfigOptions()
+
 	cobra.OnInitialize(initConfig)
 
 	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
+	// Cobra supports persistent flags, which, if defined here, will be global for your application.
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", cfgFile, "config file (default is $HOME/.lstn.yaml)")
+	rootCmd.MarkPersistentFlagFilename("config", "yaml")
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.lstn.yaml)")
+	// Cobra also supports local flags, which will only run when this action is called directly.
+	// TODO > Make these persistent?
+	rootCmd.PersistentFlags().StringVar(&cfgOpts.LogLevel, "loglevel", cfgOpts.LogLevel, "log level")
+	rootCmd.PersistentFlags().IntVar(&cfgOpts.Timeout, "timeout", cfgOpts.Timeout, "timeout in seconds")
+	rootCmd.PersistentFlags().StringVar(&cfgOpts.Endpoint, "endpoint", cfgOpts.Endpoint, "the listen.dev endpoint emitting the verdicts")
 
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	// rootCmd.Flags().BoolP("example", "e", false, "Help message for example")
+	// Tell viper to populate variables from the configuration file
+	viper.BindPFlags(rootCmd.Flags())
+
+	// Pass the configuration options through the context
+	ctx := context.WithValue(context.Background(), configKey, cfgOpts)
+	rootCmd.SetContext(ctx)
 }
 
-// initConfig reads in config file and ENV variables if set.
+// initConfig reads in config file and ENV variables if set
 func initConfig() {
 	if cfgFile != "" {
-		// Use config file from the flag.
+		// Use config file from the flag
 		viper.SetConfigFile(cfgFile)
 	} else {
-		// Find home directory.
+		// Find home directory
 		home, err := os.UserHomeDir()
 		cobra.CheckErr(err)
 
-		// Search config in home directory with name ".lstn" (without extension).
+		// Search config in home directory with name ".lstn" (without extension)
 		viper.AddConfigPath(home)
+		// TODO > Add current working directory as config path too?
 		viper.SetConfigType("yaml")
 		viper.SetConfigName(".lstn")
 	}
@@ -94,8 +173,16 @@ func initConfig() {
 	viper.SetEnvPrefix("lstn")
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 
-	// If a config file is found, read it in.
+	// If a config file is found, read it in
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+	} else {
+		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
+			// Config file not found, ignore...
+			fmt.Fprintln(os.Stderr, "Running without a configuration file")
+		} else {
+			// Config file was found but another error was produced
+			fmt.Fprintf(os.Stderr, "Error running with config file: %s\n", viper.ConfigFileUsed())
+		}
 	}
 }
