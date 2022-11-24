@@ -16,7 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -46,6 +45,7 @@ to quickly create a Cobra application.`,
 	Args:              validateInArgs, // Executes before RunE
 	ValidArgsFunction: activeHelpIn,
 	RunE: func(c *cobra.Command, args []string) error {
+		ctx := c.Context()
 		// Obtain the target directory that we want to listen in
 		targetDir, err := getTargetDirectory(args)
 		if err != nil {
@@ -64,7 +64,6 @@ to quickly create a Cobra application.`,
 			return err
 		}
 
-		ctx := context.Background()
 		packagesWithShasum, err := packageLockJSON.Shasums(ctx, time.Second*20)
 		if err != nil {
 			return err

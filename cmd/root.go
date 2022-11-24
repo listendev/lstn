@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"github.com/listendev/lstn/cmd/flags"
+	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -30,11 +31,8 @@ import (
 const defaultCommand = "in"
 
 var (
-	cfgFile   string
-	configKey contextKey = "cfg"
+	cfgFile string
 )
-
-type contextKey string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -47,7 +45,7 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	PersistentPreRunE: func(c *cobra.Command, args []string) error {
-		cfgOpts, ok := c.Context().Value(configKey).(*flags.ConfigOptions)
+		cfgOpts, ok := c.Context().Value(pkgcontext.ConfigKey).(*flags.ConfigOptions)
 		if !ok {
 			return fmt.Errorf("couldn't obtain configuration options")
 		}
@@ -148,7 +146,7 @@ func init() {
 	viper.BindPFlags(rootCmd.Flags())
 
 	// Pass the configuration options through the context
-	ctx := context.WithValue(context.Background(), configKey, cfgOpts)
+	ctx := context.WithValue(context.Background(), pkgcontext.ConfigKey, cfgOpts)
 	rootCmd.SetContext(ctx)
 }
 
