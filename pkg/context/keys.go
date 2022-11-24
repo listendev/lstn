@@ -19,3 +19,6 @@ type contextKey string
 
 // ConfigKey is the key indexing the configuration options in the contexts
 var ConfigKey contextKey = "cfg"
+
+// InKey is the key indexing the options/flags for the in subcommand
+var InKey contextKey = "in"

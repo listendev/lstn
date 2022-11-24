@@ -13,88 +13,103 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package cmd
+package in
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
+	"github.com/listendev/lstn/cmd/flags"
+	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/listendev/lstn/pkg/npm"
 	"github.com/listendev/lstn/pkg/validate"
 	"github.com/spf13/cobra"
 )
 
-// inCmd represents the in subcommand
-var inCmd = &cobra.Command{
-	Use:   "in",
-	Short: "Inspect your dependencies",
-	Long: `A longer description that spans multiple lines and likely contains examples
+func New(ctx context.Context) (*cobra.Command, error) {
+	var inCmd = &cobra.Command{
+		Use:   "in",
+		Short: "Inspect your dependencies",
+		Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Example: `  lstn in
+		Example: `  lstn in
   lstn in .
   lstn in /we/snitch
   lstn in sub/dir`,
-	Args:              validateInArgs, // Executes before RunE
-	ValidArgsFunction: activeHelpIn,
-	RunE: func(c *cobra.Command, args []string) error {
-		ctx := c.Context()
-		// Obtain the target directory that we want to listen in
-		targetDir, err := getTargetDirectory(args)
-		if err != nil {
-			return fmt.Errorf("couldn't get to know on which directory you want me to listen in")
-		}
-		// Check that the target directory contains a package.json file
-		packageJSONErrors := validate.Singleton.Var(filepath.Join(targetDir, "package.json"), "file")
-		// NOTE > In the future, we can try to detect other package managers here rather than erroring out
-		if packageJSONErrors != nil {
-			return fmt.Errorf("couldn't find a package.json in %s", targetDir)
-		}
+		Args:              validateInArgs, // Executes before RunE
+		ValidArgsFunction: activeHelpIn,
+		RunE: func(c *cobra.Command, args []string) error {
+			ctx := c.Context()
 
-		// Unmarshal the package-lock.json file contents to a struct
-		packageLockJSON, err := npm.NewPackageLockJSONFrom(targetDir)
-		if err != nil {
-			return err
-		}
+			// Obtain the local options from the context
+			inOpts, ok := ctx.Value(pkgcontext.InKey).(*flags.InOptions)
+			if !ok {
+				return fmt.Errorf("couldn't obtain options for the in subcommand")
+			}
 
-		packagesWithShasum, err := packageLockJSON.Shasums(ctx, time.Second*20)
-		if err != nil {
-			return err
-		}
-		if len(packagesWithShasum) != len(packageLockJSON.Deps()) {
-			return fmt.Errorf("couldn't find all the dependencies as per package-lock.json file")
-		}
+			// Obtain the target directory that we want to listen in
+			targetDir, err := getTargetDirectory(args)
+			if err != nil {
+				return fmt.Errorf("couldn't get to know on which directory you want me to listen in")
+			}
+			// Check that the target directory contains a package.json file
+			packageJSONErrors := validate.Singleton.Var(filepath.Join(targetDir, "package.json"), "file")
+			// NOTE > In the future, we can try to detect other package managers here rather than erroring out
+			if packageJSONErrors != nil {
+				return fmt.Errorf("couldn't find a package.json in %s", targetDir)
+			}
 
-		req := &listen.Request{
-			PackageLockJSON: packageLockJSON,
-			Packages:        packagesWithShasum,
-		}
+			// Unmarshal the package-lock.json file contents to a struct
+			packageLockJSON, err := npm.NewPackageLockJSONFrom(targetDir)
+			if err != nil {
+				return err
+			}
 
-		spew.Dump(listen.Listen(ctx, req, true))
+			packagesWithShasum, err := packageLockJSON.Shasums(ctx, time.Second*20)
+			if err != nil {
+				return err
+			}
+			if len(packagesWithShasum) != len(packageLockJSON.Deps()) {
+				return fmt.Errorf("couldn't find all the dependencies as per package-lock.json file")
+			}
 
-		return nil
-	},
-}
+			req := &listen.Request{
+				PackageLockJSON: packageLockJSON,
+				Packages:        packagesWithShasum,
+			}
 
-func init() {
-	rootCmd.AddCommand(inCmd)
+			spew.Dump(listen.Listen(ctx, req, inOpts.Json))
 
-	// Here you will define your flags and configuration settings.
+			return nil
+		},
+	}
 
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
+	// Obtain the local options
+	inOpts, err := flags.NewInOptions()
+	if err != nil {
+		return nil, err
+	}
+
+	// Persistent flags here will work for this command and all subcommands
 	// inCmd.PersistentFlags().String("foo", "", "A help for foo")
 
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// inCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// Local flags will only run when this command is called directly
+	inCmd.Flags().BoolVar(&inOpts.Json, "json", inOpts.Json, "output the verdicts in JSON form")
+
+	// Pass the configuration options through the context
+	ctx = context.WithValue(ctx, pkgcontext.InKey, inOpts)
+	inCmd.SetContext(ctx)
+
+	return inCmd, nil
 }
 
 // getTargetDirectory computes the absolute
