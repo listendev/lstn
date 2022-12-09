@@ -39,7 +39,7 @@ func Listen(ctx context.Context, r *Request, rawResponseOnly bool) (*Response, [
 	}
 	// Everything in the context has been already validated
 	// So we assume it's safe to do not validate it again
-	endpointURL := fmt.Sprintf("%s/api/analyse/npm", cfgOpts.Endpoint)
+	endpointURL := fmt.Sprintf("%s/api/analyse/npm?verbose=true", cfgOpts.Endpoint)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpointURL, bytes.NewBuffer(pl))
 	if err != nil {
@@ -49,13 +49,25 @@ func Listen(ctx context.Context, r *Request, rawResponseOnly bool) (*Response, [
 	req.Header.Set("Accept", "application/json")
 
 	client := http.Client{}
-
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, nil, err
 	}
 	defer res.Body.Close()
 
+	dec := json.NewDecoder(res.Body)
+
+	// Bail out if status != 200
+	if res.StatusCode != http.StatusOK {
+		target := &responseError{}
+		if err := dec.Decode(target); err != nil {
+			return nil, nil, err
+		}
+		// For target.Reason to have a value the verbose query param above needs to be true
+		return nil, nil, fmt.Errorf(target.Reason.Message)
+	}
+
+	// Return the JSON body
 	if rawResponseOnly {
 		b, err := io.ReadAll(res.Body)
 		if err != nil {
@@ -64,10 +76,10 @@ func Listen(ctx context.Context, r *Request, rawResponseOnly bool) (*Response, [
 		return nil, b, nil
 	}
 
+	// Unmarshal the JSON body into a Response
 	target := &Response{}
-	if err := json.NewDecoder(res.Body).Decode(target); err != nil {
+	if err := dec.Decode(target); err != nil {
 		return nil, nil, err
 	}
-
 	return target, nil, nil
 }

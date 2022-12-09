@@ -129,7 +129,7 @@ to quickly create a Cobra application.`,
 	// inCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Local flags will only run when this command is called directly
-	inCmd.Flags().BoolVar(&inOpts.Json, "json", inOpts.Json, "output the verdicts in JSON form")
+	inCmd.Flags().BoolVar(&inOpts.Json, "json", inOpts.Json, "output the possible verdicts in JSON form")
 
 	// Pass the configuration options through the context
 	ctx = context.WithValue(ctx, pkgcontext.InKey, inOpts)
