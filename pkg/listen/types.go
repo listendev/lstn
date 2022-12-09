@@ -42,22 +42,24 @@ func (req *Request) MarshalJSON() ([]byte, error) {
 }
 
 type Verdict struct {
-	Name    string
-	Message string
-	Data    map[string]string
+	Message         string            `json:"message"`
+	Priority        string            `json:"priority"`
+	PackageMetadata map[string]string `json:"package_metadata"`
+	ProcessMetadata map[string]string `json:"process_metadata"`
 }
 
-type Message struct {
-	Reason  uint8
-	Message string
+type Problem struct {
+	Type   string `json:"type"`
+	Title  string `json:"title"`
+	Detail string `json:"detail"`
 }
 
 type Package struct {
-	npm.Package
-	Name     string
-	Results  bool
+	Name     string    `json:"name"`
+	Version  string    `json:"version"`
+	Shasum   string    `json:"shasum"`
 	Verdicts []Verdict `json:"verdicts,omitempty"`
-	Messages []Message `json:"messages,omitempty"`
+	Problems []Problem `json:"problems,omitempty"`
 }
 
 type Response []Package
@@ -65,10 +67,4 @@ type Response []Package
 type Error struct {
 	Message   string
 	RequestID string `json:"request_id"`
-	Reason    struct {
-		Message string
-		Reason  string
-		Name    string
-		npm.Package
-	}
 }
