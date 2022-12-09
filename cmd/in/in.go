@@ -101,7 +101,19 @@ to quickly create a Cobra application.`,
 				Packages:        packagesWithShasum,
 			}
 
-			spew.Dump(listen.Listen(ctx, req, inOpts.Json))
+			res, resJSON, err := listen.Listen(ctx, req, inOpts.Json)
+			if err != nil {
+				return err
+			}
+
+			if inOpts.Json && resJSON != nil {
+				fmt.Println(string(resJSON))
+			}
+
+			if !inOpts.Json && res != nil {
+				spew.Dump(res)
+				// TODO > create visualization of the results
+			}
 
 			return nil
 		},
