@@ -44,8 +44,8 @@ func (req *Request) MarshalJSON() ([]byte, error) {
 type Verdict struct {
 	Message         string            `json:"message"`
 	Priority        string            `json:"priority"`
-	PackageMetadata map[string]string `json:"package_metadata"`
-	ProcessMetadata map[string]string `json:"process_metadata"`
+	PackageMetadata map[string]string `json:"package_metadata,omitempty"`
+	ProcessMetadata map[string]string `json:"process_metadata,omitempty"`
 }
 
 type Problem struct {
