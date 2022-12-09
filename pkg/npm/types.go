@@ -43,8 +43,8 @@ type PackageLockDependency struct {
 }
 
 type Package struct {
-	Version string
-	Shasum  string
+	Version string `json:"version"`
+	Shasum  string `json:"shasum"`
 }
 
 type Packages map[string]Package
