@@ -23,6 +23,7 @@ import (
 
 	"github.com/listendev/lstn/cmd/flags"
 	"github.com/listendev/lstn/cmd/in"
+	"github.com/listendev/lstn/cmd/to"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -148,6 +149,13 @@ func Boot() {
 		os.Exit(1)
 	}
 	rootCmd.AddCommand(inCmd)
+
+	// Setup the `to` subcommand
+	toCmd, err := to.New(ctx)
+	if err != nil {
+		os.Exit(1)
+	}
+	rootCmd.AddCommand(toCmd)
 
 	// Fallback to the default subcommand when the user doesn't specify one explicitly.
 	c, _, err := rootCmd.Find(os.Args[1:])
