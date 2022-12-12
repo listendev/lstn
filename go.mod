@@ -11,6 +11,7 @@ require (
 	github.com/go-playground/mold/v4 v4.2.0
 	github.com/go-playground/universal-translator v0.18.0
 	github.com/go-playground/validator/v10 v10.11.1
+	github.com/google/go-querystring v1.1.0
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.14.0
