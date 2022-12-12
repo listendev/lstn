@@ -21,23 +21,46 @@ import (
 	"github.com/listendev/lstn/pkg/npm"
 )
 
-type Request struct {
+type VerdictsRequest struct {
+	Name    string `url:"n"`
+	Version string `url:"v,omitempty"`
+	Shasum  string `url:"s,omitempty"`
+}
+
+func NewVerdictsRequest(args []string) *VerdictsRequest {
+	ret := &VerdictsRequest{}
+
+	switch len(args) {
+	case 3:
+		ret.Shasum = args[2]
+		fallthrough
+	case 2:
+		ret.Version = args[1]
+		fallthrough
+	case 1:
+		ret.Name = args[0]
+	}
+
+	return ret
+}
+
+type AnalysisRequest struct {
 	PackageLockJSON npm.PackageLockJSON `json:"package-lock.json"`
 	Packages        npm.Packages        `json:"packages"`
 	Context         string              `json:"context"` // TODO > define
 }
 
 // MarshalJSON is a custom marshaler that encodes the
-// content of the package lock in the receiving Request.
-func (req *Request) MarshalJSON() ([]byte, error) {
-	type RequestAlias Request
+// content of the package lock in the receiving AnalysisRequest.
+func (req *AnalysisRequest) MarshalJSON() ([]byte, error) {
+	type AnalysisRequestAlias AnalysisRequest
 
 	return json.Marshal(&struct {
 		PackageLockJSON string `json:"package-lock.json"`
-		*RequestAlias
+		*AnalysisRequestAlias
 	}{
-		PackageLockJSON: req.PackageLockJSON.Encode(),
-		RequestAlias:    (*RequestAlias)(req),
+		PackageLockJSON:      req.PackageLockJSON.Encode(),
+		AnalysisRequestAlias: (*AnalysisRequestAlias)(req),
 	})
 }
 
