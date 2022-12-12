@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/listendev/lstn/cmd/flags"
 	"github.com/listendev/lstn/cmd/in"
@@ -54,7 +55,7 @@ to quickly create a Cobra application.`,
 		configFlagsNames := flags.GetConfigFlagsNames()
 		// Obtain the mapping flag name -> default value
 		configFlagsDefaults := flags.GetConfigFlagsDefaults()
-
+		// Implement flag precedence over environment variables, over configuration file
 		c.Flags().VisitAll(func(f *pflag.Flag) {
 			flagName := f.Name
 			// Only for configuration flags...
@@ -109,6 +110,21 @@ to quickly create a Cobra application.`,
 		if err := cfgOpts.Transform(c.Context()); err != nil {
 			return err
 		}
+
+		// Set the context with the actual configuration values
+		ctx, cancel := context.WithTimeout(c.Context(), time.Second*time.Duration(cfgOpts.Timeout))
+		ctx = context.WithValue(ctx, pkgcontext.ContextCancelFuncKey, cancel)
+		c.SetContext(ctx)
+
+		return nil
+	},
+	PersistentPostRunE: func(c *cobra.Command, args []string) error {
+		contextCancel, ok := c.Context().Value(pkgcontext.ContextCancelFuncKey).(context.CancelFunc)
+		if !ok {
+			return fmt.Errorf("couldn't obtain configuration options")
+		}
+
+		defer contextCancel()
 
 		return nil
 	},

@@ -20,6 +20,9 @@ type contextKey string
 // ConfigKey is the key indexing the configuration options in the contexts
 var ConfigKey contextKey = "cfg"
 
+// ContextCancelFuncKey is the key indexing the context cancelation function in the context itself
+var ContextCancelFuncKey contextKey = "ctxcancel"
+
 // InKey is the key indexing the options/flags for the in subcommand
 var InKey contextKey = "in"
 

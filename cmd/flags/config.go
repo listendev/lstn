@@ -24,8 +24,8 @@ import (
 )
 
 type ConfigOptions struct {
-	LogLevel string `default:"info" name:"log level" flag:"loglevel"`                     // TODO > validator
-	Timeout  int    `default:"60" name:"timeout" flag:"timeout" validate:"number,min=30"` // TODO ? make uint
+	LogLevel string `default:"info" name:"log level" flag:"loglevel"` // TODO > validator
+	Timeout  int    `default:"60" name:"timeout" flag:"timeout" validate:"number,min=30"`
 	Endpoint string `default:"http://127.0.0.1:3000" flag:"endpoint" name:"endpoint" validate:"url" transform:"tsuffix=/"`
 
 	baseOptions
