@@ -23,24 +23,34 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/google/go-querystring/query"
 	"github.com/listendev/lstn/cmd/flags"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 )
 
-func Listen(ctx context.Context, r *Request, rawResponseOnly bool) (*Response, []byte, error) {
+func getBaseURLFromContext(ctx context.Context) (string, error) {
+	cfgOpts, ok := ctx.Value(pkgcontext.ConfigKey).(*flags.ConfigOptions)
+	if !ok {
+		return "", fmt.Errorf("couldn't obtain configuration options")
+	}
+	// Everything in the context has been already validated
+	// So we assume it's safe to do not validate it again
+	return cfgOpts.Endpoint, nil
+}
+
+func PackageLockAnalysis(ctx context.Context, r *AnalysisRequest, rawResponseOnly bool) (*Response, []byte, error) {
+	// Obtain the endpoint base URL
+	baseURL, err := getBaseURLFromContext(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	endpointURL := fmt.Sprintf("%s/api/analyse/npm?verbose=true", baseURL)
+
+	// Prepare the request
 	pl, err := json.Marshal(r)
 	if err != nil {
 		return nil, nil, err
 	}
-
-	cfgOpts, ok := ctx.Value(pkgcontext.ConfigKey).(*flags.ConfigOptions)
-	if !ok {
-		return nil, nil, fmt.Errorf("couldn't obtain configuration options")
-	}
-	// Everything in the context has been already validated
-	// So we assume it's safe to do not validate it again
-	endpointURL := fmt.Sprintf("%s/api/analyse/npm?verbose=true", cfgOpts.Endpoint)
-
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpointURL, bytes.NewBuffer(pl))
 	if err != nil {
 		return nil, nil, err
@@ -48,6 +58,7 @@ func Listen(ctx context.Context, r *Request, rawResponseOnly bool) (*Response, [
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 
+	// Send the request
 	client := http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
@@ -81,5 +92,65 @@ func Listen(ctx context.Context, r *Request, rawResponseOnly bool) (*Response, [
 	if err := dec.Decode(target); err != nil {
 		return nil, nil, err
 	}
+
+	return target, nil, nil
+}
+
+func PackageVerdicts(ctx context.Context, r *VerdictsRequest, rawResponseOnly bool) (*Package, []byte, error) {
+	// Obtain the endpoint base URL
+	baseURL, err := getBaseURLFromContext(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	endpointURL := fmt.Sprintf("%s/api/verdicts/npm", baseURL) // TODO > verbose queryparam too
+
+	// Prepare the request
+	val, err := query.Values(r)
+	if err != nil {
+		return nil, nil, err
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpointURL, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
+	req.URL.RawQuery = val.Encode()
+
+	// Send the request
+	client := http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer res.Body.Close()
+
+	dec := json.NewDecoder(res.Body)
+
+	// Bail out if status != 200
+	if res.StatusCode != http.StatusOK {
+		target := &responseError{}
+		if err := dec.Decode(target); err != nil {
+			return nil, nil, err
+		}
+		// For target.Reason to have a value the verbose query param above needs to be true
+		return nil, nil, fmt.Errorf(target.Reason.Message)
+	}
+
+	// Return the JSON body
+	if rawResponseOnly {
+		b, err := io.ReadAll(res.Body)
+		if err != nil {
+			return nil, nil, err
+		}
+		return nil, b, nil
+	}
+
+	// Unmarshal the JSON body into a Response
+	target := &Package{}
+	if err := dec.Decode(target); err != nil {
+		return nil, nil, err
+	}
+
 	return target, nil, nil
 }
