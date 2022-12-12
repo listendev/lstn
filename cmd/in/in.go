@@ -34,7 +34,7 @@ import (
 func New(ctx context.Context) (*cobra.Command, error) {
 	var inCmd = &cobra.Command{
 		Use:   "in",
-		Short: "Inspect your dependencies",
+		Short: "Inspect the verdicts of your dependencies",
 		Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
@@ -51,23 +51,13 @@ to quickly create a Cobra application.`,
 			ctx := c.Context()
 
 			// Obtain the local options from the context
-			inOpts, ok := ctx.Value(pkgcontext.InKey).(*flags.InOptions)
-			if !ok {
-				return fmt.Errorf("couldn't obtain options for the in subcommand")
-			}
-
-			if errors := inOpts.Validate(); errors != nil {
-				ret := "invalid options"
-				for _, e := range errors {
-					ret += "\n       "
-					ret += e.Error()
-				}
-				return fmt.Errorf(ret)
-			}
-
-			// Transform the config options values
-			if err := inOpts.Transform(c.Context()); err != nil {
+			opts, err := pkgcontext.GetOptionsFromContext(ctx, pkgcontext.InKey)
+			if err != nil {
 				return err
+			}
+			inOpts, ok := opts.(*flags.InOptions)
+			if !ok {
+				return fmt.Errorf("couldn't obtain options for the current subcommand")
 			}
 
 			// Obtain the target directory that we want to listen in
@@ -96,12 +86,13 @@ to quickly create a Cobra application.`,
 				return fmt.Errorf("couldn't find all the dependencies as per package-lock.json file")
 			}
 
-			req := &listen.Request{
+			// Ask listen.dev for an analysis
+			req := &listen.AnalysisRequest{
 				PackageLockJSON: packageLockJSON,
 				Packages:        packagesWithShasum,
 			}
 
-			res, resJSON, err := listen.Listen(ctx, req, inOpts.Json)
+			res, resJSON, err := listen.PackageLockAnalysis(ctx, req, inOpts.Json)
 			if err != nil {
 				return err
 			}
@@ -129,7 +120,7 @@ to quickly create a Cobra application.`,
 	// inCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Local flags will only run when this command is called directly
-	inCmd.Flags().BoolVar(&inOpts.Json, "json", inOpts.Json, "output the possible verdicts in JSON form")
+	inCmd.Flags().BoolVar(&inOpts.Json, "json", inOpts.Json, "output the verdicts (if any) in JSON form")
 
 	// Pass the configuration options through the context
 	ctx = context.WithValue(ctx, pkgcontext.InKey, inOpts)
