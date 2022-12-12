@@ -22,3 +22,6 @@ var ConfigKey contextKey = "cfg"
 
 // InKey is the key indexing the options/flags for the in subcommand
 var InKey contextKey = "in"
+
+// ToKey is the key indexing the options/flags for the in subcommand
+var ToKey contextKey = "to"
