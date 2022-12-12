@@ -19,7 +19,6 @@ import (
 	"context"
 	"runtime"
 	"sync"
-	"time"
 )
 
 type dep struct {
@@ -125,15 +124,12 @@ func (deps depsFlow) each(ctx context.Context, numWorkers int, fn eachDepCallbac
 //
 // It early exits in case the timeout was exceeded, the context got cancelled,
 // or when one query was not successful.
-func (p *packageLockJSON) Shasums(ctx context.Context, timeout time.Duration) (Packages, error) {
-	ctx, cancel := context.WithTimeout(ctx, timeout)
-	defer cancel()
-
+func (p *packageLockJSON) Shasums(ctx context.Context) (Packages, error) {
 	// Concurrently run queries over the CPUs
 	resultsChannel := p.
 		produceDependencies().
 		each(ctx, runtime.NumCPU(), func(name, version string) (*packageInfo, error) {
-			// NOTE > can call cancel() here if you wanna stop the process
+			// NOTE > can call the context cancel here if you wanna explicitly stop the process for some reason
 			return requestShasum(ctx, name, version)
 		})
 

@@ -19,7 +19,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
 )
 
 type packageLockJSON struct {
@@ -32,7 +31,7 @@ type packageLockJSON struct {
 }
 
 type PackageLockJSON interface {
-	Shasums(ctx context.Context, timeout time.Duration) (Packages, error)
+	Shasums(ctx context.Context) (Packages, error)
 	Deps() map[string]PackageLockDependency
 	Encode() string
 }
@@ -56,12 +55,12 @@ func NewPackageLockJSON() PackageLockJSON {
 }
 
 // NewPackageLockJSONFrom creates a PackageLockJSON instance from the package.json in the dir directory (if any).
-func NewPackageLockJSONFrom(dir string) (PackageLockJSON, error) {
+func NewPackageLockJSONFrom(ctx context.Context, dir string) (PackageLockJSON, error) {
 	var err error
 	ret := &packageLockJSON{}
 
 	// Get the package-lock.json file contents
-	ret.bytes, err = generatePackageLock(dir)
+	ret.bytes, err = generatePackageLock(ctx, dir)
 	if err != nil {
 		return nil, err
 	}

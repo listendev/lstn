@@ -17,6 +17,7 @@ package npm
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -33,12 +34,12 @@ import (
 //
 // It assumes that the input directory exists and it already contains
 // a package.json file.
-func generatePackageLock(dir string) ([]byte, error) {
+func generatePackageLock(ctx context.Context, dir string) ([]byte, error) {
 	// Get the npm command
-	npmPackageLockOnly, err := getNPMPackageLockOnly()
+	npmPackageLockOnly, err := getNPMPackageLockOnly(ctx)
 	if err != nil {
 		// Fallback to npm via nvm
-		npmPackageLockOnlyFromNVM, nvmErr := getNPMPackageLockOnlyFromNVM()
+		npmPackageLockOnlyFromNVM, nvmErr := getNPMPackageLockOnlyFromNVM(ctx)
 		if nvmErr != nil {
 			// FIXME > return more errors or a generic one
 			return []byte{}, err
@@ -110,19 +111,19 @@ func checkNPMVersion(c *exec.Cmd, constraint string) error {
 // It also checks that:
 // - the npm executable is available in the PATH
 // - its version is greater or equal than version "6.x".
-func getNPMPackageLockOnly() (*exec.Cmd, error) {
+func getNPMPackageLockOnly(ctx context.Context) (*exec.Cmd, error) {
 	// Check the system has the npm executable
 	exe, err := exec.LookPath("npm")
 	if err != nil {
 		return nil, fmt.Errorf("couldn't find the npm executable in the PATH")
 	}
 
-	npmVersionCmd := exec.Command(exe, "--version")
+	npmVersionCmd := exec.CommandContext(ctx, exe, "--version")
 	if err := checkNPMVersion(npmVersionCmd, ">= 6.x"); err != nil {
 		return nil, err
 	}
 
-	return exec.Command(exe, "install", "--package-lock-only", "--no-audit"), nil
+	return exec.CommandContext(ctx, exe, "install", "--package-lock-only", "--no-audit"), nil
 }
 
 // getNPMPackageLockOnlyFromNVM return the command to generate the package-lock.json file
@@ -132,7 +133,7 @@ func getNPMPackageLockOnly() (*exec.Cmd, error) {
 //
 // It also checks that:
 // - the npm version is greater or equal than version "6.x".
-func getNPMPackageLockOnlyFromNVM() (*exec.Cmd, error) {
+func getNPMPackageLockOnlyFromNVM(ctx context.Context) (*exec.Cmd, error) {
 	nvmDir := os.Getenv("NVM_DIR")
 	if nvmDir == "" {
 		return nil, fmt.Errorf("couldn't detect the nvm directory")
@@ -146,10 +147,10 @@ func getNPMPackageLockOnlyFromNVM() (*exec.Cmd, error) {
 	}
 
 	// Obtain the npm version
-	npmVersionCmd := exec.Command("bash", "-c", fmt.Sprintf("%s && npm --version", cmdline))
+	npmVersionCmd := exec.CommandContext(ctx, "bash", "-c", fmt.Sprintf("%s && npm --version", cmdline))
 	if err := checkNPMVersion(npmVersionCmd, ">= 6.x"); err != nil {
 		return nil, err
 	}
 
-	return exec.Command("bash", "-c", fmt.Sprintf("%s && npm install --package-lock-only --no-audit", cmdline)), nil
+	return exec.CommandContext(ctx, "bash", "-c", fmt.Sprintf("%s && npm install --package-lock-only --no-audit", cmdline)), nil
 }

@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/listendev/lstn/cmd/flags"
@@ -73,12 +72,12 @@ to quickly create a Cobra application.`,
 			}
 
 			// Unmarshal the package-lock.json file contents to a struct
-			packageLockJSON, err := npm.NewPackageLockJSONFrom(targetDir)
+			packageLockJSON, err := npm.NewPackageLockJSONFrom(ctx, targetDir)
 			if err != nil {
 				return err
 			}
 
-			packagesWithShasum, err := packageLockJSON.Shasums(ctx, time.Second*20)
+			packagesWithShasum, err := packageLockJSON.Shasums(ctx)
 			if err != nil {
 				return err
 			}
