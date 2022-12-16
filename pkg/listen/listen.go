@@ -44,7 +44,7 @@ func PackageLockAnalysis(ctx context.Context, r *AnalysisRequest, rawResponseOnl
 	if err != nil {
 		return nil, nil, err
 	}
-	endpointURL := fmt.Sprintf("%s/api/analyse/npm?verbose=true", baseURL)
+	endpointURL := fmt.Sprintf("%s/api/analyse/npm", baseURL)
 
 	// Prepare the request
 	pl, err := json.Marshal(r)
@@ -75,7 +75,7 @@ func PackageLockAnalysis(ctx context.Context, r *AnalysisRequest, rawResponseOnl
 			return nil, nil, err
 		}
 		// For target.Reason to have a value the verbose query param above needs to be true
-		return nil, nil, fmt.Errorf(target.Reason.Message)
+		return nil, nil, fmt.Errorf(target.Message)
 	}
 
 	// Return the JSON body
@@ -96,13 +96,13 @@ func PackageLockAnalysis(ctx context.Context, r *AnalysisRequest, rawResponseOnl
 	return target, nil, nil
 }
 
-func PackageVerdicts(ctx context.Context, r *VerdictsRequest, rawResponseOnly bool) (*Package, []byte, error) {
+func PackageVerdicts(ctx context.Context, r *VerdictsRequest, rawResponseOnly bool) (*Response, []byte, error) {
 	// Obtain the endpoint base URL
 	baseURL, err := getBaseURLFromContext(ctx)
 	if err != nil {
 		return nil, nil, err
 	}
-	endpointURL := fmt.Sprintf("%s/api/verdicts/npm", baseURL) // TODO > verbose queryparam too
+	endpointURL := fmt.Sprintf("%s/api/verdicts/npm", baseURL)
 
 	// Prepare the request
 	val, err := query.Values(r)
@@ -134,7 +134,7 @@ func PackageVerdicts(ctx context.Context, r *VerdictsRequest, rawResponseOnly bo
 			return nil, nil, err
 		}
 		// For target.Reason to have a value the verbose query param above needs to be true
-		return nil, nil, fmt.Errorf(target.Reason.Message)
+		return nil, nil, fmt.Errorf(target.Message)
 	}
 
 	// Return the JSON body
@@ -147,7 +147,7 @@ func PackageVerdicts(ctx context.Context, r *VerdictsRequest, rawResponseOnly bo
 	}
 
 	// Unmarshal the JSON body into a Response
-	target := &Package{}
+	target := &Response{}
 	if err := dec.Decode(target); err != nil {
 		return nil, nil, err
 	}
