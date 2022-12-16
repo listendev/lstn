@@ -90,7 +90,4 @@ type Response []Package
 type responseError struct {
 	Message   string `json:"message"`
 	RequestID string `json:"request_id"`
-	Reason    struct {
-		Message string `json:"message"`
-	} `json:"reason"`
 }
