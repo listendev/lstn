@@ -44,7 +44,7 @@ func PackageLockAnalysis(ctx context.Context, r *AnalysisRequest, rawResponseOnl
 	if err != nil {
 		return nil, nil, err
 	}
-	endpointURL := fmt.Sprintf("%s/api/analyse/npm", baseURL)
+	endpointURL := fmt.Sprintf("%s/api/analysis", baseURL)
 
 	// Prepare the request
 	pl, err := json.Marshal(r)
