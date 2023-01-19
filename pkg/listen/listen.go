@@ -102,7 +102,7 @@ func PackageVerdicts(ctx context.Context, r *VerdictsRequest, rawResponseOnly bo
 	if err != nil {
 		return nil, nil, err
 	}
-	endpointURL := fmt.Sprintf("%s/api/verdicts/npm", baseURL)
+	endpointURL := fmt.Sprintf("%s/api/verdicts", baseURL)
 
 	// Prepare the request
 	val, err := query.Values(r)
