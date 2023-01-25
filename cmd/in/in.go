@@ -34,12 +34,12 @@ func New(ctx context.Context) (*cobra.Command, error) {
 	var inCmd = &cobra.Command{
 		Use:   "in",
 		Short: "Inspect the verdicts of your dependencies",
-		Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+		Long: `Query listen.dev for the verdicts of all the depedencies in your project.
+		
+Using this command, you can audit all of the dependencies configured for a project and obtain their verdicts.
+This requires a package.json file to fetch the package name and version for each of the dependencies specified for the project.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+The verdicts it returns are listed by the name of each package and its specified version.`,
 		Example: `  lstn in
   lstn in .
   lstn in /we/snitch
