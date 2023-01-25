@@ -56,7 +56,7 @@ func (req *AnalysisRequest) MarshalJSON() ([]byte, error) {
 	type AnalysisRequestAlias AnalysisRequest
 
 	return json.Marshal(&struct {
-		PackageLockJSON string `json:"package-lock.json"`
+		PackageLockJSON string `json:"package-lock"`
 		*AnalysisRequestAlias
 	}{
 		PackageLockJSON:      req.PackageLockJSON.Encode(),
