@@ -45,7 +45,7 @@ func NewVerdictsRequest(args []string) *VerdictsRequest {
 }
 
 type AnalysisRequest struct {
-	PackageLockJSON npm.PackageLockJSON `json:"package-lock.json"`
+	PackageLockJSON npm.PackageLockJSON `json:"package-lock"`
 	Packages        npm.Packages        `json:"packages"`
 	Context         string              `json:"context"` // TODO > define
 }
