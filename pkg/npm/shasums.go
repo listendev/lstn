@@ -32,9 +32,10 @@ type depsFlow <-chan dep
 // receiving packageLockJSON instance on a channel.
 func (p *packageLockJSON) produceDependencies() depsFlow {
 	depsChannel := make(chan dep)
+	deps := p.Deps()
 
 	go func() {
-		for k, v := range p.Dependencies {
+		for k, v := range deps {
 			depsChannel <- dep{
 				name:    k,
 				version: v.Version,

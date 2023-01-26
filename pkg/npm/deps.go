@@ -17,5 +17,14 @@ package npm
 
 // Deps gets you the package lock dependencies.
 func (p *packageLockJSON) Deps() map[string]PackageLockDependency {
-	return p.Dependencies
+	switch p.LockfileVersion.Value {
+	case 2:
+		return p.packageLockJSONVersion2.Dependencies
+	case 3:
+		return p.packageLockJSONVersion3.Dependencies
+	case 1:
+		fallthrough
+	default:
+		return nil
+	}
 }
