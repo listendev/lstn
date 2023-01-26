@@ -19,15 +19,62 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
-type packageLockJSON struct {
-	bytes []byte
+type LockfileVersion struct {
+	Value int `json:"lockfileVersion"`
+}
 
-	Name            string                           `json:"name"`
-	Version         string                           `json:"version"`
-	LockfileVersion int                              `json:"lockfileVersion"`
-	Dependencies    map[string]PackageLockDependency `json:"dependencies"`
+type packageLockJSONVersion2 struct {
+	Name         string                           `json:"name"`
+	Version      string                           `json:"version"`
+	Dependencies map[string]PackageLockDependency `json:"dependencies"`
+}
+
+type packageLockJSONVersion3 struct {
+	Name         string                           `json:"name"`
+	Version      string                           `json:"version"`
+	Dependencies map[string]PackageLockDependency `json:"packages"`
+}
+
+type packageLockJSON struct {
+	LockfileVersion
+	*packageLockJSONVersion2
+	*packageLockJSONVersion3
+	bytes []byte
+}
+
+func (p *packageLockJSON) UnmarshalJSON(data []byte) error {
+	if err := json.Unmarshal(data, &p.LockfileVersion); err != nil {
+		return err
+	}
+
+	switch p.LockfileVersion.Value {
+	case 2:
+		p.packageLockJSONVersion2 = &packageLockJSONVersion2{}
+		return json.Unmarshal(data, p.packageLockJSONVersion2)
+	case 3:
+		p.packageLockJSONVersion3 = &packageLockJSONVersion3{}
+		if err := json.Unmarshal(data, p.packageLockJSONVersion3); err != nil {
+			return err
+		}
+		for k := range p.packageLockJSONVersion3.Dependencies {
+			if k == "" {
+				delete(p.packageLockJSONVersion3.Dependencies, k)
+			}
+			if strings.HasPrefix(k, "node_modules") {
+				newk := strings.TrimPrefix(k, "node_modules/")
+				p.packageLockJSONVersion3.Dependencies[newk] = p.packageLockJSONVersion3.Dependencies[k]
+				delete(p.packageLockJSONVersion3.Dependencies, k)
+			}
+		}
+		return nil
+	case 1:
+		fallthrough
+	default:
+		return fmt.Errorf("unsupported package-lock.json version")
+	}
 }
 
 type PackageLockJSON interface {
