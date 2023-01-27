@@ -42,18 +42,18 @@ func PackageLockAnalysis(ctx context.Context, r *AnalysisRequest, rawResponseOnl
 	// Obtain the endpoint base URL
 	baseURL, err := getBaseURLFromContext(ctx)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, pkgcontext.OutputError(ctx, err)
 	}
 	endpointURL := fmt.Sprintf("%s/api/analysis", baseURL)
 
 	// Prepare the request
 	pl, err := json.Marshal(r)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, pkgcontext.OutputError(ctx, err)
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpointURL, bytes.NewBuffer(pl))
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, pkgcontext.OutputError(ctx, err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
@@ -62,7 +62,7 @@ func PackageLockAnalysis(ctx context.Context, r *AnalysisRequest, rawResponseOnl
 	client := http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, pkgcontext.OutputError(ctx, err)
 	}
 	defer res.Body.Close()
 
@@ -72,17 +72,17 @@ func PackageLockAnalysis(ctx context.Context, r *AnalysisRequest, rawResponseOnl
 	if res.StatusCode != http.StatusOK {
 		target := &responseError{}
 		if err := dec.Decode(target); err != nil {
-			return nil, nil, err
+			return nil, nil, pkgcontext.OutputError(ctx, err)
 		}
 		// For target.Reason to have a value the verbose query param above needs to be true
-		return nil, nil, fmt.Errorf(target.Message)
+		return nil, nil, pkgcontext.OutputErrorf(ctx, err, target.Message)
 	}
 
 	// Return the JSON body
 	if rawResponseOnly {
 		b, err := io.ReadAll(res.Body)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, pkgcontext.OutputError(ctx, err)
 		}
 		return nil, b, nil
 	}
@@ -90,7 +90,7 @@ func PackageLockAnalysis(ctx context.Context, r *AnalysisRequest, rawResponseOnl
 	// Unmarshal the JSON body into a Response
 	target := &Response{}
 	if err := dec.Decode(target); err != nil {
-		return nil, nil, err
+		return nil, nil, pkgcontext.OutputError(ctx, err)
 	}
 
 	return target, nil, nil
@@ -100,18 +100,18 @@ func PackageVerdicts(ctx context.Context, r *VerdictsRequest, rawResponseOnly bo
 	// Obtain the endpoint base URL
 	baseURL, err := getBaseURLFromContext(ctx)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, pkgcontext.OutputError(ctx, err)
 	}
 	endpointURL := fmt.Sprintf("%s/api/verdicts", baseURL)
 
 	// Prepare the request
 	val, err := query.Values(r)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, pkgcontext.OutputError(ctx, err)
 	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpointURL, nil)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, pkgcontext.OutputError(ctx, err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
@@ -121,7 +121,7 @@ func PackageVerdicts(ctx context.Context, r *VerdictsRequest, rawResponseOnly bo
 	client := http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, pkgcontext.OutputError(ctx, err)
 	}
 	defer res.Body.Close()
 
@@ -131,17 +131,17 @@ func PackageVerdicts(ctx context.Context, r *VerdictsRequest, rawResponseOnly bo
 	if res.StatusCode != http.StatusOK {
 		target := &responseError{}
 		if err := dec.Decode(target); err != nil {
-			return nil, nil, err
+			return nil, nil, pkgcontext.OutputError(ctx, err)
 		}
 		// For target.Reason to have a value the verbose query param above needs to be true
-		return nil, nil, fmt.Errorf(target.Message)
+		return nil, nil, pkgcontext.OutputErrorf(ctx, err, target.Message)
 	}
 
 	// Return the JSON body
 	if rawResponseOnly {
 		b, err := io.ReadAll(res.Body)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, pkgcontext.OutputError(ctx, err)
 		}
 		return nil, b, nil
 	}
@@ -149,7 +149,7 @@ func PackageVerdicts(ctx context.Context, r *VerdictsRequest, rawResponseOnly bo
 	// Unmarshal the JSON body into a Response
 	target := &Response{}
 	if err := dec.Decode(target); err != nil {
-		return nil, nil, err
+		return nil, nil, pkgcontext.OutputError(ctx, err)
 	}
 
 	return target, nil, nil
