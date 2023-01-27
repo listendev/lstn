@@ -1,0 +1,54 @@
+project_name: lstn
+
+release:
+  prerelease: auto
+  draft: false
+  name_template: "listen.dev CLI {{.Version}}"
+
+before:
+  hooks:
+    - go mod tidy
+    # TODO > manpages
+
+builds:
+  - <<: &build_defaults
+      binary: lstn
+      main: ./
+    id: macos
+    goos: [darwin]
+    goarch: [amd64]
+
+  - <<: &build_defaults
+    id: linux
+    goos: [linux]
+    goarch: [arm, amd64, arm64]
+    env:
+      - CGO_ENABLED=0
+
+# Docs at https://goreleaser.com/customization/archive
+archives:
+  - id: nix
+    builds: [macos, linux]
+    <<: &archive_defaults
+      name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    wrap_in_directory: true
+    replacements:
+      darwin: macos
+    format: tar.gz
+    files:
+      - LICENSE
+      # TODO > add the manpages
+
+# Docs at https://goreleaser.com/customization/nfpm
+nfpms:
+  - license: Apache 2.0
+    maintainer: Garnet Labs, Inc.
+    homepage: https://github.com/listendev/lstn
+    description: |-
+      Analyze the behavior of your dependencies using listen.dev.
+    formats:
+      - apk
+      - deb
+      - rpm
+      - archlinux # Since GoReleaser v1.13
+    # TODO > add the manpages to the packages with the "contents" property
