@@ -25,7 +25,7 @@ _TODO_
 1. First, check on our issue tracker to verify that our team had approved the plans for a new command.
 2. Create a package for the new command, e.g. for a new command `lstn snitch` create the following directory
    structure: `cmd/snitch/`
-3. The new package should expose a method, e.g. `New()`, that accepts a `*context.Context` type and
+3. The new package should expose a `New()` function that accepts a `*context.Context` type and
    returns `(*cobra.Command, error)`.
 4. Use the method from the previous step to generate the command and add it to the command tree
    - Typically this means adding it as subcommand of the root command (ie., `cmd/root.go`) in its `Boot()` function.
