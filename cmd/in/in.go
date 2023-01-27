@@ -36,8 +36,8 @@ func New(ctx context.Context) (*cobra.Command, error) {
 		Short: "Inspect the verdicts of your dependencies",
 		Long: `Query listen.dev for the verdicts of all the dependencies in your project.
 		
-Using this command, you can audit all of the dependencies configured for a project and obtain their verdicts.
-This requires a package.json file to fetch the package name and version for each of the dependencies specified for the project.
+Using this command, you can audit all the dependencies configured for a project and obtain their verdicts.
+This requires a package.json file to fetch the package name and version of the project dependencies.
 
 The verdicts it returns are listed by the name of each package and its specified version.`,
 		Example: `  lstn in
