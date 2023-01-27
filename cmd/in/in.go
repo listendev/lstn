@@ -32,10 +32,11 @@ import (
 
 func New(ctx context.Context) (*cobra.Command, error) {
 	var inCmd = &cobra.Command{
-		Use:   "in",
-		Short: "Inspect the verdicts of your dependencies",
+		Use:                   "in <path>",
+		DisableFlagsInUseLine: true,
+		Short:                 "Inspect the verdicts of your dependencies",
 		Long: `Query listen.dev for the verdicts of all the dependencies in your project.
-		
+
 Using this command, you can audit all the dependencies configured for a project and obtain their verdicts.
 This requires a package.json file to fetch the package name and version of the project dependencies.
 
