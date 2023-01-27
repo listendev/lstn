@@ -1,0 +1,39 @@
+name: tests
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Set up Go 1.19
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+
+      - name: Check out the source code
+        uses: actions/checkout@v3
+
+      - name: Restore the Go modules cache
+        uses: actions/cache@v3
+        with:
+          path: ~/go/pkg/mod
+          key: go-${{ runner.os }}-${{ hashFiles('go.mod') }}
+          restore-keys: |
+            go-${{ runner.os }}-
+
+      - name: Download Go modules
+        run: go mod download
+
+      - name: Run tests
+        run: go test -race ./...
+
+      - name: Build
+        run: go build -v .
