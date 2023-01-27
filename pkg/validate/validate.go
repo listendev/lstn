@@ -47,7 +47,21 @@ func init() {
 		return name
 	})
 
+	Singleton.RegisterValidation("endpoint", isEndpoint)
+
 	eng := en.New()
-	Translator, _ = ut.New(eng, eng).GetTranslator("en")
+	Translator, _ = (ut.New(eng, eng)).GetTranslator("en")
 	en_translations.RegisterDefaultTranslations(Singleton, Translator)
+
+	Singleton.RegisterTranslation(
+		"endpoint",
+		Translator,
+		func(ut ut.Translator) error {
+			return ut.Add("endpoint", "{0} must be a valid listen.dev endpoint", true)
+		},
+		func(ut ut.Translator, fe validator.FieldError) string {
+			t, _ := ut.T("endpoint", fe.Field())
+			return t
+		},
+	)
 }
