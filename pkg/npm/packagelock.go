@@ -24,6 +24,7 @@ import (
 	"path/filepath"
 
 	"github.com/Masterminds/semver/v3"
+	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/validate"
 )
 
@@ -38,12 +39,18 @@ func generatePackageLock(ctx context.Context, dir string) ([]byte, error) {
 	// Get the npm command
 	npmPackageLockOnly, err := getNPMPackageLockOnly(ctx)
 	if err != nil {
+		// Early exit if it's a timeout (or similar) error from the context
+		if ctxErr := pkgcontext.ContextError(ctx, err); ctxErr != nil {
+			return []byte{}, ctxErr
+		}
+
 		// Fallback to npm via nvm
 		npmPackageLockOnlyFromNVM, nvmErr := getNPMPackageLockOnlyFromNVM(ctx)
 		if nvmErr != nil {
 			// FIXME > return more errors or a generic one
-			return []byte{}, err
+			return []byte{}, pkgcontext.OutputErrorf(ctx, nvmErr, "couldn't find the npm executable in any way")
 		}
+
 		npmPackageLockOnly = npmPackageLockOnlyFromNVM
 	}
 
@@ -68,7 +75,7 @@ func generatePackageLock(ctx context.Context, dir string) ([]byte, error) {
 	// TODO(leodido) > Show progress?
 	npmPackageLockOnly.Dir = tmp
 	if err := npmPackageLockOnly.Run(); err != nil {
-		return []byte{}, fmt.Errorf("couldn't generate the package-lock.json file")
+		return []byte{}, pkgcontext.OutputErrorf(ctx, err, "couldn't generate the package-lock.json file")
 	}
 	packageLockJSON, _ := os.ReadFile(filepath.Join(tmp, "package-lock.json"))
 
