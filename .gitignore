@@ -1,3 +1,6 @@
 .vscode/
 
+# Binaries
 lstn
+lstn.exe
+make/make
