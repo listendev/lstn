@@ -1,0 +1,26 @@
+name: pull requests automation
+
+on:
+  pull_request_target:
+    types: [ready_for_review, opened, reopened]
+
+jobs:
+  headers:
+    name: check license headers
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the source code
+        uses: actions/checkout@v2
+      - name: Install Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
+      - name: Install google/addlicense
+        run: go install github.com/google/addlicense@latest
+      - name: Check all the source files have the license header
+        run: |
+          addlicense -check \
+            -f .github/header_template.txt \
+            --ignore "**/*.yml" \
+            --ignore "**/*.yaml" \
+            .
