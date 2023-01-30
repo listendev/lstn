@@ -49,7 +49,7 @@ var (
 
 			// TODO > Set LDFLAGS
 
-			return run("go", "build", "-trimpath", "-o", exe, "./")
+			return run("go", "build", "-trimpath", "-o", exe, "./cmd/lstn")
 		},
 		"man": func(_ string) error {
 			fmt.Fprintf(os.Stdout, "executing `%s` ...\n", "man")
