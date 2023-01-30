@@ -24,9 +24,11 @@ import (
 
 	"github.com/listendev/lstn/cmd/in"
 	"github.com/listendev/lstn/cmd/to"
+	"github.com/listendev/lstn/cmd/version"
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	"github.com/listendev/lstn/pkg/cmd/groups"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
+	lstnversion "github.com/listendev/lstn/pkg/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
@@ -42,6 +44,8 @@ var rootCmd = &cobra.Command{
 	SilenceUsage: true,
 	Short:        "Analyze the behavior of your dependencies using listen.dev",
 	PersistentPreRunE: func(c *cobra.Command, args []string) error {
+		// TODO > ignore global/config flags for non core commands
+
 		cfgOpts, ok := c.Context().Value(pkgcontext.ConfigKey).(*flags.ConfigOptions)
 		if !ok {
 			return fmt.Errorf("couldn't obtain configuration options")
@@ -136,9 +140,7 @@ func Boot() {
 
 	// Obtain the configuration options
 	cfgOpts, err := flags.NewConfigOptions()
-	if err != nil {
-		os.Exit(1)
-	}
+	cobra.CheckErr(err)
 
 	// Cobra supports persistent flags, which, if defined here, will be global to the whole application
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", cfgFile, "config file (default is $HOME/.lstn.yaml)")
@@ -155,22 +157,28 @@ func Boot() {
 	// Pass the configuration options through the context
 	ctx = context.WithValue(ctx, pkgcontext.ConfigKey, cfgOpts)
 
+	// Store the version in the context
+	shortVersion, longVersion := lstnversion.Version()
+	ctx = context.WithValue(ctx, pkgcontext.ShortVersionKey, shortVersion)
+	ctx = context.WithValue(ctx, pkgcontext.LongVersionKey, longVersion)
+
 	// Setup the command groups
 	rootCmd.AddGroup(&groups.Core)
 
 	// Setup the `in` subcommand
 	inCmd, err := in.New(ctx)
-	if err != nil {
-		os.Exit(1)
-	}
+	cobra.CheckErr(err)
 	rootCmd.AddCommand(inCmd)
 
 	// Setup the `to` subcommand
 	toCmd, err := to.New(ctx)
-	if err != nil {
-		os.Exit(1)
-	}
+	cobra.CheckErr(err)
 	rootCmd.AddCommand(toCmd)
+
+	// Setup the `version` subcommand
+	versionCmd, err := version.New(ctx)
+	cobra.CheckErr(err)
+	rootCmd.AddCommand(versionCmd)
 
 	// Fallback to the default subcommand when the user doesn't specify one explicitly.
 	c, _, err := rootCmd.Find(os.Args[1:])
@@ -211,9 +219,9 @@ func initConfig() {
 	viper.SetEnvPrefix("lstn")
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 
-	// Do not check for the config file if the command is not available (eg., help)
+	// Do not check for the config file if the command is not available (eg., help) or not core (eg., version)
 	c, _, err := rootCmd.Find(os.Args[1:])
-	if err == nil && !c.IsAvailableCommand() {
+	if err == nil && (!c.IsAvailableCommand() || c.GroupID != groups.Core.ID) {
 		return
 	}
 
