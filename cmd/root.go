@@ -22,9 +22,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/listendev/lstn/cmd/flags"
 	"github.com/listendev/lstn/cmd/in"
 	"github.com/listendev/lstn/cmd/to"
+	"github.com/listendev/lstn/pkg/cmd/flags"
+	"github.com/listendev/lstn/pkg/cmd/groups"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -153,6 +154,9 @@ func Boot() {
 
 	// Pass the configuration options through the context
 	ctx = context.WithValue(ctx, pkgcontext.ConfigKey, cfgOpts)
+
+	// Setup the command groups
+	rootCmd.AddGroup(&groups.Core)
 
 	// Setup the `in` subcommand
 	inCmd, err := in.New(ctx)

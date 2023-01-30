@@ -24,7 +24,7 @@ import (
 	"net/http"
 
 	"github.com/google/go-querystring/query"
-	"github.com/listendev/lstn/cmd/flags"
+	"github.com/listendev/lstn/pkg/cmd/flags"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 )
 

@@ -20,7 +20,8 @@ import (
 	"fmt"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/listendev/lstn/cmd/flags"
+	"github.com/listendev/lstn/pkg/cmd/flags"
+	"github.com/listendev/lstn/pkg/cmd/groups"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/listendev/lstn/pkg/validate"
@@ -30,6 +31,7 @@ import (
 func New(ctx context.Context) (*cobra.Command, error) {
 	var toCmd = &cobra.Command{
 		Use:                   "to <name> [version] [shasum]",
+		GroupID:               groups.Core.ID,
 		DisableFlagsInUseLine: true,
 		Short:                 "Get the verdicts of a package",
 		Long: `Query listen.dev for the verdicts of a package.

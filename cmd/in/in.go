@@ -22,7 +22,8 @@ import (
 	"path/filepath"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/listendev/lstn/cmd/flags"
+	"github.com/listendev/lstn/pkg/cmd/flags"
+	"github.com/listendev/lstn/pkg/cmd/groups"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/listendev/lstn/pkg/npm"
@@ -33,6 +34,7 @@ import (
 func New(ctx context.Context) (*cobra.Command, error) {
 	var inCmd = &cobra.Command{
 		Use:                   "in <path>",
+		GroupID:               groups.Core.ID,
 		DisableFlagsInUseLine: true,
 		Short:                 "Inspect the verdicts of your dependencies",
 		Long: `Query listen.dev for the verdicts of all the dependencies in your project.
