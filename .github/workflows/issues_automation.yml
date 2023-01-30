@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   issue-auto:
+    name: label issues
     runs-on: ubuntu-latest
     steps:
       - name: Label the new issue
