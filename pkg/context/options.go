@@ -19,7 +19,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/listendev/lstn/cmd/flags"
+	"github.com/listendev/lstn/pkg/cmd/flags"
 )
 
 // GetOptionsFromContext returns a Options instance.
