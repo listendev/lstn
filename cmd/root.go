@@ -207,6 +207,12 @@ func initConfig() {
 	viper.SetEnvPrefix("lstn")
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 
+	// Do not check for the config file if the command is not available (eg., help)
+	c, _, err := rootCmd.Find(os.Args[1:])
+	if err == nil && !c.IsAvailableCommand() {
+		return
+	}
+
 	// If a config file is found, read it in
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Fprintln(os.Stderr, "Using config file: ", viper.ConfigFileUsed())
