@@ -6,5 +6,5 @@ import (
 
 var Core = cobra.Group{
 	ID:    "core",
-	Title: "Core Commands",
+	Title: "Core Commands:",
 }
