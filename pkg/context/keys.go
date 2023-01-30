@@ -28,3 +28,9 @@ var InKey contextKey = "in"
 
 // ToKey is the key indexing the options/flags for the in subcommand
 var ToKey contextKey = "to"
+
+// ShortVersionKey is the key storing the short version
+var ShortVersionKey contextKey = "version_short"
+
+// LongVersionKey is the key storing the long version
+var LongVersionKey contextKey = "version_long"
