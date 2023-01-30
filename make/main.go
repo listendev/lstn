@@ -26,6 +26,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -47,9 +48,17 @@ var (
 				return nil
 			}
 
-			// TODO > Set LDFLAGS
+			// TODO ? -ldflags "-w -s -extldflags '-static' ..."
+			ldflags := os.Getenv("GO_LDFLAGS")
+			gitTag := getGitTag()
+			if gitTag != "" {
+				if len(ldflags) > 0 {
+					ldflags += " "
+				}
+				ldflags += fmt.Sprintf("-X github.com/listendev/lstn/pkg/version.VersionPrefix=%s", gitTag)
+			}
 
-			return run("go", "build", "-trimpath", "-o", exe, "./cmd/lstn")
+			return run("go", "build", "-trimpath", "-ldflags", ldflags, "-o", exe, "./cmd/lstn")
 		},
 		"man": func(_ string) error {
 			fmt.Fprintf(os.Stdout, "executing `%s` ...\n", "man")
@@ -112,6 +121,13 @@ func main() {
 	}
 }
 
+func getGitTag() string {
+	if des, err := getCommandOutput("git", "describe", "--tags"); err == nil {
+		return des
+	}
+	return ""
+}
+
 func isTargetingWindows() bool {
 	if os.Getenv("GOOS") == "windows" {
 		return true
@@ -127,14 +143,25 @@ func run(args ...string) error {
 	if err != nil {
 		return err
 	}
-	set_x(args...)
+	setX(args...)
 	cmd := exec.Command(exe, args[1:]...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
 }
 
-func set_x(args ...string) {
+func getCommandOutput(args ...string) (string, error) {
+	exe, err := exec.LookPath(args[0])
+	if err != nil {
+		return "", err
+	}
+	cmd := exec.Command(exe, args[1:]...)
+	cmd.Stderr = io.Discard
+	out, err := cmd.Output()
+	return strings.TrimSuffix(string(out), "\n"), err
+}
+
+func setX(args ...string) {
 	// Escape special chars
 	fmtArgs := make([]string, len(args))
 	for i, arg := range args {
