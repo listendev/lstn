@@ -27,6 +27,7 @@ import (
 	"github.com/listendev/lstn/cmd/version"
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	"github.com/listendev/lstn/pkg/cmd/groups"
+	"github.com/listendev/lstn/pkg/cmd/help"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	lstnversion "github.com/listendev/lstn/pkg/version"
 	"github.com/spf13/cobra"
@@ -162,7 +163,7 @@ func Boot() {
 	ctx = context.WithValue(ctx, pkgcontext.ShortVersionKey, shortVersion)
 	ctx = context.WithValue(ctx, pkgcontext.LongVersionKey, longVersion)
 
-	// Setup the command groups
+	// Setup the core group
 	rootCmd.AddGroup(&groups.Core)
 
 	// Setup the `in` subcommand
@@ -179,6 +180,11 @@ func Boot() {
 	versionCmd, err := version.New(ctx)
 	cobra.CheckErr(err)
 	rootCmd.AddCommand(versionCmd)
+
+	// Setup the help topics subcommands
+	for t := range help.Topics {
+		rootCmd.AddCommand(help.NewTopic(t))
+	}
 
 	// Fallback to the default subcommand when the user doesn't specify one explicitly.
 	c, _, err := rootCmd.Find(os.Args[1:])
