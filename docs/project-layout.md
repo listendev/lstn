@@ -21,7 +21,7 @@ and talk through which code gets run.
 1. `go build -o make/make make/main.go` - Compiles the binary to build `lstn`
 2. `make/make lstn` - Makes sure all external Go dependencies are fetched, then compiles the `lstn` binary
 3. `./lstn in --json ./ciao` - Runs the newly build `lstn` binary and passes the following flags and arguments to the process:
-   - `["in", "--json", "./ciao"]
+   - `["in", "--json", "./ciao"]`
 4. The `main` package sets up the CLI flags, its subcommands, its context, and dispatches the execution to the "root" command with the `rootCmd.ExecuteContext()` method
 5. The [root command](../cmd/root.go) represents the top-level `lstn` command and knows how to dispatch execution to any other gh command nested under it
 6. Because of the `in` argument, the execution reaches the `RunE()` function of the `cobra.Command` within [cmd/in/in.go](../cmd/in/in.go)
