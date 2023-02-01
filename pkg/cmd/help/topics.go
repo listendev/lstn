@@ -1,3 +1,18 @@
+/*
+Copyright © 2022 The listen.dev team <engineering@garnet.ai>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+	http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package help
 
 import (
@@ -10,15 +25,15 @@ import (
 
 var Topics = map[string]map[string]string{
 	"config": {
-		"short": "Details about the .lstn.yml file",
+		"short": "Details about the .lstn.yml config file",
 		"long":  "TODO config",
 	},
 	"environment": {
+		"alias": "env",
 		"short": "Which environment variables you can use with lstn",
-		"long":  "TODO environment",
 	},
 	"exit": {
-		"short": "How lstn exits",
+		"short": "Details about the lstn exit codes",
 		"long":  "TODO exit",
 	},
 	"manual": {
@@ -29,7 +44,8 @@ var Topics = map[string]map[string]string{
 type HelpTopicFunc func(*cobra.Command, []string)
 
 var topicsHelpFuncs = map[string]func() HelpTopicFunc{
-	"manual": manualHelpTopicFunc,
+	"manual":      manualHelpTopicFunc,
+	"environment": envHelpTopicFunc,
 }
 
 // TODO > print out markdown
@@ -46,6 +62,10 @@ func NewTopic(topic string) *cobra.Command {
 			"markdown:generate": "true",
 			"markdown:basename": "lstn_help_" + topic,
 		},
+	}
+
+	if Topics[topic]["alias"] != "" {
+		c.Aliases = []string{Topics[topic]["alias"]}
 	}
 
 	c.SetHelpFunc(func(c *cobra.Command, args []string) {
