@@ -45,7 +45,7 @@ var rootCmd = &cobra.Command{
 	SilenceUsage: true,
 	Short:        "Analyze the behavior of your dependencies using listen.dev",
 	PersistentPreRunE: func(c *cobra.Command, args []string) error {
-		// TODO > ignore global/config flags for non core commands
+		// TODO ? ignore global/config flags for non core commands
 
 		cfgOpts, ok := c.Context().Value(pkgcontext.ConfigKey).(*flags.ConfigOptions)
 		if !ok {
@@ -222,8 +222,8 @@ func initConfig() {
 	}
 
 	viper.AutomaticEnv() // Read in environment variables that match
-	viper.SetEnvPrefix("lstn")
-	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
+	viper.SetEnvPrefix(flags.EnvPrefix)
+	viper.SetEnvKeyReplacer(strings.NewReplacer("-", flags.EnvSeparator))
 
 	// Do not check for the config file if the command is not available (eg., help) or not core (eg., version)
 	c, _, err := rootCmd.Find(os.Args[1:])
