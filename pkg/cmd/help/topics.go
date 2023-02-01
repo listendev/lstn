@@ -25,8 +25,7 @@ import (
 
 var Topics = map[string]map[string]string{
 	"config": {
-		"short": "Details about the .lstn.yml config file",
-		"long":  "TODO config",
+		"short": "Details about the ~/.lstn.yaml config file",
 	},
 	"environment": {
 		"alias": "env",
@@ -46,6 +45,7 @@ type HelpTopicFunc func(*cobra.Command, []string)
 var topicsHelpFuncs = map[string]func() HelpTopicFunc{
 	"manual":      manualHelpTopicFunc,
 	"environment": envHelpTopicFunc,
+	"config":      configHelpTopicFunc,
 }
 
 // TODO > print out markdown
