@@ -55,6 +55,18 @@ func init() {
 	en_translations.RegisterDefaultTranslations(Singleton, Translator)
 
 	Singleton.RegisterTranslation(
+		"excluded_without",
+		Translator,
+		func(ut ut.Translator) error {
+			return ut.Add("excluded_without", "cannot use --{0} without specifying --{1}", true)
+		},
+		func(ut ut.Translator, fe validator.FieldError) string {
+			t, _ := ut.T("excluded_without", fe.Field(), fe.Param())
+			return t
+		},
+	)
+
+	Singleton.RegisterTranslation(
 		"endpoint",
 		Translator,
 		func(ut ut.Translator) error {
