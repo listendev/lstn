@@ -25,7 +25,7 @@ import (
 
 type ToOptions struct {
 	Json bool   `name:"json"`
-	JQ   string `name:"jq" validate:"jq" flag:"jq"` // TODO > set default to empty string (valid JQ query) to obtain JSON pretty print for free?
+	JQ   string `name:"jq" validate:"excluded_without=json,jq" flag:"jq"` // TODO > set default to empty string (valid JQ query) to obtain JSON pretty print for free?
 
 	baseOptions
 }
