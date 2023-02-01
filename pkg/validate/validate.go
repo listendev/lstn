@@ -48,6 +48,7 @@ func init() {
 	})
 
 	Singleton.RegisterValidation("endpoint", isEndpoint)
+	Singleton.RegisterValidation("jq", jqQueryCompiles)
 
 	eng := en.New()
 	Translator, _ = (ut.New(eng, eng)).GetTranslator("en")
@@ -61,6 +62,18 @@ func init() {
 		},
 		func(ut ut.Translator, fe validator.FieldError) string {
 			t, _ := ut.T("endpoint", fe.Field())
+			return t
+		},
+	)
+
+	Singleton.RegisterTranslation(
+		"jq",
+		Translator,
+		func(ut ut.Translator) error {
+			return ut.Add("jq", "{0} must be a valid JQ query", true)
+		},
+		func(ut ut.Translator, fe validator.FieldError) string {
+			t, _ := ut.T("jq", fe.Field())
 			return t
 		},
 	)
