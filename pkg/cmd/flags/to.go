@@ -20,10 +20,12 @@ import (
 	"fmt"
 
 	"github.com/creasty/defaults"
+	"github.com/spf13/cobra"
 )
 
 type ToOptions struct {
-	Json bool `name:"json"`
+	Json bool   `name:"json"`
+	JQ   string `name:"jq" validate:"jq" flag:"jq"` // TODO > set default to empty string (valid JQ query) to obtain JSON pretty print for free?
 
 	baseOptions
 }
@@ -36,6 +38,11 @@ func NewToOptions() (*ToOptions, error) {
 	}
 
 	return o, nil
+}
+
+func (o *ToOptions) Attach(c *cobra.Command) {
+	c.Flags().BoolVar(&o.Json, "json", o.Json, "output the verdicts (if any) in JSON form")
+	c.Flags().StringVarP(&o.JQ, "jq", "q", o.JQ, "filter the output using a jq expression")
 }
 
 func (o *ToOptions) Validate() []error {

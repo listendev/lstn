@@ -122,7 +122,7 @@ The verdicts it returns are listed by the name of each package and its specified
 	// inCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Local flags will only run when this command is called directly
-	inCmd.Flags().BoolVar(&inOpts.Json, "json", inOpts.Json, "output the verdicts (if any) in JSON form")
+	inOpts.Attach(inCmd)
 
 	// Pass the configuration options through the context
 	ctx = context.WithValue(ctx, pkgcontext.InKey, inOpts)
