@@ -133,9 +133,18 @@ var rootCmd = &cobra.Command{
 	// Run: func(cmd *cobra.Command, args []string) { },
 }
 
+type exitCode int
+
+const (
+	exitOK     exitCode = 0
+	exitError  exitCode = 1
+	exitCancel exitCode = 2
+	exitAuth   exitCode = 4
+)
+
 // Boot adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Boot() {
+func Boot() exitCode {
 	// Setup the context
 	ctx := context.Background()
 
@@ -196,8 +205,13 @@ func Boot() {
 	// Time to listen!
 	err = rootCmd.ExecuteContext(ctx)
 	if err != nil {
-		os.Exit(1)
+		if ctxErr := pkgcontext.ContextError(ctx, err); ctxErr != nil {
+			return exitCancel
+		}
+		return exitError
 	}
+
+	return exitOK
 }
 
 func init() {

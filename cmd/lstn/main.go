@@ -16,9 +16,11 @@ limitations under the License.
 package main
 
 import (
+	"os"
+
 	"github.com/listendev/lstn/cmd"
 )
 
 func main() {
-	cmd.Boot()
+	os.Exit(int(cmd.Boot()))
 }
