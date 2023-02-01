@@ -47,14 +47,20 @@ func init() {
 		return name
 	})
 
-	Singleton.RegisterValidation("endpoint", isEndpoint)
-	Singleton.RegisterValidation("jq", jqQueryCompiles)
+	if err := Singleton.RegisterValidation("endpoint", isEndpoint); err != nil {
+		panic(err)
+	}
+	if err := Singleton.RegisterValidation("jq", jqQueryCompiles); err != nil {
+		panic(err)
+	}
 
 	eng := en.New()
 	Translator, _ = (ut.New(eng, eng)).GetTranslator("en")
-	en_translations.RegisterDefaultTranslations(Singleton, Translator)
+	if err := en_translations.RegisterDefaultTranslations(Singleton, Translator); err != nil {
+		panic(err)
+	}
 
-	Singleton.RegisterTranslation(
+	if err := Singleton.RegisterTranslation(
 		"excluded_without",
 		Translator,
 		func(ut ut.Translator) error {
@@ -64,9 +70,11 @@ func init() {
 			t, _ := ut.T("excluded_without", fe.Field(), fe.Param())
 			return t
 		},
-	)
+	); err != nil {
+		panic(err)
+	}
 
-	Singleton.RegisterTranslation(
+	if err := Singleton.RegisterTranslation(
 		"endpoint",
 		Translator,
 		func(ut ut.Translator) error {
@@ -76,9 +84,11 @@ func init() {
 			t, _ := ut.T("endpoint", fe.Field())
 			return t
 		},
-	)
+	); err != nil {
+		panic(err)
+	}
 
-	Singleton.RegisterTranslation(
+	if err := Singleton.RegisterTranslation(
 		"jq",
 		Translator,
 		func(ut ut.Translator) error {
@@ -88,5 +98,7 @@ func init() {
 			t, _ := ut.T("jq", fe.Field())
 			return t
 		},
-	)
+	); err != nil {
+		panic(err)
+	}
 }

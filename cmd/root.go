@@ -162,7 +162,8 @@ func Boot() exitCode {
 	rootCmd.PersistentFlags().StringVar(&cfgOpts.Endpoint, "endpoint", cfgOpts.Endpoint, "the listen.dev endpoint emitting the verdicts")
 
 	// Tell viper to populate variables from the configuration file
-	viper.BindPFlags(rootCmd.Flags())
+	err = viper.BindPFlags(rootCmd.Flags())
+	cobra.CheckErr(err)
 
 	// Pass the configuration options through the context
 	ctx = context.WithValue(ctx, pkgcontext.ConfigKey, cfgOpts)
