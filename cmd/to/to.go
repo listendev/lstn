@@ -88,7 +88,7 @@ If you're a hairsplitting person, you can also query for the verdicts specific t
 	// toCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Local flags will only run when this command is called directly
-	toCmd.Flags().BoolVar(&toOpts.Json, "json", toOpts.Json, "output the verdicts (if any) in JSON form")
+	toOpts.Attach(toCmd)
 
 	// Pass the configuration options through the context
 	ctx = context.WithValue(ctx, pkgcontext.ToKey, toOpts)
