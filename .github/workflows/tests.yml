@@ -35,5 +35,8 @@ jobs:
       - name: Run tests
         run: go test -race ./...
 
+      - name: Build the make/make tool
+        run: go build -o make/make make/main.go
+
       - name: Build
-        run: go build -v .
+        run: make/make lstn
