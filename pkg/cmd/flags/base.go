@@ -23,6 +23,12 @@ import (
 	"github.com/listendev/lstn/pkg/validate"
 )
 
+// EnvSeparator is the separator between the env variable prefix and the global flag name
+var EnvSeparator = "_"
+
+// EnvPrefix is the prefix of the env variables corresponding to the global flags
+var EnvPrefix = "lstn"
+
 type baseOptions struct {
 }
 
