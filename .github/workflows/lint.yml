@@ -6,11 +6,13 @@ on:
       - "**.go"
       - go.mod
       - go.sum
+    branches: ['main']
   pull_request:
     paths:
       - "**.go"
       - go.mod
       - go.sum
+    branches: ['main']
 
 permissions:
   contents: read
@@ -62,5 +64,5 @@ jobs:
           assert-nothing-changed go mod tidy
 
           bin/golangci-lint run --out-format=github-actions --timeout=3m || STATUS=$?
-          
+
           exit $STATUS
