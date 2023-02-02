@@ -28,6 +28,21 @@ func (suite *TextSuite) TestDedent() {
 }
 
 func (suite *TextSuite) TestIndent() {
+	cases := []struct {
+		b        string
+		prefix   string
+		expected string
+	}{
+		{"", "  ", ""},
+		{"line1", "  ", "  line1"},
+		{"line1\nline2\n", "\t", "\tline1\n\tline2\n"},
+		{"line1\nline2", "  ", "  line1\n  line2"},
+		{"\tline1\n\tline2", "  ", "  \tline1\n  \tline2"},
+	}
+
+	for i, tc := range cases {
+		require.Equal(suite.T(), tc.expected, Indent(tc.b, tc.prefix), fmt.Sprintf("Index: %d\n", i))
+	}
 }
 
 func (suite *TextSuite) TestIndentBytes() {
