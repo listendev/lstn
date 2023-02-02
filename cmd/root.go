@@ -155,7 +155,8 @@ func Boot() exitCode {
 
 	// Cobra supports persistent flags, which, if defined here, will be global to the whole application
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", cfgFile, "config file (default is $HOME/.lstn.yaml)")
-	rootCmd.MarkPersistentFlagFilename("config", "yaml")
+	err = rootCmd.MarkPersistentFlagFilename("config", "yaml")
+	cobra.CheckErr(err)
 
 	// Cobra also supports local flags, which will only run when this action is called directly
 	rootCmd.PersistentFlags().StringVar(&cfgOpts.LogLevel, "loglevel", cfgOpts.LogLevel, "log level")
