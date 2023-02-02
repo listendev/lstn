@@ -24,8 +24,7 @@ import (
 )
 
 type ToOptions struct {
-	Json bool   `name:"json"`
-	JQ   string `name:"jq" validate:"excluded_without=Json,jq"` // TODO > set default to empty string (valid JQ query) to obtain JSON pretty print for free?
+	JsonFlags
 
 	baseOptions
 }
@@ -41,8 +40,7 @@ func NewToOptions() (*ToOptions, error) {
 }
 
 func (o *ToOptions) Attach(c *cobra.Command) {
-	c.Flags().BoolVar(&o.Json, "json", o.Json, "output the verdicts (if any) in JSON form")
-	c.Flags().StringVarP(&o.JQ, "jq", "q", o.JQ, "filter the output using a jq expression")
+	o.JsonFlags.Attach(c)
 }
 
 func (o *ToOptions) Validate() []error {

@@ -24,8 +24,7 @@ import (
 )
 
 type InOptions struct {
-	Json bool   `name:"json"`
-	JQ   string `name:"jq" validate:"excluded_without=Json,jq"` // TODO > set default to empty string (valid JQ query) to obtain JSON pretty print for free?
+	JsonFlags
 
 	baseOptions
 }
@@ -41,26 +40,7 @@ func NewInOptions() (*InOptions, error) {
 }
 
 func (o *InOptions) Attach(c *cobra.Command) {
-	c.Flags().BoolVar(&o.Json, "json", o.Json, "output the verdicts (if any) in JSON form")
-	c.Flags().StringVarP(&o.JQ, "jq", "q", o.JQ, "filter the output using a jq expression")
-
-	// TODO > There's no need to append a pre-run function if we are not actually using one at the moment
-	// previousPreRun := c.PreRunE
-	// c.PreRunE = func(c *cobra.Command, args []string) error {
-	// 	// Run existing pre run (if any)
-	// 	if previousPreRun != nil {
-	// 		if err := previousPreRun(c, args); err != nil {
-	// 			return err
-	// 		}
-	// 	}
-
-	// 	// TODO > Check
-	// 	// Assuming the JQ query will run on a struct listen.Response (parametrize this),
-	// 	// we should get the field names of such struct (to which depth?) and check that the JQ query only uses them.
-	// 	// Otherwise return an error here interrupting the command execution.
-
-	// 	return nil
-	// }
+	o.JsonFlags.Attach(c)
 }
 
 func (o *InOptions) Validate() []error {

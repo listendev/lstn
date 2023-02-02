@@ -67,6 +67,7 @@ func Eval(ctx context.Context, input io.Reader, output io.Writer, expression str
 	for {
 		val, ok := iter.Next()
 		if !ok {
+			// TODO > do we want to continue here or to break?
 			break
 		}
 
