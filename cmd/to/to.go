@@ -18,6 +18,7 @@ package to
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/listendev/lstn/pkg/cmd/flags"
@@ -60,16 +61,16 @@ If you're a hairsplitting person, you can also query for the verdicts specific t
 			}
 
 			// Query for the package verdicts
-			res, resJSON, err := listen.PackageVerdicts(ctx, listen.NewVerdictsRequest(args), toOpts.Json)
+			res, resJSON, err := listen.PackageVerdicts(ctx, listen.NewVerdictsRequest(args), &toOpts.JsonFlags)
 			if err != nil {
 				return err
 			}
 
-			if toOpts.Json && resJSON != nil {
-				fmt.Println(string(resJSON))
+			if resJSON != nil {
+				fmt.Fprintf(os.Stdout, "%s", resJSON)
 			}
 
-			if !toOpts.Json && res != nil {
+			if res != nil {
 				spew.Dump(res)
 				// TODO > create visualization of the results
 			}
@@ -90,7 +91,7 @@ If you're a hairsplitting person, you can also query for the verdicts specific t
 	// Local flags will only run when this command is called directly
 	toOpts.Attach(toCmd)
 
-	// Pass the configuration options through the context
+	// Pass the options through the context
 	ctx = context.WithValue(ctx, pkgcontext.ToKey, toOpts)
 	toCmd.SetContext(ctx)
 

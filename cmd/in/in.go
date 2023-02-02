@@ -94,16 +94,16 @@ The verdicts it returns are listed by the name of each package and its specified
 				Packages:        packagesWithShasum,
 			}
 
-			res, resJSON, err := listen.PackageLockAnalysis(ctx, req, inOpts.Json)
+			res, resJSON, err := listen.PackageLockAnalysis(ctx, req, &inOpts.JsonFlags)
 			if err != nil {
 				return err
 			}
 
-			if inOpts.Json && resJSON != nil {
-				fmt.Println(string(resJSON))
+			if resJSON != nil {
+				fmt.Fprintf(os.Stdout, "%s", resJSON)
 			}
 
-			if !inOpts.Json && res != nil {
+			if res != nil {
 				spew.Dump(res)
 				// TODO > create visualization of the results
 			}
@@ -124,7 +124,7 @@ The verdicts it returns are listed by the name of each package and its specified
 	// Local flags will only run when this command is called directly
 	inOpts.Attach(inCmd)
 
-	// Pass the configuration options through the context
+	// Pass the options through the context
 	ctx = context.WithValue(ctx, pkgcontext.InKey, inOpts)
 	inCmd.SetContext(ctx)
 
