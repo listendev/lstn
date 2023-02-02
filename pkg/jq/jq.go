@@ -16,6 +16,7 @@ limitations under the License.
 package jq
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -45,7 +46,7 @@ func Compile(expression string) (*gojq.Code, error) {
 	return code, nil
 }
 
-func Eval(input io.Reader, output io.Writer, expression string) error {
+func Eval(ctx context.Context, input io.Reader, output io.Writer, expression string) error {
 	code, err := Compile(expression)
 	if err != nil {
 		return err
@@ -62,8 +63,7 @@ func Eval(input io.Reader, output io.Writer, expression string) error {
 		return err
 	}
 
-	// TODO ? use RunWithContext
-	iter := code.Run(resp)
+	iter := code.RunWithContext(ctx, resp)
 	for {
 		val, ok := iter.Next()
 		if !ok {
@@ -71,27 +71,27 @@ func Eval(input io.Reader, output io.Writer, expression string) error {
 		}
 
 		if err, isErr := val.(error); isErr {
-			return err
+			return convertError(err)
 		}
 
 		if text, e := jsonScalarToString(val); e == nil {
 			_, err := fmt.Fprintln(output, text)
 			if err != nil {
-				return err
+				return convertError(err)
 			}
 		} else {
 			var jsonFragment []byte
 			jsonFragment, err = json.Marshal(val)
 			if err != nil {
-				return err
+				return convertError(err)
 			}
 			_, err = output.Write(jsonFragment)
 			if err != nil {
-				return err
+				return convertError(err)
 			}
 			_, err = fmt.Fprint(output, "\n")
 			if err != nil {
-				return err
+				return convertError(err)
 			}
 		}
 
@@ -117,4 +117,39 @@ func jsonScalarToString(input interface{}) (string, error) {
 	default:
 		return "", fmt.Errorf("cannot convert type to string: %v", tt)
 	}
+}
+
+// NOTE > gojq has a few (private) errors
+// For more details see:
+// - https://github.com/itchyny/gojq/blob/main/error.go
+// - https://github.com/itchyny/gojq/blob/70c1144e9658f8688e8028da2b51f34b3e4fc699/cli/cli.go#L422
+//
+// The following function maps gojq errors to ours.
+func convertError(err error) error {
+	if er, ok := err.(interface{ IsEmptyError() bool }); !ok || !er.IsEmptyError() {
+		if er, ok := err.(interface {
+			IsHaltError() bool
+			ExitCode() int
+			Value() interface{}
+		}); ok && er.IsHaltError() {
+			v := er.Value()
+			if str, ok := v.(string); ok {
+				return &HaltError{
+					value: str,
+					code:  er.ExitCode(),
+				}
+			} else {
+				bs, _ := gojq.Marshal(v)
+				return &HaltError{
+					value: string(bs),
+					code:  er.ExitCode(),
+				}
+			}
+		} else if er, ok := err.(gojq.ValueError); ok {
+			// Generic gojq value error
+			return er
+		}
+	}
+
+	return err
 }
