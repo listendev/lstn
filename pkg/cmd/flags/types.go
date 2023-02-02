@@ -17,9 +17,16 @@ package flags
 
 import (
 	"context"
+	"io"
 )
 
 type Options interface {
 	Validate() []error
 	Transform(context.Context) error
+}
+
+type JsonOptions interface {
+	JSON() bool
+	Query() string
+	Output(ctx context.Context, input io.Reader, output io.Writer) error
 }
