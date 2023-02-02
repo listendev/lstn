@@ -67,7 +67,9 @@ func init() {
 			return ut.Add("excluded_without", "cannot use --{0} without specifying --{1}", true)
 		},
 		func(ut ut.Translator, fe validator.FieldError) string {
-			t, _ := ut.T("excluded_without", fe.Field(), fe.Param())
+			// NOTE > Assuming that the flag is the lowercase of the struct field name we are depending on
+			dependingOn := strings.ToLower(fe.Param())
+			t, _ := ut.T("excluded_without", fe.Field(), dependingOn)
 			return t
 		},
 	); err != nil {
