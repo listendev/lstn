@@ -18,7 +18,6 @@ package help
 import (
 	"bytes"
 	"fmt"
-	"os"
 
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	"github.com/spf13/cobra"
@@ -31,7 +30,7 @@ func configHelpTopicFunc() HelpTopicFunc {
 		fmt.Fprintf(b, "%s\n\n", "The `lstn` CLI looks for a configuration file .lstn.yaml in your `$HOME` directory when it starts.")
 		fmt.Fprintf(b, "%s\n", "In this file you can set the values for the global `lstn` configurations.")
 		fmt.Fprintf(b, "%s\n\n", "Anyways, notice that environment variables, and flags (if any) override the values in your configuration file.")
-		fmt.Fprintf(b, "%s", "Here's an example of a configuration file (with the default values):\n\n")
+		fmt.Fprintf(b, "%s\n\n", "Here's an example of a configuration file (with the default values):")
 
 		// NOTE > Assuming c.Parent() is the root one
 		p := c.Parent()
@@ -53,6 +52,6 @@ func configHelpTopicFunc() HelpTopicFunc {
 			}
 		}
 
-		fmt.Fprintf(os.Stdout, "%s", b.String())
+		c.Printf("%s", b.String())
 	}
 }
