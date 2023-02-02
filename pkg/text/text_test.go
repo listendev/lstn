@@ -31,13 +31,16 @@ func (suite *TextSuite) TestIndent() {
 }
 
 func (suite *TextSuite) TestIndentBytes() {
-	prefix := []byte("  ")
 	cases := []struct {
 		b        []byte
 		prefix   []byte
 		expected []byte
 	}{
-		{[]byte(""), prefix, []byte("")},
+		{[]byte(""), []byte("  "), []byte("")},
+		{[]byte("line1"), []byte("  "), []byte("  line1")},
+		{[]byte("line1\nline2\n"), []byte("\t"), []byte("\tline1\n\tline2\n")},
+		{[]byte("line1\nline2"), []byte("  "), []byte("  line1\n  line2")},
+		{[]byte("\tline1\n\tline2"), []byte("  "), []byte("  \tline1\n  \tline2")},
 	}
 
 	for i, tc := range cases {
