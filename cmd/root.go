@@ -143,9 +143,19 @@ const (
 	exitAuth   exitCode = 4
 )
 
+type BootOptions struct {
+	run bool
+}
+
+func DefaultBootOptions() *BootOptions {
+	return &BootOptions{
+		run: true,
+	}
+}
+
 // Boot adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func Boot() exitCode {
+func Boot(opts *BootOptions) exitCode {
 	// Setup the context
 	ctx := context.Background()
 
@@ -205,20 +215,22 @@ func Boot() exitCode {
 		rootCmd.SetArgs(args)
 	}
 
-	// Time to listen!
-	err = rootCmd.ExecuteContext(ctx)
-	if err != nil {
-		if ctxErr := pkgcontext.ContextError(ctx, err); ctxErr != nil {
-			return exitCancel
-		}
+	if opts.run {
+		// Time to listen!
+		err = rootCmd.ExecuteContext(ctx)
+		if err != nil {
+			if ctxErr := pkgcontext.ContextError(ctx, err); ctxErr != nil {
+				return exitCancel
+			}
 
-		// Proxy jq halt errors as they are
-		// NOTE > The default halt_error exit code is 5 but user can specify other exit codes
-		if err, ok := err.(*jq.HaltError); ok {
-			return exitCode(err.ExitCode())
-		}
+			// Proxy jq halt errors as they are
+			// NOTE > The default halt_error exit code is 5 but user can specify other exit codes
+			if err, ok := err.(*jq.HaltError); ok {
+				return exitCode(err.ExitCode())
+			}
 
-		return exitError
+			return exitError
+		}
 	}
 
 	return exitOK
