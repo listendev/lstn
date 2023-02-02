@@ -12,7 +12,7 @@ type TextSuite struct {
 	suite.Suite
 }
 
-func TestTextSuiteTestSuite(t *testing.T) {
+func TestTextSuite(t *testing.T) {
 	suite.Run(t, new(TextSuite))
 }
 
