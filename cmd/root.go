@@ -29,6 +29,7 @@ import (
 	"github.com/listendev/lstn/pkg/cmd/groups"
 	"github.com/listendev/lstn/pkg/cmd/help"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
+	"github.com/listendev/lstn/pkg/jq"
 	lstnversion "github.com/listendev/lstn/pkg/version"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -209,6 +210,13 @@ func Boot() exitCode {
 		if ctxErr := pkgcontext.ContextError(ctx, err); ctxErr != nil {
 			return exitCancel
 		}
+
+		// Proxy jq halt errors as they are
+		// NOTE > The default halt_error exit code is 5 but user can specify other exit codes
+		if err, ok := err.(*jq.HaltError); ok {
+			return exitCode(err.ExitCode())
+		}
+
 		return exitError
 	}
 
