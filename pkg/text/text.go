@@ -54,7 +54,7 @@ func Indent(s, prefix string) string {
 
 // IndentBytes inserts prefix at the beginning of each non-empty line of b.
 func IndentBytes(b, prefix []byte) []byte {
-	var res []byte
+	res := []byte("")
 	bol := true
 	for _, c := range b {
 		if bol && c != '\n' {
