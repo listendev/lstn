@@ -23,7 +23,7 @@ func (suite *TextSuite) TestDedent() {
 	}{}
 
 	for i, tc := range cases {
-		require.Equal(suite.T(), tc.expected, Dedent(tc.s), fmt.Sprintf("Index: %d\nOriginal:\n %v\n", i, tc.s))
+		require.Equal(suite.T(), tc.expected, Dedent(tc.s), fmt.Sprintf("Index: %d\n", i))
 	}
 }
 
