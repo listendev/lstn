@@ -22,5 +22,5 @@ import (
 )
 
 func main() {
-	os.Exit(int(cmd.Boot()))
+	os.Exit(int(cmd.Boot(cmd.DefaultBootOptions())))
 }
