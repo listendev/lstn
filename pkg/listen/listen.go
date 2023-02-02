@@ -20,7 +20,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 
 	"github.com/google/go-querystring/query"
@@ -38,7 +37,7 @@ func getBaseURLFromContext(ctx context.Context) (string, error) {
 	return cfgOpts.Endpoint, nil
 }
 
-func PackageLockAnalysis(ctx context.Context, r *AnalysisRequest, rawResponseOnly bool) (*Response, []byte, error) {
+func PackageLockAnalysis(ctx context.Context, r *AnalysisRequest, jsonOpts flags.JsonOptions) (*Response, []byte, error) {
 	// Obtain the endpoint base URL
 	baseURL, err := getBaseURLFromContext(ctx)
 	if err != nil {
@@ -74,29 +73,14 @@ func PackageLockAnalysis(ctx context.Context, r *AnalysisRequest, rawResponseOnl
 		if err := dec.Decode(target); err != nil {
 			return nil, nil, pkgcontext.OutputError(ctx, err)
 		}
-		// For target.Reason to have a value the verbose query param above needs to be true
+
 		return nil, nil, pkgcontext.OutputErrorf(ctx, err, target.Message)
 	}
 
-	// Return the JSON body
-	if rawResponseOnly {
-		b, err := io.ReadAll(res.Body)
-		if err != nil {
-			return nil, nil, pkgcontext.OutputError(ctx, err)
-		}
-		return nil, b, nil
-	}
-
-	// Unmarshal the JSON body into a Response
-	target := &Response{}
-	if err := dec.Decode(target); err != nil {
-		return nil, nil, pkgcontext.OutputError(ctx, err)
-	}
-
-	return target, nil, nil
+	return response(ctx, dec, res, jsonOpts)
 }
 
-func PackageVerdicts(ctx context.Context, r *VerdictsRequest, rawResponseOnly bool) (*Response, []byte, error) {
+func PackageVerdicts(ctx context.Context, r *VerdictsRequest, jsonOpts flags.JsonOptions) (*Response, []byte, error) {
 	// Obtain the endpoint base URL
 	baseURL, err := getBaseURLFromContext(ctx)
 	if err != nil {
@@ -133,24 +117,27 @@ func PackageVerdicts(ctx context.Context, r *VerdictsRequest, rawResponseOnly bo
 		if err := dec.Decode(target); err != nil {
 			return nil, nil, pkgcontext.OutputError(ctx, err)
 		}
-		// For target.Reason to have a value the verbose query param above needs to be true
+
 		return nil, nil, pkgcontext.OutputErrorf(ctx, err, target.Message)
 	}
 
-	// Return the JSON body
-	if rawResponseOnly {
-		b, err := io.ReadAll(res.Body)
-		if err != nil {
+	return response(ctx, dec, res, jsonOpts)
+}
+
+func response(ctx context.Context, dec *json.Decoder, res *http.Response, jsonOpts flags.JsonOptions) (*Response, []byte, error) {
+	if jsonOpts.JSON() {
+		// Eventually return as JSON
+		out := new(bytes.Buffer)
+		if err := jsonOpts.Output(ctx, res.Body, out); err != nil {
 			return nil, nil, pkgcontext.OutputError(ctx, err)
 		}
-		return nil, b, nil
+		return nil, out.Bytes(), nil
+	} else {
+		// Alternatively, unmarshal the JSON body into a Response
+		target := &Response{}
+		if err := dec.Decode(target); err != nil {
+			return nil, nil, pkgcontext.OutputError(ctx, err)
+		}
+		return target, nil, nil
 	}
-
-	// Unmarshal the JSON body into a Response
-	target := &Response{}
-	if err := dec.Decode(target); err != nil {
-		return nil, nil, pkgcontext.OutputError(ctx, err)
-	}
-
-	return target, nil, nil
 }
