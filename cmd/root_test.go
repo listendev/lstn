@@ -48,6 +48,14 @@ func (suite *CmdHelpSuite) SetupSuite() {
 	b += fmt.Sprintf("%s\n\n", "Here's an example of a configuration file (with the default values):")
 	b += "```yaml\nendpoint: http://127.0.0.1:3000\nloglevel: info\ntimeout: 60\n```\n"
 	suite.expectedOuts[Config] = b
+
+	b = "# lstn environment variables\n\n"
+	b += "The environment variables override any corresponding configuration setting.\n\n"
+	b += "But flags override them.\n\n"
+	b += "`LSTN_ENDPOINT`: the listen.dev endpoint emitting the verdicts\n\n"
+	b += "`LSTN_LOGLEVEL`: log level\n\n"
+	b += "`LSTN_TIMEOUT`: timeout in seconds\n\n"
+	suite.expectedOuts[Environment] = b
 }
 
 func TestCmdSuites(t *testing.T) {
@@ -55,7 +63,7 @@ func TestCmdSuites(t *testing.T) {
 }
 
 func (suite *CmdHelpSuite) TestTopics() {
-	topics := []commandName{Config}
+	topics := []commandName{Config, Environment}
 	for _, topic := range topics {
 		out := execute(suite.T(), suite.commands[Root], topic)
 		require.Equal(suite.T(), suite.expectedOuts[topic], out)
