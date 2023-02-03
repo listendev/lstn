@@ -58,6 +58,17 @@ func (suite *CmdHelpSuite) SetupSuite() {
 	suite.expectedOuts[Environment] = b
 
 	suite.expectedOuts[Manual] = "# lstn cheatsheet\n\n## Global Flags\n\nEvery child command inherits the following flags:\n\n```\n--config string     config file (default is $HOME/.lstn.yaml)\n--endpoint string   the listen.dev endpoint emitting the verdicts (default \"http://127.0.0.1:3000\")\n--loglevel string   log level (default \"info\")\n--timeout int       timeout in seconds (default 60)\n```\n\n## `lstn completion`\n\nGenerate the autocompletion script for the specified shell.\n\n### `lstn completion bash`\n\nGenerate the autocompletion script for bash.\n\n```\n--no-descriptions   disable completion descriptions\n```\n\n### `lstn completion fish [flags]`\n\nGenerate the autocompletion script for fish.\n\n```\n--no-descriptions   disable completion descriptions\n```\n\n### `lstn completion powershell [flags]`\n\nGenerate the autocompletion script for powershell.\n\n```\n--no-descriptions   disable completion descriptions\n```\n\n### `lstn completion zsh [flags]`\n\nGenerate the autocompletion script for zsh.\n\n```\n--no-descriptions   disable completion descriptions\n```\n\n## `lstn config`\n\nDetails about the ~/.lstn.yaml config file.\n\n```\n-h, --help   help for config\n```\n\n## `lstn environment`\n\nWhich environment variables you can use with lstn.\n\n```\n-h, --help   help for environment\n```\n\n## `lstn exit`\n\nDetails about the lstn exit codes.\n\n## `lstn help [command]`\n\nHelp about any command.\n\n## `lstn in <path>`\n\nInspect the verdicts of your dependencies.\n\n```\n-q, --jq string   filter the output using a jq expression\n    --json        output the verdicts (if any) in JSON form\n```\n\nFor example:\n\n```bash\nlstn in\nlstn in .\nlstn in /we/snitch\nlstn in sub/dir\n```\n\n## `lstn manual`\n\nA comprehensive reference of all the lstn commands.\n\n```\n-h, --help   help for manual\n```\n\n## `lstn to <name> [version] [shasum]`\n\nGet the verdicts of a package.\n\n```\n-q, --jq string   filter the output using a jq expression\n    --json        output the verdicts (if any) in JSON form\n```\n\nFor example:\n\n```bash\nlstn to chalk\nlstn to debug 4.3.4\n```\n\n## `lstn version`\n\nPrint out version information.\n\n"
+
+	b = "The lstn CLI follows the usual conventions regarding exit codes.\n\n"
+	b += "Meaning:\n\n"
+	b += "* when a command completes successfully, the exit code will be 0\n\n"
+	b += "* when a command fails for any reason, the exit code will be 1\n\n"
+	b += "* when a command is running but gets cancelled, the exit code will be 2\n\n"
+	b += "* when a command meets an authentication issue, the exit code will be 4\n\n"
+	b += "Notice that it's possible that a particular command may have more exit codes,\n"
+	b += "so it's a good practice to check the docs for the specific command\n"
+	b += "in case you're relying on the exit codes to control some behaviour.\n"
+	suite.expectedOuts[Exit] = b
 }
 
 func TestCmdSuites(t *testing.T) {
@@ -65,7 +76,8 @@ func TestCmdSuites(t *testing.T) {
 }
 
 func (suite *CmdHelpSuite) TestTopics() {
-	topics := []commandName{Config, Environment, Manual}
+	// TODO > Parallelize
+	topics := []commandName{Config, Environment, Manual, Exit}
 	for _, topic := range topics {
 		out := execute(suite.T(), suite.commands[Root], topic)
 		require.Equal(suite.T(), suite.expectedOuts[topic], out)

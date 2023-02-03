@@ -87,7 +87,7 @@ func NewTopic(topic string) *cobra.Command {
 
 	c.SetHelpFunc(func(c *cobra.Command, args []string) {
 		if c.Long != "" {
-			fmt.Fprintf(os.Stdout, c.Long)
+			c.Print(c.Long)
 			if c.Example != "" {
 				fmt.Fprintf(os.Stdout, "\n\nExamples:\n")
 				fmt.Fprintf(os.Stdout, "%s", text.Indent(c.Example, "  "))
