@@ -63,7 +63,6 @@ func TestCmdSuites(t *testing.T) {
 }
 
 func (suite *CmdAdditionalHelpSuite) TestTopics() {
-	// TODO > Parallelize
 	topics := []commandName{Config, Environment, Manual, Exit}
 	for _, topic := range topics {
 		out := execute(suite.T(), suite.commands[Root], topic)
