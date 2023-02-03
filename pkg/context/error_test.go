@@ -90,6 +90,23 @@ func (suite *ErrorSuite) TestOutputError() {
 	})
 }
 
+func (suite *ErrorSuite) TestOutputErrorf() {
+	suite.T().Run("returns same error formatted without args", func(t *testing.T) {
+		err := OutputErrorf(context.Background(), errors.New("some error"), "test")
+		assert.EqualError(t, err, "test")
+	})
+	suite.T().Run("returns same error formatted with args", func(t *testing.T) {
+		err := OutputErrorf(context.Background(), errors.New("some error"), "test %s and %s", "this", "that")
+		assert.EqualError(t, err, "test this and that")
+	})
+	suite.T().Run("returns context error", func(t *testing.T) {
+		input := errors.New("some error")
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+		assert.NotEqual(t, input, OutputErrorf(ctx, errors.New("some error"), "this won't be used"))
+	})
+}
+
 // Utils
 
 // Implements net.Error interface
