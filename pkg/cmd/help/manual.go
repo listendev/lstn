@@ -19,7 +19,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"os"
 	"strings"
 
 	"github.com/listendev/lstn/pkg/text"
@@ -81,6 +80,6 @@ func manualHelpTopicFunc() HelpTopicFunc {
 			cReference(b, c, 2)
 		}
 
-		fmt.Fprintf(os.Stdout, "%s", b.String())
+		c.Printf("%s", b.String())
 	}
 }
