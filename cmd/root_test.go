@@ -42,10 +42,10 @@ func (suite *CmdHelpSuite) SetupSuite() {
 
 	suite.expectedOuts = make(expectedOutsMap)
 	b := "# lstn configuration file\n\n"
-	b += fmt.Sprintf("%s\n\n", "The `lstn` CLI looks for a configuration file .lstn.yaml in your `$HOME` directory when it starts.")
-	b += fmt.Sprintf("%s\n", "In this file you can set the values for the global `lstn` configurations.")
-	b += fmt.Sprintf("%s\n\n", "Anyways, notice that environment variables, and flags (if any) override the values in your configuration file.")
-	b += fmt.Sprintf("%s\n\n", "Here's an example of a configuration file (with the default values):")
+	b += "The `lstn` CLI looks for a configuration file .lstn.yaml in your `$HOME` directory when it starts.\n\n"
+	b += "In this file you can set the values for the global `lstn` configurations.\n"
+	b += "Anyways, notice that environment variables, and flags (if any) override the values in your configuration file.\n\n"
+	b += "Here's an example of a configuration file (with the default values):\n\n"
 	b += "```yaml\nendpoint: http://127.0.0.1:3000\nloglevel: info\ntimeout: 60\n```\n"
 	suite.expectedOuts[Config] = b
 
