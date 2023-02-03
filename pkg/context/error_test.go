@@ -77,6 +77,19 @@ func (suite *ErrorSuite) TestContextError() {
 	}
 }
 
+func (suite *ErrorSuite) TestOutputError() {
+	suite.T().Run("returns same error", func(t *testing.T) {
+		input := errors.New("some error")
+		assert.Equal(t, input, OutputError(context.Background(), input))
+	})
+	suite.T().Run("returns context error", func(t *testing.T) {
+		input := errors.New("some error")
+		ctx, cancel := context.WithCancel(context.Background())
+		cancel()
+		assert.NotEqual(t, input, OutputError(ctx, errors.New("some error")))
+	})
+}
+
 // Utils
 
 // Implements net.Error interface
