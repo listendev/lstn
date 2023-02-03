@@ -1,9 +1,11 @@
 package flags
 
 import (
+	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -45,5 +47,25 @@ func (suite *FlagsBaseSuite) TestValidate() {
 		for _, a := range actual {
 			assert.Contains(suite.T(), tc.expectedStr, a.Error())
 		}
+	}
+}
+
+func (suite *FlagsBaseSuite) TestTransform() {
+	cases := []struct {
+		o        Options
+		expected error
+	}{
+		{
+			&ConfigOptions{},
+			nil,
+		},
+		// There are no other use cases to test. The only way for the underlying [(mold.Transformer).Struct](https://pkg.go.dev/github.com/go-playground/mold/v4#Transformer.Struct)
+		// to fail is when it is provided with an input that cannot be transformed into a string typo. It can't happen as it is shielded by the struct ConfigOptions.
+	}
+
+	ctx := context.Background()
+	for _, tc := range cases {
+		bo := new(baseOptions)
+		require.Equal(suite.T(), tc.expected, bo.Transform(ctx, tc.o))
 	}
 }
