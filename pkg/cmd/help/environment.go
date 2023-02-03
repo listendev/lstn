@@ -18,7 +18,6 @@ package help
 import (
 	"bytes"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/listendev/lstn/pkg/cmd/flags"
@@ -46,6 +45,6 @@ func envHelpTopicFunc() HelpTopicFunc {
 			})
 		}
 
-		fmt.Fprintf(os.Stdout, "%s", b.String())
+		c.Printf("%s", b.String())
 	}
 }
