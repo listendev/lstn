@@ -11,26 +11,13 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type commandName string
-
-const (
-	Root        commandName = "lstn"
-	Config      commandName = "config"
-	Environment             = "environment"
-	Exit                    = "exit"
-	In          commandName = "in"
-	Manual                  = "manual"
-	To                      = "to"
-	Version                 = "version"
-)
-
-type CmdHelpSuite struct {
+type CmdAdditionalHelpSuite struct {
 	suite.Suite
 	commands     commandsMap
 	expectedOuts expectedOutsMap
 }
 
-func (suite *CmdHelpSuite) SetupSuite() {
+func (suite *CmdAdditionalHelpSuite) SetupSuite() {
 	Boot(&BootOptions{run: false})
 
 	suite.commands = make(commandsMap)
@@ -72,10 +59,10 @@ func (suite *CmdHelpSuite) SetupSuite() {
 }
 
 func TestCmdSuites(t *testing.T) {
-	suite.Run(t, new(CmdHelpSuite))
+	suite.Run(t, new(CmdAdditionalHelpSuite))
 }
 
-func (suite *CmdHelpSuite) TestTopics() {
+func (suite *CmdAdditionalHelpSuite) TestTopics() {
 	// TODO > Parallelize
 	topics := []commandName{Config, Environment, Manual, Exit}
 	for _, topic := range topics {
@@ -85,6 +72,19 @@ func (suite *CmdHelpSuite) TestTopics() {
 }
 
 // Utils
+
+type commandName string
+
+const (
+	Root        commandName = "lstn"
+	Config      commandName = "config"
+	Environment             = "environment"
+	Exit                    = "exit"
+	In          commandName = "in"
+	Manual                  = "manual"
+	To                      = "to"
+	Version                 = "version"
+)
 
 type commandsMap map[commandName]*cobra.Command
 type expectedOutsMap map[commandName]string
