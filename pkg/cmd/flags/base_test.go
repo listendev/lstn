@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -79,6 +78,5 @@ func (suite *FlagsBaseSuite) TestTransform() {
 		suite.T().Run(tc.desc, func(t *testing.T) {
 			assert.Equal(t, tc.expected, bo.Transform(ctx, tc.o))
 		})
-		require.Equal(suite.T(), tc.expected, bo.Transform(ctx, tc.o))
 	}
 }
