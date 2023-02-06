@@ -106,21 +106,25 @@ func validateInArgs(c *cobra.Command, args []string) error {
 		return err
 	}
 
-	// Validate first argument is a valid package name
 	all := []error{}
 	switch len(args) {
 	case 3:
+		// Validate third argument is a shasum
 		if err := validate.Singleton.Var(args[2], "len=40"); err != nil {
 			all = append(all, fmt.Errorf("%s is not a valid shasum", args[2]))
 		}
 		fallthrough
 	case 2:
+		// Validate second argument is a valid semver version
 		if err := validate.Singleton.Var(args[1], "semver"); err != nil {
 			all = append(all, fmt.Errorf("%s is not a valid semantic version", args[1]))
 		}
 		fallthrough
-	default:
-		// TODO > validate the package name
+	case 1:
+		// Validate first argument is a valid package name
+		if err := validate.Singleton.Var(args[0], "npm_package_name"); err != nil {
+			all = append(all, fmt.Errorf("%s is not a valid npm package name", args[0]))
+		}
 	}
 
 	// Format errors (if any)
