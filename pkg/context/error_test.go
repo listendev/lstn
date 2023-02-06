@@ -44,7 +44,8 @@ func (suite *ErrorSuite) TestContextError() {
 		{
 			name: "Context error is context.DeadlineExceeded",
 			ctxFactory: func() context.Context {
-				ctx, _ := context.WithDeadline(context.Background(), time.Now())
+				ctx, cancel := context.WithDeadline(context.Background(), time.Now())
+				defer cancel()
 				return ctx
 			},
 			input:    errors.New("some error"),

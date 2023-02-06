@@ -104,7 +104,11 @@ func execute(t *testing.T, c *cobra.Command, sub commandName) string {
 	b := bytes.NewBufferString("")
 	c.SetOut(b)
 	c.SetArgs([]string{string(sub)})
-	c.Execute()
+	err := c.Execute()
+	if err != nil {
+		t.Fatalf("Error during execution of %s %s", c.Name(), sub)
+	}
+
 	out, err := io.ReadAll(b)
 	if err != nil {
 		t.Fatalf("Error during reading of %s %s", c.Name(), sub)
