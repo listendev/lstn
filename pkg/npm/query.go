@@ -19,6 +19,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
 	pkgcontext "github.com/listendev/lstn/pkg/context"
@@ -35,24 +36,45 @@ type npmRegistryPackageVersionResponse struct {
 // requestShasum queries the NPM registry to obtain the shasum of the input package version.
 // TODO > backoff/retry strategy?
 func requestShasum(ctx context.Context, name, version string) (*packageInfo, error) {
-	url := fmt.Sprintf("%s/%s/%s", npmRegistryBaseURL, name, version)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	res, err := GetFromRegistry(ctx, name, version)
 	if err != nil {
-		return nil, pkgcontext.OutputErrorf(ctx, err, "couldn't prepare the request to %s for %s/%s", npmRegistryBaseURL, name, version)
+		return nil, err
 	}
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, pkgcontext.OutputErrorf(ctx, err, "couldn't perform the request to %s", req.URL)
-	}
-	defer res.Body.Close()
-	if res.StatusCode != http.StatusOK {
-		return nil, pkgcontext.OutputErrorf(ctx, err, "the NPM registry response for %s was not ok", req.URL)
-	}
+	defer res.Close()
 
 	ret := &npmRegistryPackageVersionResponse{}
-	if err := json.NewDecoder(res.Body).Decode(ret); err != nil {
+	if err := json.NewDecoder(res).Decode(ret); err != nil {
 		return nil, pkgcontext.OutputErrorf(ctx, err, "couldn't decode the NPM registry response")
 	}
 
 	return &packageInfo{shasum: ret.Dist.Shasum, name: name, version: version}, nil
+}
+
+// GetFromRegistry asks to the npm registry for the details of a package
+// by name, and optionally, by version.
+func GetFromRegistry(ctx context.Context, name, version string) (io.ReadCloser, error) {
+	if name == "" {
+		return nil, pkgcontext.OutputError(ctx, fmt.Errorf("the name is mandatory to query the npm registry"))
+	}
+	suffix := fmt.Sprintf("/%s", name)
+	if version != "" {
+		suffix += fmt.Sprintf("/%s", version)
+	}
+
+	url := fmt.Sprintf("%s/%s", npmRegistryBaseURL, suffix)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, pkgcontext.OutputErrorf(ctx, err, "couldn't prepare the request to %s", url)
+	}
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, pkgcontext.OutputErrorf(ctx, err, "couldn't perform the request to %s", req.URL)
+	}
+
+	if res.StatusCode != http.StatusOK {
+		return nil, pkgcontext.OutputErrorf(ctx, err, "the NPM registry response for %s was not ok", req.URL)
+	}
+
+	return res.Body, nil
 }
