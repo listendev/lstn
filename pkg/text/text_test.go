@@ -15,6 +15,24 @@ func TestTextSuite(t *testing.T) {
 	suite.Run(t, new(TextSuite))
 }
 
+func (suite *TextSuite) TestIndentDedent() {
+	cases := []struct {
+		b string
+	}{
+		{""},
+		{"line1"},
+		{"line1\nline2\n"},
+		{"line1\nline2"},
+		{"\tline1\n\tline2"},
+	}
+
+	for _, tc := range cases {
+		suite.T().Run(tc.b, func(t *testing.T) {
+			assert.Equal(t, tc.b, Dedent(Indent(tc.b, "  ")))
+		})
+	}
+}
+
 func (suite *TextSuite) TestDedent() {
 	cases := []struct {
 		s        string
@@ -22,7 +40,7 @@ func (suite *TextSuite) TestDedent() {
 	}{
 		{"", ""},
 		{"line1\nline2", "line1\nline2"},
-		// {"line1\n\tline2", "line1\nline2"}, // FIXME(fra): is implementation working as supposed?
+		{" line1\n  line2\n\n line4", "line1\n line2\n\nline4"},
 	}
 
 	for _, tc := range cases {
