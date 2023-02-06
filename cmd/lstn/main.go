@@ -16,11 +16,16 @@ limitations under the License.
 package main
 
 import (
+	"context"
 	"os"
 
-	"github.com/listendev/lstn/cmd"
+	"github.com/listendev/lstn/cmd/root"
+	"github.com/spf13/cobra"
 )
 
 func main() {
-	os.Exit(int(cmd.Boot(cmd.DefaultBootOptions())))
+	cmd, err := root.New(context.Background())
+	cobra.CheckErr(err)
+
+	os.Exit(int(cmd.Go()))
 }
