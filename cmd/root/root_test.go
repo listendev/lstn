@@ -1,7 +1,8 @@
-package cmd
+package root
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"testing"
@@ -18,12 +19,15 @@ type CmdAdditionalHelpSuite struct {
 }
 
 func (suite *CmdAdditionalHelpSuite) SetupSuite() {
-	Boot(&BootOptions{run: false})
+	rootCmd, err := New(context.Background())
+	if err != nil {
+		suite.Fail("couldn't instantiate the root command")
+	}
 
 	suite.commands = make(commandsMap)
-	suite.commands[Root] = rootCmd
+	suite.commands[Root] = rootCmd.cmd
 
-	for _, command := range rootCmd.Commands() {
+	for _, command := range rootCmd.cmd.Commands() {
 		suite.commands[commandName(command.Name())] = command
 	}
 
