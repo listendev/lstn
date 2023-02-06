@@ -19,35 +19,44 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
-var changelogTests = []struct {
-	tag string
-	url string
-}{
-	{
-		tag: "0.3.2",
-		url: "https://github.com/listendev/lstn/releases/tag/v0.3.2",
-	},
-	{
-		tag: "v0.3.2",
-		url: "https://github.com/listendev/lstn/releases/tag/v0.3.2",
-	},
-	{
-		tag: "v0.3.2-alpha.1",
-		url: "https://github.com/listendev/lstn/releases/tag/v0.3.2-alpha.1",
-	},
-	{
-		tag: "150d3f96.20230130",
-		url: "",
-	},
+type VersionSuite struct {
+	suite.Suite
 }
 
-func TestChangelog(t *testing.T) {
-	for _, tt := range changelogTests {
-		t.Run(tt.tag, func(t *testing.T) {
-			res, _ := Changelog(tt.tag)
-			assert.Equal(t, res, tt.url)
+func TestVersionSuite(t *testing.T) {
+	suite.Run(t, new(VersionSuite))
+}
+
+func (suite *VersionSuite) TestChangeLog() {
+	cases := []struct {
+		tag string
+		url string
+	}{
+		{
+			tag: "0.3.2",
+			url: "https://github.com/listendev/lstn/releases/tag/v0.3.2",
+		},
+		{
+			tag: "v0.3.2",
+			url: "https://github.com/listendev/lstn/releases/tag/v0.3.2",
+		},
+		{
+			tag: "v0.3.2-alpha.1",
+			url: "https://github.com/listendev/lstn/releases/tag/v0.3.2-alpha.1",
+		},
+		{
+			tag: "150d3f96.20230130",
+			url: "",
+		},
+	}
+
+	for _, tc := range cases {
+		suite.T().Run(tc.tag, func(t *testing.T) {
+			res, _ := Changelog(tc.tag)
+			assert.Equal(t, res, tc.url)
 		})
 	}
 }
