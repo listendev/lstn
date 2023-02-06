@@ -25,6 +25,7 @@ import (
 	"github.com/listendev/lstn/pkg/cmd/groups"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/listen"
+	"github.com/listendev/lstn/pkg/npm"
 	"github.com/listendev/lstn/pkg/validate"
 	"github.com/spf13/cobra"
 )
@@ -124,6 +125,8 @@ func validateInArgs(c *cobra.Command, args []string) error {
 		// Validate first argument is a valid package name
 		if err := validate.Singleton.Var(args[0], "npm_package_name"); err != nil {
 			all = append(all, fmt.Errorf("%s is not a valid npm package name", args[0]))
+		} else if _, err := npm.GetFromRegistry(c.Context(), args[0], ""); err != nil {
+			all = append(all, fmt.Errorf("package %s doesn't exist on npm", args[0]))
 		}
 	}
 
