@@ -68,8 +68,6 @@ func (suite *FlagsBaseSuite) TestTransform() {
 			&ConfigOptions{},
 			nil,
 		},
-		// There are no other use cases to test. The only way for the underlying [(mold.Transformer).Struct](https://pkg.go.dev/github.com/go-playground/mold/v4#Transformer.Struct)
-		// to fail is when it is provided with an input that cannot be transformed into a string typo. It can't happen as it is shielded by the struct ConfigOptions.
 	}
 
 	ctx := context.Background()
