@@ -70,6 +70,11 @@ var (
 			// TODO
 			return nil
 		},
+		"tag": func(x string) error {
+			fmt.Fprintf(os.Stdout, "executing `%s` ...\n", "tag")
+			// TODO
+			return nil
+		},
 	}
 )
 
@@ -111,6 +116,8 @@ func main() {
 			fmt.Fprintf(os.Stderr, "unknown command `%s`.\n", norm)
 			os.Exit(1)
 		}
+
+		// FIXME: stop and pass all the remaining args to the command
 
 		err := c(arg)
 		if err != nil {
