@@ -3,6 +3,10 @@ name: pull requests automation
 on:
   pull_request_target:
     types: [ready_for_review, opened, reopened]
+  push:
+    paths:
+      - "**.go"
+    branches: ['main']
 
 jobs:
   headers:
