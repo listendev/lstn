@@ -29,11 +29,16 @@ Prerequisites:
 
 Build with:
 
-_TODO_
+```bash
+go build -o make/make make/main.go
+make/make lstn
+```
 
 Run the CLI as:
 
-_TODO_
+```bash
+./lstn help
+```
 
 ## Testing the CLI
 
