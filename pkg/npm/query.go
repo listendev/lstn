@@ -23,6 +23,7 @@ import (
 	"net/http"
 
 	pkgcontext "github.com/listendev/lstn/pkg/context"
+	"github.com/listendev/lstn/pkg/ua"
 )
 
 const npmRegistryBaseURL = "https://registry.npmjs.org"
@@ -66,6 +67,8 @@ func GetFromRegistry(ctx context.Context, name, version string) (io.ReadCloser, 
 	if err != nil {
 		return nil, pkgcontext.OutputErrorf(ctx, err, "couldn't prepare the request to %s", url)
 	}
+
+	req.Header.Set("User-Agent", ua.Generate(true))
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
