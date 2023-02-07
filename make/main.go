@@ -1,18 +1,18 @@
-/*
-Copyright © 2022 The listen.dev team <engineering@garnet.ai>
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-	http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+// SPDX-License-Identifier: Apache-2.0
+//
+// Copyright © 2023 The listen.dev team <engineering@garnet.ai>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 // Compile the lstn CLI et al.
 //
@@ -49,6 +49,7 @@ var (
 			info, err := os.Stat(exe)
 			if err == nil && !sourceFilesLaterThan(info.ModTime()) {
 				fmt.Fprintf(os.Stderr, "nothing to do because `%s` is up to date.\n", exe)
+
 				return nil
 			}
 
@@ -151,6 +152,7 @@ func getGitTag() string {
 	if des, err := getCommandOutput("git", "describe", "--tags"); err == nil {
 		return des
 	}
+
 	return ""
 }
 
@@ -161,6 +163,7 @@ func isTargetingWindows() bool {
 	if runtime.GOOS == "windows" {
 		return true
 	}
+
 	return false
 }
 
@@ -173,6 +176,7 @@ func run(args ...string) error {
 	cmd := exec.Command(exe, args[1:]...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
+
 	return cmd.Run()
 }
 
@@ -184,6 +188,7 @@ func getCommandOutput(args ...string) (string, error) {
 	cmd := exec.Command(exe, args[1:]...)
 	cmd.Stderr = io.Discard
 	out, err := cmd.Output()
+
 	return strings.TrimSuffix(string(out), "\n"), err
 }
 
@@ -203,6 +208,7 @@ func setX(args ...string) {
 
 func isAccessDenied(err error) bool {
 	var pe *os.PathError
+
 	return errors.As(err, &pe) && strings.Contains(pe.Err.Error(), "Access is denied")
 }
 
@@ -213,8 +219,10 @@ func sourceFilesLaterThan(t time.Time) bool {
 			// Ignore errors that occur when the project contains a symlink to a filesystem or volume that it doesn't have access to
 			if path != "." && isAccessDenied(err) {
 				fmt.Fprintf(os.Stderr, "%s: %v\n", path, err)
+
 				return nil
 			}
+
 			return err
 		}
 		if foundLater {
@@ -223,14 +231,15 @@ func sourceFilesLaterThan(t time.Time) bool {
 		if len(path) > 1 && (path[0] == '.' || path[0] == '_') {
 			if info.IsDir() {
 				return filepath.SkipDir
-			} else {
-				return nil
 			}
+
+			return nil
 		}
 		if info.IsDir() {
 			if name := filepath.Base(path); name == "vendor" || name == "node_modules" {
 				return filepath.SkipDir
 			}
+
 			return nil
 		}
 		if path == "go.mod" || path == "go.sum" || (strings.HasSuffix(path, ".go") && !strings.HasSuffix(path, "_test.go")) {
@@ -238,10 +247,12 @@ func sourceFilesLaterThan(t time.Time) bool {
 				foundLater = true
 			}
 		}
+
 		return nil
 	})
 	if err != nil {
 		panic(err)
 	}
+
 	return foundLater
 }

@@ -1,18 +1,18 @@
-/*
-Copyright © 2022 The listen.dev team <engineering@garnet.ai>
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-	http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+// SPDX-License-Identifier: Apache-2.0
+//
+// Copyright © 2023 The listen.dev team <engineering@garnet.ai>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 package root
 
 import (
@@ -40,12 +40,13 @@ var (
 	cfgFile string
 )
 
-type command struct {
+type Command struct {
 	cmd *cobra.Command
 	ctx context.Context
 }
 
-func New(ctx context.Context) (*command, error) {
+//gocyclo:ignore
+func New(ctx context.Context) (*Command, error) {
 	// rootCmd represents the base command when called without any subcommands
 	var rootCmd = &cobra.Command{
 		Use:          "lstn",
@@ -128,6 +129,7 @@ func New(ctx context.Context) (*command, error) {
 					ret += "\n       "
 					ret += e.Error()
 				}
+
 				return fmt.Errorf(ret)
 			}
 
@@ -137,7 +139,8 @@ func New(ctx context.Context) (*command, error) {
 			}
 
 			// Set the context with the actual configuration values
-			ctx, cancel := context.WithTimeout(c.Context(), time.Second*time.Duration(cfgOpts.Timeout))
+			var cancel context.CancelFunc
+			ctx, cancel = context.WithTimeout(c.Context(), time.Second*time.Duration(cfgOpts.Timeout))
 			ctx = context.WithValue(ctx, pkgcontext.ContextCancelFuncKey, cancel)
 			c.SetContext(ctx)
 
@@ -225,31 +228,31 @@ func New(ctx context.Context) (*command, error) {
 		rootCmd.SetArgs(args)
 	}
 
-	return &command{rootCmd, ctx}, nil
+	return &Command{rootCmd, ctx}, nil
 }
 
-type exitCode int
+type ExitCode int
 
 const (
-	exitOK     exitCode = 0
-	exitError  exitCode = 1
-	exitCancel exitCode = 2
-	exitAuth   exitCode = 4
+	exitOK     ExitCode = 0
+	exitError  ExitCode = 1
+	exitCancel ExitCode = 2
+	exitAuth   ExitCode = 4
 )
 
 // Boot adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
-func (c *command) Go() exitCode {
+func (c *Command) Go() ExitCode {
 	err := c.cmd.ExecuteContext(c.ctx)
 	if err != nil {
-		if ctxErr := pkgcontext.ContextError(c.ctx, err); ctxErr != nil {
+		if ctxErr := pkgcontext.Error(c.ctx, err); ctxErr != nil {
 			return exitCancel
 		}
 
 		// Proxy jq halt errors as they are
 		// NOTE > The default halt_error exit code is 5 but user can specify other exit codes
 		if err, ok := err.(*jq.HaltError); ok {
-			return exitCode(err.ExitCode())
+			return ExitCode(err.ExitCode())
 		}
 
 		return exitError
@@ -262,7 +265,7 @@ func init() {
 	cobra.OnInitialize(initConfig)
 }
 
-// initConfig reads in config file and ENV variables if set
+// initConfig reads in config file and ENV variables if set.
 func initConfig() {
 	if cfgFile != "" {
 		// Use config file from the flag
