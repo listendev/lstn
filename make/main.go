@@ -33,13 +33,16 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"golang.org/x/exp/maps"
 )
 
 const outputPath = "lstn"
 
 var (
-	commands = map[string]func(string) error{
-		outputPath: func(exe string) error {
+	commands = map[string]func([]string) error{
+		outputPath: func(args []string) error {
+			exe := args[0]
 			fmt.Fprintf(os.Stdout, "executing `%s` to build the %s executable...\n", outputPath, exe)
 
 			info, err := os.Stat(exe)
@@ -60,18 +63,18 @@ var (
 
 			return run("go", "build", "-trimpath", "-ldflags", ldflags, "-o", exe, "./cmd/lstn")
 		},
-		"man": func(_ string) error {
-			fmt.Fprintf(os.Stdout, "executing `%s` ...\n", "man")
+		"man": func(args []string) error {
+			fmt.Fprintf(os.Stdout, "executing `%s` ...\n", args[0])
 			// TODO
 			return nil
 		},
-		"clean": func(x string) error {
-			fmt.Fprintf(os.Stdout, "executing `%s` ...\n", "clean")
+		"clean": func(args []string) error {
+			fmt.Fprintf(os.Stdout, "executing `%s` ...\n", args[0])
 			// TODO
 			return nil
 		},
-		"tag": func(x string) error {
-			fmt.Fprintf(os.Stdout, "executing `%s` ...\n", "tag")
+		"tag": func(args []string) error {
+			fmt.Fprintf(os.Stdout, "executing `%s` ...\n", args[0])
 			// TODO
 			return nil
 		},
@@ -103,28 +106,28 @@ func main() {
 		}
 	}
 
+	if len(args) < 1 {
+		fmt.Fprintf(os.Stderr, "specify one command in %s.\n", maps.Keys(commands))
+		os.Exit(1)
+	}
+
 	if len(args) == 1 {
 		if isTargetingWindows() {
 			args[0] = fmt.Sprintf("%s.exe", args[0])
 		}
 	}
 
-	for _, arg := range args {
-		norm := filepath.ToSlash(strings.TrimSuffix(arg, ".exe"))
-		c := commands[norm]
-		if c == nil {
-			fmt.Fprintf(os.Stderr, "unknown command `%s`.\n", norm)
-			os.Exit(1)
-		}
+	norm := filepath.ToSlash(strings.TrimSuffix(args[0], ".exe"))
+	c := commands[norm]
+	if c == nil {
+		fmt.Fprintf(os.Stderr, "unknown command `%s`.\n", norm)
+		os.Exit(1)
+	}
 
-		// FIXME: stop and pass all the remaining args to the command
-
-		err := c(arg)
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			fmt.Fprintf(os.Stderr, "failure while executing `%s`.\n", norm)
-			os.Exit(1)
-		}
+	if err := c(args); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintf(os.Stderr, "failure while executing `%s`.\n", norm)
+		os.Exit(1)
 	}
 }
 
