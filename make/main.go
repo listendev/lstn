@@ -34,6 +34,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/listendev/lstn/pkg/validate"
 	"golang.org/x/exp/maps"
 )
 
@@ -74,9 +75,22 @@ var (
 			return nil
 		},
 		"tag": func(args []string) error {
-			fmt.Fprintf(os.Stdout, "executing `%s` ...\n", args[0])
-			// TODO
-			return nil
+			// Check we have a version argument
+			if len(args) < 2 {
+				fmt.Fprintf(os.Stderr, "missing the version argument ...\n")
+				os.Exit(1)
+			}
+			// Check the tag argument is semver
+			v := strings.TrimPrefix(args[1], "v")
+			if err := validate.Singleton.Var(v, "semver"); err != nil {
+				fmt.Fprintf(os.Stderr, "%s is not a valid semantic version.\n", v)
+				os.Exit(1)
+			}
+			v = fmt.Sprintf("v%s", v)
+
+			fmt.Fprintf(os.Stdout, "executing `%s` with version `%s` ...\n", args[0], v)
+
+			return run("git", "tag", "-a", v, "-m", fmt.Sprintf("Release %s", v), "main")
 		},
 	}
 )
