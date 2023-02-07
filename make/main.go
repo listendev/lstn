@@ -86,7 +86,9 @@ var (
 				fmt.Fprintf(os.Stderr, "%s is not a valid semantic version.\n", v)
 				os.Exit(1)
 			}
-			v = fmt.Sprintf("v%s", v)
+			if !strings.HasPrefix(v, "v") {
+				v = fmt.Sprintf("v%s", v)
+			}
 
 			fmt.Fprintf(os.Stdout, "executing `%s` with version `%s` ...\n", args[0], v)
 

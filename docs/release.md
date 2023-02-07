@@ -20,6 +20,7 @@ which also checks if the version conforms to SemVer.
 For example:
 
 ```bash
+go build -o make/make make/main.go
 make/make tag 0.22.1
 ```
 
