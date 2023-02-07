@@ -43,7 +43,7 @@ and talk through which code gets run.
 3. The new package should expose a `New()` function that accepts a `*context.Context` type and
    returns `(*cobra.Command, error)`.
 4. Use the method from the previous step to generate the command and add it to the command tree
-   - Typically this means adding it as subcommand of the root command (ie., `cmd/root.go`) in its `Boot()` function.
+   - Typically this means adding it as subcommand of the root command (ie., `cmd/root/root.go`) in its `New()` function.
 
 ## How to write tests
 
