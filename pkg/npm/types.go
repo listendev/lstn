@@ -26,6 +26,12 @@ type LockfileVersion struct {
 	Value int `json:"lockfileVersion"`
 }
 
+type packageLockJSONVersion1 struct {
+	Name         string                           `json:"name"`
+	Version      string                           `json:"version"`
+	Dependencies map[string]PackageLockDependency `json:"dependencies"`
+}
+
 type packageLockJSONVersion2 struct {
 	Name         string                           `json:"name"`
 	Version      string                           `json:"version"`
@@ -40,6 +46,7 @@ type packageLockJSONVersion3 struct {
 
 type packageLockJSON struct {
 	LockfileVersion
+	*packageLockJSONVersion1
 	*packageLockJSONVersion2
 	*packageLockJSONVersion3
 	bytes []byte
@@ -51,6 +58,10 @@ func (p *packageLockJSON) UnmarshalJSON(data []byte) error {
 	}
 
 	switch p.LockfileVersion.Value {
+	case 1:
+		p.packageLockJSONVersion1 = &packageLockJSONVersion1{}
+
+		return json.Unmarshal(data, p.packageLockJSONVersion1)
 	case 2:
 		p.packageLockJSONVersion2 = &packageLockJSONVersion2{}
 
@@ -72,8 +83,6 @@ func (p *packageLockJSON) UnmarshalJSON(data []byte) error {
 		}
 
 		return nil
-	case 1:
-		fallthrough
 	default:
 		return fmt.Errorf("unsupported package-lock.json version")
 	}
