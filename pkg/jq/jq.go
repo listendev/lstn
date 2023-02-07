@@ -1,18 +1,18 @@
-/*
-Copyright © 2022 The listen.dev team <engineering@garnet.ai>
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-	http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+// SPDX-License-Identifier: Apache-2.0
+//
+// Copyright © 2023 The listen.dev team <engineering@garnet.ai>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 package jq
 
 import (
@@ -34,9 +34,7 @@ func Compile(expression string) (*gojq.Code, error) {
 	}
 
 	// Allow access to OS environment variables
-	allowAccessToEnv := gojq.WithEnvironLoader(func() []string {
-		return os.Environ()
-	})
+	allowAccessToEnv := gojq.WithEnvironLoader(os.Environ)
 
 	code, err := gojq.Compile(query, allowAccessToEnv)
 	if err != nil {
@@ -71,12 +69,13 @@ func Eval(ctx context.Context, input io.Reader, output io.Writer, expression str
 			break
 		}
 
-		if err, isErr := val.(error); isErr {
+		var isErr bool
+		if err, isErr = val.(error); isErr {
 			return convertError(err)
 		}
 
 		if text, e := jsonScalarToString(val); e == nil {
-			_, err := fmt.Fprintln(output, text)
+			_, err = fmt.Fprintln(output, text)
 			if err != nil {
 				return convertError(err)
 			}
@@ -95,7 +94,6 @@ func Eval(ctx context.Context, input io.Reader, output io.Writer, expression str
 				return convertError(err)
 			}
 		}
-
 	}
 
 	return nil
@@ -108,9 +106,9 @@ func jsonScalarToString(input interface{}) (string, error) {
 	case float64:
 		if math.Trunc(tt) == tt {
 			return strconv.FormatFloat(tt, 'f', 0, 64), nil
-		} else {
-			return strconv.FormatFloat(tt, 'f', 2, 64), nil
 		}
+
+		return strconv.FormatFloat(tt, 'f', 2, 64), nil
 	case nil:
 		return "", nil
 	case bool:
@@ -139,12 +137,13 @@ func convertError(err error) error {
 					value: str,
 					code:  er.ExitCode(),
 				}
-			} else {
-				bs, _ := gojq.Marshal(v)
-				return &HaltError{
-					value: string(bs),
-					code:  er.ExitCode(),
-				}
+			}
+
+			bs, _ := gojq.Marshal(v)
+
+			return &HaltError{
+				value: string(bs),
+				code:  er.ExitCode(),
 			}
 		} else if er, ok := err.(gojq.ValueError); ok {
 			// Generic gojq value error

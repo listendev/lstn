@@ -1,18 +1,18 @@
-/*
-Copyright © 2022 The listen.dev team <engineering@garnet.ai>
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-	http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+// SPDX-License-Identifier: Apache-2.0
+//
+// Copyright © 2023 The listen.dev team <engineering@garnet.ai>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 package to
 
 import (
@@ -49,7 +49,7 @@ If you're a hairsplitting person, you can also query for the verdicts specific t
 		Args:              validateInArgs, // Executes before RunE
 		ValidArgsFunction: activeHelpIn,
 		RunE: func(c *cobra.Command, args []string) error {
-			ctx := c.Context()
+			ctx = c.Context()
 
 			// Obtain the local options from the context
 			opts, err := pkgcontext.GetOptionsFromContext(ctx, pkgcontext.ToKey)
@@ -62,7 +62,7 @@ If you're a hairsplitting person, you can also query for the verdicts specific t
 			}
 
 			// Query for the package verdicts
-			res, resJSON, err := listen.PackageVerdicts(ctx, listen.NewVerdictsRequest(args), &toOpts.JsonFlags)
+			res, resJSON, err := listen.PackageVerdicts(ctx, listen.NewVerdictsRequest(args), &toOpts.JSONFlags)
 			if err != nil {
 				return err
 			}
@@ -114,12 +114,14 @@ func validateInArgs(c *cobra.Command, args []string) error {
 		if err := validate.Singleton.Var(args[2], "len=40"); err != nil {
 			all = append(all, fmt.Errorf("%s is not a valid shasum", args[2]))
 		}
+
 		fallthrough
 	case 2:
 		// Validate second argument is a valid semver version
 		if err := validate.Singleton.Var(args[1], "semver"); err != nil {
 			all = append(all, fmt.Errorf("%s is not a valid semantic version", args[1]))
 		}
+
 		fallthrough
 	case 1:
 		// Validate first argument is a valid package name
@@ -144,17 +146,18 @@ func validateInArgs(c *cobra.Command, args []string) error {
 	return nil
 }
 
-// TODO(leodido) > Double-check it's working
+// TODO(leodido) > Double-check it's working.
 func activeHelpIn(c *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	var comps []string
 
-	if len(args) == 0 {
+	switch len(args) {
+	case 0:
 		comps = cobra.AppendActiveHelp(comps, "Provide a package name")
-	} else if len(args) == 1 {
+	case 1:
 		comps = cobra.AppendActiveHelp(comps, fmt.Sprintf("Provide the version of package %s or just execute the command like it is now", args[0]))
-	} else if len(args) == 2 {
+	case 2:
 		comps = cobra.AppendActiveHelp(comps, fmt.Sprintf("Provide the shasum of package %s@%s or just execute the command like it is now", args[0], args[1]))
-	} else {
+	default:
 		comps = cobra.AppendActiveHelp(comps, "This command does not take any more arguments")
 	}
 

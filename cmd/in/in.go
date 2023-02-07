@@ -1,18 +1,18 @@
-/*
-Copyright © 2022 The listen.dev team <engineering@garnet.ai>
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-	http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+// SPDX-License-Identifier: Apache-2.0
+//
+// Copyright © 2023 The listen.dev team <engineering@garnet.ai>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 package in
 
 import (
@@ -50,7 +50,7 @@ The verdicts it returns are listed by the name of each package and its specified
 		Args:              validateInArgs, // Executes before RunE
 		ValidArgsFunction: activeHelpIn,
 		RunE: func(c *cobra.Command, args []string) error {
-			ctx := c.Context()
+			ctx = c.Context()
 
 			// Obtain the local options from the context
 			opts, err := pkgcontext.GetOptionsFromContext(ctx, pkgcontext.InKey)
@@ -94,7 +94,7 @@ The verdicts it returns are listed by the name of each package and its specified
 				Packages:        packagesWithShasum,
 			}
 
-			res, resJSON, err := listen.PackageLockAnalysis(ctx, req, &inOpts.JsonFlags)
+			res, resJSON, err := listen.PackageLockAnalysis(ctx, req, &inOpts.JSONFlags)
 			if err != nil {
 				return err
 			}
@@ -168,15 +168,17 @@ func validateInArgs(c *cobra.Command, args []string) error {
 	return nil
 }
 
-// TODO(leodido) > Double-check it's working
+// TODO(leodido) > Double-check it's working.
 func activeHelpIn(c *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	var comps []string
-	if len(args) == 0 {
+	switch len(args) {
+	case 0:
 		comps = cobra.AppendActiveHelp(comps, "Executing against the current working directory")
-	} else if len(args) == 1 {
+	case 1:
 		comps = cobra.AppendActiveHelp(comps, fmt.Sprintf("Executing against directory '%s'", args[0]))
-	} else {
+	default:
 		comps = cobra.AppendActiveHelp(comps, "This command does not take any more arguments")
 	}
+
 	return comps, cobra.ShellCompDirectiveFilterDirs
 }

@@ -1,18 +1,18 @@
-/*
-Copyright © 2022 The listen.dev team <engineering@garnet.ai>
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-	http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+// SPDX-License-Identifier: Apache-2.0
+//
+// Copyright © 2023 The listen.dev team <engineering@garnet.ai>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 package context
 
 import (
@@ -41,26 +41,23 @@ func (suite *ErrorSuite) TestContextError() {
 		expected   error
 	}{
 		{
-			name: "Input error is context.Canceled",
-			ctxFactory: func() context.Context {
-				return context.Background()
-			},
-			input:    context.Canceled,
-			expected: context.Canceled,
+			name:       "Input error is context.Canceled",
+			ctxFactory: context.Background,
+			input:      context.Canceled,
+			expected:   context.Canceled,
 		},
 		{
-			name: "Input error is a timeout error",
-			ctxFactory: func() context.Context {
-				return context.Background()
-			},
-			input:    &timeoutError{true},
-			expected: context.DeadlineExceeded,
+			name:       "Input error is a timeout error",
+			ctxFactory: context.Background,
+			input:      &timeoutError{true},
+			expected:   context.DeadlineExceeded,
 		},
 		{
 			name: "Context error is context.DeadlineExceeded",
 			ctxFactory: func() context.Context {
 				ctx, cancel := context.WithDeadline(context.Background(), time.Now())
 				defer cancel()
+
 				return ctx
 			},
 			input:    errors.New("some error"),
@@ -71,24 +68,23 @@ func (suite *ErrorSuite) TestContextError() {
 			ctxFactory: func() context.Context {
 				ctx, cancel := context.WithCancel(context.Background())
 				defer cancel()
+
 				return ctx
 			},
 			input:    errors.New("some error"),
 			expected: context.Canceled,
 		},
 		{
-			name: "No error",
-			ctxFactory: func() context.Context {
-				return context.Background()
-			},
-			input:    errors.New("some error"),
-			expected: nil,
+			name:       "No error",
+			ctxFactory: context.Background,
+			input:      errors.New("some error"),
+			expected:   nil,
 		},
 	}
 
 	for _, tc := range cases {
 		suite.T().Run(tc.name, func(t *testing.T) {
-			assert.ErrorIs(t, tc.expected, ContextError(tc.ctxFactory(), tc.input))
+			assert.ErrorIs(t, tc.expected, Error(tc.ctxFactory(), tc.input))
 		})
 	}
 }
@@ -125,7 +121,7 @@ func (suite *ErrorSuite) TestOutputErrorf() {
 
 // Utils
 
-// Implements net.Error interface
+// Implements net.Error interface.
 type timeoutError struct {
 	timeout bool
 }

@@ -1,18 +1,18 @@
-/*
-Copyright © 2022 The listen.dev team <engineering@garnet.ai>
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-	http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+// SPDX-License-Identifier: Apache-2.0
+//
+// Copyright © 2023 The listen.dev team <engineering@garnet.ai>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 package listen
 
 import (
@@ -38,7 +38,7 @@ func getBaseURLFromContext(ctx context.Context) (string, error) {
 	return cfgOpts.Endpoint, nil
 }
 
-func PackageLockAnalysis(ctx context.Context, r *AnalysisRequest, jsonOpts flags.JsonOptions) (*Response, []byte, error) {
+func PackageLockAnalysis(ctx context.Context, r *AnalysisRequest, jsonOpts flags.JSONOptions) (*Response, []byte, error) {
 	// Obtain the endpoint base URL
 	baseURL, err := getBaseURLFromContext(ctx)
 	if err != nil {
@@ -72,7 +72,7 @@ func PackageLockAnalysis(ctx context.Context, r *AnalysisRequest, jsonOpts flags
 	// Bail out if status != 200
 	if res.StatusCode != http.StatusOK {
 		target := &responseError{}
-		if err := dec.Decode(target); err != nil {
+		if err = dec.Decode(target); err != nil {
 			return nil, nil, pkgcontext.OutputError(ctx, err)
 		}
 
@@ -82,7 +82,7 @@ func PackageLockAnalysis(ctx context.Context, r *AnalysisRequest, jsonOpts flags
 	return response(ctx, dec, res, jsonOpts)
 }
 
-func PackageVerdicts(ctx context.Context, r *VerdictsRequest, jsonOpts flags.JsonOptions) (*Response, []byte, error) {
+func PackageVerdicts(ctx context.Context, r *VerdictsRequest, jsonOpts flags.JSONOptions) (*Response, []byte, error) {
 	// Obtain the endpoint base URL
 	baseURL, err := getBaseURLFromContext(ctx)
 	if err != nil {
@@ -117,7 +117,7 @@ func PackageVerdicts(ctx context.Context, r *VerdictsRequest, jsonOpts flags.Jso
 	// Bail out if status != 200
 	if res.StatusCode != http.StatusOK {
 		target := &responseError{}
-		if err := dec.Decode(target); err != nil {
+		if err = dec.Decode(target); err != nil {
 			return nil, nil, pkgcontext.OutputError(ctx, err)
 		}
 
@@ -127,20 +127,21 @@ func PackageVerdicts(ctx context.Context, r *VerdictsRequest, jsonOpts flags.Jso
 	return response(ctx, dec, res, jsonOpts)
 }
 
-func response(ctx context.Context, dec *json.Decoder, res *http.Response, jsonOpts flags.JsonOptions) (*Response, []byte, error) {
-	if jsonOpts.JSON() {
+func response(ctx context.Context, dec *json.Decoder, res *http.Response, jsonOpts flags.JSONOptions) (*Response, []byte, error) {
+	if jsonOpts.IsJSON() {
 		// Eventually return as JSON
 		out := new(bytes.Buffer)
-		if err := jsonOpts.Output(ctx, res.Body, out); err != nil {
+		if err := jsonOpts.GetOutput(ctx, res.Body, out); err != nil {
 			return nil, nil, pkgcontext.OutputError(ctx, err)
 		}
+
 		return nil, out.Bytes(), nil
-	} else {
-		// Alternatively, unmarshal the JSON body into a Response
-		target := &Response{}
-		if err := dec.Decode(target); err != nil {
-			return nil, nil, pkgcontext.OutputError(ctx, err)
-		}
-		return target, nil, nil
 	}
+	// Alternatively, unmarshal the JSON body into a Response
+	target := &Response{}
+	if err := dec.Decode(target); err != nil {
+		return nil, nil, pkgcontext.OutputError(ctx, err)
+	}
+
+	return target, nil, nil
 }
