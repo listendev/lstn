@@ -25,6 +25,7 @@ import (
 	"github.com/google/go-querystring/query"
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
+	"github.com/listendev/lstn/pkg/ua"
 )
 
 func getBaseURLFromContext(ctx context.Context) (string, error) {
@@ -56,6 +57,7 @@ func PackageLockAnalysis(ctx context.Context, r *AnalysisRequest, jsonOpts flags
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
+	req.Header.Set("User-Agent", ua.Generate(true))
 
 	// Send the request
 	client := http.Client{}
@@ -99,6 +101,7 @@ func PackageVerdicts(ctx context.Context, r *VerdictsRequest, jsonOpts flags.Jso
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
+	req.Header.Set("User-Agent", ua.Generate(true))
 	req.URL.RawQuery = val.Encode()
 
 	// Send the request
