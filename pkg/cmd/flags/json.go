@@ -26,7 +26,7 @@ import (
 
 type JSONFlags struct {
 	JSON bool   `name:"json"`
-	JQ   string `name:"jq" validate:"excluded_without=Json,jq"`
+	JQ   string `name:"jq" validate:"excluded_without=JSON,jq"`
 }
 
 func (o *JSONFlags) Attach(c *cobra.Command) {
