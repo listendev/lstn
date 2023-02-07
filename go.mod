@@ -15,6 +15,7 @@ require (
 	github.com/google/go-querystring v1.1.0
 	github.com/itchyny/gojq v0.12.11
 	github.com/leodido/go-npmpackagename v0.2.0
+	github.com/matishsiao/goInfo v0.0.0-00010101000000-000000000000
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.14.0
@@ -63,3 +64,5 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/matishsiao/goInfo => github.com/mdelapenya/goInfo v0.0.0-20211021161444-126d78535ffb
