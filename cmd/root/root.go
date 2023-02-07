@@ -54,7 +54,7 @@ func New(ctx context.Context) (*command, error) {
 		PersistentPreRunE: func(c *cobra.Command, args []string) error {
 			// Do not check for the config file if the command is not available (eg., help) or not core (eg., version)
 			c, _, err := c.Find(os.Args[1:])
-			if err == nil && (c.IsAvailableCommand() || c.GroupID == groups.Core.ID) {
+			if err == nil && (c.IsAvailableCommand() && c.GroupID == groups.Core.ID) {
 				// If a config file is found, read it in
 				if err := viper.ReadInConfig(); err == nil {
 					fmt.Fprintln(os.Stderr, "Using config file: ", viper.ConfigFileUsed())
