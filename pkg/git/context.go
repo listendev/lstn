@@ -16,13 +16,74 @@
 package git
 
 import (
+	"encoding/json"
 	"fmt"
 
-	"github.com/go-git/go-git/v5" // FIXME: switch to other impl/dep/fork?
+	"github.com/go-git/go-git/v5"
 )
 
+type User struct {
+	Name  string `json:"name,omitempty"`
+	Email string `json:"email,omitempty"`
+}
+
+func (u User) jsonValue() interface{} {
+	var zero User
+	if u == zero {
+		return nil
+	}
+
+	return u
+}
+
+type Author struct {
+	Name  string `json:"email,omitempty"`
+	Email string `json:"name,omitempty"`
+}
+
+func (a Author) jsonValue() interface{} {
+	var zero Author
+	if a == zero {
+		return nil
+	}
+
+	return a
+}
+
+type FetchURL struct {
+	URL string `json:"url"`
+}
+
+type PushURL struct {
+	URL string `json:"url"`
+}
+
+type Remote struct {
+	FetchURL `json:"fetch"`
+	PushURL  `json:"push"`
+}
+
 type Context struct {
-	Remotes []*git.Remote `json:"remotes,omitempty"` // FIXME: map these to internal type?
+	User    `json:"user,omitempty"`
+	Author  `json:"author,omitempty"`
+	Remotes map[string]*Remote `json:"remotes,omitempty"`
+}
+
+func (c Context) MarshalJSON() ([]byte, error) {
+	// Avoid recursion
+	type AliasContext Context
+
+	type AliasWithI struct {
+		AliasContext
+		User   interface{} `json:"user,omitempty"`
+		Author interface{} `json:"author,omitempty"`
+	}
+
+	return json.Marshal(AliasWithI{
+		AliasContext: AliasContext(c),
+		User:         c.User.jsonValue(),
+		Author:       c.Author.jsonValue(),
+	})
 }
 
 type GetDirFunc func() (string, error)
@@ -42,9 +103,25 @@ func NewContextFromPath(path string) (*Context, error) {
 		return nil, fmt.Errorf("couldn't open the git repository at %s", path)
 	}
 
-	remotes, _ := repo.Remotes()
+	conf, err := GetFinalConfig(repo)
+	if err != nil {
+		return nil, err
+	}
+
+	remotes := make(map[string]*Remote, len(conf.Remotes))
+	for n, c := range conf.Remotes {
+		r := &Remote{}
+		if len(c.URLs) > 0 {
+			r.FetchURL.URL = c.URLs[0]
+			r.PushURL.URL = c.URLs[0]
+		}
+		remotes[n] = r
+	}
+
 	c := &Context{
 		Remotes: remotes,
+		Author:  Author(conf.Author),
+		User:    User(conf.User),
 	}
 
 	// FIXME
