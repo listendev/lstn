@@ -96,6 +96,7 @@ type PackageLockJSON interface {
 	Deps() map[string]PackageLockDependency
 	Encode() string
 	Ok() bool
+	Version() int
 }
 
 type PackageLockDependency struct {
@@ -138,6 +139,10 @@ func NewPackageLockJSON() PackageLockJSON {
 	return ret
 }
 
+func (p *packageLockJSON) Version() int {
+	return p.LockfileVersion.Value
+}
+
 func (p *packageLockJSON) Ok() bool {
 	err := validate.Singleton.Struct(p)
 
@@ -151,25 +156,26 @@ func NewPackageLockJSONFromDir(ctx context.Context, dir string) (PackageLockJSON
 		return nil, err
 	}
 
-	return NewPackageLockJsonFromBytes(JSON)
+	return NewPackageLockJSONFromBytes(JSON)
 }
 
 // NewPackageLockJSONFromReader creates a PackageLockJSON instance from by reading the contents of a package-lock.json file.
-func NewPackageLockJSONFromReader(JSON io.Reader) (PackageLockJSON, error) {
+func NewPackageLockJSONFromReader(reader io.Reader) (PackageLockJSON, error) {
 	ret := &packageLockJSON{}
-	if err := json.NewDecoder(JSON).Decode(ret); err != nil {
+	if err := json.NewDecoder(reader).Decode(ret); err != nil {
 		return nil, fmt.Errorf("couldn't instantiate from the input package-lock.json contents")
 	}
+	// TODO > set ret.bytes (TeeReader)
 
 	return ret, nil
 }
 
-func NewPackageLockJsonFromBytes(JSON []byte) (PackageLockJSON, error) {
+func NewPackageLockJSONFromBytes(b []byte) (PackageLockJSON, error) {
 	ret := &packageLockJSON{}
-	if err := json.Unmarshal(JSON, ret); err != nil {
+	if err := json.Unmarshal(b, ret); err != nil {
 		return nil, fmt.Errorf("couldn't instantiate from the input package-lock.json contents")
 	}
-	ret.bytes = JSON
+	ret.bytes = b
 
 	return ret, nil
 }

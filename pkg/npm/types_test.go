@@ -125,7 +125,7 @@ func TestPackageLockJSONInstantiation(t *testing.T) {
 
 	assert.False(t, invalid.Ok())
 
-	lockfileVersionFuture, err := NewPackageLockJsonFromBytes([]byte(heredoc.Doc(`{
+	lockfileVersionFuture, err := NewPackageLockJSONFromBytes([]byte(heredoc.Doc(`{
 		"name": "sample",
 		"version": "1.0.0",
 		"lockfileVersion": 22,
@@ -153,11 +153,12 @@ func TestPackageLockJSONInstantiation(t *testing.T) {
 		}
 	}`)))
 
-	if assert.Error(t, err, "couldn't instantiate from the input package-lock.json contents") {
+	if assert.Error(t, err) {
+		assert.Equal(t, "couldn't instantiate from the input package-lock.json contents", err.Error())
 		assert.Nil(t, lockfileVersionFuture)
 	}
 
-	valid, err := NewPackageLockJsonFromBytes([]byte(heredoc.Doc(`{
+	valid, err := NewPackageLockJSONFromBytes([]byte(heredoc.Doc(`{
 		"name": "sample",
 		"version": "1.0.0",
 		"lockfileVersion": 3,
