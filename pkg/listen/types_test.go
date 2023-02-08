@@ -38,6 +38,7 @@ func TestNewAnalysisContext(t *testing.T) {
 		if err != nil {
 			return "", err
 		}
+
 		return path.Join(cwd, "../../"), nil
 	})
 

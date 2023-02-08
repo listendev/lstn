@@ -75,7 +75,7 @@ The verdicts it returns are listed by the name of each package and its specified
 			}
 
 			// Unmarshal the package-lock.json file contents to a struct
-			packageLockJSON, err := npm.NewPackageLockJSONFrom(ctx, targetDir)
+			packageLockJSON, err := npm.NewPackageLockJSONFromDir(ctx, targetDir)
 			if err != nil {
 				return err
 			}
@@ -89,10 +89,9 @@ The verdicts it returns are listed by the name of each package and its specified
 			}
 
 			// Ask listen.dev for an analysis
-			// TODO: create with New?
-			req := &listen.AnalysisRequest{
-				PackageLockJSON: packageLockJSON,
-				Packages:        packagesWithShasum,
+			req, err := listen.NewAnalysisRequest(packageLockJSON, packagesWithShasum)
+			if err != nil {
+				return err
 			}
 
 			res, resJSON, err := listen.PackageLockAnalysis(ctx, req, &inOpts.JSONFlags)
