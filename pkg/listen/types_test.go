@@ -16,12 +16,36 @@
 package listen
 
 import (
+	"os"
+	"path"
 	"testing"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/listendev/lstn/pkg/npm"
 	"github.com/stretchr/testify/assert"
 )
+
+func TestNewAnalysisContext(t *testing.T) {
+	analysisCtx1 := NewAnalysisContext()
+
+	assert.NotNil(t, analysisCtx1)
+	assert.Nil(t, analysisCtx1.Git)
+	assert.NotEmpty(t, analysisCtx1.Version.Short)
+	assert.NotEmpty(t, analysisCtx1.Version.Long)
+
+	analysisCtx2 := NewAnalysisContext(func() (string, error) {
+		cwd, err := os.Getwd()
+		if err != nil {
+			return "", err
+		}
+		return path.Join(cwd, "../../"), nil
+	})
+
+	assert.NotNil(t, analysisCtx2)
+	assert.NotNil(t, analysisCtx2.Git)
+	assert.NotEmpty(t, analysisCtx1.Version.Short)
+	assert.NotEmpty(t, analysisCtx1.Version.Long)
+}
 
 func TestNewAnalysisRequest(t *testing.T) {
 	validPackageLockJSON, _ := npm.NewPackageLockJSONFromBytes([]byte(heredoc.Doc(`{
