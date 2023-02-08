@@ -20,6 +20,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+
+	"github.com/listendev/lstn/pkg/validate"
 )
 
 type LockfileVersion struct {
@@ -100,11 +102,32 @@ type PackageLockDependency struct {
 }
 
 type Package struct {
-	Version string `json:"version"`
-	Shasum  string `json:"shasum"`
+	Version string `json:"version" validate:"semver"`
+	Shasum  string `json:"shasum" validate:"len=40"`
+}
+
+func (p *Package) Ok() bool {
+	return validate.Singleton.Struct(p) == nil
 }
 
 type Packages map[string]Package
+
+func (p Packages) Ok() bool {
+	if len(p) == 0 {
+		return false
+	}
+
+	for name, pack := range p {
+		if validate.Singleton.Var(name, "npm_package_name") != nil {
+			return false
+		}
+		if !pack.Ok() {
+			return false
+		}
+	}
+
+	return true
+}
 
 // NewPackageLockJSON is a factory to create an empty PackageLockJSON.
 func NewPackageLockJSON() PackageLockJSON {
