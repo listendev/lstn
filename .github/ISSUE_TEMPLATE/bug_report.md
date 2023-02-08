@@ -13,7 +13,7 @@ A clear and concise description of what the bug is.
 
 Please include:
 
-- the version by typing `lstn --version`
+- the version by typing `lstn version`
 - the OS
 
 ### Steps to reproduce the behavior
