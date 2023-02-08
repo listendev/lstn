@@ -38,7 +38,7 @@ const ImportPath = "github.com/listendev/lstn"
 //
 // It can be helpful when downstream packagers need to manually set the version.
 // If no other version information is available, the short form version
-// (see Version()) will be set to VersionPrefix, and the long version
+// (see Get()) will be set to VersionPrefix, and the long version
 // will include VersionPrefix at the beginning.
 //
 // For example, set this variable during `go build` with `-ldflags`:
@@ -63,21 +63,23 @@ var VersionPrefix string
 // See relevant Go issues:
 // - https://github.com/golang/go/issues/29228
 // - https://github.com/golang/go/issues/50603
-func Version() (short, long string) {
+func Get() Version {
+	var out Version
+
 	var module *debug.Module
 	bi, ok := debug.ReadBuildInfo()
 	// Use VersionPrefix (if any) when build info is not available
 	if !ok {
 		if VersionPrefix != "" {
-			long = VersionPrefix
-			short = VersionPrefix
+			out.Long = VersionPrefix
+			out.Short = VersionPrefix
 
-			return short, long
+			return out
 		}
-		long = Unknown
-		short = Unknown
+		out.Long = Unknown
+		out.Short = Unknown
 
-		return short, long
+		return out
 	}
 
 	// Detect if used as a module...
@@ -91,23 +93,23 @@ func Version() (short, long string) {
 
 	// When used as a module...
 	if module != nil {
-		short, long = module.Version, module.Version
+		out.Short, out.Long = module.Version, module.Version
 		if module.Sum != "" {
-			long += " " + module.Sum
+			out.Long += " " + module.Sum
 		}
 		if module.Replace != nil {
-			long += " => " + module.Replace.Path
+			out.Long += " => " + module.Replace.Path
 			if module.Replace.Version != "" {
-				short = module.Replace.Version + "_custom"
-				long += "@" + module.Replace.Version
+				out.Short = module.Replace.Version + "_custom"
+				out.Long += "@" + module.Replace.Version
 			}
 			if module.Replace.Sum != "" {
-				long += " " + module.Replace.Sum
+				out.Long += " " + module.Replace.Sum
 			}
 		}
 	}
 
-	if long == "" {
+	if out.Long == "" {
 		var vcsRevision string
 		var vcsTime time.Time
 		var vcsModified bool
@@ -127,42 +129,42 @@ func Version() (short, long string) {
 			if vcsModified {
 				modified = "dirty"
 			}
-			long = fmt.Sprintf("%s.%s.%s", vcsRevision, vcsTime.Format("20060102T150405Z07:00"), modified)
-			short = vcsRevision
+			out.Long = fmt.Sprintf("%s.%s.%s", vcsRevision, vcsTime.Format("20060102T150405Z07:00"), modified)
+			out.Short = vcsRevision
 
-			// use short checksum for short, if hex-only
-			if _, err := hex.DecodeString(short); err == nil {
-				short = short[:8]
+			// use out.Short checksum for out.Short, if hex-only
+			if _, err := hex.DecodeString(out.Short); err == nil {
+				out.Short = out.Short[:8]
 			}
 
-			// append date to short
+			// append date to out.Short
 			if !vcsTime.IsZero() {
-				short += "." + vcsTime.Format("20060102")
+				out.Short += "." + vcsTime.Format("20060102")
 			}
 		}
 	}
 
-	if long == "" {
+	if out.Long == "" {
 		if VersionPrefix != "" {
-			long = VersionPrefix
+			out.Long = VersionPrefix
 		} else {
-			long = Unknown
+			out.Long = Unknown
 		}
 	} else if VersionPrefix != "" {
-		long = VersionPrefix + "+" + long
+		out.Long = VersionPrefix + "+" + out.Long
 	}
 
-	if short == "" || short == "(devel)" {
+	if out.Short == "" || out.Short == "(devel)" {
 		if VersionPrefix != "" {
-			short = VersionPrefix
+			out.Short = VersionPrefix
 		} else {
-			short = Unknown
+			out.Short = Unknown
 		}
 	} else if VersionPrefix != "" {
-		short = VersionPrefix + "+" + short
+		out.Short = VersionPrefix + "+" + out.Short
 	}
 
-	return short, long
+	return out
 }
 
 func Changelog(version string) (string, error) {
