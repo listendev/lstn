@@ -188,7 +188,7 @@ func findLongestInsteadOfMatch(remoteURL string, urls map[string]*config.URL) *c
 			continue
 		}
 
-		//Aaccording to spec if there is more than one match, take the logest
+		// According to spec if there is more than one match, take the logest
 		if longestMatch == nil || len(longestMatch.InsteadOf) < len(u.InsteadOf) {
 			longestMatch = u
 		}
