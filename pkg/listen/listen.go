@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/google/go-querystring/query"
 	"github.com/listendev/lstn/pkg/cmd/flags"
@@ -44,7 +45,7 @@ func PackageLockAnalysis(ctx context.Context, r *AnalysisRequest, jsonOpts flags
 	if err != nil {
 		return nil, nil, pkgcontext.OutputError(ctx, err)
 	}
-	endpointURL := fmt.Sprintf("%s/api/analysis", baseURL)
+	endpointURL := fmt.Sprintf("%s%s/analysis", baseURL, getAPIPrefix(baseURL))
 
 	// Prepare the request
 	pl, err := json.Marshal(r)
@@ -88,7 +89,7 @@ func PackageVerdicts(ctx context.Context, r *VerdictsRequest, jsonOpts flags.JSO
 	if err != nil {
 		return nil, nil, pkgcontext.OutputError(ctx, err)
 	}
-	endpointURL := fmt.Sprintf("%s/api/verdicts", baseURL)
+	endpointURL := fmt.Sprintf("%s%s/verdicts", baseURL, getAPIPrefix(baseURL))
 
 	// Prepare the request
 	val, err := query.Values(r)
@@ -144,4 +145,12 @@ func response(ctx context.Context, dec *json.Decoder, res *http.Response, jsonOp
 	}
 
 	return target, nil, nil
+}
+
+func getAPIPrefix(baseURL string) string {
+	if strings.HasPrefix(baseURL, "http://127.0.0.1") || strings.HasPrefix(baseURL, "http://localhost") {
+		return "/api/npm"
+	}
+
+	return "/api"
 }
