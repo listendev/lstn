@@ -16,17 +16,30 @@
 package git
 
 import (
-	"github.com/go-git/go-git/v5"
+	"fmt"
+
+	"github.com/go-git/go-git/v5" // FIXME: switch to other impl/dep/fork?
 )
 
 type Context struct {
-	Remotes []*git.Remote `json:"remotes,omitempty"`
+	Remotes []*git.Remote `json:"remotes,omitempty"` // FIXME: map these to internal type?
 }
 
-func NewContextFrom(path string) (*Context, error) {
+type GetDirFunc func() (string, error)
+
+func NewContextFromFunc(f GetDirFunc) (*Context, error) {
+	dir, err := f()
+	if err != nil {
+		return nil, fmt.Errorf("couldn't get the directory where to look for a git repository")
+	}
+
+	return NewContextFromPath(dir)
+}
+
+func NewContextFromPath(path string) (*Context, error) {
 	repo, err := git.PlainOpen(path)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("couldn't open the git repository at %s", path)
 	}
 
 	remotes, _ := repo.Remotes()
