@@ -19,13 +19,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"strings"
 
 	"github.com/listendev/lstn/pkg/validate"
 )
 
 type LockfileVersion struct {
-	Value int `json:"lockfileVersion"`
+	Value int `json:"lockfileVersion" name:"lockfile_version" validate:"gte=1,lte=3"`
 }
 
 type packageLockJSONVersion1 struct {
@@ -94,6 +95,7 @@ type PackageLockJSON interface {
 	Shasums(ctx context.Context) (Packages, error)
 	Deps() map[string]PackageLockDependency
 	Encode() string
+	Ok() bool
 }
 
 type PackageLockDependency struct {
@@ -102,8 +104,8 @@ type PackageLockDependency struct {
 }
 
 type Package struct {
-	Version string `json:"version" validate:"semver"`
-	Shasum  string `json:"shasum" validate:"len=40"`
+	Version string `json:"version" name:"version" validate:"semver"`
+	Shasum  string `json:"shasum" name:"shasum" validate:"len=40"`
 }
 
 func (p *Package) Ok() bool {
@@ -129,28 +131,45 @@ func (p Packages) Ok() bool {
 	return true
 }
 
-// NewPackageLockJSON is a factory to create an empty PackageLockJSON.
+// NewPackageLockJSON is a factory to create an empty (and invalid) PackageLockJSON.
 func NewPackageLockJSON() PackageLockJSON {
 	ret := &packageLockJSON{}
 
 	return ret
 }
 
-// NewPackageLockJSONFrom creates a PackageLockJSON instance from the package.json in the dir directory (if any).
-func NewPackageLockJSONFrom(ctx context.Context, dir string) (PackageLockJSON, error) {
-	var err error
-	ret := &packageLockJSON{}
+func (p *packageLockJSON) Ok() bool {
+	err := validate.Singleton.Struct(p)
 
-	// Get the package-lock.json file contents
-	ret.bytes, err = generatePackageLock(ctx, dir)
+	return err == nil
+}
+
+// NewPackageLockJSONFromDir creates a PackageLockJSON instance from the package.json in the dir directory (if any).
+func NewPackageLockJSONFromDir(ctx context.Context, dir string) (PackageLockJSON, error) {
+	JSON, err := generatePackageLock(ctx, dir)
 	if err != nil {
 		return nil, err
 	}
 
-	err = json.Unmarshal(ret.bytes, ret)
-	if err != nil {
+	return NewPackageLockJsonFromBytes(JSON)
+}
+
+// NewPackageLockJSONFromReader creates a PackageLockJSON instance from by reading the contents of a package-lock.json file.
+func NewPackageLockJSONFromReader(JSON io.Reader) (PackageLockJSON, error) {
+	ret := &packageLockJSON{}
+	if err := json.NewDecoder(JSON).Decode(ret); err != nil {
 		return nil, fmt.Errorf("couldn't instantiate from the input package-lock.json contents")
 	}
+
+	return ret, nil
+}
+
+func NewPackageLockJsonFromBytes(JSON []byte) (PackageLockJSON, error) {
+	ret := &packageLockJSON{}
+	if err := json.Unmarshal(JSON, ret); err != nil {
+		return nil, fmt.Errorf("couldn't instantiate from the input package-lock.json contents")
+	}
+	ret.bytes = JSON
 
 	return ret, nil
 }
