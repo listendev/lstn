@@ -188,9 +188,9 @@ func New(ctx context.Context) (*Command, error) {
 	ctx = context.WithValue(ctx, pkgcontext.ConfigKey, cfgOpts)
 
 	// Store the version in the context
-	shortVersion, longVersion := lstnversion.Version()
-	ctx = context.WithValue(ctx, pkgcontext.ShortVersionKey, shortVersion)
-	ctx = context.WithValue(ctx, pkgcontext.LongVersionKey, longVersion)
+	vers := lstnversion.Get()
+	ctx = context.WithValue(ctx, pkgcontext.ShortVersionKey, vers.Short)
+	ctx = context.WithValue(ctx, pkgcontext.LongVersionKey, vers.Long)
 
 	// Setup the core group
 	rootCmd.AddGroup(&groups.Core)
