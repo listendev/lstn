@@ -16,7 +16,7 @@
 
 // Compile the lstn CLI et al.
 //
-// Usage: go run make/main.go [<envvars>...] [<lstn|man|clean>...]
+// Usage: go run make/main.go [<envvars>...] [<lstn|man|clean|tag>...]
 //
 // Examples:
 // - go run make/main.go GOOS=windows lstn

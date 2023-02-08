@@ -28,8 +28,8 @@ import (
 // If the os parameters is true, it also appends the available info like
 // the os, the architecture, the kernel and its version, and the hostname.
 func Generate(withOS bool, comments ...string) string {
-	shortVersion, longVersion := version.Version()
-	ret := fmt.Sprintf("lstn/%s (%s", shortVersion, longVersion)
+	version := version.Get()
+	ret := fmt.Sprintf("lstn/%s (%s", version.Short, version.Long)
 	counter, _, _, success := runtime.Caller(1)
 	if success {
 		ret += fmt.Sprintf("; %s", runtime.FuncForPC(counter).Name())
