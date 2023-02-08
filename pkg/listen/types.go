@@ -17,9 +17,12 @@ package listen
 
 import (
 	"encoding/json"
+	"fmt"
+	"os"
 
 	"github.com/listendev/lstn/pkg/git"
 	"github.com/listendev/lstn/pkg/npm"
+	lstnos "github.com/listendev/lstn/pkg/os"
 	"github.com/listendev/lstn/pkg/version"
 )
 
@@ -49,18 +52,35 @@ func NewVerdictsRequest(args []string) *VerdictsRequest {
 }
 
 type AnalysisContext struct {
-	Version       version.Version `json:"version"`
-	Git           git.Context     `json:"git,omitempty"`
-	OS            string          `json:"os,omitempty"`
-	Arch          string          `json:"arch,omitempty"`
-	Kernel        string          `json:"kernel,omitempty"`
-	KernelVersion string          `json:"kernel_version,omitempty"`
+	Version version.Version `json:"version"`
+	Git     *git.Context    `json:"git,omitempty"`
+	OS      *lstnos.Info    `json:"os,omitempty"`
+}
+
+func NewAnalysisContext(funcs ...git.GetDirFunc) *AnalysisContext {
+	ret := &AnalysisContext{}
+
+	ret.Version = version.Get()
+	ret.OS, _ = lstnos.NewInfo()
+
+	for _, f := range funcs {
+		var err error
+		ret.Git, err = git.NewContextFromFunc(f)
+		if err == nil {
+			break
+		}
+	}
+	if ret.Git == nil {
+		ret.Git, _ = git.NewContextFromFunc(os.Getwd)
+	}
+
+	return ret
 }
 
 type AnalysisRequest struct {
 	PackageLockJSON npm.PackageLockJSON `json:"package-lock"`
 	Packages        npm.Packages        `json:"packages"`
-	Context         AnalysisContext             `json:"context"`
+	Context         *AnalysisContext    `json:"context"`
 }
 
 // MarshalJSON is a custom marshaler that encodes the
@@ -77,9 +97,19 @@ func (req *AnalysisRequest) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// TODO: create
-func NewAnalysisRequest() *AnalysisRequest {
-	return nil
+func NewAnalysisRequest(packageLockJSON npm.PackageLockJSON, packages npm.Packages) (*AnalysisRequest, error) {
+	if packageLockJSON == nil {
+		return nil, fmt.Errorf("could't create the analysis request")
+	}
+	if !packageLockJSON.Ok() || !packages.Ok() {
+		return nil, fmt.Errorf("could't create the analysis request")
+	}
+
+	return &AnalysisRequest{
+		packageLockJSON,
+		packages,
+		NewAnalysisContext(),
+	}, nil
 }
 
 type Verdict struct {
