@@ -20,5 +20,5 @@ type Info struct {
 	Arch          string `json:"arch,omitempty"`
 	Kernel        string `json:"kernel,omitempty"`
 	KernelVersion string `json:"kernel_version,omitempty"`
-	Hostname      string `json:"hostname",omitempty`
+	Hostname      string `json:"hostname,omitempty"`
 }

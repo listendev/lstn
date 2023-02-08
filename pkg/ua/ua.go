@@ -19,8 +19,8 @@ import (
 	"fmt"
 	"runtime"
 
+	"github.com/listendev/lstn/pkg/os"
 	"github.com/listendev/lstn/pkg/version"
-	goinfo "github.com/matishsiao/goInfo"
 )
 
 // Generate creates a user-agent string for the current lstn version.
@@ -40,28 +40,8 @@ func Generate(withOS bool, comments ...string) string {
 	}
 	ret += ")"
 
-	if withOS {
-		if info, err := goinfo.GetInfo(); err == nil {
-			// GOOS/GOARCH (hostname)
-			osStr := ""
-			if info.GoOS != "" {
-				osStr += fmt.Sprintf(" %s/%s", info.GoOS, info.GoARCH)
-				if info.Hostname != "" {
-					osStr += fmt.Sprintf(" (%s)", info.Hostname)
-				}
-			}
-			ret += osStr
-
-			// Kernel/Version
-			kernelStr := ""
-			if info.Kernel != "" && info.Kernel != "unknown" {
-				kernelStr += fmt.Sprintf(" %s", info.Kernel)
-				if info.Core != "" && info.Core != "unknown" {
-					kernelStr += fmt.Sprintf("/%s", info.Core)
-				}
-			}
-			ret += kernelStr
-		}
+	if i, err := os.NewInfo(); err == nil && withOS {
+		ret += fmt.Sprintf(" %s", i.FormatAsUserAgent())
 	}
 
 	return ret
