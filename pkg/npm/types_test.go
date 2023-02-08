@@ -18,6 +18,7 @@ package npm
 import (
 	"testing"
 
+	"github.com/MakeNowJust/heredoc"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -116,5 +117,75 @@ func TestPackagesType(t *testing.T) {
 		t.Run(tc.desc, func(t *testing.T) {
 			assert.Equal(t, tc.pkgs.Ok(), tc.okay)
 		})
+	}
+}
+
+func TestPackageLockJSONInstantiation(t *testing.T) {
+	invalid := NewPackageLockJSON()
+
+	assert.False(t, invalid.Ok())
+
+	lockfileVersionFuture, err := NewPackageLockJsonFromBytes([]byte(heredoc.Doc(`{
+		"name": "sample",
+		"version": "1.0.0",
+		"lockfileVersion": 22,
+		"requires": true,
+		"packages": {
+			"": {
+				"name": "sample",
+				"version": "1.0.0",
+				"license": "ISC",
+				"dependencies": {
+					"react": "18.0.0"
+				}
+			},
+			"node_modules/@babel/runtime": {
+				"version": "7.20.13",
+				"resolved": "https://registry.npmjs.org/@babel/runtime/-/runtime-7.20.13.tgz",
+				"integrity": "sha512-gt3PKXs0DBoL9xCvOIIZ2NEqAGZqHjAnmVbfQtB620V0uReIQutpel14KcneZuer7UioY8ALKZ7iocavvzTNFA==",
+				"dependencies": {
+					"regenerator-runtime": "^0.13.11"
+				},
+				"engines": {
+					"node": ">=6.9.0"
+				}
+			}
+		}
+	}`)))
+
+	if assert.Error(t, err, "couldn't instantiate from the input package-lock.json contents") {
+		assert.Nil(t, lockfileVersionFuture)
+	}
+
+	valid, err := NewPackageLockJsonFromBytes([]byte(heredoc.Doc(`{
+		"name": "sample",
+		"version": "1.0.0",
+		"lockfileVersion": 3,
+		"requires": true,
+		"packages": {
+			"": {
+				"name": "sample",
+				"version": "1.0.0",
+				"license": "ISC",
+				"dependencies": {
+					"react": "18.0.0"
+				}
+			},
+			"node_modules/@babel/runtime": {
+				"version": "7.20.13",
+				"resolved": "https://registry.npmjs.org/@babel/runtime/-/runtime-7.20.13.tgz",
+				"integrity": "sha512-gt3PKXs0DBoL9xCvOIIZ2NEqAGZqHjAnmVbfQtB620V0uReIQutpel14KcneZuer7UioY8ALKZ7iocavvzTNFA==",
+				"dependencies": {
+					"regenerator-runtime": "^0.13.11"
+				},
+				"engines": {
+					"node": ">=6.9.0"
+				}
+			}
+		}
+	}`)))
+
+	if assert.Nil(t, err) {
+		assert.True(t, valid.Ok())
 	}
 }
