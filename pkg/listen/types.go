@@ -18,7 +18,9 @@ package listen
 import (
 	"encoding/json"
 
+	"github.com/listendev/lstn/pkg/git"
 	"github.com/listendev/lstn/pkg/npm"
+	"github.com/listendev/lstn/pkg/version"
 )
 
 type VerdictsRequest struct {
@@ -46,10 +48,19 @@ func NewVerdictsRequest(args []string) *VerdictsRequest {
 	return ret
 }
 
+type AnalysisContext struct {
+	Version       version.Version `json:"version"`
+	Git           git.Context     `json:"git,omitempty"`
+	OS            string          `json:"os,omitempty"`
+	Arch          string          `json:"arch,omitempty"`
+	Kernel        string          `json:"kernel,omitempty"`
+	KernelVersion string          `json:"kernel_version,omitempty"`
+}
+
 type AnalysisRequest struct {
 	PackageLockJSON npm.PackageLockJSON `json:"package-lock"`
 	Packages        npm.Packages        `json:"packages"`
-	Context         string              `json:"context"` // TODO > define
+	Context         AnalysisContext             `json:"context"`
 }
 
 // MarshalJSON is a custom marshaler that encodes the
@@ -64,6 +75,11 @@ func (req *AnalysisRequest) MarshalJSON() ([]byte, error) {
 		PackageLockJSON:      req.PackageLockJSON.Encode(),
 		AnalysisRequestAlias: (*AnalysisRequestAlias)(req),
 	})
+}
+
+// TODO: create
+func NewAnalysisRequest() *AnalysisRequest {
+	return nil
 }
 
 type Verdict struct {

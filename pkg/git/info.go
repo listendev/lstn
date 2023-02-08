@@ -20,7 +20,7 @@ import (
 )
 
 type Context struct {
-	Remotes []*git.Remote
+	Remotes []*git.Remote `json:"remotes,omitempty"`
 }
 
 func NewContextFrom(path string) (*Context, error) {

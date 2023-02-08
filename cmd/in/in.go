@@ -89,6 +89,7 @@ The verdicts it returns are listed by the name of each package and its specified
 			}
 
 			// Ask listen.dev for an analysis
+			// TODO: create with New?
 			req := &listen.AnalysisRequest{
 				PackageLockJSON: packageLockJSON,
 				Packages:        packagesWithShasum,
