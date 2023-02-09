@@ -28,11 +28,14 @@ import (
 
 func TestNewAnalysisContext(t *testing.T) {
 	analysisCtx1 := NewAnalysisContext()
+	j1, e1 := json.Marshal(analysisCtx1)
 
 	assert.NotNil(t, analysisCtx1)
 	assert.Nil(t, analysisCtx1.Git)
 	assert.NotEmpty(t, analysisCtx1.Version.Short)
 	assert.NotEmpty(t, analysisCtx1.Version.Long)
+	assert.Nil(t, e1)
+	assert.NotContains(t, string(j1), "git")
 
 	analysisCtx2 := NewAnalysisContext(func() (string, error) {
 		cwd, err := os.Getwd()
@@ -42,11 +45,14 @@ func TestNewAnalysisContext(t *testing.T) {
 
 		return path.Join(cwd, "../../"), nil
 	})
+	j2, e2 := json.Marshal(analysisCtx2)
 
 	assert.NotNil(t, analysisCtx2)
 	assert.NotNil(t, analysisCtx2.Git)
 	assert.NotEmpty(t, analysisCtx1.Version.Short)
 	assert.NotEmpty(t, analysisCtx1.Version.Long)
+	assert.Nil(t, e2)
+	assert.Contains(t, string(j2), "git")
 }
 
 func TestNewAnalysisRequest(t *testing.T) {
