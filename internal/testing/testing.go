@@ -17,6 +17,7 @@ package testing
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -42,9 +43,9 @@ func StubNpm(npm NPM) error {
 	case "i":
 		fallthrough
 	case "install":
-		if len(args) > 1 {
-			// TODO:: --package-lock-only --audit
-		}
+		// if len(args) > 1 {
+		// 	// TODO:: --package-lock-only --audit
+		// }
 		fmt.Println("installing...")
 
 		return nil
@@ -82,4 +83,33 @@ func WriteFileContent(fs billy.Filesystem, path string, fileContent string, exec
 	}
 
 	return f.Close()
+}
+
+func CopyFile(src, dst string) error {
+	i, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer i.Close()
+
+	o, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer o.Close()
+
+	if _, err = io.Copy(o, i); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func CopyExecutable(src, dst string) error {
+	err := CopyFile(src, dst)
+	if err != nil {
+		return err
+	}
+
+	return os.Chmod(dst, 0o755)
 }
