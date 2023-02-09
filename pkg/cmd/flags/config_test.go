@@ -57,7 +57,7 @@ func (suite *FlagsConfigSuite) TestGetConfigFlagsDefaults() {
 	assert.Equal(suite.T(), 3, len(m))
 
 	expected := make(map[string]string)
-	expected["endpoint"] = "http://127.0.0.1:3000"
+	expected["endpoint"] = "https://npm.listen.dev"
 	expected["loglevel"] = "info"
 	expected["timeout"] = "60"
 
