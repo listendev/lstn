@@ -119,8 +119,6 @@ func (suite *ErrorSuite) TestOutputErrorf() {
 	})
 }
 
-// Utils
-
 // Implements net.Error interface.
 type timeoutError struct {
 	timeout bool

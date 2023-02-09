@@ -39,6 +39,14 @@ func getBaseURLFromContext(ctx context.Context) (string, error) {
 	return cfgOpts.Endpoint, nil
 }
 
+func getAPIPrefix(baseURL string) string {
+	if strings.HasPrefix(baseURL, "http://127.0.0.1") || strings.HasPrefix(baseURL, "http://localhost") {
+		return "/api/npm"
+	}
+
+	return "/api"
+}
+
 func PackageLockAnalysis(ctx context.Context, r *AnalysisRequest, jsonOpts flags.JSONOptions) (*Response, []byte, error) {
 	// Obtain the endpoint base URL
 	baseURL, err := getBaseURLFromContext(ctx)
@@ -145,12 +153,4 @@ func response(ctx context.Context, dec *json.Decoder, res *http.Response, jsonOp
 	}
 
 	return target, nil, nil
-}
-
-func getAPIPrefix(baseURL string) string {
-	if strings.HasPrefix(baseURL, "http://127.0.0.1") || strings.HasPrefix(baseURL, "http://localhost") {
-		return "/api/npm"
-	}
-
-	return "/api"
 }
