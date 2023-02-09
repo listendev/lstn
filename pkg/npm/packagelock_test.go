@@ -16,8 +16,11 @@
 package npm
 
 import (
+	"context"
+	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"testing"
 
 	internaltesting "github.com/listendev/lstn/internal/testing"
@@ -39,6 +42,14 @@ func TestMain(m *testing.M) {
 		}
 	case "npm-non-semver":
 		if err := internaltesting.StubNpm(internaltesting.NPM{Version: "non-semver"}); err != nil {
+			os.Exit(1)
+		}
+	case "npm-getnpm-gt-6x":
+		if err := internaltesting.StubNpm(internaltesting.NPM{Version: "6.14.17"}); err != nil {
+			os.Exit(1)
+		}
+	case "npm-getnpm-lt-6x":
+		if err := internaltesting.StubNpm(internaltesting.NPM{Version: "4.6.1"}); err != nil {
 			os.Exit(1)
 		}
 	default:
@@ -79,30 +90,50 @@ func TestCheckNPMVersionNotValidSemver(t *testing.T) {
 	}
 }
 
-// func TestCheckNPMVersion(t *testing.T) {
-// 	fs := memfs.New()
+func TestGetNPMPackageLockOnlyGt6x(t *testing.T) {
+	testExe, err := os.Executable()
+	assert.Nil(t, err)
 
-// 	ActiveFS = fs
-// 	defer func() { ActiveFS = DefaultFS() }()
+	// Prepend the path of this test binary to PATH
+	binDir := t.TempDir()
+	newPath := binDir + string(filepath.ListSeparator) + os.Getenv("PATH")
+	t.Setenv("PATH", newPath)
+	dstNPM := filepath.Join(binDir, "npm")
+	assert.Nil(t, internaltesting.CopyExecutable(testExe, dstNPM))
+	t.Setenv("TEST_NPM_BEHAVIOR", "npm-getnpm-gt-6x")
 
-// 	err := stubNPM(fs, func() string {
-// 		res, err := internaltesting.StubNpm(internaltesting.NPM{Version: "8.19.3"})
-// 		assert.Nil(t, err)
+	c, e := getNPMPackageLockOnly(context.Background())
+	assert.Nil(t, e)
+	assert.Equal(t, fmt.Sprintf("%s install --package-lock-only --no-audit", dstNPM), c.String())
+}
 
-// 		return res
-// 	})
-// 	assert.Nil(t, err)
+func TestGetNPMPackageLockOnlyLt6x(t *testing.T) {
+	testExe, err := os.Executable()
+	assert.Nil(t, err)
 
-// 	spew.Dump(fs)
+	// Prepend the path of this test binary to PATH
+	binDir := t.TempDir()
+	newPath := binDir + string(filepath.ListSeparator) + os.Getenv("PATH")
+	t.Setenv("PATH", newPath)
+	dstNPM := filepath.Join(binDir, "npm")
+	assert.Nil(t, internaltesting.CopyExecutable(testExe, dstNPM))
+	t.Setenv("TEST_NPM_BEHAVIOR", "npm-getnpm-lt-6x")
 
-// 	npmVersionCmd := exec.Command("/npm", "--version")
-// 	spew.Dump(checkNPMVersion(npmVersionCmd, ">= 6.x"))
-// }
+	c, e := getNPMPackageLockOnly(context.Background())
+	if assert.Error(t, e) {
+		assert.Nil(t, c)
+		assert.Equal(t, "the npm version is not >= 6.x", e.Error())
+	}
+}
 
-// func stubNPM(fs billy.Filesystem, content func() string) error {
-// 	if err := internaltesting.WriteFileContent(fs, "/npm", content(), true); err != nil {
-// 		return err
-// 	}
+func TestGetNPMPackageLockOnlyNPMNotInPath(t *testing.T) {
+	binDir := t.TempDir()
+	newPath := binDir
+	t.Setenv("PATH", newPath)
 
-// 	return nil
-// }
+	c, e := getNPMPackageLockOnly(context.Background())
+	if assert.Error(t, e) {
+		assert.Nil(t, c)
+		assert.Equal(t, "couldn't find the npm executable in the PATH", e.Error())
+	}
+}

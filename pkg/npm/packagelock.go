@@ -55,7 +55,7 @@ func generatePackageLock(ctx context.Context, dir string) ([]byte, error) {
 	}
 
 	// Create temporary directory
-	tmp, err := os.MkdirTemp("", "lstn-*") // FIXME: use ActiveFS?
+	tmp, err := os.MkdirTemp("", "lstn-*")
 	if err != nil {
 		return []byte{}, fmt.Errorf("couldn't create a temporary directory where to do the dirty work")
 	}
