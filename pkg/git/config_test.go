@@ -28,6 +28,7 @@ import (
 	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing/cache"
 	"github.com/go-git/go-git/v5/storage/filesystem"
+	internaltesting "github.com/listendev/lstn/internal/testing"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -339,7 +340,7 @@ func stubGitConfig(fs billy.Filesystem, worktreeDir string, s config.Scope, cont
 		if len(paths) < 1 || err != nil {
 			return fmt.Errorf("couldn't get system level Git config path")
 		}
-		if err := writeFileContent(fs, paths[0], content()); err != nil {
+		if err := internaltesting.WriteFileContent(fs, paths[0], content(), false); err != nil {
 			return err
 		}
 	}
@@ -350,7 +351,7 @@ func stubGitConfig(fs billy.Filesystem, worktreeDir string, s config.Scope, cont
 		if len(paths) < 1 || err != nil {
 			return fmt.Errorf("couldn't get system level Git config path")
 		}
-		if err := writeFileContent(fs, paths[0], content()); err != nil {
+		if err := internaltesting.WriteFileContent(fs, paths[0], content(), false); err != nil {
 			return err
 		}
 	}
@@ -358,37 +359,12 @@ func stubGitConfig(fs billy.Filesystem, worktreeDir string, s config.Scope, cont
 	if s == config.LocalScope {
 		// stub local level config
 		path := filepath.Join(worktreeDir, ".git", "config")
-		if err := writeFileContent(fs, path, content()); err != nil {
+		if err := internaltesting.WriteFileContent(fs, path, content(), false); err != nil {
 			return err
 		}
 	}
 
 	return nil
-}
-
-// writeFileContent writes content to a path inside a billy.Filesystem.
-// The containing directory (and any parents) are created as needed using fs.MkdirAll().
-func writeFileContent(fs billy.Filesystem, path string, content string) error {
-	// Ensure the parent folder exists
-	pathDir := filepath.Dir(path)
-	if err := fs.MkdirAll(pathDir, os.ModePerm); err != nil {
-		return err
-	}
-
-	// Create the file
-	f, err := fs.Create(path)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	// Write the content
-	_, err = f.Write([]byte(content))
-	if err != nil {
-		return err
-	}
-
-	return f.Close()
 }
 
 // gitInit initializes a Git repo pointing at the working tree path
