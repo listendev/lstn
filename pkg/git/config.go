@@ -194,11 +194,11 @@ func GetFinalConfig(repo *git.Repository) (*config.Config, error) {
 			return nil, fmt.Errorf("couldn't get the local git filesystem: %#v", err)
 		}
 		// Read the local Git config file
-		f, err := ActiveFS.Open(filepath.Join(fs.Filesystem().Root(), "config"))
-		if err == nil {
-			var err error
-			localCfg, err = ReadConfig(f)
-			localCfgOk = err == nil
+		f, openErr := ActiveFS.Open(filepath.Join(fs.Filesystem().Root(), "config"))
+		if openErr == nil {
+			var readErr error
+			localCfg, readErr = ReadConfig(f)
+			localCfgOk = readErr == nil
 		}
 		defer f.Close()
 	}
