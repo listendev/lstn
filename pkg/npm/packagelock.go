@@ -55,7 +55,7 @@ func generatePackageLock(ctx context.Context, dir string) ([]byte, error) {
 	}
 
 	// Create temporary directory
-	tmp, err := os.MkdirTemp("", "lstn-*")
+	tmp, err := os.MkdirTemp("", "lstn-*") // FIXME: use ActiveFS?
 	if err != nil {
 		return []byte{}, fmt.Errorf("couldn't create a temporary directory where to do the dirty work")
 	}
@@ -94,7 +94,7 @@ func checkNPMVersion(c *exec.Cmd, constraint string) error {
 	// Check the npm version is valid
 	npmVersionErrors := validate.Singleton.Var(npmVersionString, "semver")
 	if npmVersionErrors != nil {
-		return fmt.Errorf("couldn't validate the npm version string")
+		return fmt.Errorf("the npm version is not a valid semantic version")
 	}
 	npmVersion, err := semver.NewVersion(npmVersionString)
 	if err != nil {
