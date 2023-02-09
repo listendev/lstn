@@ -89,8 +89,6 @@ func (suite *CmdAdditionalHelpSuite) TestTopics() {
 	}
 }
 
-// Utils
-
 type commandName string
 
 const (

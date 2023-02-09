@@ -38,7 +38,7 @@ import (
 var ActiveFS = DefaultFS()
 
 // DefaultFS provides a billy.Filesystem abstraction over the
-// OS filesystem (via osfs.OS) scoped to the root directory.
+// OS filesystem (via osfs.OS) scoped to the root directory
 // in order to enable access to global and system configuration files
 // via absolute paths.
 func DefaultFS() billy.Filesystem {
