@@ -124,11 +124,5 @@ func NewContextFromPath(path string) (*Context, error) {
 		User:    User(conf.User),
 	}
 
-	// FIXME
-	// The current implementation does not respect the Git config semantics:
-	// repo.Config() doesn't merge the user/system Git configuration.
-	// This may result in a few issues (eg., querying remote references).
-	// See https://github.com/go-git/go-git/issues/395
-
 	return c, nil
 }
