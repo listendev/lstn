@@ -19,8 +19,10 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 
+	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/osfs"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
@@ -28,6 +30,23 @@ import (
 	"github.com/muja/goconfig"
 )
 
+// ActiveFS provides a configurable entry point to the billy.Filesystem in active use
+// for reading global and system level configuration files.
+//
+// Override this in tests to mock the filesystem
+// (then reset to restore default behavior).
+var ActiveFS = DefaultFS()
+
+// DefaultFS provides a billy.Filesystem abstraction over the
+// OS filesystem (via osfs.OS) scoped to the root directory.
+// in order to enable access to global and system configuration files
+// via absolute paths.
+func DefaultFS() billy.Filesystem {
+	return osfs.New("/")
+}
+
+// NewConfigFromMap provides a config.Config instance populating it from
+// the input map.
 func NewConfigFromMap(src map[string]string) *config.Config {
 	cfg := config.NewConfig()
 
@@ -103,6 +122,7 @@ func NewConfigFromMap(src map[string]string) *config.Config {
 	return cfg
 }
 
+// ReadConfig parses a Git configuration file in an io.Reader.
 func ReadConfig(r io.Reader) (*config.Config, error) {
 	b, err := io.ReadAll(r)
 	if err != nil {
@@ -117,6 +137,8 @@ func ReadConfig(r io.Reader) (*config.Config, error) {
 	return NewConfigFromMap(raw), nil
 }
 
+// GetConfig returns an instance of config.Config for the required scope
+// (system or global Git configuration).
 func GetConfig(s config.Scope) (*config.Config, error) {
 	files, err := config.Paths(s)
 	if err != nil {
@@ -124,7 +146,7 @@ func GetConfig(s config.Scope) (*config.Config, error) {
 	}
 
 	for _, file := range files {
-		f, err := osfs.Default.Open(file)
+		f, err := ActiveFS.Open(file)
 		if err != nil {
 			if os.IsNotExist(err) {
 				continue
@@ -140,6 +162,10 @@ func GetConfig(s config.Scope) (*config.Config, error) {
 	return config.NewConfig(), nil
 }
 
+// GetFinalConfig retrives system, global, and local Git configurations
+// and then merges them into a final config.Config instance.
+//
+// This function also applies Git URL rules (if any) to the Git remotes.
 func GetFinalConfig(repo *git.Repository) (*config.Config, error) {
 	var err error
 	c := config.NewConfig()
@@ -157,10 +183,31 @@ func GetFinalConfig(repo *git.Repository) (*config.Config, error) {
 		return nil, fmt.Errorf("couldn't merge global git config: %#v", err)
 	}
 
+	// Try to retrive the local Git config
 	localCfg, _ := repo.Config()
-	err = mergo.Merge(c, localCfg, mergo.WithOverride)
-	if err != nil {
-		return nil, fmt.Errorf("couldn't merge local git config: %#v", err)
+	localCfgOk := localCfg != nil
+	// Fallback to manual reading
+	if localCfg == nil {
+		// Try to get the local Git filesystem
+		fs, isFSBased := repo.Storer.(interface{ Filesystem() billy.Filesystem })
+		if !isFSBased {
+			return nil, fmt.Errorf("couldn't get the local git filesystem: %#v", err)
+		}
+		// Read the local Git config file
+		f, err := ActiveFS.Open(filepath.Join(fs.Filesystem().Root(), "config"))
+		if err == nil {
+			var err error
+			localCfg, err = ReadConfig(f)
+			localCfgOk = err == nil
+		}
+		defer f.Close()
+	}
+	// Merge the local Git config
+	if localCfgOk {
+		err = mergo.Merge(c, localCfg, mergo.WithOverride)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't merge local git config: %#v", err)
+		}
 	}
 
 	// Apply URL rules (if any)
@@ -188,7 +235,7 @@ func findLongestInsteadOfMatch(remoteURL string, urls map[string]*config.URL) *c
 			continue
 		}
 
-		// According to spec if there is more than one match, take the logest
+		// According to the spec if there is more than one match, the longest wins
 		if longestMatch == nil || len(longestMatch.InsteadOf) < len(u.InsteadOf) {
 			longestMatch = u
 		}
