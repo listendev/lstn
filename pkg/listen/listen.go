@@ -23,7 +23,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/google/go-querystring/query"
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/ua"
@@ -100,18 +99,17 @@ func PackageVerdicts(ctx context.Context, r *VerdictsRequest, jsonOpts flags.JSO
 	endpointURL := fmt.Sprintf("%s%s/verdicts", baseURL, getAPIPrefix(baseURL))
 
 	// Prepare the request
-	val, err := query.Values(r)
+	pl, err := json.Marshal(r)
 	if err != nil {
 		return nil, nil, pkgcontext.OutputError(ctx, err)
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpointURL, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpointURL, bytes.NewBuffer(pl))
 	if err != nil {
 		return nil, nil, pkgcontext.OutputError(ctx, err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", ua.Generate(true))
-	req.URL.RawQuery = val.Encode()
 
 	// Send the request
 	client := http.Client{}
