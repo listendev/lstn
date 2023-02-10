@@ -80,16 +80,8 @@ The verdicts it returns are listed by the name of each package and its specified
 				return err
 			}
 
-			packagesWithShasum, err := packageLockJSON.Shasums(ctx)
-			if err != nil {
-				return err
-			}
-			if len(packagesWithShasum) != len(packageLockJSON.Deps()) {
-				return fmt.Errorf("couldn't find all the dependencies as per package-lock.json file")
-			}
-
 			// Ask listen.dev for an analysis
-			req, err := listen.NewAnalysisRequest(packageLockJSON, packagesWithShasum)
+			req, err := listen.NewAnalysisRequest(packageLockJSON)
 			if err != nil {
 				return err
 			}
