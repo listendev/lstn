@@ -26,10 +26,11 @@ import (
 	"github.com/listendev/lstn/pkg/version"
 )
 
+// VerdictsRequest represents the payload for the verdicts listen.dev endpoint.
 type VerdictsRequest struct {
-	Name    string `url:"n"`
-	Version string `url:"v,omitempty"`
-	Shasum  string `url:"s,omitempty"`
+	Name    string `json:"name"`
+	Version string `json:"version,omitempty"`
+	Shasum  string `json:"shasum,omitempty"`
 }
 
 func NewVerdictsRequest(args []string) *VerdictsRequest {
@@ -110,31 +111,4 @@ func NewAnalysisRequest(packageLockJSON npm.PackageLockJSON, packages npm.Packag
 		packages,
 		NewAnalysisContext(),
 	}, nil
-}
-
-type Verdict struct {
-	Message  string                 `json:"message"`
-	Priority string                 `json:"priority"`
-	Metadata map[string]interface{} `json:"metadata,omitempty"`
-}
-
-type Problem struct {
-	Type   string `json:"type"`
-	Title  string `json:"title"`
-	Detail string `json:"detail"`
-}
-
-type Package struct {
-	Name     string    `json:"name"`
-	Version  string    `json:"version"`
-	Shasum   string    `json:"shasum"`
-	Verdicts []Verdict `json:"verdicts,omitempty"`
-	Problems []Problem `json:"problems,omitempty"`
-}
-
-type Response []Package
-
-type responseError struct {
-	Message   string `json:"message"`
-	RequestID string `json:"request_id"`
 }
