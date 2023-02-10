@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"os/exec"
 )
 
 func Error(ctx context.Context, input error) error {
@@ -28,6 +29,9 @@ func Error(ctx context.Context, input error) error {
 	}
 	if e, ok := input.(net.Error); ok && e.Timeout() {
 		return context.DeadlineExceeded
+	}
+	if e, ok := input.(*exec.ExitError); ok {
+		return fmt.Errorf("subprocess terminated with status code %s", e.ProcessState)
 	}
 	if ctx.Err() == context.DeadlineExceeded || ctx.Err() == context.Canceled {
 		return ctx.Err()
