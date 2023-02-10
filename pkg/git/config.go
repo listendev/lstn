@@ -23,27 +23,11 @@ import (
 	"strings"
 
 	"github.com/go-git/go-billy/v5"
-	"github.com/go-git/go-billy/v5/osfs"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
 	"github.com/imdario/mergo"
 	"github.com/muja/goconfig"
 )
-
-// ActiveFS provides a configurable entry point to the billy.Filesystem in active use
-// for reading global and system level configuration files.
-//
-// Override this in tests to mock the filesystem
-// (then reset to restore default behavior).
-var ActiveFS = DefaultFS()
-
-// DefaultFS provides a billy.Filesystem abstraction over the
-// OS filesystem (via osfs.OS) scoped to the root directory
-// in order to enable access to global and system configuration files
-// via absolute paths.
-func DefaultFS() billy.Filesystem {
-	return osfs.New("/")
-}
 
 // NewConfigFromMap provides a config.Config instance populating it from
 // the input map.
@@ -146,7 +130,7 @@ func GetConfig(s config.Scope) (*config.Config, error) {
 	}
 
 	for _, file := range files {
-		f, err := ActiveFS.Open(file)
+		f, err := activeFS.Open(file)
 		if err != nil {
 			if os.IsNotExist(err) {
 				continue
@@ -194,7 +178,7 @@ func GetFinalConfig(repo *git.Repository) (*config.Config, error) {
 			return nil, fmt.Errorf("couldn't get the local git filesystem: %#v", err)
 		}
 		// Read the local Git config file
-		f, openErr := ActiveFS.Open(filepath.Join(fs.Filesystem().Root(), "config"))
+		f, openErr := activeFS.Open(filepath.Join(fs.Filesystem().Root(), "config"))
 		if openErr == nil {
 			var readErr error
 			localCfg, readErr = ReadConfig(f)
