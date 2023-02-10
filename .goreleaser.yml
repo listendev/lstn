@@ -42,7 +42,7 @@ archives:
 # Docs at https://goreleaser.com/customization/nfpm
 nfpms:
   - license: Apache 2.0
-    maintainer: Garnet Labs, Inc.
+    maintainer: Garnet Labs Inc.
     homepage: https://github.com/listendev/lstn
     description: |-
       Analyze the behavior of your dependencies using listen.dev.
