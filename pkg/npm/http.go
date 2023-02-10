@@ -17,7 +17,6 @@ package npm
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -27,29 +26,6 @@ import (
 )
 
 const npmRegistryBaseURL = "https://registry.npmjs.org"
-
-type npmRegistryPackageVersionResponse struct {
-	Dist struct {
-		Shasum string
-	}
-}
-
-// requestShasum queries the NPM registry to obtain the shasum of the input package version.
-// TODO > backoff/retry strategy?
-func requestShasum(ctx context.Context, name, version string) (*packageInfo, error) {
-	res, err := GetFromRegistry(ctx, name, version)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Close()
-
-	ret := &npmRegistryPackageVersionResponse{}
-	if err := json.NewDecoder(res).Decode(ret); err != nil {
-		return nil, pkgcontext.OutputErrorf(ctx, err, "couldn't decode the NPM registry response")
-	}
-
-	return &packageInfo{shasum: ret.Dist.Shasum, name: name, version: version}, nil
-}
 
 // GetFromRegistry asks to the npm registry for the details of a package
 // by name, and optionally, by version.
