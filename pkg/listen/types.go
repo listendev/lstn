@@ -99,10 +99,10 @@ func (req *AnalysisRequest) MarshalJSON() ([]byte, error) {
 
 func NewAnalysisRequest(packageLockJSON npm.PackageLockJSON, packages npm.Packages) (*AnalysisRequest, error) {
 	if packageLockJSON == nil {
-		return nil, fmt.Errorf("could't create the analysis request")
+		return nil, fmt.Errorf("couldn't create the analysis request")
 	}
 	if !packageLockJSON.Ok() || !packages.Ok() {
-		return nil, fmt.Errorf("could't create the analysis request")
+		return nil, fmt.Errorf("couldn't create the analysis request")
 	}
 
 	return &AnalysisRequest{
