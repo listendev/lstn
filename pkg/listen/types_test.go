@@ -247,8 +247,6 @@ func TestTypesSuite(t *testing.T) {
 	suite.Run(t, new(TypesSuite))
 }
 
-type expectedFactory = func() interface{}
-
 func (suite *TypesSuite) TestResponseMarshalJSON() {
 	metadata := make(map[string]interface{})
 	metadata["number"] = float64(42)
