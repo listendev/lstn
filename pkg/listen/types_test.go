@@ -17,13 +17,16 @@ package listen
 
 import (
 	"encoding/json"
+	"io"
 	"os"
 	"path"
+	"strings"
 	"testing"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/listendev/lstn/pkg/npm"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 )
 
 func TestNewAnalysisContext(t *testing.T) {
@@ -232,6 +235,110 @@ func TestAnalysisRequestMarshal(t *testing.T) {
 				assert.Equal(t, tc.lock, []byte(o["package-lock"]))
 				assert.Equal(t, tc.pkgs, []byte(o["packages"]))
 			}
+		})
+	}
+}
+
+type TypesSuite struct {
+	suite.Suite
+}
+
+func TestTypesSuite(t *testing.T) {
+	suite.Run(t, new(TypesSuite))
+}
+
+type expectedFactory = func() interface{}
+
+func (suite *TypesSuite) TestResponseMarshalJSON() {
+	metadata := make(map[string]interface{})
+	metadata["number"] = float64(42)
+	metadata["string"] = "foo"
+
+	t := suite.T()
+	cases := []struct {
+		desc     string
+		reader   io.Reader
+		expected Response
+	}{
+		{
+			desc:     "empty list",
+			reader:   strings.NewReader(`[]`),
+			expected: Response{},
+		},
+		{
+			desc:   "without verdicts",
+			reader: strings.NewReader(`[{"name":"name","version":"version","shasum":"shasum","verdicts":[]}]`),
+			expected: Response{
+				Package{
+					Name:     "name",
+					Version:  "version",
+					Shasum:   "shasum",
+					Verdicts: []Verdict{},
+				},
+			},
+		},
+		{
+			desc:   "with verdicts",
+			reader: strings.NewReader(`[{"name":"name","version":"version","shasum":"shasum","verdicts":[{"message":"message","priority":"priority","metadata":{}}]}]`),
+			expected: Response{
+				Package{
+					Name:    "name",
+					Version: "version",
+					Shasum:  "shasum",
+					Verdicts: []Verdict{
+						{
+							Message:  "message",
+							Priority: "priority",
+							Metadata: make(map[string]interface{}),
+						},
+					},
+				},
+			},
+		},
+		{
+			desc:   "metadata accept any type",
+			reader: strings.NewReader(`[{"name":"name","version":"version","shasum":"shasum","verdicts":[{"message":"message","priority":"priority","metadata":{"number":42,"string":"foo"}}]}]`),
+			expected: Response{
+				Package{
+					Name:    "name",
+					Version: "version",
+					Shasum:  "shasum",
+					Verdicts: []Verdict{
+						{
+							Message:  "message",
+							Priority: "priority",
+							Metadata: metadata,
+						},
+					},
+				},
+			},
+		},
+		{
+			desc:   "with problems",
+			reader: strings.NewReader(`[{"name":"name","version":"version","shasum":"shasum","problems":[{"type":"type","title":"title","detail":"detail"}]}]`),
+			expected: Response{
+				Package{
+					Name:    "name",
+					Version: "version",
+					Shasum:  "shasum",
+					Problems: []Problem{
+						{
+							Type:   "type",
+							Title:  "title",
+							Detail: "detail",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		r := new(Response)
+		t.Run(tc.desc, func(t *testing.T) {
+			dec := json.NewDecoder(tc.reader)
+			suite.NoError(dec.Decode(r))
+			suite.Equal(*r, tc.expected)
 		})
 	}
 }
