@@ -95,7 +95,7 @@ func TestNewAnalysisRequest(t *testing.T) {
 			"both-nil",
 			nil,
 			nil,
-			"could't create the analysis request",
+			"couldn't create the analysis request",
 			0,
 		},
 		{
@@ -104,21 +104,21 @@ func TestNewAnalysisRequest(t *testing.T) {
 			npm.Packages{
 				"react": npm.Package{Version: "18.0.0", Shasum: "b468736d1f4a5891f38585ba8e8fb29f91c3cb96"},
 			},
-			"could't create the analysis request",
+			"couldn't create the analysis request",
 			0,
 		},
 		{
 			"pkgs-nil",
 			npm.NewPackageLockJSON(),
 			nil,
-			"could't create the analysis request",
+			"couldn't create the analysis request",
 			0,
 		},
 		{
 			"pkgs-empty",
 			npm.NewPackageLockJSON(),
 			npm.Packages{},
-			"could't create the analysis request",
+			"couldn't create the analysis request",
 			0,
 		},
 		{
