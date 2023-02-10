@@ -18,6 +18,8 @@ package context
 import (
 	"context"
 	"errors"
+	"fmt"
+	"os/exec"
 	"testing"
 	"time"
 
@@ -34,11 +36,13 @@ func TestErrorSuite(t *testing.T) {
 }
 
 func (suite *ErrorSuite) TestContextError() {
+	exitError := new(exec.ExitError)
 	cases := []struct {
 		name       string
 		ctxFactory contextFactory
 		input      error
 		expected   error
+		useEqual   bool
 	}{
 		{
 			name:       "Input error is context.Canceled",
@@ -75,6 +79,13 @@ func (suite *ErrorSuite) TestContextError() {
 			expected: context.Canceled,
 		},
 		{
+			name:       "error is *exec.ExitError",
+			ctxFactory: context.Background,
+			input:      exitError,
+			expected:   fmt.Errorf("subprocess terminated with status code %s", exitError),
+			useEqual:   true,
+		},
+		{
 			name:       "No error",
 			ctxFactory: context.Background,
 			input:      errors.New("some error"),
@@ -84,7 +95,11 @@ func (suite *ErrorSuite) TestContextError() {
 
 	for _, tc := range cases {
 		suite.T().Run(tc.name, func(t *testing.T) {
-			assert.ErrorIs(t, tc.expected, Error(tc.ctxFactory(), tc.input))
+			if tc.useEqual {
+				assert.Equal(t, tc.expected, Error(tc.ctxFactory(), tc.input))
+			} else {
+				assert.ErrorIs(t, tc.expected, Error(tc.ctxFactory(), tc.input))
+			}
 		})
 	}
 }
