@@ -130,55 +130,24 @@ func TestNewAnalysisRequest(t *testing.T) {
 	tests := []struct {
 		desc    string
 		lock    npm.PackageLockJSON
-		pkgs    npm.Packages
 		wantErr string
 		version int
 	}{
 		{
-			"both-nil",
-			nil,
-			nil,
-			"couldn't create the analysis request",
-			0,
-		},
-		{
 			"lock-nil",
 			nil,
-			npm.Packages{
-				"react": npm.Package{Version: "18.0.0", Shasum: "b468736d1f4a5891f38585ba8e8fb29f91c3cb96"},
-			},
 			"couldn't create the analysis request",
 			0,
 		},
 		{
-			"pkgs-nil",
+			"lock-empty",
 			npm.NewPackageLockJSON(),
-			nil,
-			"couldn't create the analysis request",
-			0,
-		},
-		{
-			"pkgs-empty",
-			npm.NewPackageLockJSON(),
-			npm.Packages{},
-			"couldn't create the analysis request",
-			0,
-		},
-		{
-			"okish-but-invalid-lock",
-			npm.NewPackageLockJSON(),
-			npm.Packages{
-				"react": npm.Package{Version: "18.0.0", Shasum: "b468736d1f4a5891f38585ba8e8fb29f91c3cb96"},
-			},
-			"couldn't create the analysis request",
+			"couldn't create the analysis request because of invalid package-lock.json",
 			0,
 		},
 		{
 			"valid",
 			validPackageLockJSON,
-			npm.Packages{
-				"@babel/runtime": npm.Package{Version: "7.20.13", Shasum: "7055ab8a7cff2b8f6058bf6ae45ff84ad2aded4b"},
-			},
 			"",
 			3,
 		},
@@ -186,7 +155,7 @@ func TestNewAnalysisRequest(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.desc, func(t *testing.T) {
-			res, err := NewAnalysisRequest(tc.lock, tc.pkgs)
+			res, err := NewAnalysisRequest(tc.lock)
 			if err != nil {
 				assert.Nil(t, res)
 				if assert.Error(t, err) {
@@ -230,16 +199,10 @@ func TestAnalysisRequestMarshal(t *testing.T) {
 		}
 	}`)))
 
-	validPackages := npm.Packages{
-		"@babel/runtime": npm.Package{Version: "7.20.13", Shasum: "7055ab8a7cff2b8f6058bf6ae45ff84ad2aded4b"},
-	}
-
-	validAnalysisRequest, err := NewAnalysisRequest(validPackageLockJSON, validPackages)
+	validAnalysisRequest, err := NewAnalysisRequest(validPackageLockJSON)
 	assert.Nil(t, err)
 
 	validPackageLockBody := []byte(`"ewoJIm5hbWUiOiAic2FtcGxlIiwKCSJ2ZXJzaW9uIjogIjEuMC4wIiwKCSJsb2NrZmlsZVZlcnNpb24iOiAzLAoJInJlcXVpcmVzIjogdHJ1ZSwKCSJwYWNrYWdlcyI6IHsKCQkiIjogewoJCQkibmFtZSI6ICJzYW1wbGUiLAoJCQkidmVyc2lvbiI6ICIxLjAuMCIsCgkJCSJsaWNlbnNlIjogIklTQyIsCgkJCSJkZXBlbmRlbmNpZXMiOiB7CgkJCQkicmVhY3QiOiAiMTguMC4wIgoJCQl9CgkJfSwKCQkibm9kZV9tb2R1bGVzL0BiYWJlbC9ydW50aW1lIjogewoJCQkidmVyc2lvbiI6ICI3LjIwLjEzIiwKCQkJInJlc29sdmVkIjogImh0dHBzOi8vcmVnaXN0cnkubnBtanMub3JnL0BiYWJlbC9ydW50aW1lLy0vcnVudGltZS03LjIwLjEzLnRneiIsCgkJCSJpbnRlZ3JpdHkiOiAic2hhNTEyLWd0M1BLWHMwREJvTDl4Q3ZPSUlaMk5FcUFHWnFIakFubVZiZlF0QjYyMFYwdVJlSVF1dHBlbDE0S2NuZVp1ZXI3VWlvWThBTEtaN2lvY2F2dnpUTkZBPT0iLAoJCQkiZGVwZW5kZW5jaWVzIjogewoJCQkJInJlZ2VuZXJhdG9yLXJ1bnRpbWUiOiAiXjAuMTMuMTEiCgkJCX0sCgkJCSJlbmdpbmVzIjogewoJCQkJIm5vZGUiOiAiPj02LjkuMCIKCQkJfQoJCX0KCX0KfQ=="`)
-
-	validPackagesBody := []byte(`{"@babel/runtime":{"version":"7.20.13","shasum":"7055ab8a7cff2b8f6058bf6ae45ff84ad2aded4b"}}`)
 
 	tests := []struct {
 		desc    string
@@ -252,7 +215,6 @@ func TestAnalysisRequestMarshal(t *testing.T) {
 			desc:    "valid",
 			areq:    validAnalysisRequest,
 			lock:    validPackageLockBody,
-			pkgs:    validPackagesBody,
 			wantErr: "",
 		},
 		{
@@ -278,7 +240,6 @@ func TestAnalysisRequestMarshal(t *testing.T) {
 				assert.Nil(t, e)
 
 				assert.Equal(t, tc.lock, []byte(o["package-lock"]))
-				assert.Equal(t, tc.pkgs, []byte(o["packages"]))
 			}
 		})
 	}
