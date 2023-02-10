@@ -60,6 +60,7 @@ func generatePackageLock(ctx context.Context, dir string) ([]byte, error) {
 	if err != nil {
 		return []byte{}, fmt.Errorf("couldn't create a temporary directory where to do the dirty work")
 	}
+	//nolint:errcheck // no need to check the error
 	defer util.RemoveAll(activeFS, tmp)
 
 	// Copy the package.json in the temporary directory
