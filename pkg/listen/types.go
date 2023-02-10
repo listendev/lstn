@@ -113,9 +113,9 @@ func NewAnalysisRequest(packageLockJSON npm.PackageLockJSON, packages npm.Packag
 }
 
 type Verdict struct {
-	Message  string            `json:"message"`
-	Priority string            `json:"priority"`
-	Metadata map[string]string `json:"metadata,omitempty"`
+	Message  string                 `json:"message"`
+	Priority string                 `json:"priority"`
+	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 
 type Problem struct {
