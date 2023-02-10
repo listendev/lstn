@@ -21,6 +21,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	internaltesting "github.com/listendev/lstn/internal/testing"
@@ -33,23 +34,43 @@ func TestMain(m *testing.M) {
 	case "":
 		os.Exit(m.Run())
 	case "npm-lt-6x":
-		if err := internaltesting.StubNpm(internaltesting.NPM{Version: "4.6.1"}); err != nil {
+		if err := internaltesting.StubNpm(internaltesting.NPM{
+			Version: "4.6.1",
+		}); err != nil {
 			os.Exit(1)
 		}
 	case "npm-gt-6x":
-		if err := internaltesting.StubNpm(internaltesting.NPM{Version: "8.19.3"}); err != nil {
+		if err := internaltesting.StubNpm(internaltesting.NPM{
+			Version: "8.19.3",
+		}); err != nil {
 			os.Exit(1)
 		}
 	case "npm-non-semver":
-		if err := internaltesting.StubNpm(internaltesting.NPM{Version: "non-semver"}); err != nil {
+		if err := internaltesting.StubNpm(internaltesting.NPM{
+			Version: "non-semver",
+		}); err != nil {
 			os.Exit(1)
 		}
-	case "npm-getnpm-gt-6x":
-		if err := internaltesting.StubNpm(internaltesting.NPM{Version: "6.14.17"}); err != nil {
+	case "nvm-gt-6x":
+		if err := internaltesting.StubNpm(internaltesting.NPM{
+			Version: "8.19.3",
+			WithNVM: true,
+		}); err != nil {
 			os.Exit(1)
 		}
-	case "npm-getnpm-lt-6x":
-		if err := internaltesting.StubNpm(internaltesting.NPM{Version: "4.6.1"}); err != nil {
+	case "nvm-lt-6x":
+		if err := internaltesting.StubNpm(internaltesting.NPM{
+			Version: "4.6.1",
+			WithNVM: true,
+		}); err != nil {
+			os.Exit(1)
+		}
+	case "nvm-gt-6x-no-use":
+		if err := internaltesting.StubNpm(internaltesting.NPM{
+			Version:      "8.19.3",
+			WithNVM:      true,
+			WithNVMNoUse: true,
+		}); err != nil {
 			os.Exit(1)
 		}
 	default:
@@ -100,7 +121,7 @@ func TestGetNPMPackageLockOnlyGt6x(t *testing.T) {
 	t.Setenv("PATH", newPath)
 	dstNPM := filepath.Join(binDir, "npm")
 	assert.Nil(t, internaltesting.CopyExecutable(testExe, dstNPM))
-	t.Setenv("TEST_NPM_BEHAVIOR", "npm-getnpm-gt-6x")
+	t.Setenv("TEST_NPM_BEHAVIOR", "npm-gt-6x")
 
 	c, e := getNPMPackageLockOnly(context.Background())
 	assert.Nil(t, e)
@@ -117,7 +138,7 @@ func TestGetNPMPackageLockOnlyLt6x(t *testing.T) {
 	t.Setenv("PATH", newPath)
 	dstNPM := filepath.Join(binDir, "npm")
 	assert.Nil(t, internaltesting.CopyExecutable(testExe, dstNPM))
-	t.Setenv("TEST_NPM_BEHAVIOR", "npm-getnpm-lt-6x")
+	t.Setenv("TEST_NPM_BEHAVIOR", "npm-lt-6x")
 
 	c, e := getNPMPackageLockOnly(context.Background())
 	if assert.Error(t, e) {
@@ -135,5 +156,78 @@ func TestGetNPMPackageLockOnlyNPMNotInPath(t *testing.T) {
 	if assert.Error(t, e) {
 		assert.Nil(t, c)
 		assert.Equal(t, "couldn't find the npm executable in the PATH", e.Error())
+	}
+}
+
+func TestGetNPMPackageLockOnlyFromNVMMissingNVMDir(t *testing.T) {
+	t.Setenv("NVM_DIR", "")
+
+	c, e := getNPMPackageLockOnlyFromNVM(context.Background())
+	if assert.Error(t, e) {
+		assert.Nil(t, c)
+		assert.Equal(t, "couldn't detect the nvm directory", e.Error())
+	}
+}
+
+func TestGetNPMPackageLockOnlyFromNVMNoUseGt6x(t *testing.T) {
+	testExe, err := os.Executable()
+	assert.Nil(t, err)
+
+	// Prepend the path of this test binary to PATH
+	binDir := t.TempDir()
+	t.Setenv("NVM_DIR", binDir)
+	t.Setenv("NVM_NO_USE", "true")
+	newPath := binDir + string(filepath.ListSeparator) + os.Getenv("PATH")
+	t.Setenv("PATH", newPath)
+	dstBash := filepath.Join(binDir, "bash")
+	assert.Nil(t, internaltesting.CopyExecutable(testExe, dstBash))
+	t.Setenv("TEST_NPM_BEHAVIOR", "nvm-gt-6x-no-use")
+
+	c, e := getNPMPackageLockOnlyFromNVM(context.Background())
+	assert.Nil(t, e)
+	assert.Len(t, c.Args, 3)
+	assert.True(t, strings.HasSuffix(c.Path, "bash"))
+	assert.Contains(t, c.Args[1], "-c")
+	assert.Equal(t, fmt.Sprintf("source %s/nvm.sh --no-use && npm install --package-lock-only --no-audit", binDir), strings.Join(c.Args[2:], " "))
+}
+
+func TestGetNPMPackageLockOnlyFromNVMGt6x(t *testing.T) {
+	testExe, err := os.Executable()
+	assert.Nil(t, err)
+
+	// Prepend the path of this test binary to PATH
+	binDir := t.TempDir()
+	t.Setenv("NVM_DIR", binDir)
+	newPath := binDir + string(filepath.ListSeparator) + os.Getenv("PATH")
+	t.Setenv("PATH", newPath)
+	dstBash := filepath.Join(binDir, "bash")
+	assert.Nil(t, internaltesting.CopyExecutable(testExe, dstBash))
+	t.Setenv("TEST_NPM_BEHAVIOR", "nvm-gt-6x")
+
+	c, e := getNPMPackageLockOnlyFromNVM(context.Background())
+	assert.Nil(t, e)
+	assert.Len(t, c.Args, 3)
+	assert.True(t, strings.HasSuffix(c.Path, "bash"))
+	assert.Contains(t, c.Args[1], "-c")
+	assert.Equal(t, fmt.Sprintf("source %s/nvm.sh && npm install --package-lock-only --no-audit", binDir), strings.Join(c.Args[2:], " "))
+}
+
+func TestGetNPMPackageLockOnlyFromNVMLt6x(t *testing.T) {
+	testExe, err := os.Executable()
+	assert.Nil(t, err)
+
+	// Prepend the path of this test binary to PATH
+	binDir := t.TempDir()
+	t.Setenv("NVM_DIR", binDir)
+	newPath := binDir + string(filepath.ListSeparator) + os.Getenv("PATH")
+	t.Setenv("PATH", newPath)
+	dstBash := filepath.Join(binDir, "bash")
+	assert.Nil(t, internaltesting.CopyExecutable(testExe, dstBash))
+	t.Setenv("TEST_NPM_BEHAVIOR", "nvm-lt-6x")
+
+	c, e := getNPMPackageLockOnlyFromNVM(context.Background())
+	if assert.Error(t, e) {
+		assert.Nil(t, c)
+		assert.Equal(t, "the npm version is not >= 6.x", e.Error())
 	}
 }

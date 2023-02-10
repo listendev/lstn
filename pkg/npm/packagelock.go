@@ -84,8 +84,7 @@ func generatePackageLock(ctx context.Context, dir string) ([]byte, error) {
 
 func checkNPMVersion(c *exec.Cmd, constraint string) error {
 	// Obtain the npm version
-	npmVersionCmd := c
-	npmVersionOut, err := npmVersionCmd.CombinedOutput()
+	npmVersionOut, err := c.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("couldn't get the npm version")
 	}
@@ -146,6 +145,10 @@ func getNPMPackageLockOnlyFromNVM(ctx context.Context) (*exec.Cmd, error) {
 	if nvmDir == "" {
 		return nil, fmt.Errorf("couldn't detect the nvm directory")
 	}
+	bashExe, err := exec.LookPath("bash")
+	if err != nil {
+		return nil, fmt.Errorf("couldn't find bash in the PATH")
+	}
 
 	cmdline := fmt.Sprintf("source %s/nvm.sh", nvmDir)
 
@@ -155,10 +158,10 @@ func getNPMPackageLockOnlyFromNVM(ctx context.Context) (*exec.Cmd, error) {
 	}
 
 	// Obtain the npm version
-	npmVersionCmd := exec.CommandContext(ctx, "bash", "-c", fmt.Sprintf("%s && npm --version", cmdline))
+	npmVersionCmd := exec.CommandContext(ctx, bashExe, "-c", fmt.Sprintf("%s && npm --version", cmdline))
 	if err := checkNPMVersion(npmVersionCmd, ">= 6.x"); err != nil {
 		return nil, err
 	}
 
-	return exec.CommandContext(ctx, "bash", "-c", fmt.Sprintf("%s && npm install --package-lock-only --no-audit", cmdline)), nil
+	return exec.CommandContext(ctx, bashExe, "-c", fmt.Sprintf("%s && npm install --package-lock-only --no-audit", cmdline)), nil
 }
