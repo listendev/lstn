@@ -92,7 +92,6 @@ func (p *packageLockJSON) UnmarshalJSON(data []byte) error {
 }
 
 type PackageLockJSON interface {
-	Shasums(ctx context.Context) (Packages, error)
 	Deps() map[string]PackageLockDependency
 	Encode() string
 	Ok() bool
