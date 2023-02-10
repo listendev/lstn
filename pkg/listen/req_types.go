@@ -28,13 +28,16 @@ import (
 
 // VerdictsRequest represents the payload for the verdicts listen.dev endpoint.
 type VerdictsRequest struct {
-	Name    string `json:"name"`
-	Version string `json:"version,omitempty"`
-	Shasum  string `json:"shasum,omitempty"`
+	Name    string           `json:"name"`
+	Version string           `json:"version,omitempty"`
+	Shasum  string           `json:"shasum,omitempty"`
+	Context *AnalysisContext `json:"context,omitempty"`
 }
 
 func NewVerdictsRequest(args []string) *VerdictsRequest {
-	ret := &VerdictsRequest{}
+	ret := &VerdictsRequest{
+		Context: NewAnalysisContext(),
+	}
 
 	switch len(args) {
 	case 3:
@@ -81,7 +84,7 @@ func NewAnalysisContext(funcs ...git.GetDirFunc) *AnalysisContext {
 type AnalysisRequest struct {
 	PackageLockJSON npm.PackageLockJSON `json:"package-lock"`
 	Packages        npm.Packages        `json:"packages"`
-	Context         *AnalysisContext    `json:"context"`
+	Context         *AnalysisContext    `json:"context,omitempty"`
 }
 
 // MarshalJSON is a custom marshaler that encodes the
