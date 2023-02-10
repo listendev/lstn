@@ -20,12 +20,15 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/go-git/go-billy/v5"
 )
 
 type NPM struct {
-	Version string
+	Version      string
+	WithNVM      bool
+	WithNVMNoUse bool
 }
 
 // StubNPM creates a fake npm for testing reasons.
@@ -35,20 +38,35 @@ func StubNpm(npm NPM) error {
 		return fmt.Errorf("fake npm without arguments")
 	}
 
-	switch args[0] {
-	case "--version":
-		fmt.Println(npm.Version)
+	if npm.WithNVM {
+		if len(args) >= 2 {
+			if args[0] == "-c" {
+				if strings.HasPrefix(args[1], "source") && strings.Contains(args[1], "nvm.sh") && strings.Contains(args[1], "npm") && strings.HasSuffix(args[1], "--version") {
+					if npm.WithNVMNoUse && !strings.Contains(args[1], "--no-use") {
+						return fmt.Errorf("missing --no-use nvm flag")
+					}
+					fmt.Println(npm.Version)
 
-		return nil
-	case "i":
-		fallthrough
-	case "install":
-		// if len(args) > 1 {
-		// 	// TODO:: --package-lock-only --audit
-		// }
-		fmt.Println("installing...")
+					return nil
+				}
+			}
+		}
+	} else {
+		switch args[0] {
+		case "--version":
+			fmt.Println(npm.Version)
 
-		return nil
+			return nil
+		case "i":
+			fallthrough
+		case "install":
+			// if len(args) > 1 {
+			// 	// TODO:: --package-lock-only --audit
+			// }
+			fmt.Println("installing...")
+
+			return nil
+		}
 	}
 
 	return fmt.Errorf("couldn't fake npm correctly")
