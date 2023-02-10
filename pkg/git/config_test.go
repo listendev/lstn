@@ -35,8 +35,8 @@ import (
 func TestGetConfigDoesntWorkForLocalConfig(t *testing.T) {
 	fs := memfs.New()
 
-	ActiveFS = fs
-	defer func() { ActiveFS = DefaultFS() }()
+	activeFS = fs
+	defer func() { activeFS = defaultFS() }()
 
 	err := stubGitConfig(fs, "/work/example", config.LocalScope, func() string {
 		return heredoc.Doc(`
@@ -61,8 +61,8 @@ func TestGetConfigDoesntWorkForLocalConfig(t *testing.T) {
 func TestGetConfigReturnsEmptyConfigWhenConfigFileNotFound(t *testing.T) {
 	fs := memfs.New()
 
-	ActiveFS = fs
-	defer func() { ActiveFS = DefaultFS() }()
+	activeFS = fs
+	defer func() { activeFS = defaultFS() }()
 
 	err := stubGitConfig(fs, "/work/example", config.SystemScope, func() string {
 		return heredoc.Doc(`
@@ -81,8 +81,8 @@ func TestGetConfigReturnsEmptyConfigWhenConfigFileNotFound(t *testing.T) {
 func TestGetConfigMalformedConfig(t *testing.T) {
 	fs := memfs.New()
 
-	ActiveFS = fs
-	defer func() { ActiveFS = DefaultFS() }()
+	activeFS = fs
+	defer func() { activeFS = defaultFS() }()
 
 	err := stubGitConfig(fs, "/work/example", config.SystemScope, func() string {
 		return heredoc.Doc(`
@@ -100,8 +100,8 @@ func TestGetConfigMalformedConfig(t *testing.T) {
 func TestGetFinalConfigFromSystemGitConfig(t *testing.T) {
 	fs := memfs.New()
 
-	ActiveFS = fs
-	defer func() { ActiveFS = DefaultFS() }()
+	activeFS = fs
+	defer func() { activeFS = defaultFS() }()
 
 	err := stubGitConfig(fs, "/work/example", config.SystemScope, func() string {
 		return heredoc.Doc(`
@@ -123,8 +123,8 @@ func TestGetFinalConfigFromSystemGitConfig(t *testing.T) {
 func TestGetFinalConfigFromGlobalGitConfig(t *testing.T) {
 	fs := memfs.New()
 
-	ActiveFS = fs
-	defer func() { ActiveFS = DefaultFS() }()
+	activeFS = fs
+	defer func() { activeFS = defaultFS() }()
 
 	err := stubGitConfig(fs, "/work/example", config.GlobalScope, func() string {
 		return heredoc.Doc(`
@@ -146,8 +146,8 @@ func TestGetFinalConfigFromGlobalGitConfig(t *testing.T) {
 func TestGetFinalConfigFromLocalGitConfig(t *testing.T) {
 	fs := memfs.New()
 
-	ActiveFS = fs
-	defer func() { ActiveFS = DefaultFS() }()
+	activeFS = fs
+	defer func() { activeFS = defaultFS() }()
 
 	err := stubGitConfig(fs, "/work/example", config.LocalScope, func() string {
 		return heredoc.Doc(`
@@ -169,8 +169,8 @@ func TestGetFinalConfigFromLocalGitConfig(t *testing.T) {
 func TestGetFinalConfigMergesAllConfigs(t *testing.T) {
 	fs := memfs.New()
 
-	ActiveFS = fs
-	defer func() { ActiveFS = DefaultFS() }()
+	activeFS = fs
+	defer func() { activeFS = defaultFS() }()
 
 	var err error
 	err = stubGitConfig(fs, "/work/example", config.SystemScope, func() string {
@@ -216,8 +216,8 @@ func TestGetFinalConfigMergesAllConfigs(t *testing.T) {
 func TestGetFinalConfigAppliesURLRules(t *testing.T) {
 	fs := memfs.New()
 
-	ActiveFS = fs
-	defer func() { ActiveFS = DefaultFS() }()
+	activeFS = fs
+	defer func() { activeFS = defaultFS() }()
 
 	var err error
 	err = stubGitConfig(fs, "/work/example", config.SystemScope, func() string {
@@ -274,8 +274,8 @@ func TestGetFinalConfigAppliesURLRules(t *testing.T) {
 func TestGetFinalConfigWithPartiallyValidLocalConfig(t *testing.T) {
 	fs := memfs.New()
 
-	ActiveFS = fs
-	defer func() { ActiveFS = DefaultFS() }()
+	activeFS = fs
+	defer func() { activeFS = defaultFS() }()
 
 	var err error
 	err = stubGitConfig(fs, "/work/example", config.SystemScope, func() string {
