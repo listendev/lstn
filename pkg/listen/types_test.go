@@ -127,7 +127,7 @@ func TestNewAnalysisRequest(t *testing.T) {
 			npm.Packages{
 				"react": npm.Package{Version: "18.0.0", Shasum: "b468736d1f4a5891f38585ba8e8fb29f91c3cb96"},
 			},
-			"could't create the analysis request",
+			"couldn't create the analysis request",
 			0,
 		},
 		{
