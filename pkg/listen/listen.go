@@ -46,57 +46,30 @@ func getAPIPrefix(baseURL string) string {
 	return "/api"
 }
 
-func PackageLockAnalysis(ctx context.Context, r *AnalysisRequest, jsonOpts flags.JSONOptions) (*Response, []byte, error) {
-	// Obtain the endpoint base URL
+func getEndpointURLFromContext[T any](ctx context.Context, r *T) (string, error) {
+	segment := ""
+	switch any(r).(type) {
+	case *AnalysisRequest:
+		segment = "analysis"
+	case *VerdictsRequest:
+		segment = "verdicts"
+	default:
+		return "", fmt.Errorf("unsupported request type")
+	}
+
 	baseURL, err := getBaseURLFromContext(ctx)
 	if err != nil {
-		return nil, nil, pkgcontext.OutputError(ctx, err)
+		return "", err
 	}
-	endpointURL := fmt.Sprintf("%s%s/analysis", baseURL, getAPIPrefix(baseURL))
-
-	// Prepare the request
-	pl, err := json.Marshal(r)
-	if err != nil {
-		return nil, nil, pkgcontext.OutputError(ctx, err)
-	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpointURL, bytes.NewBuffer(pl))
-	if err != nil {
-		return nil, nil, pkgcontext.OutputError(ctx, err)
-	}
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("User-Agent", ua.Generate(true))
-
-	// Send the request
-	client := http.Client{}
-	res, err := client.Do(req)
-	if err != nil {
-		return nil, nil, pkgcontext.OutputError(ctx, err)
-	}
-	defer res.Body.Close()
-
-	dec := json.NewDecoder(res.Body)
-
-	// Bail out if status != 200
-	if res.StatusCode != http.StatusOK {
-		target := &responseError{}
-		if err = dec.Decode(target); err != nil {
-			return nil, nil, pkgcontext.OutputError(ctx, err)
-		}
-
-		return nil, nil, pkgcontext.OutputErrorf(ctx, err, target.Message)
-	}
-
-	return response(ctx, dec, res, jsonOpts)
+	return fmt.Sprintf("%s%s/%s", baseURL, getAPIPrefix(baseURL), segment), nil
 }
 
-func PackageVerdicts(ctx context.Context, r *VerdictsRequest, jsonOpts flags.JSONOptions) (*Response, []byte, error) {
+func Packages[T any](ctx context.Context, r *T, jsonOpts flags.JSONOptions) (*Response, []byte, error) {
 	// Obtain the endpoint base URL
-	baseURL, err := getBaseURLFromContext(ctx)
+	endpointURL, err := getEndpointURLFromContext(ctx, r)
 	if err != nil {
 		return nil, nil, pkgcontext.OutputError(ctx, err)
 	}
-	endpointURL := fmt.Sprintf("%s%s/verdicts", baseURL, getAPIPrefix(baseURL))
 
 	// Prepare the request
 	pl, err := json.Marshal(r)

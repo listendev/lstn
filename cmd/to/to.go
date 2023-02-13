@@ -62,7 +62,7 @@ If you're a hairsplitting person, you can also query for the verdicts specific t
 			}
 
 			// Query for the package verdicts
-			res, resJSON, err := listen.PackageVerdicts(ctx, listen.NewVerdictsRequest(args), &toOpts.JSONFlags)
+			res, resJSON, err := listen.Packages(ctx, listen.NewVerdictsRequest(args), &toOpts.JSONFlags)
 			if err != nil {
 				return err
 			}
