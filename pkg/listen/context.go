@@ -25,15 +25,15 @@ import (
 	"github.com/listendev/lstn/pkg/version"
 )
 
-type AnalysisContext struct {
+type Context struct {
 	Version version.Version   `json:"version"`
 	Git     *git.Context      `json:"git,omitempty"`
 	OS      *lstnos.Info      `json:"os,omitempty"`
 	PMs     map[string]string `json:"packagemanagers,omitempty"`
 }
 
-func NewAnalysisContext(funcs ...git.GetDirFunc) *AnalysisContext {
-	ret := &AnalysisContext{}
+func NewContext(funcs ...git.GetDirFunc) *Context {
+	ret := &Context{}
 
 	ret.Version = version.Get()
 	ret.OS, _ = lstnos.NewInfo()
