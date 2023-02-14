@@ -244,12 +244,7 @@ func (suite *RequestsSuite) TestAnalysisRequest() {
 		}
 	}`)))
 
-	pkg := npm.Packages{
-		"js-tokens":    npm.Package{Version: "4.0.0", Shasum: "19203fb59991df98e3a287050d4647cdeaf32499"},
-		"loose-envify": npm.Package{Version: "1.4.0", Shasum: "71ee51fa7be4caec1a63839f7e682d8132d30caf"},
-	}
-
-	req, err1 := NewAnalysisRequest(plj, pkg)
+	req, err1 := NewAnalysisRequest(plj)
 	suite.Assert().Nil(err1)
 
 	res1, _, err1 := Packages(req, WithBaseURL(suite.server.URL))
