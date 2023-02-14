@@ -29,13 +29,13 @@ func TestMain(m *testing.M) {
 		os.Exit(m.Run())
 	case "npm-lt-6x":
 		if err := internaltesting.StubNpm(internaltesting.NPM{
-			Version: "4.6.1",
+			Version: "4.6.3",
 		}); err != nil {
 			os.Exit(1)
 		}
 	case "npm-gt-6x":
 		if err := internaltesting.StubNpm(internaltesting.NPM{
-			Version: "8.19.3",
+			Version: "8.19.2",
 		}); err != nil {
 			os.Exit(1)
 		}
@@ -47,21 +47,21 @@ func TestMain(m *testing.M) {
 		}
 	case "nvm-gt-6x":
 		if err := internaltesting.StubNpm(internaltesting.NPM{
-			Version: "8.19.3",
+			Version: "8.19.1",
 			WithNVM: true,
 		}); err != nil {
 			os.Exit(1)
 		}
 	case "nvm-lt-6x":
 		if err := internaltesting.StubNpm(internaltesting.NPM{
-			Version: "4.6.1",
+			Version: "4.6.0",
 			WithNVM: true,
 		}); err != nil {
 			os.Exit(1)
 		}
 	case "nvm-gt-6x-no-use":
 		if err := internaltesting.StubNpm(internaltesting.NPM{
-			Version:      "8.19.3",
+			Version:      "8.19.2",
 			WithNVM:      true,
 			WithNVMNoUse: true,
 		}); err != nil {
