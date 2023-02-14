@@ -84,7 +84,9 @@ func TestCheckNPMVersionLt6x(t *testing.T) {
 	assert.Nil(t, err)
 
 	npmVersionCmd := exec.Command(testExe, "--version")
-	err = checkNPMVersion(npmVersionCmd, ">= 6.x")
+	v, err := getNPMVersion(npmVersionCmd)
+	assert.Nil(t, err)
+	err = checkNPMVersion(v, ">= 6.x")
 	if assert.Error(t, err) {
 		assert.Equal(t, "the npm version is not >= 6.x", err.Error())
 	}
@@ -96,7 +98,9 @@ func TestCheckNPMVersionGt6x(t *testing.T) {
 	assert.Nil(t, err)
 
 	npmVersionCmd := exec.Command(testExe, "--version")
-	assert.Nil(t, checkNPMVersion(npmVersionCmd, ">= 6.x"))
+	v, err := getNPMVersion(npmVersionCmd)
+	assert.Nil(t, err)
+	assert.Nil(t, checkNPMVersion(v, ">= 6.x"))
 }
 
 func TestCheckNPMVersionNotValidSemver(t *testing.T) {
@@ -105,7 +109,9 @@ func TestCheckNPMVersionNotValidSemver(t *testing.T) {
 	assert.Nil(t, err)
 
 	npmVersionCmd := exec.Command(testExe, "--version")
-	err = checkNPMVersion(npmVersionCmd, ">= 6.x")
+	v, err := getNPMVersion(npmVersionCmd)
+	assert.Nil(t, err)
+	err = checkNPMVersion(v, ">= 6.x")
 	if assert.Error(t, err) {
 		assert.Equal(t, "the npm version is not a valid semantic version", err.Error())
 	}
