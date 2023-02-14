@@ -26,7 +26,7 @@ import (
 )
 
 type LockfileVersion struct {
-	Value int `json:"lockfileVersion" name:"lockfile_version" validate:"gte=1,lte=3"`
+	Value int `json:"lockfileVersion" name:"lockfile version" validate:"gte=1,lte=3"`
 }
 
 type packageLockJSONVersion1 struct {
@@ -106,7 +106,7 @@ type PackageLockDependency struct {
 
 type Package struct {
 	Version string `json:"version" name:"version" validate:"semver"`
-	Shasum  string `json:"shasum" name:"shasum" validate:"len=40"`
+	Shasum  string `json:"shasum" name:"shasum" validate:"shasum"`
 }
 
 func (p *Package) Ok() bool {

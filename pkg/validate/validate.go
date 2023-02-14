@@ -58,9 +58,27 @@ func init() {
 		panic(err)
 	}
 
+	Singleton.RegisterAlias("shasum", "len=40")
+	Singleton.RegisterAlias("mandatory", "required")
+
 	eng := en.New()
 	Translator, _ = (ut.New(eng, eng)).GetTranslator("en")
 	if err := en_translations.RegisterDefaultTranslations(Singleton, Translator); err != nil {
+		panic(err)
+	}
+
+	if err := Singleton.RegisterTranslation(
+		"mandatory",
+		Translator,
+		func(ut ut.Translator) error {
+			return ut.Add("mandatory", "{0} is mandatory", true)
+		},
+		func(ut ut.Translator, fe validator.FieldError) string {
+			t, _ := ut.T("mandatory", fe.Field())
+
+			return t
+		},
+	); err != nil {
 		panic(err)
 	}
 
@@ -112,7 +130,7 @@ func init() {
 	}
 
 	if err := Singleton.RegisterTranslation(
-		"jq",
+		"npm_package_name",
 		Translator,
 		func(ut ut.Translator) error {
 			return ut.Add("npm_package_name", "{0} is not a valid npm package name", true)
