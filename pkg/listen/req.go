@@ -93,7 +93,6 @@ func (req VerdictsRequest) MarshalJSON() ([]byte, error) {
 
 type AnalysisRequest struct {
 	PackageLockJSON npm.PackageLockJSON `json:"package-lock" name:"package lock" validate:"mandatory"`
-	Packages        npm.Packages        `json:"packages"`
 	Context         *AnalysisContext    `json:"context,omitempty"`
 }
 
@@ -128,17 +127,16 @@ func (req AnalysisRequest) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func NewAnalysisRequest(packageLockJSON npm.PackageLockJSON, packages npm.Packages) (*AnalysisRequest, error) {
+func NewAnalysisRequest(packageLockJSON npm.PackageLockJSON) (*AnalysisRequest, error) {
 	if packageLockJSON == nil {
 		return nil, fmt.Errorf("couldn't create the analysis request")
 	}
-	if !packageLockJSON.Ok() || !packages.Ok() {
-		return nil, fmt.Errorf("couldn't create the analysis request")
+	if !packageLockJSON.Ok() {
+		return nil, fmt.Errorf("couldn't create the analysis request because of invalid package-lock.json")
 	}
 
 	return &AnalysisRequest{
 		packageLockJSON,
-		packages,
 		NewAnalysisContext(),
 	}, nil
 }
