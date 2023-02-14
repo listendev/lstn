@@ -62,7 +62,16 @@ If you're a hairsplitting person, you can also query for the verdicts specific t
 			}
 
 			// Query for the package verdicts
-			res, resJSON, err := listen.Packages(ctx, listen.NewVerdictsRequest(args), &toOpts.JSONFlags)
+			req, err := listen.NewVerdictsRequest(args)
+			if err != nil {
+				return err
+			}
+
+			res, resJSON, err := listen.Packages(
+				req,
+				listen.WithContext(ctx),
+				listen.WithJSONOptions(toOpts.JSONFlags),
+			)
 			if err != nil {
 				return err
 			}
@@ -111,7 +120,7 @@ func validateInArgs(c *cobra.Command, args []string) error {
 	switch len(args) {
 	case 3:
 		// Validate third argument is a shasum
-		if err := validate.Singleton.Var(args[2], "len=40"); err != nil {
+		if err := validate.Singleton.Var(args[2], "shasum"); err != nil {
 			all = append(all, fmt.Errorf("%s is not a valid shasum", args[2]))
 		}
 

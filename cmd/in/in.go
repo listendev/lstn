@@ -94,7 +94,11 @@ The verdicts it returns are listed by the name of each package and its specified
 				return err
 			}
 
-			res, resJSON, err := listen.Packages(ctx, req, &inOpts.JSONFlags)
+			res, resJSON, err := listen.Packages(
+				req,
+				listen.WithContext(ctx),
+				listen.WithJSONOptions(inOpts.JSONFlags),
+			)
 			if err != nil {
 				return err
 			}
