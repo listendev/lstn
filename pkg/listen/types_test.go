@@ -29,6 +29,46 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
+func TestNewVerdictsRequest(t *testing.T) {
+	tests := []struct {
+		desc    string
+		args    []string
+		req     *VerdictsRequest
+		wantErr string
+	}{
+		{
+			"no-args",
+			[]string{},
+			nil,
+			"a verdicts request requires at least one argument (package name)",
+		},
+		{
+			"name-only",
+			[]string{"react"},
+			&VerdictsRequest{Name: "react"},
+			"",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.desc, func(t *testing.T) {
+			res, err := NewVerdictsRequest(tc.args)
+			if err != nil {
+				assert.Nil(t, res)
+				if assert.Error(t, err) {
+					assert.Equal(t, tc.wantErr, err.Error())
+				}
+			} else {
+				assert.Nil(t, err)
+				assert.IsType(t, &VerdictsRequest{}, res)
+				assert.Equal(t, tc.req.Name, res.Name)
+				assert.Equal(t, tc.req.Version, res.Version)
+				assert.Equal(t, tc.req.Shasum, res.Shasum)
+			}
+		})
+	}
+}
+
 func TestNewAnalysisContext(t *testing.T) {
 	analysisCtx1 := NewAnalysisContext()
 	j1, e1 := json.Marshal(analysisCtx1)
@@ -214,6 +254,11 @@ func TestAnalysisRequestMarshal(t *testing.T) {
 			lock:    validPackageLockBody,
 			pkgs:    validPackagesBody,
 			wantErr: "",
+		},
+		{
+			desc:    "missing-packagelock",
+			areq:    &AnalysisRequest{},
+			wantErr: "json: error calling MarshalJSON for type *listen.AnalysisRequest: package lock is mandatory",
 		},
 	}
 
