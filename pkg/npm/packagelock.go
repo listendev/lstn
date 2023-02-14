@@ -16,17 +16,13 @@
 package npm
 
 import (
-	"bytes"
 	"context"
 	"fmt"
-	"os"
 	"os/exec"
 	"path/filepath"
 
-	"github.com/Masterminds/semver/v3"
 	"github.com/go-git/go-billy/v5/util"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
-	"github.com/listendev/lstn/pkg/validate"
 )
 
 // generatePackageLock generates a package-lock.json by executing npm
@@ -84,55 +80,29 @@ func generatePackageLock(ctx context.Context, dir string) ([]byte, error) {
 	return packageLockJSON, nil
 }
 
-func checkNPMVersion(c *exec.Cmd, constraint string) error {
-	// Obtain the npm version
-	npmVersionOut, err := c.CombinedOutput()
-	if err != nil {
-		return fmt.Errorf("couldn't get the npm version")
-	}
-	npmVersionString := string(bytes.Trim(npmVersionOut, "\n"))
-
-	// Check the npm version is valid
-	npmVersionErrors := validate.Singleton.Var(npmVersionString, "semver")
-	if npmVersionErrors != nil {
-		return fmt.Errorf("the npm version is not a valid semantic version")
-	}
-	npmVersion, err := semver.NewVersion(npmVersionString)
-	if err != nil {
-		return fmt.Errorf("couldn't get a valid npm version")
-	}
-
-	// Check the npm is at least version 6.x
-	npmVersionConstraint, err := semver.NewConstraint(constraint)
-	if err != nil {
-		return fmt.Errorf("couldn't compare the npm version")
-	}
-	npmVersionValid, _ := npmVersionConstraint.Validate(npmVersion)
-	if !npmVersionValid {
-		return fmt.Errorf("the npm version is not %s", constraint)
-	}
-
-	return nil
-}
-
 // getNPMPackageLockOnly returns the command to generate the package-lock.json file.
 //
 // It also checks that:
 // - the npm executable is available in the PATH
 // - its version is greater or equal than version "6.x".
 func getNPMPackageLockOnly(ctx context.Context) (*exec.Cmd, error) {
-	// Check the system has the npm executable
-	exe, err := exec.LookPath("npm")
+	npm, err := getNPM(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't find the npm executable in the PATH")
-	}
-
-	npmVersionCmd := exec.CommandContext(ctx, exe, "--version")
-	if err := checkNPMVersion(npmVersionCmd, ">= 6.x"); err != nil {
 		return nil, err
 	}
 
-	return exec.CommandContext(ctx, exe, "install", "--package-lock-only", "--no-audit"), nil
+	npmVersionCmd := exec.CommandContext(ctx, npm.Path, append(npm.Args[1:], "--version")...)
+	npmVersionStr, err := getNPMVersion(npmVersionCmd)
+	if err != nil {
+		return nil, err
+	}
+	if err := checkNPMVersion(npmVersionStr, ">= 6.x"); err != nil {
+		return nil, err
+	}
+
+	npmPackageLockOnlyCmd := exec.CommandContext(ctx, npm.Path, append(npm.Args[1:], "install", "--package-lock-only", "--no-audit")...)
+
+	return npmPackageLockOnlyCmd, nil
 }
 
 // getNPMPackageLockOnlyFromNVM return the command to generate the package-lock.json file
@@ -143,27 +113,23 @@ func getNPMPackageLockOnly(ctx context.Context) (*exec.Cmd, error) {
 // It also checks that:
 // - the npm version is greater or equal than version "6.x".
 func getNPMPackageLockOnlyFromNVM(ctx context.Context) (*exec.Cmd, error) {
-	nvmDir := os.Getenv("NVM_DIR")
-	if nvmDir == "" {
-		return nil, fmt.Errorf("couldn't detect the nvm directory")
-	}
-	bashExe, err := exec.LookPath("bash")
+	npm, err := getNPMFromNVM(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't find bash in the PATH")
-	}
-
-	cmdline := fmt.Sprintf("source %s/nvm.sh", nvmDir)
-
-	nvmNoUse := os.Getenv("NVM_NO_USE")
-	if nvmNoUse == "true" {
-		cmdline += " --no-use"
-	}
-
-	// Obtain the npm version
-	npmVersionCmd := exec.CommandContext(ctx, bashExe, "-c", fmt.Sprintf("%s && npm --version", cmdline))
-	if err := checkNPMVersion(npmVersionCmd, ">= 6.x"); err != nil {
 		return nil, err
 	}
 
-	return exec.CommandContext(ctx, bashExe, "-c", fmt.Sprintf("%s && npm install --package-lock-only --no-audit", cmdline)), nil
+	npmVersionCmd := exec.CommandContext(ctx, npm.Path, npm.Args[1:]...)
+	npmVersionCmd.Args[2] += " --version"
+	npmVersionStr, err := getNPMVersion(npmVersionCmd)
+	if err != nil {
+		return nil, err
+	}
+	if err := checkNPMVersion(npmVersionStr, ">= 6.x"); err != nil {
+		return nil, err
+	}
+
+	npmPackageLockOnlyCmd := exec.CommandContext(ctx, npm.Path, npm.Args[1:]...)
+	npmPackageLockOnlyCmd.Args[2] += " install --package-lock-only --no-audit"
+
+	return npmPackageLockOnlyCmd, nil
 }
