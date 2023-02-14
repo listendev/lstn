@@ -16,17 +16,20 @@
 package listen
 
 import (
+	"context"
 	"os"
 
 	"github.com/listendev/lstn/pkg/git"
+	"github.com/listendev/lstn/pkg/npm"
 	lstnos "github.com/listendev/lstn/pkg/os"
 	"github.com/listendev/lstn/pkg/version"
 )
 
 type AnalysisContext struct {
-	Version version.Version `json:"version"`
-	Git     *git.Context    `json:"git,omitempty"`
-	OS      *lstnos.Info    `json:"os,omitempty"`
+	Version version.Version   `json:"version"`
+	Git     *git.Context      `json:"git,omitempty"`
+	OS      *lstnos.Info      `json:"os,omitempty"`
+	PMs     map[string]string `json:"packagemanagers,omitempty"`
 }
 
 func NewAnalysisContext(funcs ...git.GetDirFunc) *AnalysisContext {
@@ -44,6 +47,14 @@ func NewAnalysisContext(funcs ...git.GetDirFunc) *AnalysisContext {
 	}
 	if ret.Git == nil {
 		ret.Git, _ = git.NewContextFromFunc(os.Getwd)
+	}
+
+	npmVersion, err := npm.Version(context.TODO())
+	if err == nil {
+		if ret.PMs == nil {
+			ret.PMs = make(map[string]string)
+		}
+		ret.PMs["npm"] = npmVersion
 	}
 
 	return ret
