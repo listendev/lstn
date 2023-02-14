@@ -39,7 +39,7 @@ func TestVersionLt6x(t *testing.T) {
 
 	v, e := Version(context.TODO())
 	assert.Nil(t, e)
-	assert.Equal(t, "4.6.1", v)
+	assert.Equal(t, "4.6.3", v)
 }
 
 func TestVersionGt6x(t *testing.T) {
@@ -56,7 +56,7 @@ func TestVersionGt6x(t *testing.T) {
 
 	v, e := Version(context.TODO())
 	assert.Nil(t, e)
-	assert.Equal(t, "8.19.3", v)
+	assert.Equal(t, "8.19.2", v)
 }
 
 func TestVersionNVMNoUseGt6x(t *testing.T) {
@@ -67,7 +67,7 @@ func TestVersionNVMNoUseGt6x(t *testing.T) {
 	binDir := t.TempDir()
 	t.Setenv("NVM_DIR", binDir)
 	t.Setenv("NVM_NO_USE", "true")
-	newPath := binDir + string(filepath.ListSeparator) + os.Getenv("PATH")
+	newPath := binDir + string(filepath.ListSeparator)
 	t.Setenv("PATH", newPath)
 	dstBash := filepath.Join(binDir, "bash")
 	assert.Nil(t, internaltesting.CopyExecutable(testExe, dstBash))
@@ -75,7 +75,7 @@ func TestVersionNVMNoUseGt6x(t *testing.T) {
 
 	v, e := Version(context.TODO())
 	assert.Nil(t, e)
-	assert.Equal(t, "8.19.3", v)
+	assert.Equal(t, "8.19.2", v)
 }
 
 func TestVersionNVMGt6x(t *testing.T) {
@@ -85,7 +85,7 @@ func TestVersionNVMGt6x(t *testing.T) {
 	// Prepend the path of this test binary to PATH
 	binDir := t.TempDir()
 	t.Setenv("NVM_DIR", binDir)
-	newPath := binDir + string(filepath.ListSeparator) + os.Getenv("PATH")
+	newPath := binDir + string(filepath.ListSeparator)
 	t.Setenv("PATH", newPath)
 	dstBash := filepath.Join(binDir, "bash")
 	assert.Nil(t, internaltesting.CopyExecutable(testExe, dstBash))
@@ -93,7 +93,7 @@ func TestVersionNVMGt6x(t *testing.T) {
 
 	v, e := Version(context.TODO())
 	assert.Nil(t, e)
-	assert.Equal(t, "8.19.3", v)
+	assert.Equal(t, "8.19.1", v)
 }
 
 func TestVersionNVMLt6x(t *testing.T) {
@@ -103,7 +103,7 @@ func TestVersionNVMLt6x(t *testing.T) {
 	// Prepend the path of this test binary to PATH
 	binDir := t.TempDir()
 	t.Setenv("NVM_DIR", binDir)
-	newPath := binDir + string(filepath.ListSeparator) + os.Getenv("PATH")
+	newPath := binDir + string(filepath.ListSeparator)
 	t.Setenv("PATH", newPath)
 	dstBash := filepath.Join(binDir, "bash")
 	assert.Nil(t, internaltesting.CopyExecutable(testExe, dstBash))
@@ -111,5 +111,5 @@ func TestVersionNVMLt6x(t *testing.T) {
 
 	v, e := Version(context.TODO())
 	assert.Nil(t, e)
-	assert.Equal(t, "4.6.1", v)
+	assert.Equal(t, "4.6.0", v)
 }
