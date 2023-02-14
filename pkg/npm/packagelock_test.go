@@ -28,56 +28,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMain(m *testing.M) {
-	behavior := os.Getenv("TEST_NPM_BEHAVIOR")
-	switch behavior {
-	case "":
-		os.Exit(m.Run())
-	case "npm-lt-6x":
-		if err := internaltesting.StubNpm(internaltesting.NPM{
-			Version: "4.6.1",
-		}); err != nil {
-			os.Exit(1)
-		}
-	case "npm-gt-6x":
-		if err := internaltesting.StubNpm(internaltesting.NPM{
-			Version: "8.19.3",
-		}); err != nil {
-			os.Exit(1)
-		}
-	case "npm-non-semver":
-		if err := internaltesting.StubNpm(internaltesting.NPM{
-			Version: "non-semver",
-		}); err != nil {
-			os.Exit(1)
-		}
-	case "nvm-gt-6x":
-		if err := internaltesting.StubNpm(internaltesting.NPM{
-			Version: "8.19.3",
-			WithNVM: true,
-		}); err != nil {
-			os.Exit(1)
-		}
-	case "nvm-lt-6x":
-		if err := internaltesting.StubNpm(internaltesting.NPM{
-			Version: "4.6.1",
-			WithNVM: true,
-		}); err != nil {
-			os.Exit(1)
-		}
-	case "nvm-gt-6x-no-use":
-		if err := internaltesting.StubNpm(internaltesting.NPM{
-			Version:      "8.19.3",
-			WithNVM:      true,
-			WithNVMNoUse: true,
-		}); err != nil {
-			os.Exit(1)
-		}
-	default:
-		os.Exit(1)
-	}
-}
-
 func TestCheckNPMVersionLt6x(t *testing.T) {
 	t.Setenv("TEST_NPM_BEHAVIOR", "npm-lt-6x")
 	testExe, err := os.Executable()
