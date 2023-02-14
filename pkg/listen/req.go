@@ -30,15 +30,15 @@ type Request interface {
 
 // VerdictsRequest represents the payload for the verdicts listen.dev endpoint.
 type VerdictsRequest struct {
-	Name    string           `json:"name" name:"name" validate:"mandatory"`
-	Version string           `json:"version,omitempty" validate:"omitempty,semver"`
-	Shasum  string           `json:"shasum,omitempty" validate:"omitempty,shasum"`
-	Context *AnalysisContext `json:"context,omitempty"`
+	Name    string   `json:"name" name:"name" validate:"mandatory"`
+	Version string   `json:"version,omitempty" validate:"omitempty,semver"`
+	Shasum  string   `json:"shasum,omitempty" validate:"omitempty,shasum"`
+	Context *Context `json:"context,omitempty"`
 }
 
 func NewVerdictsRequest(args []string) (*VerdictsRequest, error) {
 	ret := &VerdictsRequest{
-		Context: NewAnalysisContext(),
+		Context: NewContext(),
 	}
 
 	switch len(args) {
@@ -93,7 +93,7 @@ func (req VerdictsRequest) MarshalJSON() ([]byte, error) {
 
 type AnalysisRequest struct {
 	PackageLockJSON npm.PackageLockJSON `json:"package-lock" name:"package lock" validate:"mandatory"`
-	Context         *AnalysisContext    `json:"context,omitempty"`
+	Context         *Context            `json:"context,omitempty"`
 }
 
 func (req *AnalysisRequest) Ok() (bool, error) {
@@ -137,7 +137,7 @@ func NewAnalysisRequest(packageLockJSON npm.PackageLockJSON) (*AnalysisRequest, 
 
 	return &AnalysisRequest{
 		packageLockJSON,
-		NewAnalysisContext(),
+		NewContext(),
 	}, nil
 }
 

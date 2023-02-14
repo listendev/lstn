@@ -69,8 +69,8 @@ func TestNewVerdictsRequest(t *testing.T) {
 	}
 }
 
-func TestNewAnalysisContext(t *testing.T) {
-	analysisCtx1 := NewAnalysisContext()
+func TestNewContext(t *testing.T) {
+	analysisCtx1 := NewContext()
 	j1, e1 := json.Marshal(analysisCtx1)
 
 	assert.NotNil(t, analysisCtx1)
@@ -80,7 +80,7 @@ func TestNewAnalysisContext(t *testing.T) {
 	assert.Nil(t, e1)
 	assert.NotContains(t, string(j1), "git")
 
-	analysisCtx2 := NewAnalysisContext(func() (string, error) {
+	analysisCtx2 := NewContext(func() (string, error) {
 		cwd, err := os.Getwd()
 		if err != nil {
 			return "", err
