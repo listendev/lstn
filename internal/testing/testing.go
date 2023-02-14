@@ -18,12 +18,37 @@ package testing
 import (
 	"fmt"
 	"io"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/go-git/go-billy/v5"
+	"github.com/stretchr/testify/assert"
 )
+
+func MockHTTPServer(assert *assert.Assertions, path string, resp []byte, status int) *httptest.Server {
+	if !strings.HasPrefix(path, "/") {
+		path = fmt.Sprintf("/%s", path)
+	}
+
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			assert.Failf("expected a POST request, got %s", r.Method)
+		}
+		if !strings.HasSuffix(r.URL.Path, path) {
+			assert.Failf("expected to request .../analysis or .../verdicts, got %s", r.URL.Path)
+		}
+		if ct := r.Header.Get("Content-Type"); ct != "application/json" {
+			assert.Failf("expected content-type: application/json header, got: %s", ct)
+		}
+
+		w.WriteHeader(status)
+		_, err := w.Write(resp)
+		assert.Nil(err)
+	}))
+}
 
 type NPM struct {
 	Version      string
