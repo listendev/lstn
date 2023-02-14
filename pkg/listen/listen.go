@@ -46,7 +46,7 @@ func getAPIPrefix(baseURL string) string {
 	return "/api"
 }
 
-func getEndpointURLFromContext[T any](ctx context.Context, r *T) (string, error) {
+func getEndpointURLFromContext[T any](r T, o *options) (string, error) {
 	segment := ""
 	switch any(r).(type) {
 	case *AnalysisRequest:
@@ -57,28 +57,37 @@ func getEndpointURLFromContext[T any](ctx context.Context, r *T) (string, error)
 		return "", fmt.Errorf("unsupported request type")
 	}
 
-	baseURL, err := getBaseURLFromContext(ctx)
-	if err != nil {
-		return "", err
+	if o.baseURL == "" {
+		var err error
+		o.baseURL, err = getBaseURLFromContext(o.ctx)
+		if err != nil {
+			return "", err
+		}
 	}
-	return fmt.Sprintf("%s%s/%s", baseURL, getAPIPrefix(baseURL), segment), nil
+
+	return fmt.Sprintf("%s%s/%s", o.baseURL, getAPIPrefix(o.baseURL), segment), nil
 }
 
-func Packages[T any](ctx context.Context, r *T, jsonOpts flags.JSONOptions) (*Response, []byte, error) {
-	// Obtain the endpoint base URL
-	endpointURL, err := getEndpointURLFromContext(ctx, r)
+func Packages[T Request](r T, opts ...func(*options)) (*Response, []byte, error) {
+	o, err := newOptions(opts...)
 	if err != nil {
-		return nil, nil, pkgcontext.OutputError(ctx, err)
+		return nil, nil, pkgcontext.OutputError(o.ctx, err)
+	}
+
+	// Obtain the endpoint base URL
+	endpointURL, err := getEndpointURLFromContext(r, o)
+	if err != nil {
+		return nil, nil, pkgcontext.OutputError(o.ctx, err)
 	}
 
 	// Prepare the request
 	pl, err := json.Marshal(r)
 	if err != nil {
-		return nil, nil, pkgcontext.OutputError(ctx, err)
+		return nil, nil, pkgcontext.OutputError(o.ctx, err)
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpointURL, bytes.NewBuffer(pl))
+	req, err := http.NewRequestWithContext(o.ctx, http.MethodPost, endpointURL, bytes.NewBuffer(pl))
 	if err != nil {
-		return nil, nil, pkgcontext.OutputError(ctx, err)
+		return nil, nil, pkgcontext.OutputError(o.ctx, err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
@@ -88,7 +97,7 @@ func Packages[T any](ctx context.Context, r *T, jsonOpts flags.JSONOptions) (*Re
 	client := http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		return nil, nil, pkgcontext.OutputError(ctx, err)
+		return nil, nil, pkgcontext.OutputError(o.ctx, err)
 	}
 	defer res.Body.Close()
 
@@ -98,21 +107,21 @@ func Packages[T any](ctx context.Context, r *T, jsonOpts flags.JSONOptions) (*Re
 	if res.StatusCode != http.StatusOK {
 		target := &responseError{}
 		if err = dec.Decode(target); err != nil {
-			return nil, nil, pkgcontext.OutputError(ctx, err)
+			return nil, nil, pkgcontext.OutputError(o.ctx, err)
 		}
 
-		return nil, nil, pkgcontext.OutputErrorf(ctx, err, target.Message)
+		return nil, nil, pkgcontext.OutputErrorf(o.ctx, err, target.Message)
 	}
 
-	return response(ctx, dec, res, jsonOpts)
+	return response(dec, res, o)
 }
 
-func response(ctx context.Context, dec *json.Decoder, res *http.Response, jsonOpts flags.JSONOptions) (*Response, []byte, error) {
-	if jsonOpts.IsJSON() {
+func response(dec *json.Decoder, res *http.Response, o *options) (*Response, []byte, error) {
+	if o.json.IsJSON() {
 		// Eventually return as JSON
 		out := new(bytes.Buffer)
-		if err := jsonOpts.GetOutput(ctx, res.Body, out); err != nil {
-			return nil, nil, pkgcontext.OutputError(ctx, err)
+		if err := o.json.GetOutput(o.ctx, res.Body, out); err != nil {
+			return nil, nil, pkgcontext.OutputError(o.ctx, err)
 		}
 
 		return nil, out.Bytes(), nil
@@ -120,7 +129,7 @@ func response(ctx context.Context, dec *json.Decoder, res *http.Response, jsonOp
 	// Alternatively, unmarshal the JSON body into a Response
 	target := &Response{}
 	if err := dec.Decode(target); err != nil {
-		return nil, nil, pkgcontext.OutputError(ctx, err)
+		return nil, nil, pkgcontext.OutputError(o.ctx, err)
 	}
 
 	return target, nil, nil
