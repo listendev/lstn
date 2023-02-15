@@ -24,7 +24,7 @@ rules:
   - name: ci-changes
     spec: $hasFilePattern(".github/**") || $hasFileName(".golangci.yml") || $hasFileName("reviewpad.yml")
   - name: deps-changes
-    spec: $hasFileName(["go.mod"]) || $hasFileName(["go.sum"])
+    spec: $hasFileName("go.mod") || $hasFileName("go.sum")
 
 groups:
   - name: ignore-patterns
