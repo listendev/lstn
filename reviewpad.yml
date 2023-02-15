@@ -28,3 +28,18 @@ workflows:
       - rule: $pullRequestCountBy($author()) == 100
         extra-actions:
           - $commentOnce($sprintf("Way to go @%s... This is your 10th pull request! 🎉", [$author()]))
+
+  # This workflow validates that pull requests follow the conventional commits specification.
+  # This helps us automatically generate changelogs.
+  # For more details, see https://www.conventionalcommits.org/en/v1.0.0/.
+  # The unerlying parser is https://github.com/leodido/go-conventionalcommits.
+  - name: check-conventional-commits
+    description: Validate that pull requests follow the conventional commits
+    always-run: true
+    if:
+      - rule: $isDraft() == false
+    then:
+      # Check commits messages against the conventional commits specification
+      - $commitLint()
+      # Check pull request title against the conventional commits specification.
+      # - $titleLint()
