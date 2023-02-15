@@ -14,6 +14,9 @@ labels:
   dependencies:
     description: Something about our dependencies
     color: "#ff8722"
+  needs-review:
+    description: Marks a pull request as waiting for review
+    color: "#aa2297"
 
 rules:
   - name: docs-changes
@@ -99,8 +102,8 @@ workflows:
 
   # This workflow labels pull requests based on the pull request change type.
   # This helps pick pull requests based on their change type.
-  - name: change-type-labelling
-    description: Label pull requests based on the type of changes
+  - name: pulls-labelling
+    description: Label pull requests
     always-run: true
     if:
       # Label pull requests with `docs` if they only modify markdown or txt files.
@@ -115,3 +118,11 @@ workflows:
       - rule: deps-changes
         extra-actions:
           - $addLabel("dependencies")
+      # Label pull requests with `needs-review` if they are waiting for review
+      - rule: $isWaitingForReview()
+        extra-actions:
+          - $addLabel("needs-review")
+      # Unlabel pull requests with `needs-review` when they got a review
+      - rule: $isWaitingForReview() == false
+        extra-actions:
+          - $removeLabel("needs-review")
