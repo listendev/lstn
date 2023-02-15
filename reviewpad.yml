@@ -62,3 +62,22 @@ workflows:
       - rule: $hasLinearHistory() == false
         extra-actions:
           - $warn("Please rebase your pull request on the latest changes")
+
+  # This workflow labels pull requests depending on the total number of lines changed.
+  # This helps pick pull requests based on their size and to incentivize small pull requests.
+  - name: size-labeling
+    description: Label pull request based on the number of lines changed
+    always-run: true
+    if:
+      - rule: $size() < 100
+        extra-actions:
+          - $removeLabels(["medium", "large"])
+          - $addLabel("small")
+      - rule: $size() >= 100 && $size() < 300
+        extra-actions:
+          - $removeLabels(["small", "large"])
+          - $addLabel("medium")
+      - rule: $size() >= 300
+        extra-actions:
+          - $removeLabels(["small", "medium"])
+          - $addLabel("large")
