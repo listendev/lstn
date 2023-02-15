@@ -1,0 +1,30 @@
+api-version: reviewpad.com/v3.x
+
+# For more details see https://docs.reviewpad.com/guides/syntax#label.
+labels:
+  small:
+    description: Pull request is small
+    color: "#76dbbe"
+  medium:
+    description: Pull request is medium
+    color: "#2986cc"
+  large:
+    description: Pull request is large
+    color: "#c90076"
+
+# For more details see https://docs.reviewpad.com/guides/syntax#workflow.
+workflows:
+  # This workflow praises contributors on their pull request contributions.
+  # This helps contributors feel appreciated.
+  - name: praise-contributors
+    description: Praise contributors
+    always-run: true
+    if:
+      # Praise contributors on their first pull request.
+      - rule: $pullRequestCountBy($author()) == 1
+        extra-actions:
+          - $commentOnce($sprintf("Thank you @%s for your first contribution!", [$author()]))
+      # Praise contributors on their 10th pull request.
+      - rule: $pullRequestCountBy($author()) == 100
+        extra-actions:
+          - $commentOnce($sprintf("Way to go @%s... This is your 10th pull request! 🎉", [$author()]))
