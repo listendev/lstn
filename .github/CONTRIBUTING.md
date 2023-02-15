@@ -50,6 +50,56 @@ See [project layout documentation](../docs/project-layout.md) for information on
 
 We generate manual pages from source on every release. You do not need to submit pull requests for documentation specifically; manual pages for commands will automatically get updated after your pull requests gets accepted.
 
+## Commit convention
+
+We enforce the commits to follow the [Conventional Commits v1.0 spec](https://www.conventionalcommits.org/en/v1.0.0/) with the following (the default one) set of prefixes:
+
+<dl>
+  <dt>build</dt>
+  <dd>you're changing something in the build system</dd>
+  <dt>ci</dt>
+  <dd>you're taking care of our CI and automation</dd>
+  <dt>chore</dt>
+  <dd>little changes like typos; generally nothing very significant</dd>
+  <dt>docs</dt>
+  <dd>you are helping us with documentation</dd>
+  <dt>feat</dt>
+  <dd>your changes implement a new feature or update an existing one</dd>
+  <dt>fix</dt>
+  <dd>we'll always be grateful to you for your bug fixes</dd>
+  <dt>perf</dt>
+  <dd>you wrote a beautiful Go benchmark</dd>
+  <dt>refactor</dt>
+  <dd>when you are moving pieces around, changing file names, etc.</dd>
+  <dt>revert</dt>
+  <dd>you're reverting some changes: it may happen</dd>
+  <dt>test</dt>
+  <dd>your changes introduce, extend, or update some tests</dd>
+</dl>
+
+Let us now provide you some examples of commit messages we accept:
+
+```
+chore: make linter happy
+chore: fix a little typo
+test: check edge case X doesn't happen
+fix: ensure edge case X doesn't verify anymore
+feat(cmd/in): support reading package.json from remote URLs
+docs: improve the commit convention examples
+build: make the manpages
+fix!: change listen.Packages API
+```
+
+Notice that by using `!` after the prefix and before the colon you are communicating **breaking changes**.
+
+Enforcing the commits to follow this convention helps us automatically generate the changelog for `lstn`. It also helps us keep the commit history readable and easily understandable.
+
+Thank you for sticking to using it!
+
+Notice that we check the commit messages and lint them on every pull request. Should you find some bugs with the commit linting process, you can notify the author of the underlying parser at [leodido/go-conventionalcommits](https://github.com/leodido/go-conventionalcommits).
+
+Notice also that the enforcement of the Conventional Commit v1.0 spec is from v0.1.0 onwards, previous git history may not follow it perfectly.
+
 ## Submitting a pull request
 
 1. Create a new branch: `git checkout -b my-branch-name`
