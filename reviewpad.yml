@@ -11,6 +11,21 @@ labels:
   large:
     description: Pull request is large
     color: "#c90076"
+  dependencies:
+    description: Something about our dependencies
+    color: "#ff8722"
+
+rules:
+  - name: docs-changes
+    spec: $hasFileExtensions([".md", ".txt"])
+  - name: ci-changes
+    spec: $hasFilePattern(".github/**") || $hasFileName(".golangci.yml") || $hasFileName("reviewpad.yml")
+  - name: deps-changes
+    spec: $hasFileName(["go.mod"]) || $hasFileName(["go.sum"])
+
+groups:
+  - name: ignore-patterns
+    spec: '["go.sum"]'
 
 # For more details see https://docs.reviewpad.com/guides/syntax#workflow.
 workflows:
@@ -69,15 +84,34 @@ workflows:
     description: Label pull request based on the number of lines changed
     always-run: true
     if:
-      - rule: $size() < 100
+      - rule: $size($group("ignore-patterns")) < 100
         extra-actions:
           - $removeLabels(["medium", "large"])
           - $addLabel("small")
-      - rule: $size() >= 100 && $size() < 300
+      - rule: $size($group("ignore-patterns")) >= 100 && $size($group("ignore-patterns")) < 300
         extra-actions:
           - $removeLabels(["small", "large"])
           - $addLabel("medium")
-      - rule: $size() >= 300
+      - rule: $size($group("ignore-patterns")) >= 300
         extra-actions:
           - $removeLabels(["small", "medium"])
           - $addLabel("large")
+
+  # This workflow labels pull requests based on the pull request change type.
+  # This helps pick pull requests based on their change type.
+  - name: change-type-labelling
+    description: Label pull requests based on the type of changes
+    always-run: true
+    if:
+      # Label pull requests with `docs` if they only modify markdown or txt files.
+      - rule: docs-changes
+        extra-actions:
+          - $addLabel("documentation")
+      # Label pull requests with `ci` if they modify files in the .github/ directory.
+      - rule: ci-changes
+        extra-actions:
+          - $addLabel("ci")
+      # Label pull requests with `dependencies` if they only modify `package.json` and `package.lock` files.
+      - rule: deps-changes
+        extra-actions:
+          - $addLabel("dependencies")
