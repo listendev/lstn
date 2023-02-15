@@ -17,8 +17,6 @@ General pointers around writing code for the `lstn` CLI:
 - When naming types, always keep in mind that the type will be used with the package name. We should **write code that does not stutter** (e.g. use `cmd.New` instead of `cmd.NewCmd`).
 - **Avoid global state**, rather pass things explicitly between structs and functions.
 
-_TODO_
-
 ### Packages
 
 We generally follow the [Style guideline for Go packages](https://rakyll.org/style-packages/). Here is a short summary
@@ -36,7 +34,7 @@ package and enforce a better separation of concerns between packages.
 
 ### Logging
 
-_TODO_
+TODO: ...
 
 ### Error Handling
 
@@ -50,11 +48,11 @@ We have 3 test suites:
 
 - Unit tests are normal Go tests that don't need any external services to run and mock internal dependencies.
   - They are located in files named `${FILE}_test.go`, where `${FILE}.go` contains the code that's being tested.
-- Integration tests are also written in Go, but can expect external dependencies.
+- TODO: Integration tests are also written in Go, but can expect external dependencies.
   - These tests should mostly be contained to code that directly communicates with those external dependencies.
   - Integration tests are located in files named `${FILE}_integration_test.go`, where `${FILE}.go` contains the code that's being tested.
   - Files that contain integration tests must contain the build tag `//go:build integration`.
-- End-to-end tests are tests that spin up... _TODO_
+- TODO: End-to-end tests are tests that spin up...
 
 ### Documentation
 
