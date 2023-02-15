@@ -43,3 +43,22 @@ workflows:
       - $commitLint()
       # Check pull request title against the conventional commits specification.
       # - $titleLint()
+
+  # This workflow validates best practices for pull request management.
+  # This helps developers follow best practices.
+  - name: best-practices
+    description: Validate best practices for pull request management
+    always-run: true
+    if:
+      # Warn pull requests that do not have an associated GitHub issue.
+      - rule: $hasLinkedIssues() == false
+        extra-actions:
+          - $warn("Please link an issue to the pull request")
+      # Warn pull requests if their description is empty.
+      - rule: $description() == ""
+        extra-actions:
+          - $warn("Please provide a description for the pull request")
+      # Warn pull request do not have a clean linear history.
+      - rule: $hasLinearHistory() == false
+        extra-actions:
+          - $warn("Please rebase your pull request on the latest changes")
