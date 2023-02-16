@@ -5,25 +5,51 @@ release:
   draft: false
   name_template: "listen.dev CLI {{.Version}}"
 
+# TODO > manpages
 before:
   hooks:
     - go mod tidy
-    # TODO > manpages
 
 builds:
   - <<: &build_defaults
       binary: lstn
-      main: ./
+      main: ./cmd/lstn
     id: macos
     goos: [darwin]
     goarch: [amd64]
 
-  - <<: &build_defaults
+  - <<: *build_defaults
     id: linux
     goos: [linux]
-    goarch: [arm, amd64, arm64]
+    goarch: ["386", arm, amd64, arm64]
     env:
       - CGO_ENABLED=0
+
+# Docs at https://goreleaser.com/customization/changelog
+changelog:
+  use: github
+  sort: asc
+  groups:
+    - title: Breaking changes
+      regexp: '^([A-Za-z0-9_]+)??(\([A-Za-z0-9_\/]+\))??!:.+$'
+      order: 0
+    - title: Features
+      regexp: '^feat(\([A-Za-z0-9_\/]+\))??:.+$'
+      order: 1
+    - title: Bug fixes
+      regexp: '^fix(\([A-Za-z0-9_\/]+\))??:.+$'
+      order: 2
+    - title: Others
+      order: 999
+  filters:
+    exclude:
+      - '^chore'
+      - '^ci'
+      - '^docs'
+      - '^test'
+      - '^refactor'
+      - '^perf'
+      - '^build'
 
 # Docs at https://goreleaser.com/customization/archive
 archives:
@@ -39,16 +65,16 @@ archives:
       - LICENSE
       # TODO > add the manpages
 
-# Docs at https://goreleaser.com/customization/nfpm
-nfpms:
-  - license: Apache 2.0
-    maintainer: Garnet Labs Inc.
-    homepage: https://github.com/listendev/lstn
-    description: |-
-      Analyze the behavior of your dependencies using listen.dev.
-    formats:
-      - apk
-      - deb
-      - rpm
-      - archlinux # Since GoReleaser v1.13
-    # TODO > add the manpages to the packages with the "contents" property
+# # Docs at https://goreleaser.com/customization/nfpm
+# nfpms:
+#   - license: Apache 2.0
+#     maintainer: Garnet Labs Inc.
+#     homepage: https://github.com/listendev/lstn
+#     description: |-
+#       Analyze the behavior of your dependencies using listen.dev.
+#     formats:
+#       - apk
+#       - deb
+#       - rpm
+#       - archlinux # Since GoReleaser v1.13
+#    # TODO > add the manpages to the packages with the "contents" property
