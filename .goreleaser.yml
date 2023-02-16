@@ -48,12 +48,10 @@ changelog:
   filters:
     exclude:
       - '^chore'
-      - '^ci'
       - '^docs'
       - '^test'
       - '^refactor'
       - '^perf'
-      - '^build'
 
 # Docs at https://goreleaser.com/customization/sign
 signs:
