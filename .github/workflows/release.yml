@@ -21,6 +21,11 @@ jobs:
 
       - name: Check out the source code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Force fetch upstream tags
+        run: git fetch --force --tags
 
       - name: Restore the Go modules cache
         uses: actions/cache@v3
