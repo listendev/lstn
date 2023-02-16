@@ -3,7 +3,7 @@ project_name: lstn
 release:
   prerelease: auto
   draft: false
-  name_template: "listen.dev CLI {{.Version}}"
+  name_template: "listen.dev CLI v{{.Version}}"
 
 # TODO > manpages
 before:
@@ -16,14 +16,18 @@ builds:
       main: ./cmd/lstn
     id: macos
     goos: [darwin]
-    goarch: [amd64]
+    goarch: [arm, amd64]
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+    ldflags:
+      - -w -s -X github.com/listendev/lstn/pkg/version.VersionPrefix=v{{.Version}}
 
   - <<: *build_defaults
     id: linux
     goos: [linux]
     goarch: ["386", arm, amd64, arm64]
-    env:
-      - CGO_ENABLED=0
 
 # Docs at https://goreleaser.com/customization/changelog
 changelog:
