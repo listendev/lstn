@@ -16,7 +16,7 @@ builds:
       main: ./cmd/lstn
     id: macos
     goos: [darwin]
-    goarch: [arm, amd64]
+    goarch: [arm64, amd64]
     env:
       - CGO_ENABLED=0
     flags:
