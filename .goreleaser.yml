@@ -62,19 +62,46 @@ signs:
     env:
       - COSIGN_EXPERIMENTAL=1
 
+# Docs at https://goreleaser.com/customization/sbom
+sboms:
+  - artifacts: binary
+    documents:
+      - >-
+        {{ .ProjectName }}_
+        {{- .Version }}_
+        {{- if eq .Os "darwin" }}macos{{ else }}{{ .Os }}{{ end }}_
+        {{- .Arch }}
+        {{- with .Arm }}v{{ . }}{{ end }}
+        {{- with .Mips }}_{{ . }}{{ end }}
+        {{- if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}.sbom
+    cmd: syft
+    args: ["$artifact", "--file", "${document}", "--output", "cyclonedx-json"]
+
 # Docs at https://goreleaser.com/customization/archive
 archives:
   - id: nix
     builds: [macos, linux]
     <<: &archive_defaults
-      name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+      name_template: >-
+        {{ .ProjectName }}_
+        {{- .Version }}_
+        {{- if eq .Os "darwin" }}macos{{ else }}{{ .Os }}{{ end }}_
+        {{- .Arch }}
+        {{- with .Arm }}v{{ . }}{{ end }}
+        {{- with .Mips }}_{{ . }}{{ end }}
+        {{- if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}
     wrap_in_directory: true
-    replacements:
-      darwin: macos
     format: tar.gz
     files:
       - LICENSE
       # TODO > add the manpages
+  # - id: win
+  #   builds: [windows]
+  #   <<: *archive_defaults
+  #   wrap_in_directory: false
+  #   format: zip
+  #   files:
+  #     - LICENSE
 
 # # Docs at https://goreleaser.com/customization/nfpm
 # nfpms:
