@@ -53,8 +53,11 @@ var (
 				return nil
 			}
 
-			// TODO ? -ldflags "-w -s -extldflags '-static' ..."
 			ldflags := os.Getenv("GO_LDFLAGS")
+			// Default to `-s -w` ldflags
+			if len(ldflags) == 0 {
+				ldflags = "-w -s"
+			}
 			gitTag := getGitTag()
 			if gitTag != "" {
 				if len(ldflags) > 0 {
