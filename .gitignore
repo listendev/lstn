@@ -5,3 +5,4 @@
 /lstn
 /make/make
 **/*.test
+/dist
