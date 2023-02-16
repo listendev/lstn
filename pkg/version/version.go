@@ -23,7 +23,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/listendev/lstn/pkg/validate"
+	"github.com/Masterminds/semver/v3"
 )
 
 // Unknown is the version string lstn ends up having when the build does not have VCS info.
@@ -171,9 +171,15 @@ func Changelog(version string) (string, error) {
 	basePath := "https://github.com/listendev/lstn"
 	v := strings.TrimPrefix(version, "v")
 
-	if errs := validate.Singleton.Var(v, "semver"); errs != nil {
+	ver, err := semver.StrictNewVersion(v)
+	if err != nil {
 		return "", fmt.Errorf("couldn't find a semver tag")
 	}
 
-	return fmt.Sprintf("%s/releases/tag/v%s", basePath, v), nil
+	prerelease := ver.Prerelease()
+	if len(prerelease) > 0 {
+		prerelease = fmt.Sprintf("-%s", prerelease)
+	}
+
+	return fmt.Sprintf("%s/releases/tag/v%d.%d.%d%s", basePath, ver.Major(), ver.Minor(), ver.Patch(), prerelease), nil
 }
