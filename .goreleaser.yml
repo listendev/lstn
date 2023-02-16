@@ -51,6 +51,17 @@ changelog:
       - '^perf'
       - '^build'
 
+# Docs at https://goreleaser.com/customization/sign
+signs:
+  - cmd: cosign
+    signature: "${artifact}.sig"
+    certificate: '{{ trimsuffix (trimsuffix .Env.artifact ".zip") ".tar.gz" }}.pem'
+    args: ["sign-blob", "--output-signature=${signature}", "--output-certificate=${certificate}", "${artifact}"]
+    artifacts: all
+    output: true
+    env:
+      - COSIGN_EXPERIMENTAL=1
+
 # Docs at https://goreleaser.com/customization/archive
 archives:
   - id: nix
