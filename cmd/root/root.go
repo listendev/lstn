@@ -19,12 +19,14 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 
 	"github.com/listendev/lstn/cmd/in"
 	"github.com/listendev/lstn/cmd/to"
 	"github.com/listendev/lstn/cmd/version"
+	"github.com/listendev/lstn/internal/project"
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	"github.com/listendev/lstn/pkg/cmd/groups"
 	"github.com/listendev/lstn/pkg/cmd/help"
@@ -37,7 +39,8 @@ import (
 )
 
 var (
-	cfgFile string
+	cfgFile           string
+	_, filename, _, _ = runtime.Caller(0)
 )
 
 type Command struct {
@@ -49,9 +52,13 @@ type Command struct {
 func New(ctx context.Context) (*Command, error) {
 	// rootCmd represents the base command when called without any subcommands
 	var rootCmd = &cobra.Command{
-		Use:          "lstn",
-		SilenceUsage: true,
-		Short:        "Analyze the behavior of your dependencies using listen.dev",
+		Use:               "lstn",
+		SilenceUsage:      true,
+		DisableAutoGenTag: true,
+		Short:             "Analyze the behavior of your dependencies using listen.dev",
+		Annotations: map[string]string{
+			"source": project.GetSourceURL(filename),
+		},
 		PersistentPreRunE: func(c *cobra.Command, args []string) error {
 			// Do not check for the config file if the command is not available (eg., help) or not core (eg., version)
 			c, _, err := c.Find(os.Args[1:])
@@ -259,6 +266,10 @@ func (c *Command) Go() ExitCode {
 	}
 
 	return exitOK
+}
+
+func (c *Command) Command() *cobra.Command {
+	return c.cmd
 }
 
 func init() {
