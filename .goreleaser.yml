@@ -31,27 +31,8 @@ builds:
 
 # Docs at https://goreleaser.com/customization/changelog
 changelog:
-  use: github
+  use: github-native
   sort: asc
-  groups:
-    - title: Breaking changes
-      regexp: '^([A-Za-z0-9_]+)??(\([A-Za-z0-9_\/]+\))??!:.+$'
-      order: 0
-    - title: Features
-      regexp: '^feat(\([A-Za-z0-9_\/]+\))??:.+$'
-      order: 1
-    - title: Bug fixes
-      regexp: '^fix(\([A-Za-z0-9_\/]+\))??:.+$'
-      order: 2
-    - title: Others
-      order: 999
-  filters:
-    exclude:
-      - '^chore'
-      - '^docs'
-      - '^test'
-      - '^refactor'
-      - '^perf'
 
 # Docs at https://goreleaser.com/customization/sign
 signs:
