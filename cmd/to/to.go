@@ -19,8 +19,10 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/davecgh/go-spew/spew"
+	"github.com/listendev/lstn/internal/project"
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	"github.com/listendev/lstn/pkg/cmd/groups"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
@@ -28,6 +30,10 @@ import (
 	"github.com/listendev/lstn/pkg/npm"
 	"github.com/listendev/lstn/pkg/validate"
 	"github.com/spf13/cobra"
+)
+
+var (
+	_, filename, _, _ = runtime.Caller(0)
 )
 
 func New(ctx context.Context) (*cobra.Command, error) {
@@ -48,6 +54,9 @@ If you're a hairsplitting person, you can also query for the verdicts specific t
   lstn to debug 4.3.4`,
 		Args:              validateInArgs, // Executes before RunE
 		ValidArgsFunction: activeHelpIn,
+		Annotations: map[string]string{
+			"source": project.GetSourceURL(filename),
+		},
 		RunE: func(c *cobra.Command, args []string) error {
 			ctx = c.Context()
 

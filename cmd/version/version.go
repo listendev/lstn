@@ -18,10 +18,16 @@ package version
 import (
 	"context"
 	"fmt"
+	"runtime"
 
+	"github.com/listendev/lstn/internal/project"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/version"
 	"github.com/spf13/cobra"
+)
+
+var (
+	_, filename, _, _ = runtime.Caller(0)
 )
 
 func New(ctx context.Context) (*cobra.Command, error) {
@@ -29,6 +35,9 @@ func New(ctx context.Context) (*cobra.Command, error) {
 		Use:                   "version",
 		Short:                 "Print out version information",
 		DisableFlagsInUseLine: true,
+		Annotations: map[string]string{
+			"source": project.GetSourceURL(filename),
+		},
 		RunE: func(c *cobra.Command, args []string) error {
 			ctx := c.Context()
 
