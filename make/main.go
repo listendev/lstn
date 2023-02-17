@@ -70,8 +70,13 @@ var (
 		},
 		"man": func(args []string) error {
 			fmt.Fprintf(os.Stdout, "executing `%s` ...\n", args[0])
-			// TODO
-			return nil
+
+			destDir := filepath.Join("share", "man", "man1")
+			if err := os.MkdirAll(destDir, 0o755); err != nil {
+				return fmt.Errorf("couldn't create the destination directory")
+			}
+
+			return run("go", "run", "./make/docs", "manpages", "--dest", destDir)
 		},
 		"clean": func(args []string) error {
 			fmt.Fprintf(os.Stdout, "executing `%s` ...\n", args[0])
@@ -145,7 +150,6 @@ func main() {
 	}
 
 	if err := c(args); err != nil {
-		fmt.Fprintln(os.Stderr, err)
 		fmt.Fprintf(os.Stderr, "failure while executing `%s`.\n", norm)
 		os.Exit(1)
 	}
