@@ -92,7 +92,11 @@ fix!: change listen.Packages API
 
 Notice that by using `!` after the prefix and before the colon you are communicating **breaking changes**.
 
-Enforcing the commits to follow this convention helps us automatically generate the changelog for `lstn`. It also helps us keep the commit history readable and easily understandable.
+Enforcing the commits to follow this convention helps us:
+
+- keep the commit history readable
+- have an easily understandable commit history
+- manually label the pull requests accordingly
 
 Thank you for sticking to using it!
 
@@ -102,9 +106,27 @@ Notice also that the enforcement of the Conventional Commit v1.0 spec is from v0
 
 ## Submitting a pull request
 
-1. Create a new branch: `git checkout -b my-branch-name`
+We also enforce the **pull requests titles** to follow the [Conventional Commits v1.0 spec](https://www.conventionalcommits.org/en/v1.0.0/).
+
+This because we have machinery in place that automatically labels the pull requests depending on the:
+
+- the path and file changes
+- the title of the pull request
+- the branch name of the pull request
+
+You can see the rules we use [here](../reviewpad.yml).
+
+It helps us automatically generate a wonderful changelog!
+
+Let's say that you spot a bug and you wanna fix it...
+You can open a pull request from a branch like `fix/some-subtle-bug` and it will be automatically labeled with the `bug` label.
+Or you can just use the title `fix: some subtle bug`.
+
+1. Create a new branch: `git checkout -b fix/some-subtle-bug`
 1. Make your change, add tests, and ensure tests pass
 1. Submit a pull request: `gh pr create --web`
+
+Please write **small pull requests** to ease our review and maintenance burdens.
 
 Contributions to this project are [released][legal] to the public under the [project's open source license][license].
 
