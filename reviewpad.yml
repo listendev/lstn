@@ -80,7 +80,7 @@ workflows:
       # Check commits messages against the conventional commits specification
       - $commitLint()
       # Check pull request title against the conventional commits specification.
-      # - $titleLint()
+      - $titleLint()
 
   # This workflow validates best practices for pull request management.
   # This helps developers follow best practices.
