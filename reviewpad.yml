@@ -63,7 +63,7 @@ workflows:
         extra-actions:
           - $commentOnce($sprintf("Thank you @%s for your first contribution!", [$author()]))
       # Praise contributors on their 10th pull request.
-      - rule: $pullRequestCountBy($author()) == 100
+      - rule: $pullRequestCountBy($author()) == 10
         extra-actions:
           - $commentOnce($sprintf("Way to go @%s... This is your 10th pull request! 🎉", [$author()]))
 
