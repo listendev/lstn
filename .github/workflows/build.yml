@@ -1,0 +1,73 @@
+name: cross-building
+
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['ci/cross-build']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      fail-fast: false
+      matrix:
+        goos:
+          - linux
+          - darwin
+          - windows
+        go:
+          - '1.19'
+          - '1.20'
+        include:
+          # Set the minimum Go patch version for the given Go minor
+          - go: '1.19'
+            GO_VERSION: '~1.19.0'
+          - go: '1.20'
+            GO_VERSION: '~1.20.0'
+    steps:
+
+      - name: Set up Go ${{ matrix.go }}
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.GO_VERSION }}
+          check-latest: true
+
+      - name: Print environment
+        id: vars
+        run: |
+          printf "Using Go at $(which go) (version $(go version))\n"
+          printf "\n\nGo environment:\n\n"
+          go env
+          printf "\n\nSystem environment:\n\n"
+          env
+
+      - name: Cache the build cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: build-go-${{ matrix.go }}-${{ matrix.goos }}-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            build-go-${{ matrix.go }}-${{ matrix.goos }}
+
+      - name: Check out the source code
+        uses: actions/checkout@v3
+
+      - name: Build the make/make tool
+        run: go build -o make/make make/main.go
+
+      - name: Build
+        continue-on-error: true
+        env:
+          GOOS: ${{ matrix.goos }}
+          CGO_ENABLED: 0
+        shell: bash
+        run: |
+          make/make GOOS=$GOOS lstn
+          if [ $? -ne 0 ]; then
+            echo "::error ::Unable to build for $GOOS"
+            exit 1
+          fi

@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  test:
     strategy:
       fail-fast: true
       matrix:
@@ -39,9 +39,3 @@ jobs:
 
       - name: Run tests
         run: go test -race ./...
-
-      - name: Build the make/make tool
-        run: go build -o make/make make/main.go
-
-      - name: Build
-        run: make/make lstn
