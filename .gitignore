@@ -4,5 +4,7 @@
 /lstn.exe
 /lstn
 /make/make
+/make/docs/docs
 **/*.test
 /dist
+/share
