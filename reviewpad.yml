@@ -14,17 +14,37 @@ labels:
   dependencies:
     description: Something about our dependencies
     color: "#ff8722"
+  build:
+    description: Marks issues or pull requests regarding changes to the build tool
+    color: "#FCEA0F"
+  breaking-change:
+    description: Marks a pull request as introducing breaking changes
+    color: "#b3c9c9"
+  no-releasenotes:
+    description: To not include a pull request in the changelog
+    color: "#333635"
   needs-review:
     description: Marks a pull request as waiting for review
     color: "#aa2297"
 
 rules:
   - name: docs-changes
-    spec: $hasFileExtensions([".md", ".txt"])
+    spec: $hasFileExtensions([".md", ".txt"]) || $matchString("doc(s)?\/.+", $head()) || $matchString("^docs(\([A-Za-z0-9_\/]+\))??:.+$", $title())
   - name: ci-changes
-    spec: $hasFilePattern(".github/**") || $hasFileName(".golangci.yml") || $hasFileName("reviewpad.yml")
+    spec: $hasFilePattern(".github/**") || $hasFileName(".golangci.yml") || $hasFileName("reviewpad.yml") || $hasFileName(".goreleaser.yml") || $matchString("^ci(\([A-Za-z0-9_\/]+\))??:.+$", $title()) || $matchString("ci\/.+", $head())
   - name: deps-changes
     spec: $hasFileName("go.mod") || $hasFileName("go.sum")
+  - name: feat-changes
+    spec: $matchString("(feat(ure)?|new)\/.+", $head()) || $matchString("^feat(\([A-Za-z0-9_\/]+\))??:.+$", $title())
+  - name: fix-changes
+    spec: $matchString("(fix|bug)\/.+", $head()) || $matchString("^fix(\([A-Za-z0-9_\/]+\))??:.+$", $title())
+  - name: breaking-changes
+    spec: $matchString("^([A-Za-z0-9_]+)??(\([A-Za-z0-9_\/]+\))??!:.+$", $title())
+  - name: exclude-changes
+    spec: $matchString("(chore|refactor|revert|perf|test)\/.+", $head()) || $matchString("^(chore|refactor|revert|perf|test)(\([A-Za-z0-9_\/]+\))??:.+$", $title())
+  - name: build-changes
+    spec: $hasFilePattern("make/**") || $matchString("^build(\([A-Za-z0-9_\/]+\))??:.+$", $title()) || $matchString("build\/.+", $head())
+
 
 groups:
   - name: ignore-patterns
@@ -106,11 +126,11 @@ workflows:
     description: Label pull requests
     always-run: true
     if:
-      # Label pull requests with `docs` if they only modify markdown or txt files.
+      # Label pull requests with `docs` if they only modify markdown or txt files, or if the branch starts with the `docs/` prefix, or if the title starts with the `docs:` prefix
       - rule: docs-changes
         extra-actions:
           - $addLabel("documentation")
-      # Label pull requests with `ci` if they modify files in the .github/ directory.
+      # Label pull requests with `ci` if they modify files in the .github/ directory, or if the branch starts with the `ci/` prefix, or if the title starts with the `ci:` prefix
       - rule: ci-changes
         extra-actions:
           - $addLabel("ci")
@@ -118,6 +138,26 @@ workflows:
       - rule: deps-changes
         extra-actions:
           - $addLabel("dependencies")
+      # Label pull requests with `build` they modify files in the make/ directory, or if the branch starts with the `build/` prefix, or if the title starts with the `build:` prefix
+      - rule: build-changes
+        extra-actions:
+          - $addLabel("build")
+      # Label pull requests with `enhancement` if the branch starts with (new|feat[ure]/) or the title starts with the feat prefix
+      - rule: feat-changes
+        extra-actions:
+          $addLabel("enhancement")
+      # Label pull requests with `bug` if the branch starts with the `fix/` prefix, or with the `bug/` prefix, or if the title starts with the `fix:` prefix
+      - rule: fix-changes
+        extra-actions:
+          $addLabel("bug")
+      # Label pull requests with `breaking-change` if the title contains any prefix followed by "!"
+      - rule: breaking-changes
+        extra-actions:
+          - $addLabel("breaking-change")
+      # Label pull requests with `no-releasenotes` if the branch or the title starts with one of the excluded prefixes (chore|refactor|revert|perf|test)
+      - rule: exclude-changes
+        extra-actions:
+          - $addLabel("no-releasenotes")
       # Label pull requests with `needs-review` if they are waiting for review
       - rule: $isWaitingForReview()
         extra-actions:
