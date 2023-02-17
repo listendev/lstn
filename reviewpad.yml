@@ -145,11 +145,11 @@ workflows:
       # Label pull requests with `enhancement` if the branch starts with (new|feat[ure]/) or the title starts with the feat prefix
       - rule: feat-changes
         extra-actions:
-          $addLabel("enhancement")
+          - $addLabel("enhancement")
       # Label pull requests with `bug` if the branch starts with the `fix/` prefix, or with the `bug/` prefix, or if the title starts with the `fix:` prefix
       - rule: fix-changes
         extra-actions:
-          $addLabel("bug")
+          - $addLabel("bug")
       # Label pull requests with `breaking-change` if the title contains any prefix followed by "!"
       - rule: breaking-changes
         extra-actions:
