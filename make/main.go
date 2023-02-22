@@ -156,7 +156,7 @@ func main() {
 }
 
 func getGitTag() string {
-	if des, err := getCommandOutput("git", "describe", "--tags"); err == nil {
+	if des, err := getCommandOutput("git", "describe", "--tag", "--abbrev=0"); err == nil {
 		return des
 	}
 
