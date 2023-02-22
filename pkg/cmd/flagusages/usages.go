@@ -75,7 +75,7 @@ func Set(c *cobra.Command) {
 		groups[lKey].AddFlag(f)
 	}
 
-	c.LocalNonPersistentFlags().VisitAll(func(f *pflag.Flag) {
+	c.LocalFlags().VisitAll(func(f *pflag.Flag) {
 		if len(f.Annotations) == 0 {
 			addToLocal(f)
 		} else {
