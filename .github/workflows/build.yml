@@ -61,14 +61,9 @@ jobs:
         run: go build -o make/make make/main.go
 
       - name: Build
-        continue-on-error: true
         env:
           GOOS: ${{ matrix.goos }}
           CGO_ENABLED: 0
         shell: bash
         run: |
           make/make GOOS=$GOOS lstn
-          if [ $? -ne 0 ]; then
-            echo "::error ::Unable to build for $GOOS"
-            exit 1
-          fi
