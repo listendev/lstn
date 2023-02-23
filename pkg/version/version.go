@@ -71,11 +71,13 @@ func Get() Version {
 	// Use VersionPrefix (if any) when build info is not available
 	if !ok {
 		if VersionPrefix != "" {
+			out.Tag = VersionPrefix
 			out.Long = VersionPrefix
 			out.Short = VersionPrefix
 
 			return out
 		}
+		out.Tag = Unknown
 		out.Long = Unknown
 		out.Short = Unknown
 
@@ -93,7 +95,7 @@ func Get() Version {
 
 	// When used as a module...
 	if module != nil {
-		out.Short, out.Long = module.Version, module.Version
+		out.Tag, out.Short, out.Long = module.Version, module.Version, module.Version
 		if module.Sum != "" {
 			out.Long += " " + module.Sum
 		}
@@ -162,6 +164,16 @@ func Get() Version {
 		}
 	} else if VersionPrefix != "" {
 		out.Short = VersionPrefix + "+" + out.Short
+	}
+
+	if out.Tag == "" {
+		if VersionPrefix != "" {
+			out.Tag = VersionPrefix
+		} else {
+			out.Tag = Unknown
+		}
+	} else if VersionPrefix != "" {
+		out.Tag = VersionPrefix
 	}
 
 	return out
