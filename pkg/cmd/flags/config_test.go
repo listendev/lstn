@@ -30,14 +30,14 @@ func TestFlagsConfigSuite(t *testing.T) {
 	suite.Run(t, new(FlagsConfigSuite))
 }
 
-func (suite *FlagsConfigSuite) TestNewConfigOptions() {
-	i, err := NewConfigOptions()
+func (suite *FlagsConfigSuite) TestNewConfigFlags() {
+	i, err := NewConfigFlags()
 	assert.NoError(suite.T(), err)
-	assert.IsType(suite.T(), &ConfigOptions{}, i)
+	assert.IsType(suite.T(), &ConfigFlags{}, i)
 }
 
 func (suite *FlagsConfigSuite) TestGetConfigFlagsNames() {
-	m := GetConfigFlagsNames()
+	m := GetNames(&ConfigFlags{})
 	assert.Equal(suite.T(), 3, len(m))
 
 	expected := make(map[string]string)
@@ -53,7 +53,7 @@ func (suite *FlagsConfigSuite) TestGetConfigFlagsNames() {
 }
 
 func (suite *FlagsConfigSuite) TestGetConfigFlagsDefaults() {
-	m := GetConfigFlagsDefaults()
+	m := GetDefaults(&ConfigFlags{})
 	assert.Equal(suite.T(), 3, len(m))
 
 	expected := make(map[string]string)
