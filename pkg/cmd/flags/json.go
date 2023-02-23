@@ -21,17 +21,11 @@ import (
 	"io"
 
 	"github.com/listendev/lstn/pkg/jq"
-	"github.com/spf13/cobra"
 )
 
 type JSONFlags struct {
-	JSON bool   `name:"json"`
-	JQ   string `name:"jq" validate:"excluded_without=JSON,jq"`
-}
-
-func (o *JSONFlags) Attach(c *cobra.Command) {
-	c.Flags().BoolVar(&o.JSON, "json", o.JSON, "output the verdicts (if any) in JSON form")
-	c.Flags().StringVarP(&o.JQ, "jq", "q", o.JQ, "filter the output using a jq expression")
+	JSON bool   `name:"json" flag:"json" desc:"output the verdicts (if any) in JSON form"`
+	JQ   string `name:"jq" flag:"jq" shorthand:"q" desc:"filter the output using a jq expression" validate:"excluded_without=JSON,jq"`
 }
 
 func (o *JSONFlags) IsJSON() bool {

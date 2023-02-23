@@ -18,21 +18,18 @@ package flags
 import (
 	"context"
 	"fmt"
-	"reflect"
 
 	"github.com/creasty/defaults"
 )
 
-type ConfigOptions struct {
-	LogLevel string `default:"info" name:"log level" flag:"loglevel"` // TODO > validator
-	Timeout  int    `default:"60" name:"timeout" flag:"timeout" validate:"number,min=30"`
-	Endpoint string `default:"https://npm.listen.dev" flag:"endpoint" name:"endpoint" validate:"url,endpoint" transform:"tsuffix=/"`
-
-	baseOptions
+type ConfigFlags struct {
+	LogLevel string `default:"info" name:"log level" flag:"loglevel" desc:"set the logging level"`                           // TODO > validator
+	Timeout  int    `default:"60" name:"timeout" flag:"timeout" desc:"set the timeout, in seconds" validate:"number,min=30"` // FIXME: change to time.Duration type
+	Endpoint string `default:"https://npm.listen.dev" flag:"endpoint" name:"endpoint" desc:"the listen.dev endpoint emitting the verdicts" validate:"url,endpoint" transform:"tsuffix=/"`
 }
 
-func NewConfigOptions() (*ConfigOptions, error) {
-	o := &ConfigOptions{}
+func NewConfigFlags() (*ConfigFlags, error) {
+	o := &ConfigFlags{}
 
 	if err := defaults.Set(o); err != nil {
 		return nil, fmt.Errorf("error setting configuration defaults")
@@ -41,42 +38,10 @@ func NewConfigOptions() (*ConfigOptions, error) {
 	return o, nil
 }
 
-func (o *ConfigOptions) Validate() []error {
-	return o.baseOptions.Validate(o)
+func (o *ConfigFlags) Validate() []error {
+	return Validate(o)
 }
 
-func (o *ConfigOptions) Transform(ctx context.Context) error {
-	return o.baseOptions.Transform(ctx, o)
-}
-
-func (o *ConfigOptions) GetField(name string) reflect.Value {
-	return reflect.ValueOf(o).Elem().FieldByName(name)
-}
-
-func GetConfigFlagsNames() map[string]string {
-	ret := make(map[string]string)
-	t := reflect.TypeOf(ConfigOptions{})
-	for i := 0; i < t.NumField(); i++ {
-		field := t.Field(i)
-		tag := field.Tag.Get("flag")
-		if tag != "" {
-			ret[tag] = field.Name
-		}
-	}
-
-	return ret
-}
-
-func GetConfigFlagsDefaults() map[string]string {
-	ret := make(map[string]string)
-	e := reflect.TypeOf(ConfigOptions{})
-	for i := 0; i < e.NumField(); i++ {
-		field := e.Field(i)
-		tag := field.Tag.Get("default")
-		if tag != "" {
-			ret[field.Tag.Get("flag")] = tag
-		}
-	}
-
-	return ret
+func (o *ConfigFlags) Transform(ctx context.Context) error {
+	return Transform(ctx, o)
 }
