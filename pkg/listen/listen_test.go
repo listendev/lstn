@@ -58,7 +58,7 @@ func (ctx mockContextLocalEndpoint) Err() error {
 func (ctx mockContextLocalEndpoint) Value(key interface{}) interface{} {
 	// pkgcontext.ConfigKey
 	if key == pkgcontext.ConfigKey {
-		c, _ := flags.NewConfigOptions()
+		c, _ := flags.NewConfigFlags()
 		c.Endpoint = localEndpoint
 
 		return c
@@ -133,7 +133,7 @@ func (ctx mockContextNonLocalEndpoint) Err() error {
 func (ctx mockContextNonLocalEndpoint) Value(key interface{}) interface{} {
 	// pkgcontext.ConfigKey
 	if key == pkgcontext.ConfigKey {
-		c, _ := flags.NewConfigOptions()
+		c, _ := flags.NewConfigFlags()
 		c.Endpoint = nonLocalEndpoint
 
 		return c
