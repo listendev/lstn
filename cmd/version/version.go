@@ -21,6 +21,7 @@ import (
 	"runtime"
 
 	"github.com/listendev/lstn/internal/project"
+	"github.com/listendev/lstn/pkg/cmd/options"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/version"
 	"github.com/spf13/cobra"
@@ -39,22 +40,57 @@ func New(ctx context.Context) (*cobra.Command, error) {
 			"source": project.GetSourceURL(filename),
 		},
 		RunE: func(c *cobra.Command, args []string) error {
-			ctx := c.Context()
+			ctx = c.Context()
 
-			// Obtain the (short) version info from the context
-			shortVersion := ctx.Value(pkgcontext.ShortVersionKey).(string)
-
-			outputString := fmt.Sprintf("lstn %s", shortVersion)
-			changelogURL, _ := version.Changelog(shortVersion)
-			if changelogURL != "" {
-				outputString += fmt.Sprintf("\n%s", changelogURL)
+			// Obtain the local options from the context
+			opts, err := options.GetFromContext(ctx, pkgcontext.VersionKey)
+			if err != nil {
+				return err
+			}
+			localOpts, ok := opts.(*options.Version)
+			if !ok {
+				return fmt.Errorf("couldn't obtain options for the current subcommand")
 			}
 
-			fmt.Println(outputString)
+			// Obtain the version info from the context
+			v := ctx.Value(pkgcontext.VersionTagKey).(string)
+			switch localOpts.Verbosity {
+			case 0:
+				// default to version tag
+			case 1:
+				v = ctx.Value(pkgcontext.VersionShortKey).(string)
+			case 2:
+				fallthrough
+
+			default:
+				v = ctx.Value(pkgcontext.VersionLongKey).(string)
+			}
+
+			outputString := fmt.Sprintf("lstn %s", v)
+			if localOpts.Changelog {
+				changelogURL, _ := version.Changelog(v)
+				if changelogURL != "" {
+					outputString += fmt.Sprintf("\n%s", changelogURL)
+				}
+			}
+
+			c.Println(outputString)
 
 			return nil
 		},
 	}
+
+	localOpts, err := options.NewVersion()
+	if err != nil {
+		return nil, err
+	}
+
+	// Local flags will only run when this command is called directly
+	localOpts.Attach(c)
+
+	// Pass the options through the context
+	ctx = context.WithValue(ctx, pkgcontext.VersionKey, localOpts)
+	c.SetContext(ctx)
 
 	return c, nil
 }
