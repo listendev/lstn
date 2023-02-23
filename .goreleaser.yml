@@ -5,10 +5,11 @@ release:
   draft: false
   name_template: "listen.dev CLI v{{.Version}}"
 
-# TODO > manpages
 before:
   hooks:
     - go mod tidy
+    - go build -o make/make make/main.go
+    - make/make man
 
 builds:
   - <<: &build_defaults
@@ -77,7 +78,6 @@ archives:
     format: tar.gz
     files:
       - LICENSE
-      # TODO > add the manpages
   # - id: win
   #   builds: [windows]
   #   <<: *archive_defaults
