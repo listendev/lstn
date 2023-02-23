@@ -78,6 +78,7 @@ archives:
     format: tar.gz
     files:
       - LICENSE
+      - ./share/man/man1/lstn*
   # - id: win
   #   builds: [windows]
   #   <<: *archive_defaults
