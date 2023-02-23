@@ -232,10 +232,25 @@ func New(ctx context.Context) (*Command, error) {
 	for _, c := range rootCmd.Commands() {
 		switch c.Name() {
 		case "help":
+			c.Use = "help [command]"
+			c.DisableFlagsInUseLine = true
+			c.DisableAutoGenTag = true
 			flagusages.Set(c)
 		case "completion":
+			completions := []string{}
 			for _, sub := range c.Commands() {
+				completions = append(completions, sub.Name())
+				sub.DisableAutoGenTag = true
+				sub.Annotations = map[string]string{
+					"source": project.GetSourceURL(filename),
+				}
 				flagusages.Set(sub)
+			}
+			c.Use = fmt.Sprintf("completion <%s>", strings.Join(completions, "|"))
+			c.DisableFlagsInUseLine = true
+			c.DisableAutoGenTag = true
+			c.Annotations = map[string]string{
+				"source": project.GetSourceURL(filename),
 			}
 			flagusages.Set(c)
 		}
