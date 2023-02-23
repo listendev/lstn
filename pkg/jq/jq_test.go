@@ -161,7 +161,6 @@ func TestEval(t *testing.T) {
 			},
 			wantW: "postcss-clean\n1.2.2\n",
 		},
-		// TODO > with verdicts array/objects
 		{
 			name: "object-json",
 			args: arguments{

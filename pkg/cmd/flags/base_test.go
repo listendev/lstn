@@ -40,7 +40,7 @@ func (suite *FlagsBaseSuite) TestValidate() {
 		expectedStr []string
 	}{
 		{
-			"empty config options",
+			"empty config flags",
 			&ConfigFlags{},
 			[]string{"timeout must be 30 or greater", "endpoint must be a valid URL"},
 		},
@@ -55,7 +55,7 @@ func (suite *FlagsBaseSuite) TestValidate() {
 			[]string{"endpoint must be a valid listen.dev endpoint"},
 		},
 		{
-			"valid config options",
+			"valid config flags",
 			&ConfigFlags{Timeout: 31, Endpoint: "http://127.0.0.1:3000"},
 			[]string{},
 		},
@@ -80,7 +80,7 @@ func (suite *FlagsBaseSuite) TestTransform() {
 		wantErr  error
 	}{
 		{
-			"empty config options",
+			"empty config flags",
 			&ConfigFlags{},
 			&ConfigFlags{},
 			nil,

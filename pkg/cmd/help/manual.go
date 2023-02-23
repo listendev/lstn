@@ -21,8 +21,10 @@ import (
 	"io"
 	"strings"
 
+	"github.com/listendev/lstn/pkg/cmd/flagusages"
 	"github.com/listendev/lstn/pkg/text"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 func cReference(w io.Writer, c *cobra.Command, depth int) {
@@ -38,9 +40,32 @@ func cReference(w io.Writer, c *cobra.Command, depth int) {
 
 	// Local flags
 	if c.HasAvailableLocalFlags() {
-		localFlagsUsage := c.LocalFlags().FlagUsages()
-		if localFlagsUsage != "" {
-			fmt.Fprintf(w, "```\n%s```\n\n", text.Dedent(localFlagsUsage))
+		groups := flagusages.Groups(c)
+
+		if localGroup, found := groups[flagusages.LocalGroup]; found {
+			localFlagsUsage := localGroup.FlagUsages()
+			if localFlagsUsage != "" {
+				// Remove the help flag
+				saneLocalFlagSet := pflag.NewFlagSet(c.Name(), pflag.ContinueOnError)
+				localGroup.VisitAll(func(f *pflag.Flag) {
+					if f.Name != "help" {
+						saneLocalFlagSet.AddFlag(f)
+					}
+				})
+
+				saneLocalFlagsUsage := saneLocalFlagSet.FlagUsages()
+				if saneLocalFlagsUsage != "" {
+					fmt.Fprintf(w, "### Flags\n\n```\n%s```\n\n", text.Dedent(localFlagsUsage))
+				}
+			}
+			delete(groups, flagusages.LocalGroup)
+		}
+
+		for group, f := range groups {
+			groupFlagsUsage := f.FlagUsages()
+			if groupFlagsUsage != "" {
+				fmt.Fprintf(w, "### %s Flags\n\n```\n%s```\n\n", group, text.Dedent(groupFlagsUsage))
+			}
 		}
 	}
 
