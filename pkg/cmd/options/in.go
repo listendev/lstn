@@ -13,13 +13,42 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package flags
+package options
 
 import (
 	"context"
+	"fmt"
+
+	"github.com/creasty/defaults"
+	"github.com/listendev/lstn/pkg/cmd/flags"
+	"github.com/listendev/lstn/pkg/cmd/flagusages"
+	"github.com/spf13/cobra"
 )
 
-type Options interface {
-	Validate() []error
-	Transform(context.Context) error
+type In struct {
+	flags.JSONFlags
+	flags.ConfigFlags `flagset:"Config"`
+}
+
+func NewIn() (*In, error) {
+	o := &In{}
+
+	if err := defaults.Set(o); err != nil {
+		return nil, fmt.Errorf("error setting configuration defaults")
+	}
+
+	return o, nil
+}
+
+func (o *In) Attach(c *cobra.Command) {
+	flags.Define(c, o, "")
+	flagusages.Set(c)
+}
+
+func (o *In) Validate() []error {
+	return flags.Validate(o)
+}
+
+func (o *In) Transform(ctx context.Context) error {
+	return flags.Transform(ctx, o)
 }
