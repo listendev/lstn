@@ -28,8 +28,10 @@ import (
 	"github.com/listendev/lstn/cmd/version"
 	"github.com/listendev/lstn/internal/project"
 	"github.com/listendev/lstn/pkg/cmd/flags"
+	"github.com/listendev/lstn/pkg/cmd/flagusages"
 	"github.com/listendev/lstn/pkg/cmd/groups"
-	"github.com/listendev/lstn/pkg/cmd/help"
+	pkghelp "github.com/listendev/lstn/pkg/cmd/help"
+	"github.com/listendev/lstn/pkg/cmd/options"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/jq"
 	lstnversion "github.com/listendev/lstn/pkg/version"
@@ -77,24 +79,22 @@ func New(ctx context.Context) (*Command, error) {
 				}
 			}
 
-			// TODO ? ignore global/config flags for non core commands
-
-			cfgOpts, ok := c.Context().Value(pkgcontext.ConfigKey).(*flags.ConfigOptions)
+			// Obtain the configuration options
+			cfgOpts, ok := c.Context().Value(pkgcontext.ConfigKey).(*flags.ConfigFlags)
 			if !ok {
 				return fmt.Errorf("couldn't obtain configuration options")
 			}
-
 			// Obtain the mapping flag name -> struct field name
-			configFlagsNames := flags.GetConfigFlagsNames()
+			configFlagsNames := flags.GetNames(cfgOpts)
 			// Obtain the mapping flag name -> default value
-			configFlagsDefaults := flags.GetConfigFlagsDefaults()
+			configFlagsDefaults := flags.GetDefaults(cfgOpts)
 			// Implement flag precedence over environment variables, over configuration file
 			c.Flags().VisitAll(func(f *pflag.Flag) {
 				flagName := f.Name
 				// Only for configuration flags...
 				fieldName, ok := configFlagsNames[flagName]
 				if ok {
-					v := cfgOpts.GetField(fieldName)
+					v := flags.GetField(cfgOpts, fieldName)
 					if v.IsValid() {
 						switch v.Interface().(type) {
 						case int:
@@ -130,6 +130,7 @@ func New(ctx context.Context) (*Command, error) {
 			})
 
 			// Validate the config options
+			// NOTE > It must happen after the precedence mechanism
 			if errors := cfgOpts.Validate(); errors != nil {
 				ret := "invalid configuration options/flags"
 				for _, e := range errors {
@@ -167,23 +168,19 @@ func New(ctx context.Context) (*Command, error) {
 		// Run: func(cmd *cobra.Command, args []string) { },
 	}
 
-	// Obtain the configuration options
-	cfgOpts, err := flags.NewConfigOptions()
-	if err != nil {
-		return nil, err
-	}
-
 	// Cobra supports persistent flags, which, if defined here, will be global to the whole application
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", cfgFile, "config file (default is $HOME/.lstn.yaml)")
-	err = rootCmd.MarkPersistentFlagFilename("config", "yaml")
+	err := rootCmd.MarkPersistentFlagFilename("config", "yaml")
 	if err != nil {
 		return nil, err
 	}
 
 	// Cobra also supports local flags, which will only run when this action is called directly
-	rootCmd.PersistentFlags().StringVar(&cfgOpts.LogLevel, "loglevel", cfgOpts.LogLevel, "log level")
-	rootCmd.PersistentFlags().IntVar(&cfgOpts.Timeout, "timeout", cfgOpts.Timeout, "timeout in seconds")
-	rootCmd.PersistentFlags().StringVar(&cfgOpts.Endpoint, "endpoint", cfgOpts.Endpoint, "the listen.dev endpoint emitting the verdicts")
+	rootOpts, err := options.NewRoot()
+	if err != nil {
+		return nil, err
+	}
+	rootOpts.Attach(rootCmd)
 
 	// Tell viper to populate variables from the configuration file
 	err = viper.BindPFlags(rootCmd.Flags())
@@ -192,12 +189,13 @@ func New(ctx context.Context) (*Command, error) {
 	}
 
 	// Pass the configuration options through the context
-	ctx = context.WithValue(ctx, pkgcontext.ConfigKey, cfgOpts)
+	ctx = context.WithValue(ctx, pkgcontext.ConfigKey, &rootOpts.ConfigFlags)
 
 	// Store the version in the context
 	vers := lstnversion.Get()
-	ctx = context.WithValue(ctx, pkgcontext.ShortVersionKey, vers.Short)
-	ctx = context.WithValue(ctx, pkgcontext.LongVersionKey, vers.Long)
+	ctx = context.WithValue(ctx, pkgcontext.VersionTagKey, vers.Tag)
+	ctx = context.WithValue(ctx, pkgcontext.VersionShortKey, vers.Short)
+	ctx = context.WithValue(ctx, pkgcontext.VersionLongKey, vers.Long)
 
 	// Setup the core group
 	rootCmd.AddGroup(&groups.Core)
@@ -224,8 +222,23 @@ func New(ctx context.Context) (*Command, error) {
 	rootCmd.AddCommand(versionCmd)
 
 	// Setup the help topics subcommands
-	for t := range help.Topics {
-		rootCmd.AddCommand(help.NewTopic(t))
+	for t := range pkghelp.Topics {
+		rootCmd.AddCommand(pkghelp.NewTopic(t))
+	}
+
+	// Setup help and completion subcommands
+	rootCmd.InitDefaultHelpCmd()
+	rootCmd.InitDefaultCompletionCmd()
+	for _, c := range rootCmd.Commands() {
+		switch c.Name() {
+		case "help":
+			flagusages.Set(c)
+		case "completion":
+			for _, sub := range c.Commands() {
+				flagusages.Set(sub)
+			}
+			flagusages.Set(c)
+		}
 	}
 
 	// Fallback to the default subcommand when the user doesn't specify one explicitly.

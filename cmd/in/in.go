@@ -24,8 +24,8 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/listendev/lstn/internal/project"
-	"github.com/listendev/lstn/pkg/cmd/flags"
 	"github.com/listendev/lstn/pkg/cmd/groups"
+	"github.com/listendev/lstn/pkg/cmd/options"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/listendev/lstn/pkg/npm"
@@ -62,11 +62,11 @@ The verdicts it returns are listed by the name of each package and its specified
 			ctx = c.Context()
 
 			// Obtain the local options from the context
-			opts, err := pkgcontext.GetOptionsFromContext(ctx, pkgcontext.InKey)
+			opts, err := options.GetFromContext(ctx, pkgcontext.InKey)
 			if err != nil {
 				return err
 			}
-			inOpts, ok := opts.(*flags.InOptions)
+			inOpts, ok := opts.(*options.In)
 			if !ok {
 				return fmt.Errorf("couldn't obtain options for the current subcommand")
 			}
@@ -118,7 +118,7 @@ The verdicts it returns are listed by the name of each package and its specified
 	}
 
 	// Obtain the local options
-	inOpts, err := flags.NewInOptions()
+	inOpts, err := options.NewIn()
 	if err != nil {
 		return nil, err
 	}

@@ -23,8 +23,8 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/listendev/lstn/internal/project"
-	"github.com/listendev/lstn/pkg/cmd/flags"
 	"github.com/listendev/lstn/pkg/cmd/groups"
+	"github.com/listendev/lstn/pkg/cmd/options"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/listendev/lstn/pkg/npm"
@@ -48,8 +48,7 @@ Using this command, you can audit a single package version or all the versions o
 
 Specifying the package name is mandatory.
 
-The verdicts it returns are listed by the shasum of each version belonging to that package name.
-If you're a hairsplitting person, you can also query for the verdicts specific to a package version's shasum.`,
+It lists out the verdicts of all the versions of the input package name.`,
 		Example: `  lstn to chalk
   lstn to debug 4.3.4`,
 		Args:              validateInArgs, // Executes before RunE
@@ -61,11 +60,11 @@ If you're a hairsplitting person, you can also query for the verdicts specific t
 			ctx = c.Context()
 
 			// Obtain the local options from the context
-			opts, err := pkgcontext.GetOptionsFromContext(ctx, pkgcontext.ToKey)
+			opts, err := options.GetFromContext(ctx, pkgcontext.ToKey)
 			if err != nil {
 				return err
 			}
-			toOpts, ok := opts.(*flags.ToOptions)
+			toOpts, ok := opts.(*options.To)
 			if !ok {
 				return fmt.Errorf("couldn't obtain options for the current subcommand")
 			}
@@ -99,13 +98,10 @@ If you're a hairsplitting person, you can also query for the verdicts specific t
 	}
 
 	// Obtain the local options
-	toOpts, err := flags.NewToOptions()
+	toOpts, err := options.NewTo()
 	if err != nil {
 		return nil, err
 	}
-
-	// Persistent flags here will work for this command and all subcommands
-	// toCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Local flags will only run when this command is called directly
 	toOpts.Attach(toCmd)
