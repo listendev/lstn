@@ -16,6 +16,7 @@
 package version
 
 type Version struct {
+	Tag   string `json:"tag,omitempty"`
 	Short string `json:"short,omitempty"`
 	Long  string `json:"long,omitempty"`
 }
