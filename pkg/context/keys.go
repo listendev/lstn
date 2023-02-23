@@ -23,14 +23,24 @@ var ConfigKey contextKey = "cfg"
 // ContextCancelFuncKey is the key indexing the context cancelation function in the context itself.
 var ContextCancelFuncKey contextKey = "ctxcancel"
 
-// InKey is the key indexing the options/flags for the in subcommand.
+// InKey is the key indexing the options for the `in` child command.
 var InKey contextKey = "in"
 
-// ToKey is the key indexing the options/flags for the in subcommand.
+// ToKey is the key indexing the options for the `to` child command.
 var ToKey contextKey = "to"
 
+// VersionKey is the key indexing the options for the `version` child command.
+var VersionKey contextKey = "version"
+
+// VersionTagKey is the key storing the tag part of the version.
+var VersionTagKey contextKey = "version_tag"
+
+// VersionShortKey is the key storing the short version.
+var VersionShortKey contextKey = "version_short"
+
+// VersionLongKey is the key storing the long version.
+var VersionLongKey contextKey = "version_long"
+
+// FIXME: remove
 // ShortVersionKey is the key storing the short version.
 var ShortVersionKey contextKey = "version_short"
-
-// LongVersionKey is the key storing the long version.
-var LongVersionKey contextKey = "version_long"
