@@ -40,7 +40,3 @@ var VersionShortKey contextKey = "version_short"
 
 // VersionLongKey is the key storing the long version.
 var VersionLongKey contextKey = "version_long"
-
-// FIXME: remove
-// ShortVersionKey is the key storing the short version.
-var ShortVersionKey contextKey = "version_short"
