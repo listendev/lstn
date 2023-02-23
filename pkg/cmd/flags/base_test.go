@@ -19,6 +19,8 @@ import (
 	"context"
 	"testing"
 
+	"github.com/listendev/lstn/pkg/cmd/flagusages"
+	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
@@ -34,36 +36,34 @@ func TestFlagsBaseSuite(t *testing.T) {
 func (suite *FlagsBaseSuite) TestValidate() {
 	cases := []struct {
 		desc        string
-		o           Options
+		o           *ConfigFlags
 		expectedStr []string
 	}{
 		{
 			"empty config options",
-			&ConfigOptions{},
+			&ConfigFlags{},
 			[]string{"timeout must be 30 or greater", "endpoint must be a valid URL"},
 		},
 		{
 			"invalid timeout",
-			&ConfigOptions{Timeout: 29, Endpoint: "http://127.0.0.1:3000"},
+			&ConfigFlags{Timeout: 29, Endpoint: "http://127.0.0.1:3000"},
 			[]string{"timeout must be 30 or greater"},
 		},
 		{
 			"invalid endpoint",
-			&ConfigOptions{Timeout: 31, Endpoint: "http://invalid.endpoint"},
+			&ConfigFlags{Timeout: 31, Endpoint: "http://invalid.endpoint"},
 			[]string{"endpoint must be a valid listen.dev endpoint"},
 		},
 		{
 			"valid config options",
-			&ConfigOptions{Timeout: 31, Endpoint: "http://127.0.0.1:3000"},
+			&ConfigFlags{Timeout: 31, Endpoint: "http://127.0.0.1:3000"},
 			[]string{},
 		},
 	}
 
 	for _, tc := range cases {
-		bo := new(baseOptions)
-
 		suite.T().Run(tc.desc, func(t *testing.T) {
-			actual := bo.Validate(tc.o)
+			actual := Validate(tc.o)
 			assert.Equal(suite.T(), len(tc.expectedStr), len(actual))
 			for _, a := range actual {
 				assert.Contains(suite.T(), tc.expectedStr, a.Error())
@@ -75,21 +75,84 @@ func (suite *FlagsBaseSuite) TestValidate() {
 func (suite *FlagsBaseSuite) TestTransform() {
 	cases := []struct {
 		desc     string
-		o        Options
-		expected error
+		o        *ConfigFlags
+		expected *ConfigFlags
+		wantErr  error
 	}{
 		{
 			"empty config options",
-			&ConfigOptions{},
+			&ConfigFlags{},
+			&ConfigFlags{},
+			nil,
+		},
+		{
+			"endpoint config with leading slash",
+			&ConfigFlags{
+				Endpoint: "https://npm.listen.dev/",
+			},
+			&ConfigFlags{
+				Endpoint: "https://npm.listen.dev",
+			},
 			nil,
 		},
 	}
 
 	ctx := context.Background()
 	for _, tc := range cases {
-		bo := new(baseOptions)
 		suite.T().Run(tc.desc, func(t *testing.T) {
-			assert.Equal(t, tc.expected, bo.Transform(ctx, tc.o))
+			err := Transform(ctx, tc.o)
+			if tc.wantErr == nil {
+				assert.Equal(t, tc.expected, tc.o)
+			} else {
+				assert.Error(t, err)
+			}
+		})
+	}
+}
+
+func (suite *FlagsBaseSuite) TestDefine() {
+	type testFlags struct {
+		ConfigFlags `flagset:"Config"`
+		JSONFlags
+	}
+
+	cases := []struct {
+		desc  string
+		input interface{}
+	}{
+		{
+			"flags definition from struct reference",
+			&testFlags{},
+		},
+		{
+			"flags definition from struct",
+			testFlags{},
+		},
+	}
+
+	expectedAnnotations := map[string][]string{flagusages.FlagGroupAnnotation: []string{"Config"}}
+
+	for _, tc := range cases {
+		suite.T().Run(tc.desc, func(t *testing.T) {
+			c := &cobra.Command{}
+			Define(c, tc.input, "")
+			f := c.Flags()
+
+			assert.NotNil(t, f.Lookup("loglevel"))
+			assert.NotNil(t, f.Lookup("endpoint"))
+			assert.NotNil(t, f.Lookup("timeout"))
+			assert.Equal(t, expectedAnnotations, f.Lookup("loglevel").Annotations)
+			assert.Equal(t, expectedAnnotations, f.Lookup("endpoint").Annotations)
+			assert.Equal(t, expectedAnnotations, f.Lookup("timeout").Annotations)
+			assert.Equal(t, "set the logging level", f.Lookup("loglevel").Usage)
+			assert.Equal(t, "the listen.dev endpoint emitting the verdicts", f.Lookup("endpoint").Usage)
+			assert.Equal(t, "set the timeout, in seconds", f.Lookup("timeout").Usage)
+
+			assert.NotNil(t, f.Lookup("json"))
+			assert.NotNil(t, f.Lookup("jq"))
+			assert.NotNil(t, f.ShorthandLookup("q"))
+			assert.Equal(t, "output the verdicts (if any) in JSON form", f.Lookup("json").Usage)
+			assert.Equal(t, "filter the output using a jq expression", f.Lookup("jq").Usage)
 		})
 	}
 }
