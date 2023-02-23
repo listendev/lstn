@@ -53,26 +53,52 @@ Additional help topics:{{range .Commands}}{{if .IsAdditionalHelpTopicCommand}}
 
 Use "{{.CommandPath}} [command] --help" for more information about a command.{{end}}
 `
+	noFlagsTemplate = `Usage:{{if .Runnable}}
+  {{.UseLine}}{{end}}{{if .HasAvailableSubCommands}}
+  {{.CommandPath}} [command]{{end}}{{if gt (len .Aliases) 0}}
+
+Aliases:
+  {{.NameAndAliases}}{{end}}{{if .HasExample}}
+
+Examples:
+{{.Example}}{{end}}{{if .HasAvailableSubCommands}}{{$cmds := .Commands}}{{if eq (len .Groups) 0}}
+
+Available Commands:{{range $cmds}}{{if (or .IsAvailableCommand (eq .Name "help"))}}
+  {{rpad .Name .NamePadding }} {{.Short}}{{end}}{{end}}{{else}}{{range $group := .Groups}}
+
+{{.Title}}{{range $cmds}}{{if (and (eq .GroupID $group.ID) (or .IsAvailableCommand (eq .Name "help")))}}
+  {{rpad .Name .NamePadding }} {{.Short}}{{end}}{{end}}{{end}}{{if not .AllChildCommandsHaveGroup}}
+
+Additional Commands:{{range $cmds}}{{if (and (eq .GroupID "") (or .IsAvailableCommand (eq .Name "help")))}}
+  {{rpad .Name .NamePadding }} {{.Short}}{{end}}{{end}}{{end}}{{end}}{{end}}{{if .HasAvailableInheritedFlags}}
+
+Global Flags:
+{{.InheritedFlags.FlagUsages | trimTrailingWhitespaces}}{{end}}{{if .HasHelpSubCommands}}
+
+Additional help topics:{{range .Commands}}{{if .IsAdditionalHelpTopicCommand}}
+  {{rpad .CommandPath .CommandPathPadding}} {{.Short}}{{end}}{{end}}{{end}}{{if .HasAvailableSubCommands}}
+
+Use "{{.CommandPath}} [command] --help" for more information about a command.{{end}}
+`
 )
 
 // FlagGroupAnnotation is the annotations key that marks a flag as belonging to a specific group.
 var FlagGroupAnnotation = "lstn___group"
 
-// Set generates the flag usages of the flags local to the input command.
-//
-// It also groups the flags by the FlagGroupAnnotation annotation.
-func Set(c *cobra.Command) {
-	lKey := "<local>"
+var LocalGroup = "<local>"
+
+func Groups(c *cobra.Command) map[string]*pflag.FlagSet {
+	LocalGroup := "<local>"
 	groups := map[string]*pflag.FlagSet{
 		"<origin>": c.LocalFlags(),
 	}
 	delete(groups, "<origin>")
 
 	addToLocal := func(f *pflag.Flag) {
-		if groups[lKey] == nil {
-			groups[lKey] = pflag.NewFlagSet(c.Name(), pflag.ContinueOnError)
+		if groups[LocalGroup] == nil {
+			groups[LocalGroup] = pflag.NewFlagSet(c.Name(), pflag.ContinueOnError)
 		}
-		groups[lKey].AddFlag(f)
+		groups[LocalGroup].AddFlag(f)
 	}
 
 	c.LocalFlags().VisitAll(func(f *pflag.Flag) {
@@ -91,17 +117,36 @@ func Set(c *cobra.Command) {
 		}
 	})
 
+	return groups
+}
+
+// Set generates the flag usages of the flags local to the input command.
+//
+// It also groups the flags by the FlagGroupAnnotation annotation.
+func Set(c *cobra.Command) {
+	LocalGroup := "<local>"
+	groups := Groups(c)
+
 	usages := ""
-	if lFlags, ok := groups[lKey]; ok {
+	if lFlags, ok := groups[LocalGroup]; ok {
 		usages += "Flags:\n"
-		usages += lFlags.FlagUsages() + "\n"
-		delete(groups, lKey)
+		usages += lFlags.FlagUsages()
+		delete(groups, LocalGroup)
 	}
 
 	for group, flags := range groups {
+		if usages != "" {
+			usages += "\n"
+		}
 		usages += fmt.Sprintf("%s Flags:\n", group)
-		usages += flags.FlagUsages() + "\n"
+		usages += flags.FlagUsages()
+	}
+	usages = strings.TrimSuffix(usages, "\n")
+
+	s := fmt.Sprintf(usageTemplate, usages)
+	if usages == "" {
+		s = noFlagsTemplate
 	}
 
-	c.SetUsageTemplate(fmt.Sprintf(usageTemplate, strings.TrimSpace(usages)))
+	c.SetUsageTemplate(s)
 }
