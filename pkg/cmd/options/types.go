@@ -13,40 +13,13 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package flags
+package options
 
 import (
 	"context"
-	"fmt"
-
-	"github.com/creasty/defaults"
-	"github.com/spf13/cobra"
 )
 
-type ToOptions struct {
-	JSONFlags
-
-	baseOptions
-}
-
-func NewToOptions() (*ToOptions, error) {
-	o := &ToOptions{}
-
-	if err := defaults.Set(o); err != nil {
-		return nil, fmt.Errorf("error setting configuration defaults")
-	}
-
-	return o, nil
-}
-
-func (o *ToOptions) Attach(c *cobra.Command) {
-	o.JSONFlags.Attach(c)
-}
-
-func (o *ToOptions) Validate() []error {
-	return o.baseOptions.Validate(o)
-}
-
-func (o *ToOptions) Transform(ctx context.Context) error {
-	return o.baseOptions.Transform(ctx, o)
+type Options interface {
+	Validate() []error
+	Transform(context.Context) error
 }
