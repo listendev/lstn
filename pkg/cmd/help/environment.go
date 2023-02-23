@@ -33,9 +33,9 @@ func envHelpTopicFunc() TopicFunc {
 
 		// NOTE > Assuming c.Parent() is the root one
 		p := c.Parent()
-		if p.HasPersistentFlags() {
-			configFlagsNames := flags.GetConfigFlagsNames()
-			p.PersistentFlags().VisitAll(func(f *pflag.Flag) {
+		if p.HasFlags() {
+			configFlagsNames := flags.GetNames(&flags.ConfigFlags{})
+			p.Flags().VisitAll(func(f *pflag.Flag) {
 				flagName := f.Name
 				_, ok := configFlagsNames[flagName]
 				if ok {

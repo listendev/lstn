@@ -33,13 +33,14 @@ func configHelpTopicFunc() TopicFunc {
 		fmt.Fprintf(b, "%s\n\n", "Here's an example of a configuration file (with the default values):")
 
 		// NOTE > Assuming c.Parent() is the root one
-		p := c.Parent()
-		if p.HasPersistentFlags() {
-			configFlagsNames := flags.GetConfigFlagsNames()
-			configFlagsDefaults := flags.GetConfigFlagsDefaults()
+		p := c.Root()
+		if p.HasFlags() {
+			cfgFlags := &flags.ConfigFlags{}
+			configFlagsNames := flags.GetNames(cfgFlags)
+			configFlagsDefaults := flags.GetDefaults(cfgFlags)
 			fileContent := ""
 
-			p.PersistentFlags().VisitAll(func(f *pflag.Flag) {
+			p.Flags().VisitAll(func(f *pflag.Flag) {
 				flagName := f.Name
 				_, ok := configFlagsNames[flagName]
 				if ok {
