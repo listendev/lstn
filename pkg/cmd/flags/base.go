@@ -18,9 +18,13 @@ package flags
 import (
 	"context"
 	"fmt"
+	"reflect"
+	"unsafe"
 
-	"github.com/listendev/lstn/pkg/transform"
-	"github.com/listendev/lstn/pkg/validate"
+	"github.com/listendev/lstn/pkg/cmd/flagusages"
+	t "github.com/listendev/lstn/pkg/transform"
+	v "github.com/listendev/lstn/pkg/validate"
+	"github.com/spf13/cobra"
 )
 
 // EnvSeparator is the separator between the env variable prefix and the global flag name.
@@ -29,14 +33,11 @@ var EnvSeparator = "_"
 // EnvPrefix is the prefix of the env variables corresponding to the global flags.
 var EnvPrefix = "lstn"
 
-type baseOptions struct {
-}
-
-func (b *baseOptions) Validate(o Options) []error {
-	if err := validate.Singleton.Struct(o); err != nil {
+func Validate(o interface{}) []error {
+	if err := v.Singleton.Struct(o); err != nil {
 		all := []error{}
-		for _, e := range err.(validate.ValidationErrors) {
-			all = append(all, fmt.Errorf(e.Translate(validate.Translator)))
+		for _, e := range err.(v.ValidationErrors) {
+			all = append(all, fmt.Errorf(e.Translate(v.Translator)))
 		}
 
 		return all
@@ -45,10 +46,117 @@ func (b *baseOptions) Validate(o Options) []error {
 	return nil
 }
 
-func (b *baseOptions) Transform(ctx context.Context, o Options) error {
-	if err := transform.Singleton.Struct(ctx, o); err != nil {
+func Transform(ctx context.Context, o interface{}) error {
+	if err := t.Singleton.Struct(ctx, o); err != nil {
 		return fmt.Errorf("couldn't transform configuration options properly")
 	}
 
 	return nil
+}
+
+func Define(c *cobra.Command, o interface{}, startingGroup string) {
+	val := getValue(o)
+
+	for i := 0; i < val.NumField(); i++ {
+		field := val.Field(i)
+		f := val.Type().Field(i)
+		short := f.Tag.Get("shorthand")
+		tag := f.Tag.Get("flag")
+		descr := f.Tag.Get("desc")
+		group := f.Tag.Get("flagset")
+		if startingGroup != "" {
+			group = startingGroup
+		}
+
+		// TODO: complete type switch as needed
+		switch f.Type.Kind() {
+		case reflect.Struct:
+			// NOTE > field.Interface() doesn't work because it actually returns a copy of the object wrapping the interface
+			Define(c, field.Addr().Interface(), group)
+
+		case reflect.Bool:
+			val := field.Interface().(bool)
+			ref := (*bool)(unsafe.Pointer(field.UnsafeAddr()))
+			c.Flags().BoolVarP(ref, tag, short, val, descr)
+
+		case reflect.String:
+			val := field.Interface().(string)
+			ref := (*string)(unsafe.Pointer(field.UnsafeAddr()))
+			c.Flags().StringVarP(ref, tag, short, val, descr)
+
+		case reflect.Int:
+			val := field.Interface().(int)
+			ref := (*int)(unsafe.Pointer(field.UnsafeAddr()))
+			if f.Tag.Get("type") == "count" {
+				c.Flags().CountVarP(ref, tag, short, descr)
+
+				continue
+			}
+			c.Flags().IntVarP(ref, tag, short, val, descr)
+
+		default:
+			continue
+		}
+
+		// Set the group annotation on the current flag
+		if group != "" {
+			_ = c.Flags().SetAnnotation(tag, flagusages.FlagGroupAnnotation, []string{group})
+		}
+	}
+}
+
+func GetNames(o interface{}) map[string]string {
+	ret := make(map[string]string)
+	val := getValue(o)
+
+	for i := 0; i < val.NumField(); i++ {
+		field := val.Type().Field(i)
+		tag := field.Tag.Get("flag")
+		if tag != "" {
+			ret[tag] = field.Name
+		}
+	}
+
+	return ret
+}
+
+func GetDefaults(o interface{}) map[string]string {
+	ret := make(map[string]string)
+	val := getValue(o)
+
+	for i := 0; i < val.NumField(); i++ {
+		field := val.Type().Field(i)
+		tag := field.Tag.Get("default")
+		if tag != "" {
+			ret[field.Tag.Get("flag")] = tag
+		}
+	}
+
+	return ret
+}
+
+func GetField(o interface{}, name string) reflect.Value {
+	val := getValue(o)
+
+	return val.FieldByName(name)
+}
+
+func getValue(o interface{}) reflect.Value {
+	var ptr reflect.Value
+	var val reflect.Value
+
+	val = reflect.ValueOf(o)
+	// When we get a pointer, we want to get the value pointed to.
+	// Otherwise, we need to get a pointer to the value we got.
+	if val.Type().Kind() == reflect.Ptr {
+		ptr = val
+		val = ptr.Elem()
+	} else {
+		ptr = reflect.New(reflect.TypeOf(o))
+		temp := ptr.Elem()
+		temp.Set(val)
+		val = temp
+	}
+
+	return val
 }
