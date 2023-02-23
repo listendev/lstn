@@ -29,13 +29,13 @@ import (
 )
 
 func getBaseURLFromContext(ctx context.Context) (string, error) {
-	cfgOpts, ok := ctx.Value(pkgcontext.ConfigKey).(*flags.ConfigOptions)
+	cfg, ok := ctx.Value(pkgcontext.ConfigKey).(*flags.ConfigFlags)
 	if !ok {
 		return "", fmt.Errorf("couldn't obtain configuration options")
 	}
 	// Everything in the context has been already validated
 	// So we assume it's safe to do not validate it again
-	return cfgOpts.Endpoint, nil
+	return cfg.Endpoint, nil
 }
 
 func getAPIPrefix(baseURL string) string {
