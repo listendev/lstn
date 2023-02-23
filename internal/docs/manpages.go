@@ -57,6 +57,7 @@ func genManTreeFromOpts(c *cobra.Command, opts doc.GenManTreeOptions) error {
 		header = &doc.GenManHeader{}
 	}
 	for _, c := range c.Commands() {
+		// Exclude help topics
 		if !c.IsAvailableCommand() || c.IsAdditionalHelpTopicCommand() {
 			continue
 		}
