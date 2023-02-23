@@ -29,21 +29,21 @@ labels:
 
 rules:
   - name: docs-changes
-    spec: $hasFileExtensions([".md", ".txt"]) || $matchString("doc(s)?\/.+", $head()) || $matchString("^docs(\([A-Za-z0-9_\/]+\))??:.+$", $title())
+    spec: $hasFileExtensions([".md", ".txt"]) || $matchString("^doc(s)?\/.+", $head()) || $matchString("^docs(\([A-Za-z0-9_\/]+\))??:.+$", $title())
   - name: ci-changes
-    spec: $hasFilePattern(".github/**") || $hasFileName(".golangci.yml") || $hasFileName("reviewpad.yml") || $hasFileName(".goreleaser.yml") || $matchString("^ci(\([A-Za-z0-9_\/]+\))??:.+$", $title()) || $matchString("ci\/.+", $head())
+    spec: $hasFilePattern(".github/**") || $hasFileName(".golangci.yml") || $hasFileName("reviewpad.yml") || $hasFileName(".goreleaser.yml") || $matchString("^ci(\([A-Za-z0-9_\/]+\))??:.+$", $title()) || $matchString("^ci\/.+", $head())
   - name: deps-changes
-    spec: $hasFileName("go.mod") || $hasFileName("go.sum")
+    spec: $hasFileName("go.mod") || $hasFileName("go.sum") || $matchString("^build\(deps\)\/.+", $title())
   - name: feat-changes
-    spec: $matchString("(feat(ure)?|new)\/.+", $head()) || $matchString("^feat(\([A-Za-z0-9_\/]+\))??:.+$", $title())
+    spec: $matchString("^(feat(ure)?|new)\/.+", $head()) || $matchString("^feat(\([A-Za-z0-9_\/]+\))??:.+$", $title())
   - name: fix-changes
-    spec: $matchString("(fix|bug)\/.+", $head()) || $matchString("^fix(\([A-Za-z0-9_\/]+\))??:.+$", $title())
+    spec: $matchString("^(fix|bug)\/.+", $head()) || $matchString("^fix(\([A-Za-z0-9_\/]+\))??:.+$", $title())
   - name: breaking-changes
     spec: $matchString("^([A-Za-z0-9_]+)??(\([A-Za-z0-9_\/]+\))??!:.+$", $title())
   - name: exclude-changes
-    spec: $matchString("(chore|refactor|revert|perf|test)\/.+", $head()) || $matchString("^(chore|refactor|revert|perf|test)(\([A-Za-z0-9_\/]+\))??:.+$", $title())
+    spec: $matchString("^(chore|refactor|revert|perf|test)\/.+", $head()) || $matchString("^(chore|refactor|revert|perf|test)(\([A-Za-z0-9_\/]+\))??:.+$", $title())
   - name: build-changes
-    spec: $hasFilePattern("make/**") || $matchString("^build(\([A-Za-z0-9_\/]+\))??:.+$", $title()) || $matchString("build\/.+", $head())
+    spec: $hasFilePattern("make/**") || $matchString("^build(\([A-Za-z0-9_\/]+\))??:.+$", $title()) || $matchString("^build\/.+", $head())
 
 
 groups:

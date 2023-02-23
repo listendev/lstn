@@ -20,7 +20,7 @@ jobs:
           path-to-signatures: '.github/cla/signatures.json'
           path-to-document: 'https://github.com/listendev/lstn/blob/main/.github/cla/ICLA.md'
           branch: 'signatures' # must not be protected
-          # allowlist: jadoonf,leodido,fntlnz,didof
+          allowlist: dependabot*
           create-file-commit-message: 'docs: store CLA signature'
           signed-commit-message: 'chore: $contributorName has signed the CLA in #$pullRequestNo'
           # use-dco-flag: true # Set this to true if you want to use a dco instead of a CLA
