@@ -73,9 +73,9 @@ We recommend using binary installation. Using `go install` or `go get` might wor
 <details>
 <summary>Why?</summary>
 <ol>
-<li>Some users use the `-u` flag for `go get` which upgrades our dependencies: we can not guarantee they work!</li>
-<li>The `go.mod` replacement directive doesn't apply.</li>
-<li>The `lstn` stability may depend on a user's Go version.</li>
+<li>Some users use the <code>-u</code> flag for <code>go get</code> which upgrades our dependencies: we can not guarantee they work!</li>
+<li>The <code>go.mod</code> replacement directive doesn't apply.</li>
+<li>The <code>lstn</code> stability may depend on a user's Go version.</li>
 <li>It allows installation from the main branch which can't be considered stable.</li>
 <li>It is way slower than binary installation.</li>
 </ol>
