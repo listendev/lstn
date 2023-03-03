@@ -41,7 +41,7 @@ You can test the installation by running:
 lstn version
 ```
 
-### Local
+### Locally
 
 Wanna install `lstn` on your machine?
 
@@ -74,11 +74,11 @@ We recommend using binary installation. Using `go install` or `go get` might wor
 <summary>Why?</summary>
 <ol>
 <li>Some users use the `-u` flag for `go get` which upgrades our dependencies: we can not guarantee they work!</li>
-</ol>
 <li>The `go.mod` replacement directive doesn't apply.</li>
 <li>The `lstn` stability may depend on a user's Go version.</li>
 <li>It allows installation from the main branch which can't be considered stable.</li>
 <li>It is way slower than binary installation.</li>
+</ol>
 </details>
 
 ## Contributing
