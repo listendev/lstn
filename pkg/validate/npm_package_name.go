@@ -25,11 +25,23 @@ import (
 
 func isNpmPackageName(fl validator.FieldLevel) bool {
 	field := fl.Field()
+	// Do you want strict validation or not?
+	strict := false
+	switch fl.Param() {
+	case "strict":
+		strict = true
+	}
 
 	if field.Kind() == reflect.String {
 		valid, warnings, err := npmpackagename.Validate([]byte(field.String()))
-		if err == nil && len(warnings) == 0 {
-			return valid
+		if strict {
+			if err == nil && len(warnings) == 0 {
+				return valid
+			}
+		} else {
+			if err == nil {
+				return valid
+			}
 		}
 
 		return false
