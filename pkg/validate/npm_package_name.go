@@ -27,8 +27,7 @@ func isNpmPackageName(fl validator.FieldLevel) bool {
 	field := fl.Field()
 	// Do you want strict validation or not?
 	strict := false
-	switch fl.Param() {
-	case "strict":
+	if fl.Param() == "strict" {
 		strict = true
 	}
 
