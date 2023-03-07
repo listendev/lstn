@@ -22,6 +22,7 @@ import (
 	"path/filepath"
 
 	"github.com/go-git/go-billy/v5/util"
+	"github.com/listendev/lstn/pkg/cmd/options"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 )
 
@@ -65,8 +66,23 @@ func generatePackageLock(ctx context.Context, dir string) ([]byte, error) {
 	if err != nil {
 		return []byte{}, fmt.Errorf("couldn't read the package.json file")
 	}
-	if err := util.WriteFile(activeFS, filepath.Join(tmp, "package.json"), packageJSON, 0644); err != nil {
+	if writeErr := util.WriteFile(activeFS, filepath.Join(tmp, "package.json"), packageJSON, 0644); writeErr != nil {
 		return []byte{}, fmt.Errorf("couldn't copy the package.json file")
+	}
+
+	// Obtain the local options from the context
+	opts, err := options.GetFromContext(ctx, pkgcontext.InKey)
+	if err != nil {
+		return []byte{}, err
+	}
+	inOpts, ok := opts.(*options.In)
+	if !ok {
+		return []byte{}, fmt.Errorf("couldn't obtain options for the current subcommand")
+	}
+
+	// Set the custom registry
+	if inOpts.Registry != "" {
+		npmPackageLockOnly.Args = append(npmPackageLockOnly.Args, "--registry", inOpts.Registry)
 	}
 
 	// Generate the package-lock.json file
