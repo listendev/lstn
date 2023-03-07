@@ -26,6 +26,7 @@ import (
 )
 
 type In struct {
+	Registry string `name:"registry" flag:"registry" desc:"set a custom packages registry URL" validate:"omitempty,url"`
 	flags.JSONFlags
 	flags.ConfigFlags `flagset:"Config"`
 }
