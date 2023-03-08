@@ -81,7 +81,7 @@ func TestGetNPMPackageLockOnlyGt6x(t *testing.T) {
 
 	c, e := getNPMPackageLockOnly(context.Background())
 	assert.Nil(t, e)
-	assert.Equal(t, fmt.Sprintf("%s install --package-lock-only --no-audit", dstNPM), c.String())
+	assert.Equal(t, fmt.Sprintf("%s install --package-lock-only --no-audit --ignore-scripts", dstNPM), c.String())
 }
 
 func TestGetNPMPackageLockOnlyLt6x(t *testing.T) {
@@ -144,7 +144,7 @@ func TestGetNPMPackageLockOnlyFromNVMNoUseGt6x(t *testing.T) {
 	assert.Len(t, c.Args, 3)
 	assert.True(t, strings.HasSuffix(c.Path, "bash"))
 	assert.Contains(t, c.Args[1], "-c")
-	assert.Equal(t, fmt.Sprintf("source %s/nvm.sh --no-use && npm install --package-lock-only --no-audit", binDir), strings.Join(c.Args[2:], " "))
+	assert.Equal(t, fmt.Sprintf("source %s/nvm.sh --no-use && npm install --package-lock-only --no-audit --ignore-scripts", binDir), strings.Join(c.Args[2:], " "))
 }
 
 func TestGetNPMPackageLockOnlyFromNVMGt6x(t *testing.T) {
@@ -165,7 +165,7 @@ func TestGetNPMPackageLockOnlyFromNVMGt6x(t *testing.T) {
 	assert.Len(t, c.Args, 3)
 	assert.True(t, strings.HasSuffix(c.Path, "bash"))
 	assert.Contains(t, c.Args[1], "-c")
-	assert.Equal(t, fmt.Sprintf("source %s/nvm.sh && npm install --package-lock-only --no-audit", binDir), strings.Join(c.Args[2:], " "))
+	assert.Equal(t, fmt.Sprintf("source %s/nvm.sh && npm install --package-lock-only --no-audit --ignore-scripts", binDir), strings.Join(c.Args[2:], " "))
 }
 
 func TestGetNPMPackageLockOnlyFromNVMLt6x(t *testing.T) {
