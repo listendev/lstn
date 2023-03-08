@@ -100,7 +100,7 @@ func getNPMPackageLockOnly(ctx context.Context) (*exec.Cmd, error) {
 		return nil, err
 	}
 
-	npmPackageLockOnlyCmd := exec.CommandContext(ctx, npm.Path, append(npm.Args[1:], "install", "--package-lock-only", "--no-audit")...)
+	npmPackageLockOnlyCmd := exec.CommandContext(ctx, npm.Path, append(npm.Args[1:], "install", "--package-lock-only", "--no-audit", "--ignore-scripts")...)
 
 	return npmPackageLockOnlyCmd, nil
 }
@@ -129,7 +129,7 @@ func getNPMPackageLockOnlyFromNVM(ctx context.Context) (*exec.Cmd, error) {
 	}
 
 	npmPackageLockOnlyCmd := exec.CommandContext(ctx, npm.Path, npm.Args[1:]...)
-	npmPackageLockOnlyCmd.Args[2] += " install --package-lock-only --no-audit"
+	npmPackageLockOnlyCmd.Args[2] += " install --package-lock-only --no-audit --ignore-scripts"
 
 	return npmPackageLockOnlyCmd, nil
 }
