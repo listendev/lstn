@@ -1,0 +1,38 @@
+name: linting
+
+on:
+  push:
+    paths:
+      - "**.bash"
+      - "**.sh"
+    branches: ['main']
+  pull_request:
+    paths:
+      - "**.bash"
+      - "**.sh"
+    branches: ['main']
+
+jobs:
+  shellcheck:
+    name: "shell"
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        shell:
+          - sh
+          - dash
+          - bash
+          - ksh
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Run shellcheck
+        uses: reviewdog/action-shellcheck@v1.17.0
+        env:
+          reporter: github-pr-review
+          pattern: |
+            *.sh
+            *.bash
+          fail_on_error: true

@@ -19,6 +19,7 @@ permissions:
 
 jobs:
   lint:
+    name: "go"
     runs-on: ubuntu-latest
 
     steps:
