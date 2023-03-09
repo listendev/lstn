@@ -76,12 +76,6 @@ The verdicts it returns are listed by the name of each package and its specified
 			if err != nil {
 				return fmt.Errorf("couldn't get to know on which directory you want me to listen in")
 			}
-			// Check that the target directory contains a package.json file
-			packageJSONErrors := validate.Singleton.Var(filepath.Join(targetDir, "package.json"), "file")
-			// NOTE > In the future, we can try to detect other package managers here rather than erroring out
-			if packageJSONErrors != nil {
-				return fmt.Errorf("couldn't find a package.json in %s", targetDir)
-			}
 
 			// Unmarshal the package-lock.json file contents to a struct
 			packageLockJSON, err := npm.NewPackageLockJSONFromDir(ctx, targetDir)
@@ -169,6 +163,15 @@ func validateInArgs(c *cobra.Command, args []string) error {
 	if errs := validate.Singleton.Var(args[0], "dir"); errs != nil {
 		return fmt.Errorf("requires the argument to be an existing directory")
 	}
+
+	// Check that the target directory contains a package.json file
+	packageJSONErrors := validate.Singleton.Var(filepath.Join(args[0], "package.json"), "file")
+	// NOTE > In the future, we can try to detect other package managers here rather than erroring out
+	if packageJSONErrors != nil {
+		return fmt.Errorf("couldn't find a package.json in %s", args[0])
+	}
+
+	// TODO: check whether the package.json contains packageManager field
 
 	return nil
 }
