@@ -19,6 +19,7 @@ import (
 	"context"
 	"os"
 
+	"github.com/google/uuid"
 	"github.com/listendev/lstn/pkg/git"
 	"github.com/listendev/lstn/pkg/npm"
 	lstnos "github.com/listendev/lstn/pkg/os"
@@ -26,6 +27,7 @@ import (
 )
 
 type Context struct {
+	ID      uuid.UUID         `json:"id"`
 	Version version.Version   `json:"version"`
 	Git     *git.Context      `json:"git,omitempty"`
 	OS      *lstnos.Info      `json:"os,omitempty"`
@@ -33,7 +35,9 @@ type Context struct {
 }
 
 func NewContext(funcs ...git.GetDirFunc) *Context {
-	ret := &Context{}
+	ret := &Context{
+		ID: uuid.New(),
+	}
 
 	ret.Version = version.Get()
 	ret.OS, _ = lstnos.NewInfo()
