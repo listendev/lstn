@@ -86,7 +86,7 @@ func PackageTriple(c *cobra.Command, args []string) error {
 					}
 				}
 				// Store all of its versions matching the constraints
-				c.SetContext(context.WithValue(c.Context(), pkgcontext.ToVersionListKey, matching))
+				c.SetContext(context.WithValue(c.Context(), pkgcontext.VersionsCollection, matching))
 			}
 			defer body.Close()
 		}

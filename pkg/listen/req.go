@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/Masterminds/semver/v3"
 	"github.com/listendev/lstn/pkg/npm"
 	"github.com/listendev/lstn/pkg/validate"
 )
@@ -71,6 +72,25 @@ func NewVerdictsRequest(args []string) (*VerdictsRequest, error) {
 	}
 
 	return fillVerdictsRequest(ret, args)
+}
+
+func NewVerdictsRequestsFromVersionCollection(args []string, versions semver.Collection) ([]*VerdictsRequest, error) {
+	c := NewContext()
+
+	reqs := make([]*VerdictsRequest, len(versions))
+	for i, v := range versions {
+		inputs := []string{args[0], v.String()}
+		if len(args) > 2 {
+			inputs = append(inputs, args[2])
+		}
+		var reqErr error
+		reqs[i], reqErr = NewVerdictsRequestWithContext(inputs, c)
+		if reqErr != nil {
+			return nil, reqErr
+		}
+	}
+
+	return reqs, nil
 }
 
 func (req VerdictsRequest) IsRequest() bool {
