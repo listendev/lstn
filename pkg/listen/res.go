@@ -31,7 +31,7 @@ type Package struct {
 	Name     string    `json:"name"`
 	Version  string    `json:"version"`
 	Shasum   string    `json:"shasum"`
-	Verdicts []Verdict `json:"verdicts,omitempty"`
+	Verdicts []Verdict `json:"verdicts"`
 	Problems []Problem `json:"problems,omitempty"`
 }
 
