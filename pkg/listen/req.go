@@ -44,7 +44,6 @@ func fillVerdictsRequest(r *VerdictsRequest, args []string) (*VerdictsRequest, e
 
 		fallthrough
 	case 2:
-		// TODO: resolve version here?
 		r.Version = args[1]
 
 		fallthrough

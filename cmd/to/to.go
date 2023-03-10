@@ -21,14 +21,14 @@ import (
 	"os"
 	"runtime"
 
+	"github.com/Masterminds/semver/v3"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/listendev/lstn/internal/project"
+	"github.com/listendev/lstn/pkg/cmd/arguments"
 	"github.com/listendev/lstn/pkg/cmd/groups"
 	"github.com/listendev/lstn/pkg/cmd/options"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/listen"
-	"github.com/listendev/lstn/pkg/npm"
-	"github.com/listendev/lstn/pkg/validate"
 	"github.com/spf13/cobra"
 )
 
@@ -38,7 +38,7 @@ var (
 
 func New(ctx context.Context) (*cobra.Command, error) {
 	var toCmd = &cobra.Command{
-		Use:                   "to <name> [version] [shasum]",
+		Use:                   "to <name> [[version] [shasum] | [version constraint]]",
 		GroupID:               groups.Core.ID,
 		DisableFlagsInUseLine: true,
 		Short:                 "Get the verdicts of a package",
@@ -49,10 +49,18 @@ Using this command, you can audit a single package version or all the versions o
 Specifying the package name is mandatory.
 
 It lists out the verdicts of all the versions of the input package name.`,
-		Example: `  lstn to chalk
-  lstn to debug 4.3.4`,
-		Args:              validateInArgs, // Executes before RunE
-		ValidArgsFunction: activeHelpIn,
+		Example: `  # Get the verdicts for all the chalk versions that listen.dev owns
+  lstn to chalk
+  lstn to debug 4.3.4
+  lstn to react 18.0.0 b468736d1f4a5891f38585ba8e8fb29f91c3cb96
+
+  # Get the verdicts for all the existing chalk versions
+  lstn to chalk "*"
+  lstn to nock "~13.2"
+  lstn to tap "^16.3.4"
+  lstn to prettier ">=2.7.0 <=3.0.0"`,
+		Args:              arguments.PackageTriple, // Executes before RunE
+		ValidArgsFunction: arguments.PackageTripleActiveHelp,
 		Annotations: map[string]string{
 			"source": project.GetSourceURL(filename),
 		},
@@ -66,21 +74,47 @@ It lists out the verdicts of all the versions of the input package name.`,
 			}
 			toOpts, ok := opts.(*options.To)
 			if !ok {
-				return fmt.Errorf("couldn't obtain options for the current subcommand")
+				return fmt.Errorf("couldn't obtain options for the current child command")
 			}
 
-			// Query for the package verdicts
-			req, err := listen.NewVerdictsRequest(args)
-			if err != nil {
-				return err
+			var res *listen.Response
+			var resJSON []byte
+			var resErr error
+
+			versions, multiple := ctx.Value(pkgcontext.VersionsCollection).(semver.Collection)
+			if multiple {
+				// Create list of verdicts requests
+				reqs, err := listen.NewVerdictsRequestsFromVersionCollection(args, versions)
+				if err != nil {
+					return err
+				}
+				// spew.Dump(reqs)
+
+				// Query for verdicts about specific package versions...
+
+				res, resJSON, resErr = listen.BulkPackages(reqs, listen.WithContext(ctx), listen.WithJSONOptions(toOpts.JSONFlags))
+
+				goto EXIT
 			}
 
-			res, resJSON, err := listen.Packages(
-				req,
-				listen.WithContext(ctx),
-				listen.WithJSONOptions(toOpts.JSONFlags),
-			)
-			if err != nil {
+			// Query for one single package version...
+			// Or for all the package versions listen.dev owns of the target package
+			{
+				// New block so it's safe to skip variable declarations
+				req, err := listen.NewVerdictsRequest(args)
+				if err != nil {
+					return err
+				}
+
+				res, resJSON, resErr = listen.Packages(
+					req,
+					listen.WithContext(ctx),
+					listen.WithJSONOptions(toOpts.JSONFlags),
+				)
+			}
+
+		EXIT:
+			if resErr != nil {
 				return err
 			}
 
@@ -111,69 +145,4 @@ It lists out the verdicts of all the versions of the input package name.`,
 	toCmd.SetContext(ctx)
 
 	return toCmd, nil
-}
-
-func validateInArgs(c *cobra.Command, args []string) error {
-	if err := cobra.MinimumNArgs(1)(c, args); err != nil {
-		return fmt.Errorf("requires at least 1 arg (package name)")
-	}
-	if err := cobra.RangeArgs(1, 3)(c, args); err != nil {
-		return err
-	}
-
-	all := []error{}
-	switch len(args) {
-	case 3:
-		// Validate third argument is a shasum
-		if err := validate.Singleton.Var(args[2], "shasum"); err != nil {
-			all = append(all, fmt.Errorf("%s is not a valid shasum", args[2]))
-		}
-
-		fallthrough
-	case 2:
-		// Validate second argument is a valid semver version
-		if err := validate.Singleton.Var(args[1], "semver"); err != nil {
-			all = append(all, fmt.Errorf("%s is not a valid semantic version", args[1]))
-		}
-
-		fallthrough
-	case 1:
-		// Validate first argument is a valid package name
-		if err := validate.Singleton.Var(args[0], "npm_package_name"); err != nil {
-			all = append(all, fmt.Errorf("%s is not a valid npm package name", args[0]))
-		} else if _, err := npm.GetFromRegistry(c.Context(), args[0], ""); err != nil {
-			all = append(all, fmt.Errorf("package %s doesn't exist on npm", args[0]))
-		}
-	}
-
-	// Format errors (if any)
-	if len(all) > 0 {
-		ret := "invalid arguments"
-		for _, e := range all {
-			ret += "\n       "
-			ret += e.Error()
-		}
-
-		return fmt.Errorf(ret)
-	}
-
-	return nil
-}
-
-// TODO(leodido) > Double-check it's working.
-func activeHelpIn(c *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	var comps []string
-
-	switch len(args) {
-	case 0:
-		comps = cobra.AppendActiveHelp(comps, "Provide a package name")
-	case 1:
-		comps = cobra.AppendActiveHelp(comps, fmt.Sprintf("Provide the version of package %s or just execute the command like it is now", args[0]))
-	case 2:
-		comps = cobra.AppendActiveHelp(comps, fmt.Sprintf("Provide the shasum of package %s@%s or just execute the command like it is now", args[0], args[1]))
-	default:
-		comps = cobra.AppendActiveHelp(comps, "This command does not take any more arguments")
-	}
-
-	return comps, cobra.ShellCompDirectiveFilterDirs
 }
