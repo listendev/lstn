@@ -21,11 +21,12 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/davecgh/go-spew/spew"
+	"github.com/cli/cli/pkg/iostreams"
 	"github.com/listendev/lstn/internal/project"
 	"github.com/listendev/lstn/pkg/cmd/arguments"
 	"github.com/listendev/lstn/pkg/cmd/groups"
 	"github.com/listendev/lstn/pkg/cmd/options"
+	"github.com/listendev/lstn/pkg/cmd/packagesprinter"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/listendev/lstn/pkg/npm"
@@ -88,6 +89,8 @@ The verdicts it returns are listed by the name of each package and its specified
 				return err
 			}
 
+			io := c.Context().Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
+
 			res, resJSON, err := listen.Packages(
 				req,
 				listen.WithContext(ctx),
@@ -101,12 +104,11 @@ The verdicts it returns are listed by the name of each package and its specified
 				fmt.Fprintf(os.Stdout, "%s", resJSON)
 			}
 
-			if res != nil {
-				spew.Dump(res)
-				// TODO > create visualization of the results
+			if res == nil {
+				return nil
 			}
 
-			return nil
+			return packagesprinter.PrintTable(io, res)
 		},
 	}
 

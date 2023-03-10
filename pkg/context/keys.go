@@ -49,3 +49,6 @@ var VersionLongKey contextKey = "version_long"
 
 // RegistryKey is the key indexing the registry flags values.
 var RegistryKey contextKey = "registry"
+
+// IOStreamsKey is the key storing the IOStreams (stdout, stderr, stdin).
+var IOStreamsKey contextKey = "iostreams"
