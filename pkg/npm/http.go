@@ -17,12 +17,16 @@ package npm
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"sort"
 
+	"github.com/Masterminds/semver/v3"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/ua"
+	"golang.org/x/exp/maps"
 )
 
 const npmRegistryBaseURL = "https://registry.npmjs.org"
@@ -56,4 +60,40 @@ func GetFromRegistry(ctx context.Context, name, version string) (io.ReadCloser, 
 	}
 
 	return res.Body, nil
+}
+
+func GetVersionsFromRegistry(ctx context.Context, name string) (semver.Collection, error) {
+	body, err := GetFromRegistry(ctx, name, "")
+	if err != nil {
+		return nil, fmt.Errorf("package %s doesn't exist on npm", name)
+	}
+	defer body.Close()
+
+	return GetVersionsFromRegistryResponse(body)
+}
+
+func GetVersionsFromRegistryResponse(body io.ReadCloser) (semver.Collection, error) {
+	type response struct {
+		Name     string                 `json:"name"`
+		Versions map[string]interface{} `json:"versions"`
+	}
+	res := &response{}
+
+	if err := json.NewDecoder(body).Decode(&res); err != nil {
+		return nil, fmt.Errorf("couldn't decode the registry response")
+	}
+
+	raw := maps.Keys(res.Versions)
+
+	versions := make(semver.Collection, len(raw))
+	for i, r := range raw {
+		v, err := semver.NewVersion(r)
+		if err != nil {
+			return nil, fmt.Errorf("couln't parse version %s for package %s", r, res.Name)
+		}
+		versions[i] = v
+	}
+	sort.Sort(versions)
+
+	return versions, nil
 }
