@@ -181,15 +181,15 @@ func BulkPackages(requests []*VerdictsRequest, opts ...func(*options)) (*Respons
 	}
 
 	cb := func(req *VerdictsRequest) returnWrap {
-		dec, res, err := request(req, o, endpointURL, userAgent)
-		if err != nil {
-			return returnWrap{nil, err}
+		dec, res, reqErr := request(req, o, endpointURL, userAgent)
+		if reqErr != nil {
+			return returnWrap{nil, reqErr}
 		}
 		defer res.Body.Close()
 
 		ret := Response{}
-		if err := dec.Decode(&ret); err != nil {
-			return returnWrap{nil, err}
+		if decodeErr := dec.Decode(&ret); decodeErr != nil {
+			return returnWrap{nil, decodeErr}
 		}
 
 		// It's impossible to have more that one Package in every Response (a list of Package items) in this case
