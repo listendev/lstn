@@ -84,9 +84,9 @@ It lists out the verdicts of all the versions of the input package name.`,
 			versions, multiple := ctx.Value(pkgcontext.VersionsCollection).(semver.Collection)
 			if multiple {
 				// Create list of verdicts requests
-				reqs, err := listen.NewVerdictsRequestsFromVersionCollection(args, versions)
-				if err != nil {
-					return err
+				reqs, multipleErr := listen.NewVerdictsRequestsFromVersionCollection(args, versions)
+				if multipleErr != nil {
+					return multipleErr
 				}
 				// spew.Dump(reqs)
 
@@ -101,9 +101,9 @@ It lists out the verdicts of all the versions of the input package name.`,
 			// Or for all the package versions listen.dev owns of the target package
 			{
 				// New block so it's safe to skip variable declarations
-				req, err := listen.NewVerdictsRequest(args)
-				if err != nil {
-					return err
+				req, reqErr := listen.NewVerdictsRequest(args)
+				if reqErr != nil {
+					return reqErr
 				}
 
 				res, resJSON, resErr = listen.Packages(
