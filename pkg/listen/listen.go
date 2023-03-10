@@ -21,8 +21,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"runtime"
 	"strings"
 
+	"github.com/XANi/goneric"
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/ua"
@@ -68,18 +70,32 @@ func getEndpointURLFromContext[T any](r T, o *options) (string, error) {
 	return fmt.Sprintf("%s%s/%s", o.baseURL, getAPIPrefix(o.baseURL), segment), nil
 }
 
-func Packages[T Request](r T, opts ...func(*options)) (*Response, []byte, error) {
-	o, err := newOptions(opts...)
-	if err != nil {
+func response(dec *json.Decoder, o *options) (*Response, []byte, error) {
+	// Unmarshal the JSON body into a Response
+	target := &Response{}
+	if err := dec.Decode(target); err != nil {
 		return nil, nil, pkgcontext.OutputError(o.ctx, err)
 	}
 
-	// Obtain the endpoint base URL
-	endpointURL, err := getEndpointURLFromContext(r, o)
-	if err != nil {
-		return nil, nil, pkgcontext.OutputError(o.ctx, err)
+	if o.json.IsJSON() {
+		allJSON := new(bytes.Buffer)
+		if err := json.NewEncoder(allJSON).Encode(target); err != nil {
+			return nil, nil, pkgcontext.OutputError(o.ctx, fmt.Errorf("couldn't JSON encode the response"))
+		}
+
+		// Eventually filter the JSON
+		out := new(bytes.Buffer)
+		if err := o.json.GetOutput(o.ctx, allJSON, out); err != nil {
+			return nil, nil, pkgcontext.OutputError(o.ctx, err)
+		}
+
+		return nil, out.Bytes(), nil
 	}
 
+	return target, nil, nil
+}
+
+func request[T Request](r T, o *options, endpointURL, userAgent string) (*json.Decoder, *http.Response, error) {
 	// Prepare the request
 	pl, err := json.Marshal(r)
 	if err != nil {
@@ -91,7 +107,11 @@ func Packages[T Request](r T, opts ...func(*options)) (*Response, []byte, error)
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
-	req.Header.Set("User-Agent", ua.Generate(true))
+	// Automatically generate user agent
+	if userAgent == "" {
+		userAgent = ua.Generate(true)
+	}
+	req.Header.Set("User-Agent", userAgent)
 
 	// Send the request
 	client := http.Client{}
@@ -99,7 +119,6 @@ func Packages[T Request](r T, opts ...func(*options)) (*Response, []byte, error)
 	if err != nil {
 		return nil, nil, pkgcontext.OutputError(o.ctx, err)
 	}
-	defer res.Body.Close()
 
 	dec := json.NewDecoder(res.Body)
 
@@ -113,24 +132,102 @@ func Packages[T Request](r T, opts ...func(*options)) (*Response, []byte, error)
 		return nil, nil, pkgcontext.OutputErrorf(o.ctx, err, target.Message)
 	}
 
-	return response(dec, res, o)
+	return dec, res, nil
 }
 
-func response(dec *json.Decoder, res *http.Response, o *options) (*Response, []byte, error) {
+func Packages[T Request](r T, opts ...func(*options)) (*Response, []byte, error) {
+	o, err := newOptions(opts...)
+	if err != nil {
+		return nil, nil, pkgcontext.OutputError(o.ctx, err)
+	}
+
+	endpointURL, err := getEndpointURLFromContext(r, o)
+	if err != nil {
+		return nil, nil, pkgcontext.OutputError(o.ctx, err)
+	}
+
+	dec, res, err := request(r, o, endpointURL, "")
+	if err != nil {
+		return nil, nil, err
+	}
+	defer res.Body.Close()
+
+	return response(dec, o)
+}
+
+func BulkPackages(requests []*VerdictsRequest, opts ...func(*options)) (*Response, []byte, error) {
+	o, err := newOptions(opts...)
+	if err != nil {
+		return nil, nil, pkgcontext.OutputError(o.ctx, err)
+	}
+
+	numPackages := len(requests)
+	if numPackages == 0 {
+		return nil, nil, pkgcontext.OutputError(o.ctx, fmt.Errorf("empty requests set"))
+	}
+
+	// TODO: validate that all requests are ok
+
+	endpointURL, err := getEndpointURLFromContext(requests[0], o)
+	if err != nil {
+		return nil, nil, pkgcontext.OutputError(o.ctx, err)
+	}
+
+	userAgent := ua.Generate(true)
+
+	type returnWrap struct {
+		res *Package
+		err error
+	}
+
+	cb := func(req *VerdictsRequest) returnWrap {
+		dec, res, err := request(req, o, endpointURL, userAgent)
+		if err != nil {
+			return returnWrap{nil, err}
+		}
+		defer res.Body.Close()
+
+		ret := Response{}
+		if err := dec.Decode(&ret); err != nil {
+			return returnWrap{nil, err}
+		}
+
+		// It's impossible to have more that one Package in every Response (a list of Package items) in this case
+		// Why? Because every VerdictsRequest contains an exact pacakge version
+		// So we only grab the first element of the Response
+		return returnWrap{&ret[0], nil}
+	}
+
+	returns := goneric.ParallelMapSlice(cb, runtime.NumCPU(), requests)
+
+	numReturns := len(returns)
+	if numReturns != numPackages {
+		return nil, nil, pkgcontext.OutputError(o.ctx, fmt.Errorf("wrong number of responses: %d responses for %d requests", numReturns, numPackages))
+	}
+
+	res := []Package{}
+	for _, ret := range returns {
+		if ret.err == nil {
+			res = append(res, *ret.res)
+		} else {
+			return nil, nil, pkgcontext.OutputError(o.ctx, err)
+		}
+	}
 	if o.json.IsJSON() {
-		// Eventually return as JSON
+		allJSON := new(bytes.Buffer)
+		if err := json.NewEncoder(allJSON).Encode(res); err != nil {
+			return nil, nil, pkgcontext.OutputError(o.ctx, fmt.Errorf("couldn't JSON encode the response"))
+		}
+
+		// Eventually filter the JSON
 		out := new(bytes.Buffer)
-		if err := o.json.GetOutput(o.ctx, res.Body, out); err != nil {
+		if err := o.json.GetOutput(o.ctx, allJSON, out); err != nil {
 			return nil, nil, pkgcontext.OutputError(o.ctx, err)
 		}
 
 		return nil, out.Bytes(), nil
 	}
-	// Alternatively, unmarshal the JSON body into a Response
-	target := &Response{}
-	if err := dec.Decode(target); err != nil {
-		return nil, nil, pkgcontext.OutputError(o.ctx, err)
-	}
+	cast := (Response)(res)
 
-	return target, nil, nil
+	return &cast, nil, nil
 }
