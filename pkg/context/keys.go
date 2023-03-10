@@ -29,6 +29,9 @@ var InKey contextKey = "in"
 // ToKey is the key indexing the options for the `to` child command.
 var ToKey contextKey = "to"
 
+// VersionsCollection is the key indexing a versions collection.
+var VersionsCollection contextKey = "versionscollection"
+
 // VersionKey is the key indexing the options for the `version` child command.
 var VersionKey contextKey = "version"
 
