@@ -23,6 +23,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cli/cli/pkg/iostreams"
 	"github.com/listendev/lstn/cmd/in"
 	"github.com/listendev/lstn/cmd/scan"
 	"github.com/listendev/lstn/cmd/to"
@@ -151,6 +152,9 @@ func New(ctx context.Context) (*Command, error) {
 			var cancel context.CancelFunc
 			ctx, cancel = context.WithTimeout(c.Context(), time.Second*time.Duration(cfgOpts.Timeout))
 			ctx = context.WithValue(ctx, pkgcontext.ContextCancelFuncKey, cancel)
+
+			io := iostreams.System()
+			ctx = context.WithValue(ctx, pkgcontext.IOStreamsKey, io)
 			c.SetContext(ctx)
 
 			return nil
