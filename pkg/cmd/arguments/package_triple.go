@@ -69,26 +69,28 @@ func PackageTriple(c *cobra.Command, args []string) error {
 		if err := validate.Singleton.Var(args[0], "npm_package_name"); err != nil {
 			// Check the first argument is a valid package name
 			all = append(all, fmt.Errorf("%s is not a valid npm package name", args[0]))
-		} else if body, err := npm.GetFromRegistry(c.Context(), args[0], ""); err != nil {
-			// Also check such a package actually exists on the registry
-			all = append(all, fmt.Errorf("package %s doesn't exist on npm", args[0]))
-			defer body.Close()
 		} else {
-			// Now that we know the package exists on the registry...
-			if versions, err := npm.GetVersionsFromRegistryResponse(body); err != nil {
-				return err
-			} else if constraints != nil {
-				// Apply the constraints we got from the previous argument
-				var matching semver.Collection
-				for _, v := range versions {
-					if constraints.Check(v) {
-						matching = append(matching, v)
+			body, err := npm.GetFromRegistry(c.Context(), args[0], "")
+			if err != nil {
+				// Also check such a package actually exists on the registry
+				all = append(all, fmt.Errorf("package %s doesn't exist on npm", args[0]))
+			} else {
+				// Now that we know the package exists on the registry...
+				if versions, err := npm.GetVersionsFromRegistryResponse(body); err != nil {
+					return err
+				} else if constraints != nil {
+					// Apply the constraints we got from the previous argument
+					var matching semver.Collection
+					for _, v := range versions {
+						if constraints.Check(v) {
+							matching = append(matching, v)
+						}
 					}
+					// Store all of its versions matching the constraints
+					c.SetContext(context.WithValue(c.Context(), pkgcontext.VersionsCollection, matching))
 				}
-				// Store all of its versions matching the constraints
-				c.SetContext(context.WithValue(c.Context(), pkgcontext.VersionsCollection, matching))
 			}
-			defer body.Close()
+			body.Close()
 		}
 	}
 
