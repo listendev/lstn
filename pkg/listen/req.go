@@ -36,28 +36,41 @@ type VerdictsRequest struct {
 	Context *Context `json:"context,omitempty"`
 }
 
-func NewVerdictsRequest(args []string) (*VerdictsRequest, error) {
-	ret := &VerdictsRequest{
-		Context: NewContext(),
-	}
-
+func fillVerdictsRequest(r *VerdictsRequest, args []string) (*VerdictsRequest, error) {
 	switch len(args) {
 	case 3:
-		ret.Shasum = args[2]
+		r.Shasum = args[2]
 
 		fallthrough
 	case 2:
-		ret.Version = args[1]
+		// TODO: resolve version here?
+		r.Version = args[1]
 
 		fallthrough
 	case 1:
-		ret.Name = args[0]
+		r.Name = args[0]
 
 	default:
 		return nil, fmt.Errorf("a verdicts request requires at least one argument (package name)")
 	}
 
-	return ret, nil
+	return r, nil
+}
+
+func NewVerdictsRequestWithContext(args []string, c *Context) (*VerdictsRequest, error) {
+	ret := &VerdictsRequest{
+		Context: c,
+	}
+
+	return fillVerdictsRequest(ret, args)
+}
+
+func NewVerdictsRequest(args []string) (*VerdictsRequest, error) {
+	ret := &VerdictsRequest{
+		Context: NewContext(),
+	}
+
+	return fillVerdictsRequest(ret, args)
 }
 
 func (req VerdictsRequest) IsRequest() bool {
