@@ -13,6 +13,7 @@ require (
 	github.com/go-playground/mold/v4 v4.2.0
 	github.com/go-playground/universal-translator v0.18.0
 	github.com/go-playground/validator/v10 v10.11.1
+	github.com/google/uuid v1.1.2
 	github.com/imdario/mergo v0.3.13
 	github.com/itchyny/gojq v0.12.11
 	github.com/leodido/go-npmpackagename v0.2.0
