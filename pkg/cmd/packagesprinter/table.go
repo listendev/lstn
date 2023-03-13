@@ -75,11 +75,10 @@ func printVerdict(out io.Writer, cs *iostreams.ColorScheme, p listen.Package, ve
 	}
 	fmt.Fprintln(out, "")
 	printVerdictMetadata(out, cs, verdict.Metadata)
-	fmt.Fprintln(out, "")
 }
 
 func printProblem(out io.Writer, cs *iostreams.ColorScheme, p listen.Package, problem listen.Problem) {
-	fmt.Fprintf(out, "  - %s %s", cs.Yellow(fmt.Sprintf("[%s]", problem.Title)), problem.Type)
+	fmt.Fprintf(out, "  %s: %s", cs.Yellow(fmt.Sprintf("- %s", problem.Title)), cs.Gray(problem.Type))
 	fmt.Fprintln(out, "")
 }
 
@@ -108,6 +107,7 @@ func printPackages(out io.Writer, cs *iostreams.ColorScheme, packages *listen.Re
 		for _, problem := range p.Problems {
 			printProblem(out, cs, p, problem)
 		}
+		fmt.Fprintln(out, "")
 	}
 
 }
