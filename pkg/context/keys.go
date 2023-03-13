@@ -32,6 +32,9 @@ var ToKey contextKey = "to"
 // VersionsCollection is the key indexing a versions collection.
 var VersionsCollection contextKey = "versionscollection"
 
+// ScanKey is the key indexing the options for the `scan` child command.
+var ScanKey contextKey = "scan"
+
 // VersionKey is the key indexing the options for the `version` child command.
 var VersionKey contextKey = "version"
 
