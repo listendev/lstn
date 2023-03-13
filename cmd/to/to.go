@@ -84,6 +84,9 @@ It lists out the verdicts of all the versions of the input package name.`,
 			var resJSON []byte
 			var resErr error
 
+			io := c.Context().Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
+			io.StartProgressIndicator()
+
 			versions, multiple := ctx.Value(pkgcontext.VersionsCollection).(semver.Collection)
 			if multiple {
 				nv := len(versions)
@@ -126,7 +129,6 @@ It lists out the verdicts of all the versions of the input package name.`,
 				return err
 			}
 
-			io := c.Context().Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
 			if resJSON != nil {
 				fmt.Fprintf(io.Out, "%s", resJSON)
 			}
