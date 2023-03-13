@@ -185,3 +185,125 @@ func TestTablePrinter_printProblem(t *testing.T) {
 		})
 	}
 }
+
+func TestTablePrinter_printPackage(t *testing.T) {
+	tests := []struct {
+		name           string
+		p              *listen.Package
+		expectedOutput string
+	}{
+		{
+			name: "package with no problems or verdicts gives this information along with the package name and version",
+			p: &listen.Package{
+				Name:     "my-package",
+				Version:  "1.0.0",
+				Verdicts: []listen.Verdict{},
+				Problems: []listen.Problem{},
+			},
+			expectedOutput: "There are 0 verdicts and 0 problems for my-package@1.0.0\n\n\n",
+		},
+		{
+			name: "package with a single verdict prints the verdict",
+			p: &listen.Package{
+				Name:    "my-package",
+				Version: "1.0.0",
+				Verdicts: []listen.Verdict{
+					{
+						Message:  "unexpected outbound connection destination",
+						Priority: "high",
+						Metadata: map[string]interface{}{
+							"commandline":      "/usr/local/bin/node",
+							"file_descriptor:": "10.0.2.100:47326->142.251.111.128:0",
+							"server_ip":        "142.251.111.128",
+							"executable_path":  "/usr/local/bin/node",
+						},
+					},
+				},
+				Problems: []listen.Problem{},
+			},
+			expectedOutput: "There is 1 verdict and 0 problems for my-package@1.0.0\n\n  [high] unexpected outbound connection destination\n    commandline: /usr/local/bin/node\n    executable_path: /usr/local/bin/node\n    file_descriptor:: 10.0.2.100:47326->142.251.111.128:0\n    server_ip: 142.251.111.128\n\n",
+		},
+		{
+			name: "package with verdicts prints the verdicts recognizing transient dependencies",
+			p: &listen.Package{
+				Name:    "my-package",
+				Version: "1.0.0",
+				Verdicts: []listen.Verdict{
+					{
+						Message:  "npm spawned a child process",
+						Priority: "high",
+						Metadata: map[string]interface{}{
+							"npm_package_name":    "react",
+							"npm_package_version": "0.18.0",
+							"parent_name":         "node",
+							"executable_path":     "/bin/sh",
+							"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
+							"server_ip":           "",
+						},
+					},
+					{
+						Message:  "unexpected outbound connection destination",
+						Priority: "high",
+						Metadata: map[string]interface{}{
+							"commandline":      "/usr/local/bin/node",
+							"file_descriptor:": "10.0.2.100:47326->142.251.111.128:0",
+							"server_ip":        "142.251.111.128",
+							"executable_path":  "/usr/local/bin/node",
+						},
+					},
+				},
+				Problems: []listen.Problem{},
+			},
+			expectedOutput: "There are 2 verdicts and 0 problems for my-package@1.0.0\n\n  [high] npm spawned a child process (from transitive dependency react@0.18.0)\n    commandline: sh -c  node -e \"try{require('./_postinstall')}catch(e){}\" || exit 0\n    executable_path: /bin/sh\n    parent_name: node\n  [high] unexpected outbound connection destination\n    commandline: /usr/local/bin/node\n    executable_path: /usr/local/bin/node\n    file_descriptor:: 10.0.2.100:47326->142.251.111.128:0\n    server_ip: 142.251.111.128\n\n",
+		},
+		{
+			name: "package with a single problem prints the problem",
+			p: &listen.Package{
+				Name:     "my-package",
+				Version:  "1.0.0",
+				Verdicts: []listen.Verdict{},
+				Problems: []listen.Problem{
+					{
+						Type:   "https://listen.dev/probs/invalid-name",
+						Title:  "Package name not valid",
+						Detail: "Package name not valid",
+					},
+				},
+			},
+			expectedOutput: "There are 0 verdicts and 1 problem for my-package@1.0.0\n\n  - Package name not valid: https://listen.dev/probs/invalid-name\n\n",
+		},
+		{
+			name: "package with many problems prints the problems",
+			p: &listen.Package{
+				Name:     "my-package",
+				Version:  "1.0.0",
+				Verdicts: []listen.Verdict{},
+				Problems: []listen.Problem{
+					{
+						Type:   "https://listen.dev/probs/invalid-name",
+						Title:  "Package name not valid",
+						Detail: "Package name not valid",
+					},
+					{
+						Type:   "https://listen.dev/probs/does-not-exist",
+						Title:  "A problem that does not exist, just for testing",
+						Detail: "A problem that does not exist, just for testing",
+					},
+				},
+			},
+			expectedOutput: "There are 0 verdicts and 2 problems for my-package@1.0.0\n\n  - Package name not valid: https://listen.dev/probs/invalid-name\n  - A problem that does not exist, just for testing: https://listen.dev/probs/does-not-exist\n\n",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			outBuf := &bytes.Buffer{}
+			tr := &TablePrinter{
+				streams: &iostreams.IOStreams{
+					Out: outBuf,
+				},
+			}
+			tr.printPackage(tt.p)
+			require.Equal(t, tt.expectedOutput, outBuf.String())
+		})
+	}
+}
