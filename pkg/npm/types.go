@@ -63,7 +63,7 @@ type packageJSON struct {
 }
 
 type PackageJSON interface {
-	Deps(context.Context, VersionResolutionStrategy, ...DependencyType) map[DependencyType]map[string]semver.Version
+	Deps(context.Context, VersionResolutionStrategy, ...DependencyType) map[DependencyType]map[string]*semver.Version
 }
 
 // The VersionResolutionStrategy is a function that, given a version constraints,
