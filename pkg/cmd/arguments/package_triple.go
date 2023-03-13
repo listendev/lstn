@@ -69,15 +69,13 @@ func PackageTriple(c *cobra.Command, args []string) error {
 		if err := validate.Singleton.Var(args[0], "npm_package_name"); err != nil {
 			// Check the first argument is a valid package name
 			all = append(all, fmt.Errorf("%s is not a valid npm package name", args[0]))
-		} else {
-			if constraints != nil {
-				versions, err := npm.GetVersionsFromRegistry(c.Context(), args[0], constraints)
-				if err != nil {
-					return err
-				}
-				// Store all of its versions matching the constraints
-				c.SetContext(context.WithValue(c.Context(), pkgcontext.VersionsCollection, versions))
+		} else if constraints != nil {
+			versions, err := npm.GetVersionsFromRegistry(c.Context(), args[0], constraints)
+			if err != nil {
+				return err
 			}
+			// Store all of its versions matching the constraints
+			c.SetContext(context.WithValue(c.Context(), pkgcontext.VersionsCollection, versions))
 		}
 	}
 
