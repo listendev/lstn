@@ -62,17 +62,17 @@ func GetFromRegistry(ctx context.Context, name, version string) (io.ReadCloser, 
 	return res.Body, nil
 }
 
-func GetVersionsFromRegistry(ctx context.Context, name string) (semver.Collection, error) {
+func GetVersionsFromRegistry(ctx context.Context, name string, constraints *semver.Constraints) (semver.Collection, error) {
 	body, err := GetFromRegistry(ctx, name, "")
 	if err != nil {
 		return nil, fmt.Errorf("package %s doesn't exist on npm", name)
 	}
-	defer body.Close()
 
-	return GetVersionsFromRegistryResponse(body)
+	return GetVersionsFromRegistryResponse(body, constraints)
 }
 
-func GetVersionsFromRegistryResponse(body io.ReadCloser) (semver.Collection, error) {
+func GetVersionsFromRegistryResponse(body io.ReadCloser, constraints *semver.Constraints) (semver.Collection, error) {
+	defer body.Close()
 	type response struct {
 		Name     string                 `json:"name"`
 		Versions map[string]interface{} `json:"versions"`
@@ -85,13 +85,16 @@ func GetVersionsFromRegistryResponse(body io.ReadCloser) (semver.Collection, err
 
 	raw := maps.Keys(res.Versions)
 
-	versions := make(semver.Collection, len(raw))
-	for i, r := range raw {
+	versions := semver.Collection{}
+	for _, r := range raw {
 		v, err := semver.NewVersion(r)
 		if err != nil {
 			return nil, fmt.Errorf("couln't parse version %s for package %s", r, res.Name)
 		}
-		versions[i] = v
+
+		if constraints == nil || constraints.Check(v) {
+			versions = append(versions, v)
+		}
 	}
 	sort.Sort(versions)
 
