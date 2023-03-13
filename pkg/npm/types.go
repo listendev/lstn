@@ -22,8 +22,53 @@ import (
 	"io"
 	"strings"
 
+	"github.com/Masterminds/semver/v3"
 	"github.com/listendev/lstn/pkg/validate"
 )
+
+type DependencyType int8
+
+const (
+	All DependencyType = iota
+	Dependencies
+	DevDependencies
+	PeerDependencies
+	BundleDependencies
+	OptionalDependencies
+)
+
+func (dt DependencyType) String() string {
+	switch dt {
+	case Dependencies:
+		return "dependencies"
+	case DevDependencies:
+		return "devDependencies"
+	case PeerDependencies:
+		return "peerDependencies"
+	case BundleDependencies:
+		return "bundleDependencies"
+	case OptionalDependencies:
+		return "optionalDependencies"
+	default:
+		return "all"
+	}
+}
+
+type packageJSON struct {
+	Dependencies         map[string]string `json:"dependencies"`
+	DevDependencies      map[string]string `json:"devDependencies"`
+	PeerDependencies     map[string]string `json:"peerDependencies"`
+	BundleDependencies   map[string]string `json:"bundleDependencies"`
+	OptionalDependencies map[string]string `json:"optionalDependencies"`
+}
+
+type PackageJSON interface {
+	Deps(context.Context, VersionResolutionStrategy, ...DependencyType) map[DependencyType]map[string]semver.Version
+}
+
+// The VersionResolutionStrategy is a function that, given a version constraints,
+// returns back an exact version.
+type VersionResolutionStrategy func(semver.Collection) *semver.Version
 
 type LockfileVersion struct {
 	Value int `json:"lockfileVersion" name:"lockfile version" validate:"gte=1,lte=3"`
@@ -175,6 +220,24 @@ func NewPackageLockJSONFromBytes(b []byte) (PackageLockJSON, error) {
 		return nil, fmt.Errorf("couldn't instantiate from the input package-lock.json contents")
 	}
 	ret.bytes = b
+
+	return ret, nil
+}
+
+func GetPackageJSONFromDir(dir string) (PackageJSON, error) {
+	reader, err := readPackageJSON(dir)
+	if err != nil {
+		return nil, err
+	}
+
+	return NewPackageJSONFromReader(reader)
+}
+
+func NewPackageJSONFromReader(reader io.Reader) (PackageJSON, error) {
+	ret := &packageJSON{}
+	if err := json.NewDecoder(reader).Decode(ret); err != nil {
+		return nil, fmt.Errorf("couldn't instantiate from the input package.json contents")
+	}
 
 	return ret, nil
 }
