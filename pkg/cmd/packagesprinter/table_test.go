@@ -307,3 +307,173 @@ func TestTablePrinter_printPackage(t *testing.T) {
 		})
 	}
 }
+
+func TestTablePrinter_printPackages(t *testing.T) {
+	tests := []struct {
+		name           string
+		packages       *listen.Response
+		expectedOutput string
+	}{
+		{
+			name: "packages with problems and verdicts prints the verdicts and problems",
+			packages: &listen.Response{
+				{
+					Name:     "my-package",
+					Version:  "1.0.0",
+					Verdicts: []listen.Verdict{},
+					Problems: []listen.Problem{
+						{
+							Type:   "https://listen.dev/probs/invalid-name",
+							Title:  "Package name not valid",
+							Detail: "Package name not valid",
+						},
+						{
+							Type:   "https://listen.dev/probs/does-not-exist",
+							Title:  "A problem that does not exist, just for testing",
+							Detail: "A problem that does not exist, just for testing",
+						},
+					},
+				},
+				{
+					Name:     "my-package",
+					Version:  "1.0.0",
+					Verdicts: []listen.Verdict{},
+					Problems: []listen.Problem{
+						{
+							Type:   "https://listen.dev/probs/invalid-name",
+							Title:  "Package name not valid",
+							Detail: "Package name not valid",
+						},
+					},
+				},
+			},
+			expectedOutput: "\nThere are 0 verdicts and 2 problems for my-package@1.0.0\n\n  - Package name not valid: https://listen.dev/probs/invalid-name\n  - A problem that does not exist, just for testing: https://listen.dev/probs/does-not-exist\n\n\nThere are 0 verdicts and 1 problem for my-package@1.0.0\n\n  - Package name not valid: https://listen.dev/probs/invalid-name\n\n",
+		},
+		{
+			name: "empty packages prints nothing",
+			packages: &listen.Response{
+				{
+					Name:     "my-package",
+					Version:  "1.0.0",
+					Verdicts: []listen.Verdict{},
+					Problems: []listen.Problem{},
+				},
+			},
+			expectedOutput: "",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			outBuf := &bytes.Buffer{}
+			tr := &TablePrinter{
+				streams: &iostreams.IOStreams{
+					Out: outBuf,
+				},
+			}
+			tr.printPackages(tt.packages)
+			require.Equal(t, tt.expectedOutput, outBuf.String())
+		})
+	}
+}
+
+func TestTablePrinter_printTable(t *testing.T) {
+	tests := []struct {
+		name           string
+		packages       *listen.Response
+		expectedOutput string
+		wantErr        bool
+	}{
+		{
+			name:           "empty packages prints nothing",
+			packages:       &listen.Response{},
+			expectedOutput: "",
+		},
+		{
+			name: "inform that there are problems and verdicts in table format",
+			packages: &listen.Response{
+				{
+					Name:    "react",
+					Version: "1.0.0",
+					Verdicts: []listen.Verdict{
+						{
+							Message:  "unexpected outbound connection destination",
+							Priority: "high",
+							Metadata: map[string]interface{}{
+								"commandline":      "/usr/local/bin/node",
+								"file_descriptor:": "10.0.2.100:47326->142.251.111.128:0",
+								"server_ip":        "142.251.111.128",
+								"executable_path":  "/usr/local/bin/node",
+							},
+						},
+					},
+					Problems: []listen.Problem{},
+				},
+				{
+					Name:    "my-package",
+					Version: "1.0.0",
+					Verdicts: []listen.Verdict{
+						{
+							Message:  "npm spawned a child process",
+							Priority: "high",
+							Metadata: map[string]interface{}{
+								"npm_package_name":    "react",
+								"npm_package_version": "0.18.0",
+								"parent_name":         "node",
+								"executable_path":     "/bin/sh",
+								"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
+								"server_ip":           "",
+							},
+						},
+						{
+							Message:  "unexpected outbound connection destination",
+							Priority: "high",
+							Metadata: map[string]interface{}{
+								"commandline":      "/usr/local/bin/node",
+								"file_descriptor:": "10.0.2.100:47326->142.251.111.128:0",
+								"server_ip":        "142.251.111.128",
+								"executable_path":  "/usr/local/bin/node",
+							},
+						},
+					},
+					Problems: []listen.Problem{
+						{
+							Type:   "https://listen.dev/probs/invalid-name",
+							Title:  "Package name not valid",
+							Detail: "Package name not valid",
+						},
+						{
+							Type:   "https://listen.dev/probs/does-not-exist",
+							Title:  "A problem that does not exist, just for testing",
+							Detail: "A problem that does not exist, just for testing",
+						},
+					},
+				},
+				{
+					Name:     "my-package",
+					Version:  "1.0.0",
+					Verdicts: []listen.Verdict{},
+					Problems: []listen.Problem{
+						{
+							Type:   "https://listen.dev/probs/invalid-name",
+							Title:  "Package name not valid",
+							Detail: "Package name not valid",
+						},
+					},
+				},
+			},
+			expectedOutput: "react\t1.0.0\tX 1 verdicts\t✓ 0 problems\nmy-package\t1.0.0\tX 2 verdicts\t! 2 problems\nmy-package\t1.0.0\t✓ 0 verdicts\t! 1 problems\n",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			outBuf := &bytes.Buffer{}
+			tr := &TablePrinter{
+				streams: &iostreams.IOStreams{
+					Out: outBuf,
+				},
+			}
+			tr.printTable(tt.packages)
+			require.Equal(t, tt.expectedOutput, outBuf.String())
+		})
+	}
+}
