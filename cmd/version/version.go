@@ -49,7 +49,7 @@ func New(ctx context.Context) (*cobra.Command, error) {
 			}
 			localOpts, ok := opts.(*options.Version)
 			if !ok {
-				return fmt.Errorf("couldn't obtain options for the current subcommand")
+				return fmt.Errorf("couldn't obtain options for the current child command")
 			}
 
 			// Obtain the version info from the context

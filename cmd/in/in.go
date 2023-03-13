@@ -19,17 +19,16 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"path/filepath"
 	"runtime"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/listendev/lstn/internal/project"
+	"github.com/listendev/lstn/pkg/cmd/arguments"
 	"github.com/listendev/lstn/pkg/cmd/groups"
 	"github.com/listendev/lstn/pkg/cmd/options"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/listendev/lstn/pkg/npm"
-	"github.com/listendev/lstn/pkg/validate"
 	"github.com/spf13/cobra"
 )
 
@@ -42,7 +41,7 @@ func New(ctx context.Context) (*cobra.Command, error) {
 		Use:                   "in <path>",
 		GroupID:               groups.Core.ID,
 		DisableFlagsInUseLine: true,
-		Short:                 "Inspect the verdicts of your dependencies",
+		Short:                 "Inspect the verdicts for your dependencies tree",
 		Long: `Query listen.dev for the verdicts of all the dependencies in your project.
 
 Using this command, you can audit all the dependencies configured for a project and obtain their verdicts.
@@ -53,8 +52,8 @@ The verdicts it returns are listed by the name of each package and its specified
   lstn in .
   lstn in /we/snitch
   lstn in sub/dir`,
-		Args:              validateInArgs, // Executes before RunE
-		ValidArgsFunction: activeHelpIn,
+		Args:              arguments.SingleDirectory, // Executes before RunE
+		ValidArgsFunction: arguments.SingleDirectoryActiveHelp,
 		Annotations: map[string]string{
 			"source": project.GetSourceURL(filename),
 		},
@@ -68,19 +67,13 @@ The verdicts it returns are listed by the name of each package and its specified
 			}
 			inOpts, ok := opts.(*options.In)
 			if !ok {
-				return fmt.Errorf("couldn't obtain options for the current subcommand")
+				return fmt.Errorf("couldn't obtain options for the current child command")
 			}
 
 			// Obtain the target directory that we want to listen in
-			targetDir, err := getTargetDirectory(args)
+			targetDir, err := arguments.GetDirectory(args)
 			if err != nil {
 				return fmt.Errorf("couldn't get to know on which directory you want me to listen in")
-			}
-			// Check that the target directory contains a package.json file
-			packageJSONErrors := validate.Singleton.Var(filepath.Join(targetDir, "package.json"), "file")
-			// NOTE > In the future, we can try to detect other package managers here rather than erroring out
-			if packageJSONErrors != nil {
-				return fmt.Errorf("couldn't find a package.json in %s", targetDir)
 			}
 
 			// Unmarshal the package-lock.json file contents to a struct
@@ -134,56 +127,4 @@ The verdicts it returns are listed by the name of each package and its specified
 	inCmd.SetContext(ctx)
 
 	return inCmd, nil
-}
-
-// getTargetDirectory computes the absolute
-// path from the input arguments.
-//
-// When no argument has been specified,
-// it return the current working directory.
-func getTargetDirectory(args []string) (string, error) {
-	dir, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
-
-	if len(args) > 0 {
-		dir = args[0]
-	}
-
-	return filepath.Abs(dir)
-}
-
-// validateInArgs validates the input arguments.
-//
-// It checks that there is maximum one argument.
-// It checks that the argument is an existing directory, too.
-func validateInArgs(c *cobra.Command, args []string) error {
-	if err := cobra.MaximumNArgs(1)(c, args); err != nil {
-		return err
-	}
-	// No further validation left if there are no arguments at all
-	if len(args) == 0 {
-		return nil
-	}
-	if errs := validate.Singleton.Var(args[0], "dir"); errs != nil {
-		return fmt.Errorf("requires the argument to be an existing directory")
-	}
-
-	return nil
-}
-
-// TODO(leodido) > Double-check it's working.
-func activeHelpIn(c *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	var comps []string
-	switch len(args) {
-	case 0:
-		comps = cobra.AppendActiveHelp(comps, "Executing against the current working directory")
-	case 1:
-		comps = cobra.AppendActiveHelp(comps, fmt.Sprintf("Executing against directory '%s'", args[0]))
-	default:
-		comps = cobra.AppendActiveHelp(comps, "This command does not take any more arguments")
-	}
-
-	return comps, cobra.ShellCompDirectiveFilterDirs
 }
