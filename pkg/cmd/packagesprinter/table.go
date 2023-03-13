@@ -45,7 +45,12 @@ func NewTablePrinter(streams *iostreams.IOStreams) *TablePrinter {
 }
 
 func (t *TablePrinter) RenderPackages(pkgs *listen.Response) error {
-	return t.printTable(pkgs)
+	err := t.printTable(pkgs)
+	if err != nil {
+		return err
+	}
+	t.printPackages(pkgs)
+	return nil
 }
 
 func (t *TablePrinter) printVerdictMetadata(metadata map[string]interface{}) {
@@ -99,7 +104,7 @@ func (t *TablePrinter) printVerdict(p *listen.Package, verdict listen.Verdict) {
 	t.printVerdictMetadata(verdict.Metadata)
 }
 
-func (t *TablePrinter) printProblem(p *listen.Package, problem listen.Problem) {
+func (t *TablePrinter) printProblem(problem listen.Problem) {
 	cs := t.streams.ColorScheme()
 	out := t.streams.Out
 	fmt.Fprintf(out, "  %s: %s", cs.Yellow(fmt.Sprintf("- %s", problem.Title)), cs.Gray(problem.Type))
@@ -126,7 +131,7 @@ func (t *TablePrinter) printPackage(p *listen.Package) {
 	}
 
 	for _, problem := range p.Problems {
-		t.printProblem(p, problem)
+		t.printProblem(problem)
 	}
 	fmt.Fprintln(out, "")
 }
@@ -172,12 +177,5 @@ func (t *TablePrinter) printTable(packages *listen.Response) error {
 	}
 
 	t.streams.StopProgressIndicator()
-	err := tab.Render()
-	if err != nil {
-		return err
-	}
-
-	t.printPackages(packages)
-
-	return nil
+	return tab.Render()
 }
