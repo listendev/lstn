@@ -56,8 +56,11 @@ It lists out the verdicts of all the versions of the input package name.`,
 
   # Get the verdicts for all the existing chalk versions
   lstn to chalk "*"
-  lstn to nock "~13.2"
-  lstn to tap "^16.3.4"
+  # Get the verdicts for nock versions >= 13.2.0 and < 13.3.0
+  lstn to nock "~13.2.x"
+  # Get the verdicts for tap versions >= 16.3.0 and < 16.4.0
+  lstn to tap "^16.3.0"
+  # Get the verdicts for prettier versions >= 2.7.0 <= 3.0.0
   lstn to prettier ">=2.7.0 <=3.0.0"`,
 		Args:              arguments.PackageTriple, // Executes before RunE
 		ValidArgsFunction: arguments.PackageTripleActiveHelp,
@@ -83,15 +86,20 @@ It lists out the verdicts of all the versions of the input package name.`,
 
 			versions, multiple := ctx.Value(pkgcontext.VersionsCollection).(semver.Collection)
 			if multiple {
+				nv := len(versions)
+
+				names := make([]string, nv)
+				for i := 0; i < nv; i++ {
+					names[i] = args[0]
+				}
+
 				// Create list of verdicts requests
-				reqs, multipleErr := listen.NewVerdictsRequestsFromVersionCollection(args, versions)
+				reqs, multipleErr := listen.NewBulkVerdictsRequests(names, versions)
 				if multipleErr != nil {
 					return multipleErr
 				}
-				// spew.Dump(reqs)
 
 				// Query for verdicts about specific package versions...
-
 				res, resJSON, resErr = listen.BulkPackages(reqs, listen.WithContext(ctx), listen.WithJSONOptions(toOpts.JSONFlags))
 
 				goto EXIT
