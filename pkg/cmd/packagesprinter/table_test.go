@@ -135,12 +135,51 @@ func TestTablePrinter_printVerdict(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			outBuf := &bytes.Buffer{}
 			tr := &TablePrinter{
-
 				streams: &iostreams.IOStreams{
 					Out: outBuf,
 				},
 			}
 			tr.printVerdict(tt.p, tt.verdict)
+
+			require.Equal(t, tt.expectedOutput, outBuf.String())
+		})
+	}
+}
+
+func TestTablePrinter_printProblem(t *testing.T) {
+	tests := []struct {
+		name           string
+		problem        listen.Problem
+		expectedOutput string
+	}{
+		{
+			name: "problem with all details gets printed",
+			problem: listen.Problem{
+				Type:   "https://listen.dev/probs/invalid-name",
+				Title:  "Package name not valid",
+				Detail: "Package name not valid",
+			},
+			expectedOutput: "  - Package name not valid: https://listen.dev/probs/invalid-name\n",
+		},
+		{
+			name: "problem with missing type",
+			problem: listen.Problem{
+				Type:   "",
+				Title:  "Package name not valid",
+				Detail: "Package name not valid",
+			},
+			expectedOutput: "  - Package name not valid: \n",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			outBuf := &bytes.Buffer{}
+			tr := &TablePrinter{
+				streams: &iostreams.IOStreams{
+					Out: outBuf,
+				},
+			}
+			tr.printProblem(tt.problem)
 
 			require.Equal(t, tt.expectedOutput, outBuf.String())
 		})
