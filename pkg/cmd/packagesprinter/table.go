@@ -2,6 +2,7 @@ package packagesprinter
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 
 	"github.com/cli/cli/pkg/iostreams"
@@ -48,8 +49,15 @@ func (t *TablePrinter) RenderPackages(pkgs *listen.Response) error {
 }
 
 func (t *TablePrinter) printVerdictMetadata(metadata map[string]interface{}) {
+	keys := make([]string, 0, len(metadata))
+	for k := range metadata {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
 	cs := t.streams.ColorScheme()
-	for mdkey, md := range metadata {
+	for _, mdkey := range keys {
+		md := metadata[mdkey]
 		if mdkey == "npm_package_name" || mdkey == "npm_package_version" {
 			continue
 		}
@@ -84,7 +92,7 @@ func (t *TablePrinter) printVerdict(p *listen.Package, verdict listen.Verdict) {
 		metadataPackageVersion = packageVersion.(string)
 	}
 
-	if metadataPackageName != p.Name && metadataPackageVersion != p.Version {
+	if metadataPackageName != "" && metadataPackageVersion != "" && metadataPackageName != p.Name && metadataPackageVersion != p.Version {
 		fmt.Fprintf(out, cs.Bold(" (from transitive dependency %s@%s)"), cs.CyanBold(metadataPackageName), cs.CyanBold(metadataPackageVersion))
 	}
 	fmt.Fprintln(out, "")
