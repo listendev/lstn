@@ -15,6 +15,17 @@
 // limitations under the License.
 package npm
 
+import (
+	"context"
+	"reflect"
+	"runtime"
+	"sort"
+	"unicode"
+
+	"github.com/Masterminds/semver/v3"
+	"github.com/XANi/goneric"
+)
+
 // Deps gets you the package lock dependencies.
 func (p *packageLockJSON) Deps() map[string]PackageLockDependency {
 	switch p.LockfileVersion.Value {
@@ -27,4 +38,105 @@ func (p *packageLockJSON) Deps() map[string]PackageLockDependency {
 	default:
 		return nil
 	}
+}
+
+func (p *packageJSON) getDepsByType(t DependencyType) map[string]string {
+	// TODO: assert t != All
+
+	typeStr := []rune(t.String())
+	depType := string(append([]rune{unicode.ToUpper(typeStr[0])}, typeStr[1:]...))
+	r := reflect.ValueOf(p)
+	f := reflect.Indirect(r).FieldByName(depType)
+
+	ret := map[string]string{}
+	if f.Kind() == reflect.Map {
+		for _, e := range f.MapKeys() {
+			v := f.MapIndex(e)
+			if v.Kind().String() == "string" {
+				packageName := e.String()
+				versionConstraint := v.Interface().(string)
+				ret[packageName] = versionConstraint
+			}
+		}
+	}
+
+	return ret
+}
+
+func (p *packageJSON) Deps(ctx context.Context, resolve VersionResolutionStrategy, types ...DependencyType) map[DependencyType]map[string]*semver.Version {
+	ret := map[DependencyType]map[string]*semver.Version{}
+
+	// No input dependency types means give me all the dependencies for all the dependency types
+	if len(types) == 0 {
+		types = []DependencyType{All}
+	}
+
+	// Sort (ascending) dependency types
+	sort.Slice(types, func(i, j int) bool {
+		return types[i] < types[j]
+	})
+
+	// We assume the All type is the one with the lowest value
+	if types[0] == All {
+		types = []DependencyType{
+			Dependencies,
+			DevDependencies,
+			PeerDependencies,
+			BundleDependencies,
+			OptionalDependencies,
+		}
+	}
+
+	type dep struct {
+		name        string
+		version     *semver.Version
+		constraints *semver.Constraints
+	}
+
+	for _, t := range types {
+		depsByType := p.getDepsByType(t)
+
+		// TODO: process the overrides field
+
+		// Create a slice of dep instances
+		deps := goneric.MapToSlice(func(packageName, versionConstraint string) *dep {
+			constraints, err := semver.NewConstraint(versionConstraint)
+			// TODO: support URLs as dependencies (https://docs.npmjs.com/cli/v9/configuring-npm/package-json#dependencies)
+			// TODO: those do not match as semver version constraints...
+			if err != nil {
+				return nil
+			}
+
+			return &dep{
+				name:        packageName,
+				constraints: constraints,
+			}
+		}, depsByType)
+
+		// Resolve version constraints with parallel requests to the registry
+		resolutions := goneric.ParallelMapSlice(func(input *dep) *dep {
+			// Get all the versions matching the constraint
+			collect, err := GetVersionsFromRegistry(ctx, input.name, input.constraints)
+			// TODO: understand what to do when the HTTP call to the registry fails
+			if err != nil {
+				return nil
+			}
+
+			return &dep{
+				name:    input.name,
+				version: resolve(collect),
+			}
+		}, runtime.NumCPU(), deps)
+
+		for _, resol := range resolutions {
+			if resol.version != nil {
+				if _, ok := ret[t]; !ok {
+					ret[t] = map[string]*semver.Version{}
+				}
+				ret[t][resol.name] = resol.version
+			}
+		}
+	}
+
+	return ret
 }
