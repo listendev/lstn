@@ -18,15 +18,15 @@ package to
 import (
 	"context"
 	"fmt"
-	"os"
 	"runtime"
 
 	"github.com/Masterminds/semver/v3"
-	"github.com/davecgh/go-spew/spew"
+	"github.com/cli/cli/pkg/iostreams"
 	"github.com/listendev/lstn/internal/project"
 	"github.com/listendev/lstn/pkg/cmd/arguments"
 	"github.com/listendev/lstn/pkg/cmd/groups"
 	"github.com/listendev/lstn/pkg/cmd/options"
+	"github.com/listendev/lstn/pkg/cmd/packagesprinter"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/spf13/cobra"
@@ -126,16 +126,17 @@ It lists out the verdicts of all the versions of the input package name.`,
 				return err
 			}
 
+			io := c.Context().Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
 			if resJSON != nil {
-				fmt.Fprintf(os.Stdout, "%s", resJSON)
+				fmt.Fprintf(io.Out, "%s", resJSON)
 			}
 
-			if res != nil {
-				spew.Dump(res)
-				// TODO > create visualization of the results
+			if res == nil {
+				return nil
 			}
 
-			return nil
+			tablePrinter := packagesprinter.NewTablePrinter(io)
+			return tablePrinter.RenderPackages(res)
 		},
 	}
 

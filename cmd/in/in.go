@@ -101,14 +101,15 @@ The verdicts it returns are listed by the name of each package and its specified
 			}
 
 			if resJSON != nil {
-				fmt.Fprintf(os.Stdout, "%s", resJSON)
+				fmt.Fprintf(io.Out, "%s", resJSON)
 			}
 
 			if res == nil {
 				return nil
 			}
 
-			return packagesprinter.PrintTable(io, res)
+			tablePrinter := packagesprinter.NewTablePrinter(io)
+			return tablePrinter.RenderPackages(res)
 		},
 	}
 

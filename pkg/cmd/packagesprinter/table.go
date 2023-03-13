@@ -2,7 +2,6 @@ package packagesprinter
 
 import (
 	"fmt"
-	"io"
 	"strconv"
 
 	"github.com/cli/cli/pkg/iostreams"
@@ -10,22 +9,20 @@ import (
 	"github.com/listendev/lstn/pkg/listen"
 )
 
-type VerdictPriority string
-
 const (
-	VerdictPriorityLow    VerdictPriority = "low"
-	VerdictPriorityMedium VerdictPriority = "medium"
-	VerdictPriorityHigh   VerdictPriority = "high"
+	verdictPriorityLow    string = "low"
+	verdictPriorityMedium string = "medium"
+	verdictPriorityHigh   string = "high"
 )
 
-func verdictPriorityToColorFunc(colorScheme *iostreams.ColorScheme, p VerdictPriority) func(string) string {
+func verdictPriorityToColorFunc(colorScheme *iostreams.ColorScheme, p string) func(string) string {
 	var fn func(string) string
 	switch p {
-	case VerdictPriorityHigh:
+	case verdictPriorityHigh:
 		fn = colorScheme.Red
-	case VerdictPriorityMedium:
+	case verdictPriorityMedium:
 		fn = colorScheme.Yellow
-	case VerdictPriorityLow:
+	case verdictPriorityLow:
 		fn = colorScheme.Cyan
 	default:
 		fn = func(s string) string {
@@ -36,7 +33,22 @@ func verdictPriorityToColorFunc(colorScheme *iostreams.ColorScheme, p VerdictPri
 	return fn
 }
 
-func printVerdictMetadata(out io.Writer, cs *iostreams.ColorScheme, metadata map[string]interface{}) {
+type TablePrinter struct {
+	streams *iostreams.IOStreams
+}
+
+func NewTablePrinter(streams *iostreams.IOStreams) *TablePrinter {
+	return &TablePrinter{
+		streams: streams,
+	}
+}
+
+func (t *TablePrinter) RenderPackages(pkgs *listen.Response) error {
+	return t.printTable(pkgs)
+}
+
+func (t *TablePrinter) printVerdictMetadata(metadata map[string]interface{}) {
+	cs := t.streams.ColorScheme()
 	for mdkey, md := range metadata {
 		if mdkey == "npm_package_name" || mdkey == "npm_package_version" {
 			continue
@@ -54,12 +66,14 @@ func printVerdictMetadata(out io.Writer, cs *iostreams.ColorScheme, metadata map
 		if len(mdStr) == 0 {
 			continue
 		}
-		fmt.Fprintf(out, "    %s: %s\n", mdkey, cs.Gray(mdStr))
+		fmt.Fprintf(t.streams.Out, "    %s: %s\n", mdkey, cs.Gray(mdStr))
 	}
 }
 
-func printVerdict(out io.Writer, cs *iostreams.ColorScheme, p listen.Package, verdict listen.Verdict) {
-	prioColor := verdictPriorityToColorFunc(cs, VerdictPriority(verdict.Priority))
+func (t *TablePrinter) printVerdict(p *listen.Package, verdict listen.Verdict) {
+	cs := t.streams.ColorScheme()
+	out := t.streams.Out
+	prioColor := verdictPriorityToColorFunc(cs, verdict.Priority)
 	fmt.Fprintf(out, "  %s %s", prioColor(fmt.Sprintf("[%s]", verdict.Priority)), verdict.Message)
 	metadataPackageName := ""
 	metadataPackageVersion := ""
@@ -74,48 +88,56 @@ func printVerdict(out io.Writer, cs *iostreams.ColorScheme, p listen.Package, ve
 		fmt.Fprintf(out, cs.Bold(" (from transitive dependency %s@%s)"), cs.CyanBold(metadataPackageName), cs.CyanBold(metadataPackageVersion))
 	}
 	fmt.Fprintln(out, "")
-	printVerdictMetadata(out, cs, verdict.Metadata)
+	t.printVerdictMetadata(verdict.Metadata)
 }
 
-func printProblem(out io.Writer, cs *iostreams.ColorScheme, p listen.Package, problem listen.Problem) {
+func (t *TablePrinter) printProblem(p *listen.Package, problem listen.Problem) {
+	cs := t.streams.ColorScheme()
+	out := t.streams.Out
 	fmt.Fprintf(out, "  %s: %s", cs.Yellow(fmt.Sprintf("- %s", problem.Title)), cs.Gray(problem.Type))
 	fmt.Fprintln(out, "")
 }
 
-func printPackages(out io.Writer, cs *iostreams.ColorScheme, packages *listen.Response) {
+func (t *TablePrinter) printPackage(p *listen.Package) {
+	cs := t.streams.ColorScheme()
+	out := t.streams.Out
+	thereIsAre := "are"
+	verdictsWord := "verdicts"
+	if len(p.Verdicts) == 1 {
+		verdictsWord = "verdict"
+		thereIsAre = "is"
+	}
+	problemsWord := "problems"
+	if len(p.Problems) == 1 {
+		problemsWord = "problem"
+	}
+	fmt.Fprintf(out, "There %s %s %s and %s %s for %s@%s\n", thereIsAre, cs.Bold(strconv.Itoa(len(p.Verdicts))), verdictsWord, cs.Bold(strconv.Itoa(len(p.Problems))), problemsWord, cs.CyanBold(p.Name), cs.CyanBold(p.Version))
+	fmt.Fprintln(out, "")
+	for _, verdict := range p.Verdicts {
+		t.printVerdict(p, verdict)
+	}
+
+	for _, problem := range p.Problems {
+		t.printProblem(p, problem)
+	}
+	fmt.Fprintln(out, "")
+}
+
+func (t *TablePrinter) printPackages(packages *listen.Response) {
+	out := t.streams.Out
 	for _, p := range *packages {
 		if len(p.Verdicts) == 0 && len(p.Problems) == 0 {
 			continue
 		}
 		fmt.Fprintln(out, "")
-		thereIsAre := "are"
-		verdictsWord := "verdicts"
-		if len(p.Verdicts) == 1 {
-			verdictsWord = "verdict"
-			thereIsAre = "is"
-		}
-		problemsWord := "problems"
-		if len(p.Problems) == 1 {
-			problemsWord = "problem"
-		}
-		fmt.Fprintf(out, "There %s %s %s and %s %s for %s@%s\n", thereIsAre, cs.Bold(strconv.Itoa(len(p.Verdicts))), verdictsWord, cs.Bold(strconv.Itoa(len(p.Problems))), problemsWord, cs.CyanBold(p.Name), cs.CyanBold(p.Version))
-		fmt.Fprintln(out, "")
-		for _, verdict := range p.Verdicts {
-			printVerdict(out, cs, p, verdict)
-		}
-
-		for _, problem := range p.Problems {
-			printProblem(out, cs, p, problem)
-		}
-		fmt.Fprintln(out, "")
+		t.printPackage(&p)
 	}
-
 }
 
-func PrintTable(io *iostreams.IOStreams, packages *listen.Response) error {
-	tab := utils.NewTablePrinter(io)
+func (t *TablePrinter) printTable(packages *listen.Response) error {
+	tab := utils.NewTablePrinter(t.streams)
 
-	cs := io.ColorScheme()
+	cs := t.streams.ColorScheme()
 
 	for _, p := range *packages {
 		verdictsColor := cs.ColorFromString("green")
@@ -146,7 +168,7 @@ func PrintTable(io *iostreams.IOStreams, packages *listen.Response) error {
 		return err
 	}
 
-	printPackages(io.Out, cs, packages)
+	t.printPackages(packages)
 
 	return nil
 }
