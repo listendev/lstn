@@ -73,15 +73,16 @@ func NewVerdictsRequest(args []string) (*VerdictsRequest, error) {
 	return fillVerdictsRequest(ret, args)
 }
 
-func NewVerdictsRequestsFromVersionCollection(args []string, versions semver.Collection) ([]*VerdictsRequest, error) {
+func NewBulkVerdictsRequests(names []string, versions semver.Collection) ([]*VerdictsRequest, error) {
+	if len(names) != len(versions) {
+		return nil, fmt.Errorf("couldn't create a request set because of mismatching lenghts")
+	}
+
 	c := NewContext()
 
 	reqs := make([]*VerdictsRequest, len(versions))
 	for i, v := range versions {
-		inputs := []string{args[0], v.String()}
-		if len(args) > 2 {
-			inputs = append(inputs, args[2])
-		}
+		inputs := []string{names[i], v.String()}
 		var reqErr error
 		reqs[i], reqErr = NewVerdictsRequestWithContext(inputs, c)
 		if reqErr != nil {
