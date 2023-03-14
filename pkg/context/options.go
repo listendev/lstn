@@ -13,11 +13,13 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package options
+package context
 
 import (
 	"context"
 	"fmt"
+
+	"github.com/listendev/lstn/pkg/cmd"
 )
 
 // GetFromContext returns a Options instance.
@@ -26,8 +28,8 @@ import (
 //
 // It errors out if the context key does not refer an Options instance
 // or f the validation and trasformation process errored out.
-func GetFromContext(ctx context.Context, key any) (Options, error) {
-	o, ok := ctx.Value(key).(Options)
+func GetOptionsFromContext(ctx context.Context, key any) (cmd.Options, error) {
+	o, ok := ctx.Value(key).(cmd.Options)
 	if !ok {
 		return nil, fmt.Errorf("the key does not refer an Options instance")
 	}
