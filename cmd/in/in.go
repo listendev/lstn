@@ -61,7 +61,7 @@ The verdicts it returns are listed by the name of each package and its specified
 			ctx = c.Context()
 
 			// Obtain the local options from the context
-			opts, err := options.GetFromContext(ctx, pkgcontext.InKey)
+			opts, err := pkgcontext.GetOptionsFromContext(ctx, pkgcontext.InKey)
 			if err != nil {
 				return err
 			}

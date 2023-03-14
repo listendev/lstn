@@ -43,7 +43,7 @@ func New(ctx context.Context) (*cobra.Command, error) {
 			ctx = c.Context()
 
 			// Obtain the local options from the context
-			opts, err := options.GetFromContext(ctx, pkgcontext.VersionKey)
+			opts, err := pkgcontext.GetOptionsFromContext(ctx, pkgcontext.VersionKey)
 			if err != nil {
 				return err
 			}
