@@ -71,7 +71,7 @@ It lists out the verdicts of all the versions of the input package name.`,
 			ctx = c.Context()
 
 			// Obtain the local options from the context
-			opts, err := options.GetFromContext(ctx, pkgcontext.ToKey)
+			opts, err := pkgcontext.GetOptionsFromContext(ctx, pkgcontext.ToKey)
 			if err != nil {
 				return err
 			}
@@ -150,6 +150,9 @@ It lists out the verdicts of all the versions of the input package name.`,
 
 	// Pass the options through the context
 	ctx = context.WithValue(ctx, pkgcontext.ToKey, toOpts)
+	// Pass the registry option as a standalone to do not depend on the command
+	ctx = context.WithValue(ctx, pkgcontext.RegistryKey, &toOpts.RegistryFlags)
+
 	toCmd.SetContext(ctx)
 
 	return toCmd, nil

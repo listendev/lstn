@@ -75,7 +75,7 @@ func PackageTriple(c *cobra.Command, args []string) error {
 				all = append(all, fmt.Errorf("the %s package doesn't exist on the registry", args[0]))
 			}
 			if constraints != nil {
-				versions, err := npm.GetVersionsFromRegistryResponse(body, constraints) //npm.GetVersionsFromRegistry(c.Context(), args[0], constraints)
+				versions, err := npm.GetVersionsFromRegistryResponse(body, constraints)
 				if err != nil {
 					return err
 				}
