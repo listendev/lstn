@@ -48,5 +48,10 @@ func getNPMFromNVM(ctx context.Context) (*exec.Cmd, error) {
 		cmdline += " --no-use"
 	}
 
+	// TODO: detect whether nvm has already a Node version installed (`nvm ls current` or `nvm which current`)
+	// in case it doesn't have any we can:
+	// 1. automatically install the latest lts (`source $NVM_DIR/nvm.sh --install`)
+	// 2. exit and warn the user to install and use a Node version via nvm
+
 	return exec.CommandContext(ctx, bashExe, "-c", fmt.Sprintf("%s && npm", cmdline)), nil
 }
