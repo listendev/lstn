@@ -29,7 +29,6 @@ import (
 )
 
 func MockHTTPServer(assert *assert.Assertions, path string, resp []byte, status int, wantMethod string) *httptest.Server {
-
 	if !strings.HasPrefix(path, "/") {
 		path = fmt.Sprintf("/%s", path)
 	}

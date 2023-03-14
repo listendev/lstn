@@ -18,6 +18,7 @@ package npm
 import (
 	"testing"
 
+	"github.com/Masterminds/semver/v3"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -44,4 +45,93 @@ func TestGetDepsByType(t *testing.T) {
 
 	assert.Equal(t, map[string]string{}, p2.getDepsByType(Dependencies))
 	assert.Equal(t, e2, p2.getDepsByType(DevDependencies))
+}
+
+func TestGetDepsMapFromDepList(t *testing.T) {
+	ret := map[DependencyType]map[string]*semver.Version{}
+	getDepsMapFromDepList([]*dep{}, DevDependencies, ret)
+	assert.Empty(t, ret)
+
+	depList := []*dep{
+		&dep{
+			name:    "core-js",
+			version: semver.MustParse("3.29.1"),
+		},
+		&dep{
+			name:    "vue",
+			version: semver.MustParse("3.2.47"),
+		},
+		nil,
+		&dep{
+			name:    "react",
+			version: semver.MustParse("18.2.0"),
+		},
+	}
+	getDepsMapFromDepList(depList, Dependencies, ret)
+	assert.Len(t, ret, 1)
+	assert.Len(t, ret[Dependencies], 3)
+	assert.Equal(t, map[DependencyType]map[string]*semver.Version{
+		Dependencies: map[string]*semver.Version{
+			"react":   semver.MustParse("18.2.0"),
+			"vue":     semver.MustParse("3.2.47"),
+			"core-js": semver.MustParse("3.29.1"),
+		},
+	}, ret)
+}
+
+func TestGetDepInstance(t *testing.T) {
+	v1820, _ := semver.NewConstraint("18.2.0")
+	v267, _ := semver.NewConstraint("^2.6.7")
+
+	cases := []struct {
+		des string
+		pkg string
+		ver string
+		res *dep
+	}{
+		{
+			des: "exact version",
+			pkg: "react",
+			ver: "18.2.0",
+			res: &dep{
+				name:        "react",
+				constraints: v1820,
+			},
+		},
+		{
+			des: "constraints",
+			pkg: "node-fetch",
+			ver: "^2.6.7",
+			res: &dep{
+				name:        "node-fetch",
+				constraints: v267,
+			},
+		},
+		// Unsupported
+		{
+			des: "local path",
+			pkg: "dyl",
+			ver: "file:.../dyl",
+			res: nil,
+		},
+		{
+			des: "URL",
+			pkg: "asd",
+			ver: "http://asdf.com/asfg.tar.gz",
+			res: nil,
+		},
+		{
+			des: "git URLs",
+			pkg: "cli",
+			ver: "git+ssh://git@github.com:npm/cli#semver:^5.0",
+			res: nil,
+		},
+	}
+
+	for _, tc := range cases {
+		tc := tc
+		t.Run(tc.des, func(t *testing.T) {
+			assert.Equal(t, tc.res, getDepInstance(tc.pkg, tc.ver))
+		})
+	}
 }
