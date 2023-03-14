@@ -24,9 +24,10 @@ import (
 
 	"github.com/Masterminds/semver/v3"
 	"github.com/listendev/lstn/pkg/validate"
+	"github.com/thediveo/enumflag/v2"
 )
 
-type DependencyType int8
+type DependencyType enumflag.Flag
 
 const (
 	All DependencyType = iota
@@ -37,18 +38,26 @@ const (
 	OptionalDependencies
 )
 
+var DependencyTypeIDs = map[DependencyType][]string{
+	Dependencies:         {Dependencies.String()},
+	DevDependencies:      {DevDependencies.String()},
+	PeerDependencies:     {PeerDependencies.String()},
+	BundleDependencies:   {BundleDependencies.String()},
+	OptionalDependencies: {OptionalDependencies.String()},
+}
+
 func (dt DependencyType) String() string {
 	switch dt {
 	case Dependencies:
-		return "dependencies"
+		return "deps"
 	case DevDependencies:
-		return "devDependencies"
+		return "dev"
 	case PeerDependencies:
-		return "peerDependencies"
+		return "peer"
 	case BundleDependencies:
-		return "bundleDependencies"
+		return "bundle"
 	case OptionalDependencies:
-		return "optionalDependencies"
+		return "optional"
 	default:
 		return "all"
 	}
