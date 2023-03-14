@@ -18,7 +18,6 @@ package in
 import (
 	"context"
 	"fmt"
-	"os"
 	"runtime"
 
 	"github.com/cli/cli/pkg/iostreams"
