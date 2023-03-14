@@ -67,6 +67,7 @@ func generatePackageLock(ctx context.Context, dir string) ([]byte, error) {
 		if os.IsNotExist(err) {
 			return []byte{}, fmt.Errorf("directory %s does not contain a package.json file", dir)
 		}
+
 		return []byte{}, fmt.Errorf("couldn't read the package.json file")
 	}
 	if err := util.WriteFile(activeFS, filepath.Join(tmp, "package.json"), packageJSON, 0644); err != nil {
