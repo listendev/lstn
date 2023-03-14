@@ -63,6 +63,41 @@ func (p *packageJSON) getDepsByType(t DependencyType) map[string]string {
 	return ret
 }
 
+type dep struct {
+	name        string
+	version     *semver.Version
+	constraints *semver.Constraints
+}
+
+func getDepInstance(packageName, versionConstraint string) *dep {
+	constraints, err := semver.NewConstraint(versionConstraint)
+	// TODO: support URLs as dependencies (https://docs.npmjs.com/cli/v9/configuring-npm/package-json#dependencies)
+	// TODO: those do not match as semver version constraints...
+	if err != nil {
+		return nil
+	}
+
+	return &dep{
+		name:        packageName,
+		constraints: constraints,
+	}
+}
+
+func getDepsMapFromDepList(list []*dep, t DependencyType, out map[DependencyType]map[string]*semver.Version) {
+	for _, resol := range list {
+		// Ignore dependency if we were unable to resolve its version
+		if resol == nil {
+			continue
+		}
+		if resol.version != nil {
+			if _, ok := out[t]; !ok {
+				out[t] = map[string]*semver.Version{}
+			}
+			out[t][resol.name] = resol.version
+		}
+	}
+}
+
 func (p *packageJSON) Deps(ctx context.Context, resolve VersionResolutionStrategy, types ...DependencyType) map[DependencyType]map[string]*semver.Version {
 	ret := map[DependencyType]map[string]*semver.Version{}
 
@@ -87,31 +122,13 @@ func (p *packageJSON) Deps(ctx context.Context, resolve VersionResolutionStrateg
 		}
 	}
 
-	type dep struct {
-		name        string
-		version     *semver.Version
-		constraints *semver.Constraints
-	}
-
 	for _, t := range types {
 		depsByType := p.getDepsByType(t)
 
 		// TODO: process the overrides field
 
 		// Create a slice of dep instances
-		deps := goneric.MapToSlice(func(packageName, versionConstraint string) *dep {
-			constraints, err := semver.NewConstraint(versionConstraint)
-			// TODO: support URLs as dependencies (https://docs.npmjs.com/cli/v9/configuring-npm/package-json#dependencies)
-			// TODO: those do not match as semver version constraints...
-			if err != nil {
-				return nil
-			}
-
-			return &dep{
-				name:        packageName,
-				constraints: constraints,
-			}
-		}, depsByType)
+		deps := goneric.MapToSlice(getDepInstance, depsByType)
 
 		// Resolve version constraints with parallel requests to the registry
 		resolutions := goneric.ParallelMapSlice(func(input *dep) *dep {
@@ -131,17 +148,7 @@ func (p *packageJSON) Deps(ctx context.Context, resolve VersionResolutionStrateg
 			}
 		}, runtime.NumCPU(), deps)
 
-		for _, resol := range resolutions {
-			if resol == nil {
-				return nil
-			}
-			if resol.version != nil {
-				if _, ok := ret[t]; !ok {
-					ret[t] = map[string]*semver.Version{}
-				}
-				ret[t][resol.name] = resol.version
-			}
-		}
+		getDepsMapFromDepList(resolutions, t, ret)
 	}
 
 	return ret
