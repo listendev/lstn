@@ -52,6 +52,9 @@ The verdicts it returns are listed by the name of each package and its specified
 		Example: `  lstn scan
   lstn scan .
   lstn scan /we/snitch
+  lstn scan /we/snitch -e peer
+  lstn scan /we/snitch -e dev,peer
+  lstn scan /we/snitch -e dev -e peer
   lstn scan sub/dir`,
 		Args:              arguments.SingleDirectory, // Executes before RunE
 		ValidArgsFunction: arguments.SingleDirectoryActiveHelp,
@@ -82,15 +85,21 @@ The verdicts it returns are listed by the name of each package and its specified
 				return err
 			}
 
-			dependenciesTypes := []npm.DependencyType{
-				npm.Dependencies,
-				npm.DevDependencies,
-				npm.PeerDependencies,
-				npm.OptionalDependencies,
+			// Exclude dependencies sets
+			dependenciesTypes, _ := goneric.SliceDiff(npm.AllDependencyTypes, scanOpts.Excludes)
+
+			// We don't want to fallback to process all the dependencies sets by default when the user excluded all of them
+			if len(dependenciesTypes) == 0 {
+				return fmt.Errorf("no dependencies sets to process")
 			}
 
 			deps := packageJSON.Deps(ctx, npm.DefaultVersionResolutionStrategy, dependenciesTypes...)
 
+			if len(deps) == 0 {
+				return fmt.Errorf("there are no dependencies to process for the currently selected sets of dependencies")
+			}
+
+			// Process one dependency set at once
 			for _, deps := range deps {
 				names := goneric.MapSliceKey(deps)
 				versions := goneric.MapSliceValue(deps)
@@ -100,7 +109,7 @@ The verdicts it returns are listed by the name of each package and its specified
 					return err
 				}
 
-				// Query for verdicts about specific package versions...
+				// Query for verdicts about specific package versions in bulk...
 				res, resJSON, resErr := listen.BulkPackages(reqs, listen.WithContext(ctx), listen.WithJSONOptions(scanOpts.JSONFlags))
 
 				if resErr != nil {
