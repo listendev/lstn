@@ -30,6 +30,7 @@ func readPackageJSON(dir string) (io.Reader, error) {
 		if os.IsNotExist(err) {
 			return nil, fmt.Errorf("directory %s does not contain a package.json file", dir)
 		}
+
 		return nil, fmt.Errorf("couldn't read the package.json file")
 	}
 
