@@ -18,6 +18,7 @@ package npm
 import (
 	"context"
 	"fmt"
+	"os"
 	"os/exec"
 	"path/filepath"
 
@@ -63,6 +64,9 @@ func generatePackageLock(ctx context.Context, dir string) ([]byte, error) {
 	packageJSONPath := filepath.Join(dir, "package.json")
 	packageJSON, err := util.ReadFile(activeFS, packageJSONPath)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return []byte{}, fmt.Errorf("directory %s does not contain a package.json file", dir)
+		}
 		return []byte{}, fmt.Errorf("couldn't read the package.json file")
 	}
 	if err := util.WriteFile(activeFS, filepath.Join(tmp, "package.json"), packageJSON, 0644); err != nil {
