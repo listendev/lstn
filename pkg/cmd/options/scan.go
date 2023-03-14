@@ -18,6 +18,7 @@ package options
 import (
 	"context"
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/XANi/goneric"
@@ -41,24 +42,22 @@ type Scan struct {
 func NewScan() (*Scan, error) {
 	o := &Scan{}
 
-	// Setup --ignore enum flag manually
+	// Create the enum flag for --exclude
 	alwaysInSet := npm.BundleDependencies
-	ignoreValues := `(` + strings.Join(
-		goneric.MapSliceSkip(
-			func(identifiers []string) (string, bool) {
-				t := identifiers[0]
-				if t == alwaysInSet.String() {
-					return "", true
-				}
+	ignoreValues := goneric.MapSliceSkip(
+		func(identifiers []string) (string, bool) {
+			t := identifiers[0]
+			if t == alwaysInSet.String() {
+				return "", true
+			}
 
-				return t, false
-			},
-			maps.Values(npm.DependencyTypeIDs),
-		),
-		",",
-	) + `)`
+			return t, false
+		},
+		maps.Values(npm.DependencyTypeIDs),
+	)
+	sort.Strings(ignoreValues)
 	// Proxy values to o.Ignores
-	o.exclude = enumflag.NewSlice(&o.Excludes, ignoreValues, npm.DependencyTypeIDs, enumflag.EnumCaseInsensitive)
+	o.exclude = enumflag.NewSlice(&o.Excludes, `(`+strings.Join(ignoreValues, ",")+`)`, npm.DependencyTypeIDs, enumflag.EnumCaseInsensitive)
 	if err := o.exclude.Set(alwaysInSet.String()); err != nil {
 		return nil, fmt.Errorf("error setting defaults for the scan options")
 	}
