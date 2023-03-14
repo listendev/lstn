@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/Masterminds/semver/v3 v3.1.1
-	github.com/XANi/goneric v0.1.7
+	github.com/XANi/goneric v0.1.8-0.20230112002309-548406b75d3d
 	github.com/creasty/defaults v1.6.0
 	github.com/davecgh/go-spew v1.1.1
 	github.com/go-git/go-billy/v5 v5.4.1
@@ -24,7 +24,8 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.14.0
 	github.com/stretchr/testify v1.8.1
-	golang.org/x/exp v0.0.0-20230206171751-46f607a40771
+	github.com/thediveo/enumflag/v2 v2.0.2
+	golang.org/x/exp v0.0.0-20230213192124-5e25df0256eb
 )
 
 require (
@@ -64,7 +65,7 @@ require (
 	golang.org/x/net v0.7.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/text v0.7.0 // indirect
-	golang.org/x/tools v0.5.0 // indirect
+	golang.org/x/tools v0.6.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
