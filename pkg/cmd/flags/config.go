@@ -20,7 +20,10 @@ import (
 	"fmt"
 
 	"github.com/creasty/defaults"
+	"github.com/listendev/lstn/pkg/cmd"
 )
+
+var _ cmd.Options = (*ConfigFlags)(nil)
 
 type ConfigFlags struct {
 	LogLevel string `default:"info" name:"log level" flag:"loglevel" desc:"set the logging level"`                           // TODO > validator
