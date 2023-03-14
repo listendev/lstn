@@ -46,3 +46,6 @@ var VersionShortKey contextKey = "version_short"
 
 // VersionLongKey is the key storing the long version.
 var VersionLongKey contextKey = "version_long"
+
+// RegistryKey is the key indexing the registry flags values.
+var RegistryKey contextKey = "registry"
