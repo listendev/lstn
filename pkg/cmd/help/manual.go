@@ -55,7 +55,7 @@ func cReference(w io.Writer, c *cobra.Command, depth int) {
 
 				saneLocalFlagsUsage := saneLocalFlagSet.FlagUsages()
 				if saneLocalFlagsUsage != "" {
-					fmt.Fprintf(w, "### Flags\n\n```\n%s```\n\n", text.Dedent(localFlagsUsage))
+					fmt.Fprintf(w, "%s Flags\n\n```\n%s```\n\n", strings.Repeat("#", depth+1), text.Dedent(localFlagsUsage))
 				}
 			}
 			delete(groups, flagusages.LocalGroup)
@@ -64,7 +64,7 @@ func cReference(w io.Writer, c *cobra.Command, depth int) {
 		for group, f := range groups {
 			groupFlagsUsage := f.FlagUsages()
 			if groupFlagsUsage != "" {
-				fmt.Fprintf(w, "### %s Flags\n\n```\n%s```\n\n", group, text.Dedent(groupFlagsUsage))
+				fmt.Fprintf(w, "%s %s Flags\n\n```\n%s```\n\n", strings.Repeat("#", depth+1), group, text.Dedent(groupFlagsUsage))
 			}
 		}
 	}
