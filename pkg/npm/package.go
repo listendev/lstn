@@ -18,12 +18,18 @@ package npm
 import (
 	"fmt"
 	"io"
+	"os"
 	"path/filepath"
 )
 
 func readPackageJSON(dir string) (io.Reader, error) {
-	f, err := activeFS.Open(filepath.Join(dir, "package.json"))
+	name := filepath.Join(dir, "package.json")
+
+	f, err := activeFS.Open(name)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, fmt.Errorf("directory %s does not contain a package.json file", dir)
+		}
 		return nil, fmt.Errorf("couldn't read the package.json file")
 	}
 
