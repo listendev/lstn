@@ -31,9 +31,9 @@ import (
 )
 
 type Scan struct {
-	ignore *enumflag.EnumFlagValue[npm.DependencyType]
+	exclude *enumflag.EnumFlagValue[npm.DependencyType]
 
-	Ignores []npm.DependencyType
+	Excludes []npm.DependencyType
 	flags.JSONFlags
 	flags.ConfigFlags `flagset:"Config"`
 }
@@ -41,13 +41,30 @@ type Scan struct {
 func NewScan() (*Scan, error) {
 	o := &Scan{}
 
-	ignoreValues := `(` + strings.Join(goneric.MapSlice(func(t npm.DependencyType) string { return t.String() }, maps.Keys(npm.DependencyTypeIDs)), ",") + `)`
-	o.ignore = enumflag.NewSlice(&o.Ignores, ignoreValues, npm.DependencyTypeIDs, enumflag.EnumCaseInsensitive)
+	// Setup --ignore enum flag manually
+	alwaysInSet := npm.BundleDependencies
+	ignoreValues := `(` + strings.Join(
+		goneric.MapSliceSkip(
+			func(identifiers []string) (string, bool) {
+				t := identifiers[0]
+				if t == alwaysInSet.String() {
+					return "", true
+				}
 
-	if err := defaults.Set(o); err != nil {
+				return t, false
+			},
+			maps.Values(npm.DependencyTypeIDs),
+		),
+		",",
+	) + `)`
+	// Proxy values to o.Ignores
+	o.exclude = enumflag.NewSlice(&o.Excludes, ignoreValues, npm.DependencyTypeIDs, enumflag.EnumCaseInsensitive)
+	if err := o.exclude.Set(alwaysInSet.String()); err != nil {
 		return nil, fmt.Errorf("error setting defaults for the scan options")
 	}
-	if err := o.ignore.Set(npm.BundleDependencies.String()); err != nil {
+
+	// Set defaults for other (normal) flags
+	if err := defaults.Set(o); err != nil {
 		return nil, fmt.Errorf("error setting defaults for the scan options")
 	}
 
@@ -56,8 +73,8 @@ func NewScan() (*Scan, error) {
 
 func (o *Scan) Attach(c *cobra.Command) {
 	flags.Define(c, o, "")
-	c.Flags().VarP(o.ignore, "ignore", "i", "sets of dependencies to ignore")
-	c.Flags().Lookup("ignore").DefValue = `"` + npm.DependencyTypeIDs[npm.BundleDependencies][0] + `"`
+	// Define --exclude enum flag manually
+	c.Flags().VarP(o.exclude, "exclude", "e", `sets of dependencies to exclude (in addition to the default)`)
 	flagusages.Set(c)
 }
 
