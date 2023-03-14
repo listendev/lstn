@@ -20,7 +20,6 @@ import (
 	"reflect"
 	"runtime"
 	"sort"
-	"unicode"
 
 	"github.com/Masterminds/semver/v3"
 	"github.com/XANi/goneric"
@@ -43,10 +42,8 @@ func (p *packageLockJSON) Deps() map[string]PackageLockDependency {
 func (p *packageJSON) getDepsByType(t DependencyType) map[string]string {
 	// TODO: assert t != All
 
-	typeStr := []rune(t.String())
-	depType := string(append([]rune{unicode.ToUpper(typeStr[0])}, typeStr[1:]...))
 	r := reflect.ValueOf(p)
-	f := reflect.Indirect(r).FieldByName(depType)
+	f := reflect.Indirect(r).FieldByName(t.Name())
 
 	ret := map[string]string{}
 	if f.Kind() == reflect.Map {
@@ -113,17 +110,15 @@ func (p *packageJSON) Deps(ctx context.Context, resolve VersionResolutionStrateg
 
 	// We assume the All type is the one with the lowest value
 	if types[0] == All {
-		types = []DependencyType{
-			Dependencies,
-			DevDependencies,
-			PeerDependencies,
-			BundleDependencies,
-			OptionalDependencies,
-		}
+		types = AllDependencyTypes
 	}
 
 	for _, t := range types {
 		depsByType := p.getDepsByType(t)
+
+		if len(depsByType) == 0 {
+			continue
+		}
 
 		// TODO: process the overrides field
 
