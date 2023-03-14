@@ -110,6 +110,7 @@ The verdicts it returns are listed by the name of each package and its specified
 			}
 
 			tablePrinter := packagesprinter.NewTablePrinter(io)
+
 			return tablePrinter.RenderPackages(res)
 		},
 	}

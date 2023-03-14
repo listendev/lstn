@@ -138,6 +138,7 @@ It lists out the verdicts of all the versions of the input package name.`,
 			}
 
 			tablePrinter := packagesprinter.NewTablePrinter(io)
+
 			return tablePrinter.RenderPackages(res)
 		},
 	}
