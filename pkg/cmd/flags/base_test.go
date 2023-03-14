@@ -19,6 +19,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/listendev/lstn/pkg/cmd"
 	"github.com/listendev/lstn/pkg/cmd/flagusages"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
@@ -75,8 +76,8 @@ func (suite *FlagsBaseSuite) TestValidate() {
 func (suite *FlagsBaseSuite) TestTransform() {
 	cases := []struct {
 		desc     string
-		o        *ConfigFlags
-		expected *ConfigFlags
+		o        cmd.Options
+		expected cmd.Options
 		wantErr  error
 	}{
 		{
@@ -92,6 +93,16 @@ func (suite *FlagsBaseSuite) TestTransform() {
 			},
 			&ConfigFlags{
 				Endpoint: "https://npm.listen.dev",
+			},
+			nil,
+		},
+		{
+			"custom registry with leading slash",
+			&RegistryFlags{
+				URL: "https://registry.npm.org/",
+			},
+			&RegistryFlags{
+				URL: "https://registry.npm.org",
 			},
 			nil,
 		},
