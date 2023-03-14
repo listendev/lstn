@@ -267,7 +267,7 @@ func New(ctx context.Context) (*Command, error) {
 	// Fallback to the default subcommand when the user doesn't specify one explicitly.
 	c, _, err := rootCmd.Find(os.Args[1:])
 	if err == nil && c.Use == rootCmd.Use && c.Flags().Parse(os.Args[1:]) != pflag.ErrHelp {
-		args := append([]string{inCmd.Name()}, os.Args[1:]...)
+		args := append([]string{scanCmd.Name()}, os.Args[1:]...)
 		rootCmd.SetArgs(args)
 	}
 
