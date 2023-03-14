@@ -170,10 +170,10 @@ func (suite *RequestsSuite) BeforeTest(suiteName, testName string) {
 	switch testName {
 	case "TestAnalysisRequest":
 		resp := []byte(`[{"name":"js-tokens","shasum":"19203fb59991df98e3a287050d4647cdeaf32499","verdicts":[],"version":"4.0.0"},{"name":"loose-envify","shasum":"71ee51fa7be4caec1a63839f7e682d8132d30caf","verdicts":[],"version":"1.4.0"}]`)
-		suite.server = internaltesting.MockHTTPServer(suite.Assert(), "analysis", resp, http.StatusOK)
+		suite.server = internaltesting.MockHTTPServer(suite.Assert(), "analysis", resp, http.StatusOK, "POST")
 	case "TestVerdictsRequest":
 		resp := []byte(`[{"name":"js-tokens","shasum":"19203fb59991df98e3a287050d4647cdeaf32499","verdicts":[],"version":"4.0.0"}]`)
-		suite.server = internaltesting.MockHTTPServer(suite.Assert(), "verdicts", resp, http.StatusOK)
+		suite.server = internaltesting.MockHTTPServer(suite.Assert(), "verdicts", resp, http.StatusOK, "POST")
 	}
 }
 

@@ -28,14 +28,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func MockHTTPServer(assert *assert.Assertions, path string, resp []byte, status int) *httptest.Server {
+func MockHTTPServer(assert *assert.Assertions, path string, resp []byte, status int, wantMethod string) *httptest.Server {
+
 	if !strings.HasPrefix(path, "/") {
 		path = fmt.Sprintf("/%s", path)
 	}
 
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "POST" {
-			assert.Failf("expected a POST request, got %s", r.Method)
+		if r.Method != wantMethod {
+			assert.Failf("expected a %s request, got %s", wantMethod, r.Method)
 		}
 		if !strings.HasSuffix(r.URL.Path, path) {
 			assert.Failf("expected to request .../analysis or .../verdicts, got %s", r.URL.Path)
