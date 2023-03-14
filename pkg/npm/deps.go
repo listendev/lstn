@@ -115,6 +115,9 @@ func (p *packageJSON) Deps(ctx context.Context, resolve VersionResolutionStrateg
 
 		// Resolve version constraints with parallel requests to the registry
 		resolutions := goneric.ParallelMapSlice(func(input *dep) *dep {
+			if input == nil {
+				return nil
+			}
 			// Get all the versions matching the constraint
 			collect, err := GetVersionsFromRegistry(ctx, input.name, input.constraints)
 			// TODO: understand what to do when the HTTP call to the registry fails
@@ -129,6 +132,9 @@ func (p *packageJSON) Deps(ctx context.Context, resolve VersionResolutionStrateg
 		}, runtime.NumCPU(), deps)
 
 		for _, resol := range resolutions {
+			if resol == nil {
+				return nil
+			}
 			if resol.version != nil {
 				if _, ok := ret[t]; !ok {
 					ret[t] = map[string]*semver.Version{}
