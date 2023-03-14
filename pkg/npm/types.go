@@ -30,13 +30,21 @@ import (
 type DependencyType enumflag.Flag
 
 const (
-	All DependencyType = iota
+	All DependencyType = (iota + 1) * 22
 	Dependencies
 	DevDependencies
 	PeerDependencies
 	BundleDependencies
 	OptionalDependencies
 )
+
+var AllDependencyTypes = []DependencyType{
+	Dependencies,
+	DevDependencies,
+	PeerDependencies,
+	BundleDependencies,
+	OptionalDependencies,
+}
 
 var DependencyTypeIDs = map[DependencyType][]string{
 	Dependencies:         {Dependencies.String()},
@@ -49,7 +57,7 @@ var DependencyTypeIDs = map[DependencyType][]string{
 func (dt DependencyType) String() string {
 	switch dt {
 	case Dependencies:
-		return "deps"
+		return "dep"
 	case DevDependencies:
 		return "dev"
 	case PeerDependencies:
@@ -60,6 +68,23 @@ func (dt DependencyType) String() string {
 		return "optional"
 	default:
 		return "all"
+	}
+}
+
+func (dt DependencyType) Name() string {
+	switch dt {
+	case Dependencies:
+		return "Dependencies"
+	case DevDependencies:
+		return "DevDependencies"
+	case PeerDependencies:
+		return "PeerDependencies"
+	case BundleDependencies:
+		return "BundleDependencies"
+	case OptionalDependencies:
+		return "OptionalDependencies"
+	default:
+		return ""
 	}
 }
 
