@@ -24,20 +24,30 @@ import (
 	"sort"
 
 	"github.com/Masterminds/semver/v3"
+	"github.com/listendev/lstn/pkg/cmd/flags"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/ua"
 	"golang.org/x/exp/maps"
 )
 
-const npmRegistryBaseURL = "https://registry.npmjs.org"
-
 // GetFromRegistry asks to the npm registry for the details of a package
 // by name, and optionally, by version.
 func GetFromRegistry(ctx context.Context, name, version string) (io.ReadCloser, error) {
+	// Obtain the local options from the context
+	opts, err := pkgcontext.GetOptionsFromContext(ctx, pkgcontext.RegistryKey)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't find the registry key in the configuration")
+	}
+	registryFlags, ok := opts.(*flags.RegistryFlags)
+	if !ok {
+		return nil, fmt.Errorf("couldn't find the registry configuration")
+	}
+	npmRegistryBaseURL := registryFlags.URL
+
 	if name == "" {
 		return nil, pkgcontext.OutputError(ctx, fmt.Errorf("the name is mandatory to query the npm registry"))
 	}
-	suffix := fmt.Sprintf("/%s", name)
+	suffix := name
 	if version != "" {
 		suffix += fmt.Sprintf("/%s", version)
 	}
