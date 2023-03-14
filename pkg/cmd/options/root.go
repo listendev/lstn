@@ -20,10 +20,13 @@ import (
 	"fmt"
 
 	"github.com/creasty/defaults"
+	"github.com/listendev/lstn/pkg/cmd"
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	"github.com/listendev/lstn/pkg/cmd/flagusages"
 	"github.com/spf13/cobra"
 )
+
+var _ cmd.Options = (*Root)(nil)
 
 type Root struct {
 	flags.ConfigFlags `flagset:"Config"`

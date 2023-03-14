@@ -20,10 +20,13 @@ import (
 	"fmt"
 
 	"github.com/creasty/defaults"
+	"github.com/listendev/lstn/pkg/cmd"
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	"github.com/listendev/lstn/pkg/cmd/flagusages"
 	"github.com/spf13/cobra"
 )
+
+var _ cmd.Options = (*Version)(nil)
 
 type Version struct {
 	Verbosity int  `name:"verbosity" shorthand:"v" desc:"increment the verbosity level" type:"count" validate:"gte=0"`

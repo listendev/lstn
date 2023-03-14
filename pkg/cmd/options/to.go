@@ -20,14 +20,18 @@ import (
 	"fmt"
 
 	"github.com/creasty/defaults"
+	"github.com/listendev/lstn/pkg/cmd"
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	"github.com/listendev/lstn/pkg/cmd/flagusages"
 	"github.com/spf13/cobra"
 )
 
+var _ cmd.Options = (*To)(nil)
+
 type To struct {
 	flags.JSONFlags
-	flags.ConfigFlags `flagset:"Config"`
+	flags.ConfigFlags   `flagset:"Config"`
+	flags.RegistryFlags `flagset:"Config"`
 }
 
 func NewTo() (*To, error) {

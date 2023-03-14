@@ -23,6 +23,7 @@ import (
 
 	"github.com/XANi/goneric"
 	"github.com/creasty/defaults"
+	"github.com/listendev/lstn/pkg/cmd"
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	"github.com/listendev/lstn/pkg/cmd/flagusages"
 	"github.com/listendev/lstn/pkg/npm"
@@ -31,18 +32,21 @@ import (
 	"golang.org/x/exp/maps"
 )
 
+var _ cmd.Options = (*Scan)(nil)
+
 type Scan struct {
 	exclude *enumflag.EnumFlagValue[npm.DependencyType]
 
 	Excludes []npm.DependencyType
 	flags.JSONFlags
-	flags.ConfigFlags `flagset:"Config"`
+	flags.ConfigFlags   `flagset:"Config"`
+	flags.RegistryFlags `flagset:"Config"`
 }
 
 func NewScan() (*Scan, error) {
 	o := &Scan{}
 
-	// Create the enum flag for --exclude
+	// Create the enum flag value for --exclude
 	alwaysInSet := npm.BundleDependencies
 	ignoreValues := goneric.MapSliceSkip(
 		func(identifiers []string) (string, bool) {
