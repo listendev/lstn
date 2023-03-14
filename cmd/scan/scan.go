@@ -22,11 +22,12 @@ import (
 	"runtime"
 
 	"github.com/XANi/goneric"
-	"github.com/davecgh/go-spew/spew"
+	"github.com/cli/cli/pkg/iostreams"
 	"github.com/listendev/lstn/internal/project"
 	"github.com/listendev/lstn/pkg/cmd/arguments"
 	"github.com/listendev/lstn/pkg/cmd/groups"
 	"github.com/listendev/lstn/pkg/cmd/options"
+	"github.com/listendev/lstn/pkg/cmd/packagesprinter"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/listendev/lstn/pkg/npm"
@@ -64,6 +65,9 @@ The verdicts it returns are listed by the name of each package and its specified
 		RunE: func(c *cobra.Command, args []string) error {
 			ctx = c.Context()
 
+			io := c.Context().Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
+			io.StartProgressIndicator()
+
 			// Obtain the local options from the context
 			opts, err := pkgcontext.GetOptionsFromContext(ctx, pkgcontext.ScanKey)
 			if err != nil {
@@ -100,6 +104,8 @@ The verdicts it returns are listed by the name of each package and its specified
 			}
 
 			// Process one dependency set at once
+			tablePrinter := packagesprinter.NewTablePrinter(io)
+			combinedResponse := []listen.Package{}
 			for _, deps := range deps {
 				names := goneric.MapSliceKey(deps)
 				versions := goneric.MapSliceValue(deps)
@@ -121,10 +127,12 @@ The verdicts it returns are listed by the name of each package and its specified
 				}
 
 				if res != nil {
-					spew.Dump(res)
-					// TODO > create visualization of the results
+					combinedResponse = append(combinedResponse, *res...)
 				}
 			}
+
+			responsePtr := &combinedResponse
+			tablePrinter.RenderPackages((*listen.Response)(responsePtr))
 
 			return nil
 		},
