@@ -2,7 +2,6 @@ changelog:
   exclude:
     labels:
       - no-releasenotes
-      - dependencies
   categories:
     - title: Breaking Changes 🛠
       labels:
