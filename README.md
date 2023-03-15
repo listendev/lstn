@@ -50,7 +50,7 @@ See options below.
 #### Binaries
 
 ```bash
-curl -sSfL https://lstn.dev/get | sh -s -- -b $(go env GOPATH)/bin
+curl -sSfL https://lstn.dev/get | sh -s -- -b /usr/local/bin
 lstn --version
 ```
 
