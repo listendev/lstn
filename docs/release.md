@@ -5,12 +5,15 @@ A `lstn` release has the following parts:
 - a GitHub release, which further includes
   - packages for different operating systems and architectures
   - a file with checksums for the packages
+  - SBOMs
   - a changelog
   - the source code
 
 ### How to release a new version
 
-A release is triggered by pushing a new tag which starts with `v` (for example `v1.2.3`).
+A release is triggered by pushing a new tag which starts with `v` (for example `v1.2.3`) on the main branch.
+
+Before doing it, ensure all the other GitHub checks are green on the main branch.
 
 Everything else is then handled by GoReleaser and GitHub actions.
 
