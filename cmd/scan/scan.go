@@ -126,15 +126,13 @@ The verdicts it returns are listed by the name of each package and its specified
 					fmt.Fprintf(os.Stdout, "%s", resJSON)
 				}
 
+				// Appending the results of the current dependency set
 				if res != nil {
 					combinedResponse = append(combinedResponse, *res...)
 				}
 			}
 
-			responsePtr := &combinedResponse
-			tablePrinter.RenderPackages((*listen.Response)(responsePtr))
-
-			return nil
+			return tablePrinter.RenderPackages((*listen.Response)(&combinedResponse))
 		},
 	}
 
