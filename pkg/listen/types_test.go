@@ -24,6 +24,9 @@ import (
 	"testing"
 
 	"github.com/MakeNowJust/heredoc"
+	"github.com/Masterminds/semver/v3"
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/listendev/lstn/pkg/npm"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -48,6 +51,18 @@ func TestNewVerdictsRequest(t *testing.T) {
 			&VerdictsRequest{Name: "react"},
 			"",
 		},
+		{
+			"name+version",
+			[]string{"react", "18.2.0"},
+			&VerdictsRequest{Name: "react", Version: "18.2.0"},
+			"",
+		},
+		{
+			"name+version+shasum",
+			[]string{"react", "18.2.0", "555bd98592883255fa00de14f1151a917b5d77d5"},
+			&VerdictsRequest{Name: "react", Version: "18.2.0", Shasum: "555bd98592883255fa00de14f1151a917b5d77d5"},
+			"",
+		},
 	}
 
 	for _, tc := range tests {
@@ -64,6 +79,151 @@ func TestNewVerdictsRequest(t *testing.T) {
 				assert.Equal(t, tc.req.Name, res.Name)
 				assert.Equal(t, tc.req.Version, res.Version)
 				assert.Equal(t, tc.req.Shasum, res.Shasum)
+			}
+		})
+	}
+}
+
+func TestNewVerdictsRequestWithContext(t *testing.T) {
+	c := NewContext()
+
+	tests := []struct {
+		desc    string
+		args    []string
+		req     *VerdictsRequest
+		wantErr string
+	}{
+		{
+			"no-args",
+			[]string{},
+			nil,
+			"a verdicts request requires at least one argument (package name)",
+		},
+		{
+			"name-only",
+			[]string{"react"},
+			&VerdictsRequest{Name: "react", Context: c},
+			"",
+		},
+		{
+			"name+version",
+			[]string{"react", "18.2.0"},
+			&VerdictsRequest{Name: "react", Version: "18.2.0", Context: c},
+			"",
+		},
+		{
+			"name+version+shasum",
+			[]string{"react", "18.2.0", "555bd98592883255fa00de14f1151a917b5d77d5"},
+			&VerdictsRequest{Name: "react", Version: "18.2.0", Shasum: "555bd98592883255fa00de14f1151a917b5d77d5", Context: c},
+			"",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.desc, func(t *testing.T) {
+			res, err := NewVerdictsRequestWithContext(tc.args, c)
+			if err != nil {
+				assert.Nil(t, res)
+				if assert.Error(t, err) {
+					assert.Equal(t, tc.wantErr, err.Error())
+				}
+			} else {
+				assert.Nil(t, err)
+				assert.IsType(t, &VerdictsRequest{}, res)
+				assert.Equal(t, tc.req.Name, res.Name)
+				assert.Equal(t, tc.req.Version, res.Version)
+				assert.Equal(t, tc.req.Shasum, res.Shasum)
+				assert.Equal(t, tc.req.Context, res.Context)
+			}
+		})
+	}
+}
+
+func TestNewBulkVerdictsRequestsFromMap(t *testing.T) {
+	tests := []struct {
+		desc    string
+		args    map[string]*semver.Version
+		reqs    []*VerdictsRequest
+		wantErr string
+	}{
+		{
+			"empty",
+			map[string]*semver.Version{},
+			nil,
+			"couldn't create a request set from empty dependencies map",
+		},
+		{
+			"one-package-without-version",
+			map[string]*semver.Version{
+				"tap": nil,
+			},
+			[]*VerdictsRequest{
+				{Name: "tap"},
+			},
+			"",
+		},
+		{
+			"one-package-without-empty-name",
+			map[string]*semver.Version{
+				"": nil,
+			},
+			nil,
+			"a verdicts request requires at least one argument (package name)",
+		},
+		{
+			"one-package-with-version",
+			map[string]*semver.Version{
+				"tap": semver.MustParse("15.1.2"),
+			},
+			[]*VerdictsRequest{
+				{Name: "tap", Version: "15.1.2"},
+			},
+			"",
+		},
+		{
+			"more-packages-with-version",
+			map[string]*semver.Version{
+				"tap":   semver.MustParse("15.1.2"),
+				"react": semver.MustParse("18.2.0"),
+			},
+			[]*VerdictsRequest{
+				{Name: "tap", Version: "15.1.2"},
+				{Name: "react", Version: "18.2.0"},
+			},
+			"",
+		},
+		{
+			"more-packages-with-or-without-versions",
+			map[string]*semver.Version{
+				"tap":     semver.MustParse("15.1.2"),
+				"core-js": semver.MustParse("3.25.0"),
+				"react":   nil,
+			},
+			[]*VerdictsRequest{
+				{Name: "tap", Version: "15.1.2"},
+				{Name: "core-js", Version: "3.25.0"},
+				{Name: "react"},
+			},
+			"",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.desc, func(t *testing.T) {
+			res, err := NewBulkVerdictsRequestsFromMap(tc.args)
+			if err != nil {
+				assert.Nil(t, res)
+				if assert.Error(t, err) {
+					assert.Equal(t, tc.wantErr, err.Error())
+				}
+			} else {
+				assert.Nil(t, err)
+				assert.IsType(t, []*VerdictsRequest{}, res)
+				if diff := cmp.Diff(tc.reqs, res, cmpopts.SortSlices(func(x, y *VerdictsRequest) bool {
+					return x.Name < y.Name
+				}), cmpopts.IgnoreFields(VerdictsRequest{}, "Context")); diff != "" {
+					t.Errorf("vedicts request mismatch (-want +got):\n%s", diff)
+				}
 			}
 		})
 	}
