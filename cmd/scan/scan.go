@@ -107,10 +107,8 @@ The verdicts it returns are listed by the name of each package and its specified
 			tablePrinter := packagesprinter.NewTablePrinter(io)
 			combinedResponse := []listen.Package{}
 			for _, deps := range deps {
-				names := goneric.MapSliceKey(deps)
-				versions := goneric.MapSliceValue(deps)
 				// Create list of verdicts requests
-				reqs, err := listen.NewBulkVerdictsRequests(names, versions)
+				reqs, err := listen.NewBulkVerdictsRequestsFromMap(deps)
 				if err != nil {
 					return err
 				}
