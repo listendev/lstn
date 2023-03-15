@@ -73,6 +73,27 @@ func NewVerdictsRequest(args []string) (*VerdictsRequest, error) {
 	return fillVerdictsRequest(ret, args)
 }
 
+func NewBulkVerdictsRequestsFromMap(deps map[string]*semver.Version) ([]*VerdictsRequest, error) {
+	if len(deps) == 0 {
+		return nil, fmt.Errorf("couldn't create a request set when there are no dependencies")
+	}
+
+	c := NewContext()
+
+	i := 0
+	reqs := make([]*VerdictsRequest, len(deps))
+	for name, vers := range deps {
+		var reqErr error
+		reqs[i], reqErr = NewVerdictsRequestWithContext([]string{name, vers.String()}, c)
+		if reqErr != nil {
+			return nil, reqErr
+		}
+		i++
+	}
+
+	return reqs, nil
+}
+
 func NewBulkVerdictsRequests(names []string, versions semver.Collection) ([]*VerdictsRequest, error) {
 	if len(names) != len(versions) {
 		return nil, fmt.Errorf("couldn't create a request set because of mismatching lenghts")
