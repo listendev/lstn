@@ -4,11 +4,11 @@
 
 It lets you analyze the behavior of your dependencies.
 
-TODO: image
+TODO: image or asciinema
 
 ## Documentation
 
-For [installation options see below](#installation), for usage instructions TODO: [see the manual]().
+For [installation options see below](#installation), for usage instructions [see the manual](docs/cheatsheet.md).
 
 ## Installation
 
@@ -25,8 +25,8 @@ It's highly recommended installing a specific version of `lstn` available on the
 Here are a few ways to install it:
 
 ```bash
-# THe binary will be $(go env GOPATH)/bin/lstn
-curl -sSfL https://lstn.dev/get | sh -s -- -b $(go env GOPATH)/bin
+# The binary will be /usr/local/bin/lstn
+curl -sSfL https://lstn.dev/get | sh -s -- -b /usr/local/bin
 
 # Or install it into $PWD/bin/
 curl -sSfL https://lstn.dev/get | sh -s
