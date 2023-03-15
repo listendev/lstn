@@ -29,19 +29,21 @@ labels:
 
 rules:
   - name: docs-changes
-    spec: $hasFileExtensions([".md", ".txt"]) || $matchString("^doc(s)?\/.+", $head()) || $matchString("^docs(\([A-Za-z0-9_\/]+\))??:.+$", $title())
+    spec: $hasFileExtensions([".md", ".txt"]) || $matchString("^docs(\([A-Za-z0-9_\/]+\))??:.+$", $title())
   - name: ci-changes
-    spec: $hasFilePattern(".github/**") || $hasFileName(".golangci.yml") || $hasFileName("reviewpad.yml") || $hasFileName(".goreleaser.yml") || $matchString("^ci(\([A-Za-z0-9_\/]+\))??:.+$", $title()) || $matchString("^ci\/.+", $head())
+    spec: $hasFilePattern(".github/**") || $hasFileName(".golangci.yml") || $hasFileName("reviewpad.yml") || $hasFileName(".goreleaser.yml") || $matchString("^ci(\([A-Za-z0-9_\/]+\))??:.+$", $title())
   - name: deps-changes
     spec: $hasFileName("go.mod") || $hasFileName("go.sum") || $matchString("^build\(deps\)\/.+", $title())
   - name: feat-changes
-    spec: $matchString("^(feat(ure)?|new)\/.+", $head()) || $matchString("^feat(\([A-Za-z0-9_\/]+\))??:.+$", $title())
+    spec: $matchString("^feat(\([A-Za-z0-9_\/]+\))??:.+$", $title())
   - name: fix-changes
-    spec: $matchString("^(fix|bug)\/.+", $head()) || $matchString("^fix(\([A-Za-z0-9_\/]+\))??:.+$", $title())
+    spec: $matchString("^fix(\([A-Za-z0-9_\/]+\))??:.+$", $title())
   - name: breaking-changes
     spec: $matchString("^([A-Za-z0-9_]+)??(\([A-Za-z0-9_\/]+\))??!:.+$", $title())
   - name: exclude-changes
     spec: $matchString("^(chore|refactor|revert|perf|test)\/.+", $head()) || $matchString("^(chore|refactor|revert|perf|test)(\([A-Za-z0-9_\/]+\))??:.+$", $title())
+  - name: by-bot
+    spec: $matchString("^(dependabot|github-actions).*$", $author())
   - name: build-changes
     spec: $hasFilePattern("make/**") || $matchString("^build(\([A-Za-z0-9_\/]+\))??:.+$", $title()) || $matchString("^build\/.+", $head())
 
@@ -156,6 +158,10 @@ workflows:
           - $addLabel("breaking-change")
       # Label pull requests with `no-releasenotes` if the branch or the title starts with one of the excluded prefixes (chore|refactor|revert|perf|test)
       - rule: exclude-changes
+        extra-actions:
+          - $addLabel("no-releasenotes")
+      # Label pull requests with `no-releasenotes` if their author is...
+      - rule: by-bot
         extra-actions:
           - $addLabel("no-releasenotes")
       # Label pull requests with `needs-review` if they are waiting for review
