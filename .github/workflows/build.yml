@@ -32,8 +32,13 @@ jobs:
 
     steps:
 
+      - name: Check out the source code
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
       - name: Set up Go ${{ matrix.go }}
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
           go-version: ${{ matrix.GO_VERSION }}
           check-latest: true
@@ -46,21 +51,6 @@ jobs:
           go env
           printf "\n\nSystem environment:\n\n"
           env
-
-      - name: Cache the build cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/go/pkg/mod
-            ~/.cache/go-build
-          key: build-go-${{ matrix.go }}-${{ matrix.goos }}-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            build-go-${{ matrix.go }}-${{ matrix.goos }}
-
-      - name: Check out the source code
-        uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
       - name: Build the make/make tool
         run: go build -o make/make make/main.go
