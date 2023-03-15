@@ -48,6 +48,9 @@ func fillVerdictsRequest(r *VerdictsRequest, args []string) (*VerdictsRequest, e
 
 		fallthrough
 	case 1:
+		if len(args[0]) == 0 {
+			return nil, fmt.Errorf("a verdicts request requires at least one argument (package name)")
+		}
 		r.Name = args[0]
 
 	default:
@@ -75,7 +78,7 @@ func NewVerdictsRequest(args []string) (*VerdictsRequest, error) {
 
 func NewBulkVerdictsRequestsFromMap(deps map[string]*semver.Version) ([]*VerdictsRequest, error) {
 	if len(deps) == 0 {
-		return nil, fmt.Errorf("couldn't create a request set when there are no dependencies")
+		return nil, fmt.Errorf("couldn't create a request set from empty dependencies map")
 	}
 
 	c := NewContext()
@@ -83,8 +86,12 @@ func NewBulkVerdictsRequestsFromMap(deps map[string]*semver.Version) ([]*Verdict
 	i := 0
 	reqs := make([]*VerdictsRequest, len(deps))
 	for name, vers := range deps {
+		inputs := []string{name}
+		if vers != nil {
+			inputs = append(inputs, vers.String())
+		}
 		var reqErr error
-		reqs[i], reqErr = NewVerdictsRequestWithContext([]string{name, vers.String()}, c)
+		reqs[i], reqErr = NewVerdictsRequestWithContext(inputs, c)
 		if reqErr != nil {
 			return nil, reqErr
 		}
