@@ -15,15 +15,15 @@ builds:
   - <<: &build_defaults
       binary: lstn
       main: ./cmd/lstn
+      env:
+        - CGO_ENABLED=0
+      flags:
+        - -trimpath
+      ldflags:
+        - -w -s -X github.com/listendev/lstn/pkg/version.VersionPrefix=v{{.Version}}
     id: macos
     goos: [darwin]
     goarch: [arm64, amd64]
-    env:
-      - CGO_ENABLED=0
-    flags:
-      - -trimpath
-    ldflags:
-      - -w -s -X github.com/listendev/lstn/pkg/version.VersionPrefix=v{{.Version}}
 
   - <<: *build_defaults
     id: linux
@@ -75,6 +75,7 @@ archives:
         {{- with .Mips }}_{{ . }}{{ end }}
         {{- if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}
     wrap_in_directory: true
+    rlcp: true
     format: tar.gz
     files:
       - LICENSE
