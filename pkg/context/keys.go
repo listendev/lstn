@@ -35,6 +35,9 @@ var VersionsCollection contextKey = "versionscollection"
 // ScanKey is the key indexing the options for the `scan` child command.
 var ScanKey contextKey = "scan"
 
+// ReportKey is the key indexing the options for the `report` child command.
+var ReportKey contextKey = "report"
+
 // VersionKey is the key indexing the options for the `version` child command.
 var VersionKey contextKey = "version"
 
