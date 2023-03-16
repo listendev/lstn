@@ -84,14 +84,24 @@ func New(ctx context.Context) (*cobra.Command, error) {
 
 			// json report
 			jsonReport := report.NewJSONReport()
-			reportFile, err := createReportFile(targetDir, "report.json")
+			jsonReportFile, err := createReportFile(targetDir, "report.json")
 			if err != nil {
 				return err
 			}
-			jsonReport.WithOutput(reportFile)
+			defer jsonReportFile.Close()
+			jsonReport.WithOutput(jsonReportFile)
+
+			// full markdown report
+			fullMarkdownReport := report.NewFullMarkdwonReport()
+			fullMDReportFile, err := createReportFile(targetDir, "full.md")
+			if err != nil {
+				return err
+			}
+			fullMarkdownReport.WithOutput(fullMDReportFile)
 
 			rb := report.NewReportBuilder()
 			rb.RegisterReport(jsonReport)
+			rb.RegisterReport(fullMarkdownReport)
 
 			return rb.Render(packages)
 		},
@@ -102,9 +112,6 @@ func New(ctx context.Context) (*cobra.Command, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	// Persistent flags here will work for this command and all subcommands
-	// scanCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Local flags will only run when this command is called directly
 	reportOpts.Attach(reportCmd)
