@@ -30,6 +30,7 @@ import (
 	"github.com/listendev/lstn/pkg/cmd/arguments"
 	"github.com/listendev/lstn/pkg/cmd/groups"
 	"github.com/listendev/lstn/pkg/cmd/options"
+	"github.com/listendev/lstn/pkg/cmd/report"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/spf13/cobra"
@@ -81,21 +82,18 @@ func New(ctx context.Context) (*cobra.Command, error) {
 				return err
 			}
 
-			jsonReportFile, err := os.Create(path.Join(targetDir, "report.json"))
-
-			if err != nil {
-				return fmt.Errorf("couldn't open the JSON report file: %w", err)
-			}
-			defer jsonReportFile.Close()
-			_ = jsonReportFile.Truncate(0)
-			_, _ = jsonReportFile.Seek(0, 0)
-
-			err = jsonReportWrite(packages, jsonReportFile)
+			// json report
+			jsonReport := report.NewJSONReport()
+			reportFile, err := createReportFile(targetDir, "report.json")
 			if err != nil {
 				return err
 			}
+			jsonReport.WithOutput(reportFile)
 
-			return nil
+			rb := report.NewReportBuilder()
+			rb.RegisterReport(jsonReport)
+
+			return rb.Render(packages)
 		},
 	}
 
@@ -142,12 +140,20 @@ func readPackagesFromReader(reader io.Reader) ([]listen.Package, error) {
 	return combinedResponse, nil
 }
 
-func jsonReportWrite(packages []listen.Package, writer io.Writer) error {
-	enc := json.NewEncoder(writer)
-	enc.SetIndent("", "  ")
-	err := enc.Encode(packages)
+func createReportFile(targetDir string, filename string) (*os.File, error) {
+	reportFile, err := os.Create(path.Join(targetDir, filename))
+
 	if err != nil {
-		return fmt.Errorf("couldn't encode the JSON report: %w", err)
+		return nil, fmt.Errorf("couldn't open the report file: %w", err)
 	}
-	return nil
+
+	err = reportFile.Truncate(0)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't truncate the report file: %w", err)
+	}
+	_, err = reportFile.Seek(0, 0)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't seek the report file: %w", err)
+	}
+	return reportFile, nil
 }
