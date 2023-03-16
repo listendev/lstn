@@ -130,6 +130,10 @@ The verdicts it returns are listed by the name of each package and its specified
 				}
 			}
 
+			if scanOpts.JSON {
+				return nil
+			}
+
 			return tablePrinter.RenderPackages((*listen.Response)(&combinedResponse))
 		},
 	}
