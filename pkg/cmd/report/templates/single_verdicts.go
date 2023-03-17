@@ -16,31 +16,43 @@ const singleVerdictsTpl = `
         {{ len .Verdicts }} alert{{ if gt (len .Verdicts) 1 }}s{{end}} found
     </span> <i>(click to expand)</i>
 </summary>
-
 {{ range .Verdicts }}
-{{ if eq .Priority "high" }}
-## :stop_sign: {{ .Message }}
-{{ else if eq .Priority "medium" }}
-## :warning: {{ .Message }}
-{{ else if eq .Priority "low" }}
-## :large_blue_diamond: {{ .Message }}
+{{ $priority := index .Metadata "ai_rank" }}
+{{ $staticPriority := .Priority}}
+{{ if not $priority }}
+	{{ $priority := $staticPriority }}
 {{ end }}
+{{ $priorityEmoji := ":large_blue_diamond:" }}
+{{ if eq $priority "high" }}
+	{{ $priorityEmoji = ":stop_sign:" }}
+{{ else if eq $priority "medium" }}
+	{{ $priorityEmoji = ":warning:" }}
+{{ else if eq $priority "low" }}
+	{{ $priorityEmoji = ":large_blue_diamond:" }}
+{{ end }}
+## {{ $priorityEmoji }} {{ .Message }}
 <dl>
 <dt>Dependency type</dt>
 <dd>
 {{ if and (eq (index .Metadata "npm_package_name") $.Name) (eq (index .Metadata "npm_package_version") $.Version) }}
 Direct dependency
 {{ else }}
-Transitive dependency ({{ index .Metadata "npm_package_name" }}@{{ index .Metadata "npm_package_version" }})
+{{ $transitivePackageName := index .Metadata "npm_package_name" }}
+{{ $transitivePackageVersion := index .Metadata "npm_package_version" }}
+Transitive dependency (<a href="https://www.npmjs.com/package/{{ $transitivePackageName }}/v/{{ $transitivePackageVersion }}">{{ $transitivePackageName }}@{{ $transitivePackageVersion }}</a>)
 {{ end }}
 </dd>
 {{ if index .Metadata "ai_context" }}
 <dt>Context</dt>
 <dd>{{ index .Metadata "ai_context" }}</dd>
 {{ end }}
-{{ if index .Metadata "ai_action" }}
-<dt>Action</dt>
-<dd>{{ index .Metadata "ai_action" }}</dd>
+{{ if index .Metadata "ai_actions" }}
+<dt>Suggested actions</dt>
+<dd>
+{{ range $action := index .Metadata "ai_actions" }}
+- {{ $action }}
+{{ end }}
+</dd>
 {{ end }}
 <dt>Metadata</dt>
 <dd>
@@ -48,10 +60,15 @@ Transitive dependency ({{ index .Metadata "npm_package_name" }}@{{ index .Metada
 {{ range $key, $value := .Metadata }}
 {{ if or (eq $key "npm_package_name")
         (eq $key "npm_package_version")
-        (eq $key "ai_comment")
-        (eq $key "ai_action")
+        (eq $key "ai_context")
+        (eq $key "ai_actions")
+        (eq $key "ai_concern")
+        (eq $key "ai_rank")
 }}
     {{ continue }}
+{{ end }}
+{{ if not $value }}
+	{{ continue }}
 {{ end }}
 <tr>
 <td>{{ $key }}:</td><td>{{ $value }}</td>
@@ -61,7 +78,6 @@ Transitive dependency ({{ index .Metadata "npm_package_name" }}@{{ index .Metada
 </dd>
 </dl>
 {{ end }}
-
 </details>
 {{ end }}
 `
