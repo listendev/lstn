@@ -17,11 +17,7 @@ const singleVerdictsTpl = `
     </span> <i>(click to expand)</i>
 </summary>
 {{ range .Verdicts }}
-{{ $priority := index .Metadata "ai_rank" }}
-{{ $staticPriority := .Priority}}
-{{ if not $priority }}
-	{{ $priority := $staticPriority }}
-{{ end }}
+{{ $priority := .Priority}}
 {{ $priorityEmoji := ":large_blue_diamond:" }}
 {{ if eq $priority "high" }}
 	{{ $priorityEmoji = ":stop_sign:" }}
