@@ -47,7 +47,7 @@ func New(ctx context.Context) (*cobra.Command, error) {
 		DisableFlagsInUseLine: true,
 		Short:                 "TODO",
 		Long:                  `TODO`,
-		Example:               `  lstn scan | lstn report /tmp/myreport`,
+		Example:               `lstn scan | lstn report /tmp/myreport`,
 		Args:                  arguments.SingleDirectory, // Executes before RunE
 		ValidArgsFunction:     arguments.SingleDirectoryActiveHelp,
 		Annotations: map[string]string{
