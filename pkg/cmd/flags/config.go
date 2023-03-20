@@ -25,10 +25,15 @@ import (
 
 var _ cmd.Options = (*ConfigFlags)(nil)
 
+type Token struct {
+	GitHub string `flag:"gh-token" name:"GitHub token" desc:"the GitHub token" flagset:"Token"`
+}
+
 type ConfigFlags struct {
-	LogLevel string `default:"info" name:"log level" flag:"loglevel" desc:"set the logging level"`                           // TODO > validator
-	Timeout  int    `default:"60" name:"timeout" flag:"timeout" desc:"set the timeout, in seconds" validate:"number,min=30"` // FIXME: change to time.Duration type
-	Endpoint string `default:"https://npm.listen.dev" flag:"endpoint" name:"endpoint" desc:"the listen.dev endpoint emitting the verdicts" validate:"url,endpoint" transform:"tsuffix=/"`
+	LogLevel string `default:"info" name:"log level" flag:"loglevel" desc:"set the logging level" flagset:"Config"`                           // TODO > validator
+	Timeout  int    `default:"60" name:"timeout" flag:"timeout" desc:"set the timeout, in seconds" validate:"number,min=30" flagset:"Config"` // FIXME: change to time.Duration type
+	Endpoint string `default:"https://npm.listen.dev" flag:"endpoint" name:"endpoint" desc:"the listen.dev endpoint emitting the verdicts" validate:"url,endpoint" transform:"tsuffix=/" flagset:"Config"`
+	Token
 }
 
 func NewConfigFlags() (*ConfigFlags, error) {
