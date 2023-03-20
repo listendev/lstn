@@ -25,5 +25,9 @@ import (
 func DefaultVersionResolutionStrategy(versions semver.Collection) *semver.Version {
 	sort.Sort(versions)
 
+	if versions.Len() == 0 {
+		return nil
+	}
+
 	return versions[versions.Len()-1]
 }
