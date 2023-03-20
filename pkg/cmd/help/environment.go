@@ -39,7 +39,7 @@ func envHelpTopicFunc() TopicFunc {
 				flagName := f.Name
 				_, ok := configFlagsNames[flagName]
 				if ok {
-					envVarName := strings.ToUpper(fmt.Sprintf("%s%s%s", flags.EnvPrefix, flags.EnvSeparator, flagName))
+					envVarName := strings.ToUpper(fmt.Sprintf("%s%s%s", flags.EnvPrefix, flags.EnvSeparator, flags.EnvReplacer.Replace(flagName)))
 					fmt.Fprintf(b, "`%s`: %s\n\n", envVarName, f.Usage)
 				}
 			})
