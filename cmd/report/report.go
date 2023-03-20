@@ -45,11 +45,14 @@ func New(ctx context.Context) (*cobra.Command, error) {
 		Use:                   "report <output_path>",
 		GroupID:               groups.Core.ID,
 		DisableFlagsInUseLine: true,
-		Short:                 "TODO",
-		Long:                  `TODO`,
-		Example:               `lstn scan --json | lstn report /tmp/myreport`,
-		Args:                  arguments.SingleDirectory, // Executes before RunE
-		ValidArgsFunction:     arguments.SingleDirectoryActiveHelp,
+		Short:                 "Generate a report for the current project",
+		Long: `Generate a report for the current project. The report is generated in the specified output path.
+The report is made of two files: a JSON file with the whole report (in many cases is 1:1 with the input, however it merges it if the input is a stream)
+and a markdown file with a human-readable report.
+The report command takes the input in JSON from the standard input (stdin), so you can pipe the output of the scan, to and in commands to it.`,
+		Example:           `lstn scan --json | lstn report /tmp/myreport`,
+		Args:              arguments.SingleDirectory, // Executes before RunE
+		ValidArgsFunction: arguments.SingleDirectoryActiveHelp,
 		Annotations: map[string]string{
 			"source": project.GetSourceURL(filename),
 		},
