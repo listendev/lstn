@@ -25,7 +25,6 @@ import (
 
 	"github.com/cli/cli/pkg/iostreams"
 	"github.com/listendev/lstn/cmd/in"
-	"github.com/listendev/lstn/cmd/report"
 	"github.com/listendev/lstn/cmd/scan"
 	"github.com/listendev/lstn/cmd/to"
 	"github.com/listendev/lstn/cmd/version"
@@ -233,13 +232,6 @@ func New(ctx context.Context) (*Command, error) {
 		return nil, err
 	}
 	rootCmd.AddCommand(scanCmd)
-
-	// Setup the `report` subcommand
-	reportCmd, err := report.New(ctx)
-	if err != nil {
-		return nil, err
-	}
-	rootCmd.AddCommand(reportCmd)
 
 	// Setup the `version` subcommand
 	versionCmd, err := version.New(ctx)
