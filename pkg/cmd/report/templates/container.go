@@ -5,7 +5,6 @@ import (
 	"io"
 	"text/template"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/listendev/lstn/pkg/listen"
 )
 
@@ -147,7 +146,6 @@ func RenderContainer(
 	highAlertPackages := filterPackagesByVerdictPriority(packages, "high")
 	mediumAlertPackages := filterPackagesByVerdictPriority(packages, "medium")
 	lowAlertPacakges := filterPackagesByVerdictPriority(packages, "low")
-	spew.Dump(lowAlertPacakges)
 
 	lowDetails, err := renderDetails(lowAlertPacakges)
 	if err != nil {
