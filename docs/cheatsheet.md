@@ -87,6 +87,12 @@ Inspect the verdicts for your dependencies tree.
 --timeout int       set the timeout, in seconds (default 60)
 ```
 
+### Token Flags
+
+```
+--gh-token string   the GitHub token
+```
+
 For example:
 
 ```bash
@@ -121,6 +127,12 @@ Inspect the verdicts for your direct dependencies.
 --timeout int       set the timeout, in seconds (default 60)
 ```
 
+### Token Flags
+
+```
+--gh-token string   the GitHub token
+```
+
 For example:
 
 ```bash
@@ -151,6 +163,12 @@ Get the verdicts of a package.
 --loglevel string   set the logging level (default "info")
 --registry string   set a custom registry (default "https://registry.npmjs.org")
 --timeout int       set the timeout, in seconds (default 60)
+```
+
+### Token Flags
+
+```
+--gh-token string   the GitHub token
 ```
 
 For example:

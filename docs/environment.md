@@ -6,6 +6,8 @@ But flags override them.
 
 `LSTN_ENDPOINT`: the listen.dev endpoint emitting the verdicts
 
+`LSTN_GH_TOKEN`: the GitHub token
+
 `LSTN_LOGLEVEL`: set the logging level
 
 `LSTN_TIMEOUT`: set the timeout, in seconds
