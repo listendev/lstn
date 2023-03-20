@@ -34,6 +34,45 @@ func TestFlagsBaseSuite(t *testing.T) {
 	suite.Run(t, new(FlagsBaseSuite))
 }
 
+func (suite *FlagsBaseSuite) TestGetNames() {
+	type ScanOpts struct {
+		ConfigFlags
+		JSONFlags
+	}
+	res := GetNames(&ScanOpts{})
+
+	// Expecting all the (sub)fields
+	assert.Len(suite.T(), res, 6)
+}
+
+func (suite *FlagsBaseSuite) TestGetDefaults() {
+	type ScanOpts struct {
+		ConfigFlags
+		JSONFlags
+	}
+	res := GetDefaults(&ScanOpts{})
+
+	// Only 3 (sub)fields have default values
+	assert.Len(suite.T(), res, 3)
+}
+
+func (suite *FlagsBaseSuite) TestGetField() {
+	cfg := ConfigFlags{
+		Token: Token{
+			GitHub: "xxxx",
+		},
+		LogLevel: "info",
+	}
+
+	tokenGithubVal := GetField(cfg, "Token.GitHub")
+	assert.True(suite.T(), tokenGithubVal.IsValid())
+	assert.Equal(suite.T(), "xxxx", tokenGithubVal.Interface())
+
+	logLevelVal := GetField(cfg, "LogLevel")
+	assert.True(suite.T(), logLevelVal.IsValid())
+	assert.Equal(suite.T(), "info", logLevelVal.Interface())
+}
+
 func (suite *FlagsBaseSuite) TestValidate() {
 	cases := []struct {
 		desc        string
