@@ -71,6 +71,8 @@ Transitive dependency (<a href="https://www.npmjs.com/package/{{ $transitivePack
 </dd>
 </dl>
 {{ end }}
+{{ else }}
+Nothing to see here, lucky us! :tada:
 {{ end }}
 `
 
