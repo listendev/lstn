@@ -18,8 +18,10 @@ package context
 import (
 	"context"
 	"fmt"
+	"reflect"
 
 	"github.com/listendev/lstn/pkg/cmd"
+	"github.com/listendev/lstn/pkg/cmd/flags"
 )
 
 // GetFromContext returns a Options instance.
@@ -32,6 +34,18 @@ func GetOptionsFromContext(ctx context.Context, key any) (cmd.Options, error) {
 	o, ok := ctx.Value(key).(cmd.Options)
 	if !ok {
 		return nil, fmt.Errorf("the key does not refer an Options instance")
+	}
+
+	// Update the inner config options into the current option set
+	// This makes the config options work as global options
+	val := reflect.ValueOf(o).Elem()
+	fld := val.FieldByName("ConfigFlags")
+	if fld.IsValid() && fld.CanSet() {
+		cfgOpts, ok := ctx.Value(ConfigKey).(*flags.ConfigFlags)
+		if !ok {
+			return nil, fmt.Errorf("couldn't obtain the config options to update the current option set")
+		}
+		fld.Set(reflect.ValueOf(cfgOpts).Elem())
 	}
 
 	if errors := o.Validate(); errors != nil {
