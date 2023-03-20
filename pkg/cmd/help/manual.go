@@ -19,12 +19,14 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"sort"
 	"strings"
 
 	"github.com/listendev/lstn/pkg/cmd/flagusages"
 	"github.com/listendev/lstn/pkg/text"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"golang.org/x/exp/maps"
 )
 
 func cReference(w io.Writer, c *cobra.Command, depth int) {
@@ -41,6 +43,8 @@ func cReference(w io.Writer, c *cobra.Command, depth int) {
 	// Local flags
 	if c.HasAvailableLocalFlags() {
 		groups := flagusages.Groups(c)
+		groupKeys := maps.Keys(groups)
+		sort.Strings(groupKeys)
 
 		if localGroup, found := groups[flagusages.LocalGroup]; found {
 			localFlagsUsage := localGroup.FlagUsages()
@@ -61,10 +65,13 @@ func cReference(w io.Writer, c *cobra.Command, depth int) {
 			delete(groups, flagusages.LocalGroup)
 		}
 
-		for group, f := range groups {
-			groupFlagsUsage := f.FlagUsages()
-			if groupFlagsUsage != "" {
-				fmt.Fprintf(w, "%s %s Flags\n\n```\n%s```\n\n", strings.Repeat("#", depth+1), group, text.Dedent(groupFlagsUsage))
+		for _, k := range groupKeys {
+			if k != flagusages.LocalGroup {
+				f := groups[k]
+				groupFlagsUsage := f.FlagUsages()
+				if groupFlagsUsage != "" {
+					fmt.Fprintf(w, "%s %s Flags\n\n```\n%s```\n\n", strings.Repeat("#", depth+1), k, text.Dedent(groupFlagsUsage))
+				}
 			}
 		}
 	}
