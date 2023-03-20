@@ -9,13 +9,8 @@ import (
 
 const singleVerdictsTpl = `
 {{ if gt (len .Verdicts) 0 }}
-<b><a href="https://www.npmjs.com/package/{{ .Name }}/v/{{ .Version }}">{{ .Name }}@{{ .Version }}</a></b><br>
-<details>
-<summary>:stop_sign:
-    <span style="color: red">
-        {{ len .Verdicts }} alert{{ if gt (len .Verdicts) 1 }}s{{end}} found
-    </span> <i>(click to expand)</i>
-</summary>
+## <b><a href="https://www.npmjs.com/package/{{ .Name }}/v/{{ .Version }}">{{ .Name }}@{{ .Version }}</a></b><br>
+
 {{ range .Verdicts }}
 {{ $priority := .Priority}}
 {{ $priorityEmoji := ":large_blue_diamond:" }}
@@ -26,7 +21,7 @@ const singleVerdictsTpl = `
 {{ else if eq $priority "low" }}
 	{{ $priorityEmoji = ":large_blue_diamond:" }}
 {{ end }}
-## {{ $priorityEmoji }} {{ .Message }}
+### {{ $priorityEmoji }} {{ .Message }}
 <dl>
 <dt>Dependency type</dt>
 <dd>
@@ -76,7 +71,6 @@ Transitive dependency (<a href="https://www.npmjs.com/package/{{ $transitivePack
 </dd>
 </dl>
 {{ end }}
-</details>
 {{ end }}
 `
 
