@@ -69,7 +69,7 @@ func New(ctx context.Context) (*Command, error) {
 			if err == nil && (c.IsAvailableCommand() && c.GroupID == groups.Core.ID) {
 				// If a config file is found, read it in
 				if err := viper.ReadInConfig(); err == nil {
-					fmt.Fprintln(os.Stderr, "Using config file: ", viper.ConfigFileUsed())
+					fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
 				} else {
 					if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 						// Config file not found, ignore...
@@ -86,6 +86,13 @@ func New(ctx context.Context) (*Command, error) {
 			if !ok {
 				return fmt.Errorf("couldn't obtain configuration options")
 			}
+
+			// Update them with the values in the config file
+			if err := viper.Unmarshal(&cfgOpts); err != nil {
+				return err
+			}
+
+			// Update them with environment variable values
 			// Obtain the mapping flag name -> struct field name
 			configFlagsNames := flags.GetNames(cfgOpts)
 			// Obtain the mapping flag name -> default value
@@ -333,7 +340,7 @@ func initConfig() {
 		viper.SetConfigName(".lstn")
 	}
 
-	viper.AutomaticEnv() // Read in environment variables that match
 	viper.SetEnvPrefix(flags.EnvPrefix)
-	viper.SetEnvKeyReplacer(strings.NewReplacer("-", flags.EnvSeparator))
+	viper.SetEnvKeyReplacer(flags.EnvReplacer)
+	viper.AutomaticEnv() // Read in environment variables that match
 }
