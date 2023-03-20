@@ -1,0 +1,92 @@
+package templates
+
+import (
+	"bytes"
+	"testing"
+
+	"github.com/listendev/lstn/pkg/listen"
+	"github.com/stretchr/testify/require"
+)
+
+func TestRenderSingleVerdictsPackage(t *testing.T) {
+	tests := []struct {
+		name           string
+		p              listen.Package
+		expectedOutput []byte
+		wantErr        bool
+	}{
+		{
+			name: "no verdicts",
+			p: listen.Package{
+				Name:     "foo",
+				Version:  "1.0.0",
+				Verdicts: []listen.Verdict{},
+			},
+			expectedOutput: testdataFileToBytes(t, "testdata/single_verdicts_no_verdicts.md"),
+		},
+		{
+			name: "one verdict",
+			p: listen.Package{
+				Name:    "foo",
+				Version: "1.0.0",
+				Verdicts: []listen.Verdict{
+					{
+						Message:  "outbound network connection",
+						Priority: "high",
+						Metadata: map[string]interface{}{
+							"npm_package_name":    "foo",
+							"npm_package_version": "1.0.0",
+							"parent_name":         "node",
+							"executable_path":     "/bin/sh",
+							"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
+							"server_ip":           "",
+						},
+					},
+				},
+			},
+			expectedOutput: testdataFileToBytes(t, "testdata/single_verdicts_one_verdict.md"),
+		},
+		{
+			name: "verdicts with gpt35turbo",
+			p: listen.Package{
+				Name:    "foo",
+				Version: "1.0.0",
+				Verdicts: []listen.Verdict{
+					{
+						Message:  "unexpected outbound connection destination",
+						Priority: "high",
+						Metadata: map[string]interface{}{
+							"npm_package_name":    "foo",
+							"npm_package_version": "1.0.0",
+							"parent_name":         "node",
+							"executable_path":     "/bin/sh",
+							"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
+							"server_ip":           "",
+							"gpt35turbo": map[string]interface{}{
+								"actions": []string{
+									"Do not continue to install this dependency as it could potentially harm your system.",
+									"Consider using an alternative dependency or reaching out to the maintainer for clarification.",
+									"Monitor your system for any suspicious activity.",
+								},
+								"concern": 1,
+								"context": "The IP address 43.131.244.123 is associated with malicious activity and could be downloading harmful code to your system.",
+							},
+						},
+					},
+				},
+			},
+			expectedOutput: testdataFileToBytes(t, "testdata/single_verdicts_with_gpt35turbo.md"),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			outBuf := &bytes.Buffer{}
+			err := RenderSingleVerdictsPackage(outBuf, tt.p)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("RenderSingleVerdictsPackage() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			require.Equal(t, tt.expectedOutput, outBuf.Bytes())
+		})
+	}
+}
