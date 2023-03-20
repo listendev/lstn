@@ -18,6 +18,7 @@ package help
 import (
 	"bytes"
 	"fmt"
+	"strings"
 
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	"github.com/spf13/cobra"
@@ -42,9 +43,17 @@ func configHelpTopicFunc() TopicFunc {
 
 			p.Flags().VisitAll(func(f *pflag.Flag) {
 				flagName := f.Name
-				_, ok := configFlagsNames[flagName]
+				target, ok := configFlagsNames[flagName]
 				if ok {
-					fileContent += fmt.Sprintf("%s: %s\n", flagName, configFlagsDefaults[flagName])
+					parts := strings.Split(strings.ToLower(target), ".")
+					num := len(parts)
+					for i, part := range parts {
+						def := configFlagsDefaults[flagName]
+						if def == "" && num == (i+1) {
+							def = "..."
+						}
+						fileContent += fmt.Sprintf("%s%s: %s\n", strings.Repeat(" ", i*2), part, def)
+					}
 				}
 			})
 
