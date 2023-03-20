@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"strings"
 	"unsafe"
 
 	"github.com/listendev/lstn/pkg/cmd/flagusages"
@@ -29,6 +30,9 @@ import (
 
 // EnvSeparator is the separator between the env variable prefix and the global flag name.
 var EnvSeparator = "_"
+
+// EnvReplacer is the string replacer that defines the transformation for flag names into environment variable names.
+var EnvReplacer = strings.NewReplacer("-", EnvSeparator, ".", EnvSeparator)
 
 // EnvPrefix is the prefix of the env variables corresponding to the global flags.
 var EnvPrefix = "lstn"
@@ -105,13 +109,23 @@ func Define(c *cobra.Command, o interface{}, startingGroup string) {
 	}
 }
 
-func GetNames(o interface{}) map[string]string {
+func getNames(val reflect.Value) map[string]string {
 	ret := make(map[string]string)
-	val := getValue(o)
+
+	if val.Kind() != reflect.Struct {
+		return ret
+	}
 
 	for i := 0; i < val.NumField(); i++ {
 		field := val.Type().Field(i)
 		tag := field.Tag.Get("flag")
+
+		if val.Field(i).Kind() == reflect.Struct {
+			for k, v := range getNames(val.Field(i)) {
+				ret[k] = fmt.Sprintf("%s.%s", field.Name, v)
+			}
+		}
+
 		if tag != "" {
 			ret[tag] = field.Name
 		}
@@ -120,13 +134,25 @@ func GetNames(o interface{}) map[string]string {
 	return ret
 }
 
-func GetDefaults(o interface{}) map[string]string {
-	ret := make(map[string]string)
+func GetNames(o interface{}) map[string]string {
 	val := getValue(o)
+
+	return getNames(val)
+}
+
+func getDefaults(val reflect.Value) map[string]string {
+	ret := make(map[string]string)
 
 	for i := 0; i < val.NumField(); i++ {
 		field := val.Type().Field(i)
 		tag := field.Tag.Get("default")
+
+		if val.Field(i).Kind() == reflect.Struct {
+			for k, v := range getDefaults(val.Field(i)) {
+				ret[k] = v
+			}
+		}
+
 		if tag != "" {
 			ret[field.Tag.Get("flag")] = tag
 		}
@@ -135,10 +161,26 @@ func GetDefaults(o interface{}) map[string]string {
 	return ret
 }
 
+func GetDefaults(o interface{}) map[string]string {
+	val := getValue(o)
+
+	return getDefaults(val)
+}
+
+func getField(val reflect.Value, name string) reflect.Value {
+	parts := strings.Split(name, ".")
+	ret := val.FieldByName(parts[0])
+	if ret.Kind() != reflect.Struct {
+		return ret
+	}
+
+	return getField(ret, strings.Join(parts[1:], "."))
+}
+
 func GetField(o interface{}, name string) reflect.Value {
 	val := getValue(o)
 
-	return val.FieldByName(name)
+	return getField(val, name)
 }
 
 func getValue(o interface{}) reflect.Value {
