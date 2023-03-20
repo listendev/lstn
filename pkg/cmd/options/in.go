@@ -30,7 +30,7 @@ var _ cmd.Options = (*In)(nil)
 
 type In struct {
 	flags.JSONFlags
-	flags.ConfigFlags `flagset:"Config"`
+	flags.ConfigFlags
 }
 
 func NewIn() (*In, error) {

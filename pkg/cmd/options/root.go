@@ -29,7 +29,7 @@ import (
 var _ cmd.Options = (*Root)(nil)
 
 type Root struct {
-	flags.ConfigFlags `flagset:"Config"`
+	flags.ConfigFlags
 }
 
 func NewRoot() (*Root, error) {

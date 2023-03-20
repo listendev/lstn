@@ -38,12 +38,13 @@ func (suite *FlagsConfigSuite) TestNewConfigFlags() {
 
 func (suite *FlagsConfigSuite) TestGetConfigFlagsNames() {
 	m := GetNames(&ConfigFlags{})
-	assert.Equal(suite.T(), 3, len(m))
+	assert.Equal(suite.T(), 4, len(m))
 
 	expected := make(map[string]string)
 	expected["loglevel"] = "LogLevel"
 	expected["endpoint"] = "Endpoint"
 	expected["timeout"] = "Timeout"
+	expected["gh-token"] = "Token.GitHub"
 
 	for k, v := range m {
 		e, ok := expected[k]

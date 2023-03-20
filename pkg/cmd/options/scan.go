@@ -39,7 +39,7 @@ type Scan struct {
 
 	Excludes []npm.DependencyType
 	flags.JSONFlags
-	flags.ConfigFlags   `flagset:"Config"`
+	flags.ConfigFlags
 	flags.RegistryFlags `flagset:"Config"`
 }
 
