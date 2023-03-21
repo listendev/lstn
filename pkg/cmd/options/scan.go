@@ -40,7 +40,6 @@ type Scan struct {
 	Excludes []npm.DependencyType
 	flags.JSONFlags
 	flags.ConfigFlags
-	flags.RegistryFlags `flagset:"Config"`
 }
 
 func NewScan() (*Scan, error) {

@@ -31,7 +31,6 @@ var _ cmd.Options = (*To)(nil)
 type To struct {
 	flags.JSONFlags
 	flags.ConfigFlags
-	flags.RegistryFlags `flagset:"Config"`
 }
 
 func NewTo() (*To, error) {
