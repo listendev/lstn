@@ -87,6 +87,12 @@ Inspect the verdicts for your dependencies tree.
 --timeout int       set the timeout, in seconds (default 60)
 ```
 
+### Debug Flags
+
+```
+--debug-options   output the options, then exit
+```
+
 ### Registry Flags
 
 ```
@@ -132,6 +138,12 @@ Inspect the verdicts for your direct dependencies.
 --timeout int       set the timeout, in seconds (default 60)
 ```
 
+### Debug Flags
+
+```
+--debug-options   output the options, then exit
+```
+
 ### Registry Flags
 
 ```
@@ -175,6 +187,12 @@ Get the verdicts of a package.
 --timeout int       set the timeout, in seconds (default 60)
 ```
 
+### Debug Flags
+
+```
+--debug-options   output the options, then exit
+```
+
 ### Registry Flags
 
 ```
@@ -212,7 +230,13 @@ Print out version information.
 ### Flags
 
 ```
--v, -- count      increment the verbosity level
-    --changelog   output the relase notes URL
+--changelog   output the relase notes URL
+```
+
+### Debug Flags
+
+```
+-v, -- count          increment the verbosity level
+    --debug-options   output the options, then exit
 ```
 
