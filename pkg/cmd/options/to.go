@@ -29,6 +29,7 @@ import (
 var _ cmd.Options = (*To)(nil)
 
 type To struct {
+	flags.DebugFlags `flagset:"Debug"`
 	flags.JSONFlags
 	flags.ConfigFlags
 }
@@ -54,4 +55,8 @@ func (o *To) Validate() []error {
 
 func (o *To) Transform(ctx context.Context) error {
 	return flags.Transform(ctx, o)
+}
+
+func (o *To) AsJSON() string {
+	return flags.AsJSON(o)
 }

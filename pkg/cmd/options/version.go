@@ -29,8 +29,9 @@ import (
 var _ cmd.Options = (*Version)(nil)
 
 type Version struct {
-	Verbosity int  `name:"verbosity" shorthand:"v" desc:"increment the verbosity level" type:"count" validate:"gte=0"`
-	Changelog bool `name:"changelog" flag:"changelog" desc:"output the relase notes URL"`
+	Verbosity        int  `name:"verbosity" shorthand:"v" desc:"increment the verbosity level" type:"count" validate:"gte=0" json:"verbosity"`
+	Changelog        bool `name:"changelog" flag:"changelog" desc:"output the relase notes URL" json:"changelog"`
+	flags.DebugFlags `flagset:"Debug"`
 }
 
 func NewVersion() (*Version, error) {
@@ -54,4 +55,8 @@ func (v *Version) Transform(ctx context.Context) error {
 func (v *Version) Attach(c *cobra.Command) {
 	flags.Define(c, v, "")
 	flagusages.Set(c)
+}
+
+func (o *Version) AsJSON() string {
+	return flags.AsJSON(o)
 }

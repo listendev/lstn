@@ -37,7 +37,8 @@ var _ cmd.Options = (*Scan)(nil)
 type Scan struct {
 	exclude *enumflag.EnumFlagValue[npm.DependencyType]
 
-	Excludes []npm.DependencyType
+	Excludes         []npm.DependencyType `json:"exclude"`
+	flags.DebugFlags `flagset:"Debug"`
 	flags.JSONFlags
 	flags.ConfigFlags
 }
@@ -86,4 +87,8 @@ func (o *Scan) Validate() []error {
 
 func (o *Scan) Transform(ctx context.Context) error {
 	return flags.Transform(ctx, o)
+}
+
+func (o *Scan) AsJSON() string {
+	return flags.AsJSON(o)
 }

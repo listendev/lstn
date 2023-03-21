@@ -222,7 +222,7 @@ func TestNewBulkVerdictsRequestsFromMap(t *testing.T) {
 				if diff := cmp.Diff(tc.reqs, res, cmpopts.SortSlices(func(x, y *VerdictsRequest) bool {
 					return x.Name < y.Name
 				}), cmpopts.IgnoreFields(VerdictsRequest{}, "Context")); diff != "" {
-					t.Errorf("vedicts request mismatch (-want +got):\n%s", diff)
+					t.Errorf("verdicts request mismatch (-want +got):\n%s", diff)
 				}
 			}
 		})
