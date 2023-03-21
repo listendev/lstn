@@ -17,6 +17,7 @@ package root
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"runtime"
@@ -54,6 +55,11 @@ type Command struct {
 
 //gocyclo:ignore
 func New(ctx context.Context) (*Command, error) {
+	rootOpts, err := options.NewRoot()
+	if err != nil {
+		return nil, err
+	}
+
 	// rootCmd represents the base command when called without any subcommands
 	var rootCmd = &cobra.Command{
 		Use:               "lstn",
@@ -69,14 +75,14 @@ func New(ctx context.Context) (*Command, error) {
 			if err == nil && (c.IsAvailableCommand() && c.GroupID == groups.Core.ID) {
 				// If a config file is found, read it in
 				if err := viper.ReadInConfig(); err == nil {
-					fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+					c.Printf("Using config file: %s\n", viper.ConfigFileUsed())
 				} else {
 					if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 						// Config file not found, ignore...
-						fmt.Fprintln(os.Stderr, "Running without a configuration file")
+						c.PrintErrln("Running without a configuration file")
 					} else {
 						// Config file was found but another error was produced
-						fmt.Fprintf(os.Stderr, "Error running with config file: %s\n", viper.ConfigFileUsed())
+						c.PrintErrf("Error running with config file: %s\n", viper.ConfigFileUsed())
 					}
 				}
 			}
@@ -164,6 +170,13 @@ func New(ctx context.Context) (*Command, error) {
 			ctx = context.WithValue(ctx, pkgcontext.IOStreamsKey, io)
 			c.SetContext(ctx)
 
+			if rootOpts.DebugOptions {
+				s, _ := json.MarshalIndent(rootOpts, "", "\t")
+				c.Println(string(s))
+
+				return nil
+			}
+
 			return nil
 		},
 		PersistentPostRunE: func(c *cobra.Command, args []string) error {
@@ -182,16 +195,12 @@ func New(ctx context.Context) (*Command, error) {
 
 	// Cobra supports persistent flags, which, if defined here, will be global to the whole application
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", cfgFile, "config file (default is $HOME/.lstn.yaml)")
-	err := rootCmd.MarkPersistentFlagFilename("config", "yaml")
-	if err != nil {
-		return nil, err
+	persistentFlagFilenameErr := rootCmd.MarkPersistentFlagFilename("config", "yaml")
+	if persistentFlagFilenameErr != nil {
+		return nil, persistentFlagFilenameErr
 	}
 
 	// Cobra also supports local flags, which will only run when this action is called directly
-	rootOpts, err := options.NewRoot()
-	if err != nil {
-		return nil, err
-	}
 	rootOpts.Attach(rootCmd)
 
 	// Tell viper to populate variables from the configuration file

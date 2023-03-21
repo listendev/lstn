@@ -60,9 +60,6 @@ The verdicts it returns are listed by the name of each package and its specified
 		RunE: func(c *cobra.Command, args []string) error {
 			ctx = c.Context()
 
-			io := c.Context().Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
-			io.StartProgressIndicator()
-
 			// Obtain the local options from the context
 			opts, err := pkgcontext.GetOptionsFromContext(ctx, pkgcontext.InKey)
 			if err != nil {
@@ -72,6 +69,15 @@ The verdicts it returns are listed by the name of each package and its specified
 			if !ok {
 				return fmt.Errorf("couldn't obtain options for the current child command")
 			}
+
+			if inOpts.DebugOptions {
+				c.Println(inOpts.AsJSON())
+
+				return nil
+			}
+
+			io := c.Context().Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
+			io.StartProgressIndicator()
 
 			// Obtain the target directory that we want to listen in
 			targetDir, err := arguments.GetDirectory(args)

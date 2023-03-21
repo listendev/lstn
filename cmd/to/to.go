@@ -97,6 +97,12 @@ It lists out the verdicts of all the versions of the input package name.`,
 				return fmt.Errorf("couldn't obtain options for the current child command")
 			}
 
+			if toOpts.DebugOptions {
+				c.Println(toOpts.AsJSON())
+
+				return nil
+			}
+
 			var res *listen.Response
 			var resJSON []byte
 			var resErr error

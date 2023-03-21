@@ -52,6 +52,12 @@ func New(ctx context.Context) (*cobra.Command, error) {
 				return fmt.Errorf("couldn't obtain options for the current child command")
 			}
 
+			if localOpts.DebugOptions {
+				c.Println(localOpts.AsJSON())
+
+				return nil
+			}
+
 			// Obtain the version info from the context
 			v := ctx.Value(pkgcontext.VersionTagKey).(string)
 			switch localOpts.Verbosity {
