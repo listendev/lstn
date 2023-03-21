@@ -52,6 +52,9 @@ func configHelpTopicFunc() TopicFunc {
 						if def == "" && num == (i+1) {
 							def = "..."
 						}
+						if def != "" && num > (i+1) {
+							def = ""
+						}
 						fileContent += fmt.Sprintf("%s%s: %s\n", strings.Repeat(" ", i*2), part, def)
 					}
 				}
