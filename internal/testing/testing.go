@@ -16,6 +16,7 @@
 package testing
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"net/http"
@@ -25,6 +26,7 @@ import (
 	"strings"
 
 	"github.com/go-git/go-billy/v5"
+	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -155,4 +157,48 @@ func CopyExecutable(src, dst string) error {
 	}
 
 	return os.Chmod(dst, 0o755)
+}
+
+func ExecuteCommand(root *cobra.Command, cmdline ...string) (string, string, error) {
+	bOut := bytes.NewBufferString("")
+	root.SetOut(bOut)
+
+	bErr := bytes.NewBufferString("")
+	root.SetErr(bErr)
+
+	root.SetArgs(cmdline)
+	execErr := root.Execute()
+	outOut, err := io.ReadAll(bOut)
+	if err != nil {
+		return "", "", fmt.Errorf("error while reading the stdout: %s %s", root.Name(), strings.Join(cmdline, " "))
+	}
+
+	outErr, err := io.ReadAll(bErr)
+	if err != nil {
+		return "", "", fmt.Errorf("error while reading the stderr: %s %s", root.Name(), strings.Join(cmdline, " "))
+	}
+
+	return string(outOut), string(outErr), execErr
+}
+
+func EnvSetter(envs map[string]string) (closer func()) {
+	originalEnvs := map[string]string{}
+
+	for name, value := range envs {
+		if originalValue, ok := os.LookupEnv(name); ok {
+			originalEnvs[name] = originalValue
+		}
+		_ = os.Setenv(name, value)
+	}
+
+	return func() {
+		for name := range envs {
+			origValue, has := originalEnvs[name]
+			if has {
+				_ = os.Setenv(name, origValue)
+			} else {
+				_ = os.Unsetenv(name)
+			}
+		}
+	}
 }
