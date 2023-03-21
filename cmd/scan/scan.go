@@ -69,6 +69,10 @@ The verdicts it returns are listed by the name of each package and its specified
 		RunE: func(c *cobra.Command, args []string) error {
 			ctx = c.Context()
 
+			io := c.Context().Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
+			io.StartProgressIndicator()
+			defer io.StopProgressIndicator()
+
 			// Obtain the local options from the context
 			opts, err := pkgcontext.GetOptionsFromContext(ctx, pkgcontext.ScanKey)
 			if err != nil {
@@ -144,8 +148,16 @@ The verdicts it returns are listed by the name of each package and its specified
 				return nil
 			}
 
+			err = tablePrinter.RenderPackages((*listen.Response)(&combinedResponse))
+
+			if err != nil {
+				return err
+			}
+
 			if len(scanOpts.Reporter) > 0 {
+				cs := io.ColorScheme()
 				reporterIdentifier := scanOpts.Reporter
+				fmt.Fprintf(io.Out, "sending report using the %s reporter\n", cs.Gray(reporterIdentifier))
 				ts := oauth2.StaticTokenSource(
 					&oauth2.Token{AccessToken: scanOpts.ConfigFlags.GitHub},
 				)
@@ -168,10 +180,14 @@ The verdicts it returns are listed by the name of each package and its specified
 					},
 				}
 
-				return rep.Report(&req)
+				err = rep.Report(&req)
+				if err != nil {
+					return fmt.Errorf("error while executing reporter (%s): %w", reporterIdentifier, err)
+				}
+				fmt.Fprintf(io.Out, "%s report successfully sent using the %s reporter\n", cs.SuccessIcon(), cs.Gray(reporterIdentifier))
 			}
 
-			return tablePrinter.RenderPackages((*listen.Response)(&combinedResponse))
+			return nil
 		},
 	}
 
