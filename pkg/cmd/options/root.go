@@ -30,6 +30,7 @@ var _ cmd.Options = (*Root)(nil)
 
 type Root struct {
 	flags.ConfigFlags
+	flags.DebugFlags `flagset:"Debug"`
 }
 
 func NewRoot() (*Root, error) {
@@ -53,4 +54,8 @@ func (o *Root) Validate() []error {
 
 func (o *Root) Transform(ctx context.Context) error {
 	return flags.Transform(ctx, o)
+}
+
+func (o *Root) AsJSON() string {
+	return flags.AsJSON(o)
 }

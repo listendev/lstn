@@ -31,6 +31,7 @@ var _ cmd.Options = (*In)(nil)
 type In struct {
 	flags.JSONFlags
 	flags.ConfigFlags
+	flags.DebugFlags `flagset:"Debug"`
 }
 
 func NewIn() (*In, error) {
@@ -54,4 +55,8 @@ func (o *In) Validate() []error {
 
 func (o *In) Transform(ctx context.Context) error {
 	return flags.Transform(ctx, o)
+}
+
+func (o *In) AsJSON() string {
+	return flags.AsJSON(o)
 }
