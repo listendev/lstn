@@ -16,12 +16,8 @@
 package arguments
 
 import (
-	"context"
 	"fmt"
 
-	"github.com/Masterminds/semver/v3"
-	pkgcontext "github.com/listendev/lstn/pkg/context"
-	"github.com/listendev/lstn/pkg/npm"
 	"github.com/listendev/lstn/pkg/validate"
 	"github.com/spf13/cobra"
 )
@@ -40,7 +36,6 @@ func PackageTriple(c *cobra.Command, args []string) error {
 		return err
 	}
 
-	var constraints *semver.Constraints
 	all := []error{}
 	switch len(args) {
 	case 3:
@@ -57,9 +52,6 @@ func PackageTriple(c *cobra.Command, args []string) error {
 			if err := validate.Singleton.Var(args[1], "version_constraint"); err != nil {
 				all = append(all, fmt.Errorf("%s is neither a valid version constraint not an exact valid semantic version", args[1]))
 			} else {
-				// Theoretically this should never error at this point
-				constraints, _ = semver.NewConstraint(args[1])
-				// Ignore shasum errors
 				all = []error{}
 			}
 		}
@@ -69,19 +61,6 @@ func PackageTriple(c *cobra.Command, args []string) error {
 		if err := validate.Singleton.Var(args[0], "npm_package_name"); err != nil {
 			// Check the first argument is a valid package name
 			all = append(all, fmt.Errorf("%s is not a valid npm package name", args[0]))
-		} else {
-			body, notOnRegistryErr := npm.GetFromRegistry(c.Context(), args[0], "")
-			if notOnRegistryErr != nil {
-				all = append(all, fmt.Errorf("the %s package doesn't exist on the registry", args[0]))
-			}
-			if constraints != nil {
-				versions, err := npm.GetVersionsFromRegistryResponse(body, constraints)
-				if err != nil {
-					return err
-				}
-				// Store all of its versions matching the constraints
-				c.SetContext(context.WithValue(c.Context(), pkgcontext.VersionsCollection, versions))
-			}
 		}
 	}
 
