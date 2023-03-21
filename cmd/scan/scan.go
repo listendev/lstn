@@ -118,8 +118,8 @@ The verdicts it returns are listed by the name of each package and its specified
 			combinedResponse := []listen.Package{}
 			for _, deps := range deps {
 				// Create list of verdicts requests
-				reqs, err := listen.NewBulkVerdictsRequestsFromMap(deps)
-				if err != nil {
+				reqs, bulkErr := listen.NewBulkVerdictsRequestsFromMap(deps)
+				if bulkErr != nil {
 					return err
 				}
 
