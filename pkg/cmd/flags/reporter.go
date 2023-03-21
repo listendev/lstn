@@ -24,7 +24,7 @@ import (
 var _ cmd.Options = (*ReporterFlags)(nil)
 
 type ReporterFlags struct {
-	Reporter string `name:"reporter" flag:"reporter" desc:"use a reporter" validate:"omitempty,reporter" default:"github-pr-review"`
+	Reporter string `name:"reporter" flag:"reporter" desc:"use a reporter" validate:"omitempty,reporter" default:""`
 
 	// github-pr-review reporter flags
 	GithubPRReviewReporterOwner      string `name:"github_pr_owner" flag:"github_pr_owner" desc:"PR owner name (organization/user)" validate:"required_if=Reporter github-pr-review"`
