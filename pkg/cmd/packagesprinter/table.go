@@ -193,7 +193,5 @@ func (t *TablePrinter) printTable(packages *listen.Response) error {
 		tab.EndRow()
 	}
 
-	t.streams.StopProgressIndicator()
-
 	return tab.Render()
 }

@@ -3,6 +3,7 @@ package githubprreview
 import (
 	"bytes"
 	"context"
+	"io"
 	"strings"
 
 	"github.com/google/go-github/v50/github"
@@ -38,28 +39,21 @@ func (r *ReviewReporter) WithContext(ctx context.Context) {
 	r.ctx = ctx
 }
 
-func (r *ReviewReporter) Report(req *request.Report) error {
+func (r *ReviewReporter) stickyComment(owner string, repo string, id int, comment io.Reader) error {
 	buf := bytes.Buffer{}
 	_, err := buf.Write([]byte(stickyReviewCommentAnnotation))
 	if err != nil {
 		return err
 	}
 
-	fullMarkdownReport := report.NewFullMarkdwonReport()
-	fullMarkdownReport.WithOutput(&buf)
-	if err := fullMarkdownReport.Render(req.Packages); err != nil {
+	if _, err := io.Copy(&buf, comment); err != nil {
 		return err
 	}
-
-	owner := req.GithubPRReviewRequest.Owner
-	repo := req.GithubPRReviewRequest.Repo
-	id := req.GithubPRReviewRequest.ID
 
 	comments, _, err := r.ghClient.Issues.ListComments(r.ctx, owner, repo, id, nil)
 	if err != nil {
 		return err
 	}
-
 	issueComment := &github.IssueComment{
 		Body: github.String(buf.String()),
 	}
@@ -77,8 +71,22 @@ func (r *ReviewReporter) Report(req *request.Report) error {
 		}
 	}
 
-	err = commentFn()
+	return commentFn()
+}
 
+func (r *ReviewReporter) Report(req *request.Report) error {
+	buf := bytes.Buffer{}
+	fullMarkdownReport := report.NewFullMarkdwonReport()
+	fullMarkdownReport.WithOutput(&buf)
+	if err := fullMarkdownReport.Render(req.Packages); err != nil {
+		return err
+	}
+
+	owner := req.GithubPRReviewRequest.Owner
+	repo := req.GithubPRReviewRequest.Repo
+	id := req.GithubPRReviewRequest.ID
+
+	err := r.stickyComment(owner, repo, id, &buf)
 	if err != nil {
 		return err
 	}
