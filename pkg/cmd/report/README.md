@@ -1,4 +1,3 @@
-
 # Report
 
 A package for generating reports from a list of packages `[]listen.Packages`.
@@ -43,7 +42,7 @@ func main() {
 	}
 	fullMarkdownReport.WithOutput(fullMDReportFile)
 
-	rb := report.NewReportBuilder()
+	rb := report.NewBuilder()
 	rb.RegisterReport(jsonReport)
 	rb.RegisterReport(fullMarkdownReport)
 
