@@ -26,17 +26,17 @@ import (
 var _ cmd.Options = (*ConfigFlags)(nil)
 
 type Token struct {
-	GitHub string `name:"GitHub token" flag:"gh-token" desc:"set the GitHub token" flagset:"Token"`
+	GitHub string `name:"GitHub token" flag:"gh-token" desc:"set the GitHub token" flagset:"Token" json:"gh-token"`
 }
 
 type Registry struct {
-	NPM string `name:"NPM registry" flag:"npm-registry" desc:"set a custom NPM registry" validate:"omitempty,url" default:"https://registry.npmjs.org" transform:"tsuffix=/" flagset:"Registry"`
+	NPM string `name:"NPM registry" flag:"npm-registry" desc:"set a custom NPM registry" validate:"omitempty,url" default:"https://registry.npmjs.org" transform:"tsuffix=/" flagset:"Registry" json:"npm-registry"`
 }
 
 type ConfigFlags struct {
-	LogLevel string `default:"info" name:"log level" flag:"loglevel" desc:"set the logging level" flagset:"Config"`                           // TODO > validator
-	Timeout  int    `default:"60" name:"timeout" flag:"timeout" desc:"set the timeout, in seconds" validate:"number,min=30" flagset:"Config"` // FIXME: change to time.Duration type
-	Endpoint string `default:"https://npm.listen.dev" flag:"endpoint" name:"endpoint" desc:"the listen.dev endpoint emitting the verdicts" validate:"url,endpoint" transform:"tsuffix=/" flagset:"Config"`
+	LogLevel string `default:"info" name:"log level" flag:"loglevel" desc:"set the logging level" flagset:"Config" json:"loglevel"`                          // TODO > validator
+	Timeout  int    `default:"60" name:"timeout" flag:"timeout" desc:"set the timeout, in seconds" validate:"number,min=30" flagset:"Config" json:"timeout"` // FIXME: change to time.Duration type
+	Endpoint string `default:"https://npm.listen.dev" flag:"endpoint" name:"endpoint" desc:"the listen.dev endpoint emitting the verdicts" validate:"url,endpoint" transform:"tsuffix=/" flagset:"Config" json:"endpoint"`
 	Token
 	Registry
 }

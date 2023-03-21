@@ -15,31 +15,6 @@
 // limitations under the License.
 package flags
 
-import (
-	"context"
-	"fmt"
-	"io"
-
-	"github.com/listendev/lstn/pkg/jq"
-)
-
-type JSONFlags struct {
-	JSON bool   `name:"json" flag:"json" desc:"output the verdicts (if any) in JSON form" json:"json"`
-	JQ   string `name:"jq" flag:"jq" shorthand:"q" desc:"filter the output using a jq expression" validate:"excluded_without=JSON,jq" json:"jq"`
-}
-
-func (o *JSONFlags) IsJSON() bool {
-	return o.JSON
-}
-
-func (o *JSONFlags) GetQuery() string {
-	return o.JQ
-}
-
-func (o *JSONFlags) GetOutput(ctx context.Context, input io.Reader, output io.Writer) error {
-	if o.IsJSON() {
-		return jq.Eval(ctx, input, output, o.GetQuery())
-	}
-
-	return fmt.Errorf("cannot output JSON")
+type DebugFlags struct {
+	DebugOptions bool `name:"debug options" flag:"debug-options" desc:"output the options, then exit" json:"debug-options"`
 }

@@ -17,6 +17,7 @@ package flags
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strings"
@@ -56,6 +57,17 @@ func Transform(ctx context.Context, o interface{}) error {
 	}
 
 	return nil
+}
+
+func AsJSON(o interface{}) string {
+	data, _ := json.MarshalIndent(o, "", "\t")
+
+	var iface interface{}
+	json.Unmarshal(data, &iface)
+
+	data, _ = json.MarshalIndent(iface, "", "\t")
+
+	return string(data)
 }
 
 func Define(c *cobra.Command, o interface{}, startingGroup string) {
