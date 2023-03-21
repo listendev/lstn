@@ -23,6 +23,7 @@ import (
 
 	"github.com/XANi/goneric"
 	"github.com/cli/cli/pkg/iostreams"
+	"github.com/google/go-github/v50/github"
 	"github.com/listendev/lstn/internal/project"
 	"github.com/listendev/lstn/pkg/cmd/arguments"
 	"github.com/listendev/lstn/pkg/cmd/groups"
@@ -31,7 +32,10 @@ import (
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/listendev/lstn/pkg/npm"
+	"github.com/listendev/lstn/pkg/reporter"
+	"github.com/listendev/lstn/pkg/reporter/request"
 	"github.com/spf13/cobra"
+	"golang.org/x/oauth2"
 )
 
 var (
@@ -138,6 +142,33 @@ The verdicts it returns are listed by the name of each package and its specified
 
 			if scanOpts.JSON {
 				return nil
+			}
+
+			if len(scanOpts.Reporter) > 0 {
+				reporterIdentifier := scanOpts.Reporter
+				ts := oauth2.StaticTokenSource(
+					&oauth2.Token{AccessToken: scanOpts.ConfigFlags.GitHub},
+				)
+				tc := oauth2.NewClient(ctx, ts)
+				client := github.NewClient(tc)
+
+				rep, err := reporter.BuildReporter(reporterIdentifier)
+				if err != nil {
+					return err
+				}
+				rep.WithGithubClient(client)
+				rep.WithContext(ctx)
+
+				req := request.Report{
+					Packages: combinedResponse,
+					GithubPRReviewRequest: request.GithubPRReviewReportRequest{
+						Owner: scanOpts.GithubPRReviewReporterOwner,
+						Repo:  scanOpts.GithubPRReviewReporterRepository,
+						ID:    scanOpts.GithubPRReviewReporterPRID,
+					},
+				}
+
+				return rep.Report(&req)
 			}
 
 			return tablePrinter.RenderPackages((*listen.Response)(&combinedResponse))
