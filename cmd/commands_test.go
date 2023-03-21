@@ -125,6 +125,10 @@ Global Flags:
 		{
 			cmdline: []string{"scan", "--debug-options"},
 			stdout: heredoc.Doc(`{
+	"GithubPRReviewReporterOwner": "",
+	"GithubPRReviewReporterPRID": 0,
+	"GithubPRReviewReporterRepository": "",
+	"Reporter": "",
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
 	"exclude": [
@@ -142,8 +146,25 @@ Global Flags:
 			errstr: "",
 		},
 		{
-			cmdline: []string{"scan", "--debug-options", "--gh-token", "xxx"},
+			cmdline: []string{
+				"scan",
+				"--debug-options",
+				"--gh-token",
+				"xxx",
+				"--reporter",
+				"github-pr-review",
+				"--github_pr_owner",
+				"fntlnz",
+				"--github_pr_repository",
+				"lstnrepotest",
+				"--github_pr_id",
+				"1",
+			},
 			stdout: heredoc.Doc(`{
+	"GithubPRReviewReporterOwner": "fntlnz",
+	"GithubPRReviewReporterPRID": 1,
+	"GithubPRReviewReporterRepository": "lstnrepotest",
+	"Reporter": "github-pr-review",
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
 	"exclude": [
@@ -167,6 +188,10 @@ Global Flags:
 			},
 			cmdline: []string{"scan", "--debug-options"},
 			stdout: heredoc.Doc(`{
+	"GithubPRReviewReporterOwner": "",
+	"GithubPRReviewReporterPRID": 0,
+	"GithubPRReviewReporterRepository": "",
+	"Reporter": "",
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
 	"exclude": [
