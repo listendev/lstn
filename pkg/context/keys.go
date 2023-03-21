@@ -35,9 +35,6 @@ var VersionsCollection contextKey = "versionscollection"
 // ScanKey is the key indexing the options for the `scan` child command.
 var ScanKey contextKey = "scan"
 
-// ReportKey is the key indexing the options for the `report` child command.
-var ReportKey contextKey = "report"
-
 // VersionKey is the key indexing the options for the `version` child command.
 var VersionKey contextKey = "version"
 
@@ -49,9 +46,6 @@ var VersionShortKey contextKey = "version_short"
 
 // VersionLongKey is the key storing the long version.
 var VersionLongKey contextKey = "version_long"
-
-// RegistryKey is the key indexing the registry flags values.
-var RegistryKey contextKey = "registry"
 
 // IOStreamsKey is the key storing the IOStreams (stdout, stderr, stdin).
 var IOStreamsKey contextKey = "iostreams"
