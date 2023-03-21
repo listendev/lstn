@@ -32,20 +32,20 @@ import (
 
 // GetFromRegistry asks to the npm registry for the details of a package
 // by name, and optionally, by version.
-func GetFromRegistry(ctx context.Context, name, version string) (io.ReadCloser, error) {
+func GetFromRegistry(ctx context.Context, name, version string) (io.ReadCloser, string, error) {
 	// Obtain the local options from the context
-	opts, err := pkgcontext.GetOptionsFromContext(ctx, pkgcontext.RegistryKey)
+	opts, err := pkgcontext.GetOptionsFromContext(ctx, pkgcontext.ConfigKey)
 	if err != nil {
-		return nil, fmt.Errorf("couldn't find the registry key in the configuration")
+		return nil, "", fmt.Errorf("couldn't find the registry key in the configuration")
 	}
-	registryFlags, ok := opts.(*flags.RegistryFlags)
+	cfgFlags, ok := opts.(*flags.ConfigFlags)
 	if !ok {
-		return nil, fmt.Errorf("couldn't find the registry configuration")
+		return nil, "", fmt.Errorf("couldn't find the registry configuration")
 	}
-	npmRegistryBaseURL := registryFlags.URL
+	npmRegistryBaseURL := cfgFlags.Registry.NPM
 
 	if name == "" {
-		return nil, pkgcontext.OutputError(ctx, fmt.Errorf("the name is mandatory to query the npm registry"))
+		return nil, npmRegistryBaseURL, pkgcontext.OutputError(ctx, fmt.Errorf("the name is mandatory to query the npm registry"))
 	}
 	suffix := name
 	if version != "" {
@@ -55,27 +55,30 @@ func GetFromRegistry(ctx context.Context, name, version string) (io.ReadCloser, 
 	url := fmt.Sprintf("%s/%s", npmRegistryBaseURL, suffix)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		return nil, pkgcontext.OutputErrorf(ctx, err, "couldn't prepare the request to %s", url)
+		return nil, npmRegistryBaseURL, pkgcontext.OutputErrorf(ctx, err, "couldn't prepare the request to %s", url)
 	}
 
 	req.Header.Set("User-Agent", ua.Generate(true))
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return nil, pkgcontext.OutputErrorf(ctx, err, "couldn't perform the request to %s", req.URL)
+		return nil, npmRegistryBaseURL, pkgcontext.OutputErrorf(ctx, err, "couldn't perform the request to %s", req.URL)
 	}
 
 	if res.StatusCode != http.StatusOK {
-		return nil, pkgcontext.OutputErrorf(ctx, err, "the NPM registry response for %s was not ok", req.URL)
+		return nil, npmRegistryBaseURL, pkgcontext.OutputErrorf(ctx, err, "the NPM registry response for %s was not ok", req.URL)
 	}
 
-	return res.Body, nil
+	return res.Body, npmRegistryBaseURL, nil
 }
 
 func GetVersionsFromRegistry(ctx context.Context, name string, constraints *semver.Constraints) (semver.Collection, error) {
-	body, err := GetFromRegistry(ctx, name, "")
+	body, URL, err := GetFromRegistry(ctx, name, "")
+	if URL == "" {
+		return nil, err
+	}
 	if err != nil {
-		return nil, fmt.Errorf("package %s doesn't exist on npm", name)
+		return nil, fmt.Errorf("package %s doesn't exist on registry %s", name, URL)
 	}
 
 	return GetVersionsFromRegistryResponse(body, constraints)
