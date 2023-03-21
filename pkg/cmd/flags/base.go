@@ -63,6 +63,7 @@ func AsJSON(o interface{}) string {
 	data, _ := json.MarshalIndent(o, "", "\t")
 
 	var iface interface{}
+	//nolint:errcheck // no need to check the error
 	json.Unmarshal(data, &iface)
 
 	data, _ = json.MarshalIndent(iface, "", "\t")
