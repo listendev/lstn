@@ -29,6 +29,7 @@ import (
 	"github.com/listendev/lstn/pkg/cmd/packagesprinter"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/listen"
+	"github.com/listendev/lstn/pkg/npm"
 	"github.com/spf13/cobra"
 )
 
@@ -66,6 +67,22 @@ It lists out the verdicts of all the versions of the input package name.`,
 		ValidArgsFunction: arguments.PackageTripleActiveHelp,
 		Annotations: map[string]string{
 			"source": project.GetSourceURL(filename),
+		},
+		PreRunE: func(c *cobra.Command, args []string) error {
+			if len(args) > 1 {
+				// Theoretically, it's impossible args[1] is not a valid semver constraint at this point
+				constraints, _ := semver.NewConstraint(args[1])
+
+				versions, err := npm.GetVersionsFromRegistry(c.Context(), args[0], constraints)
+				if err != nil {
+					return err
+				}
+
+				// Store all of its versions matching the constraints
+				c.SetContext(context.WithValue(c.Context(), pkgcontext.VersionsCollection, versions))
+			}
+
+			return nil
 		},
 		RunE: func(c *cobra.Command, args []string) error {
 			ctx = c.Context()
@@ -154,9 +171,6 @@ It lists out the verdicts of all the versions of the input package name.`,
 
 	// Pass the options through the context
 	ctx = context.WithValue(ctx, pkgcontext.ToKey, toOpts)
-	// Pass the registry option as a standalone to do not depend on the command
-	ctx = context.WithValue(ctx, pkgcontext.RegistryKey, &toOpts.RegistryFlags)
-
 	toCmd.SetContext(ctx)
 
 	return toCmd, nil
