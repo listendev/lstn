@@ -12,5 +12,7 @@ endpoint: https://npm.listen.dev
 token: 
   github: ...
 loglevel: info
+registry: 
+  npm: https://registry.npmjs.org
 timeout: 60
 ```

@@ -87,10 +87,16 @@ Inspect the verdicts for your dependencies tree.
 --timeout int       set the timeout, in seconds (default 60)
 ```
 
+### Registry Flags
+
+```
+--npm-registry string   set a custom NPM registry (default "https://registry.npmjs.org")
+```
+
 ### Token Flags
 
 ```
---gh-token string   the GitHub token
+--gh-token string   set the GitHub token
 ```
 
 For example:
@@ -123,14 +129,19 @@ Inspect the verdicts for your direct dependencies.
 ```
 --endpoint string   the listen.dev endpoint emitting the verdicts (default "https://npm.listen.dev")
 --loglevel string   set the logging level (default "info")
---registry string   set a custom registry (default "https://registry.npmjs.org")
 --timeout int       set the timeout, in seconds (default 60)
+```
+
+### Registry Flags
+
+```
+--npm-registry string   set a custom NPM registry (default "https://registry.npmjs.org")
 ```
 
 ### Token Flags
 
 ```
---gh-token string   the GitHub token
+--gh-token string   set the GitHub token
 ```
 
 For example:
@@ -161,14 +172,19 @@ Get the verdicts of a package.
 ```
 --endpoint string   the listen.dev endpoint emitting the verdicts (default "https://npm.listen.dev")
 --loglevel string   set the logging level (default "info")
---registry string   set a custom registry (default "https://registry.npmjs.org")
 --timeout int       set the timeout, in seconds (default 60)
+```
+
+### Registry Flags
+
+```
+--npm-registry string   set a custom NPM registry (default "https://registry.npmjs.org")
 ```
 
 ### Token Flags
 
 ```
---gh-token string   the GitHub token
+--gh-token string   set the GitHub token
 ```
 
 For example:
