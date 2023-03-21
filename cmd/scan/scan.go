@@ -152,8 +152,6 @@ The verdicts it returns are listed by the name of each package and its specified
 
 	// Pass the options through the context
 	ctx = context.WithValue(ctx, pkgcontext.ScanKey, scanOpts)
-	// Pass the registry option as a standalone to do not depend on the command
-	ctx = context.WithValue(ctx, pkgcontext.RegistryKey, &scanOpts.RegistryFlags)
 
 	scanCmd.SetContext(ctx)
 
