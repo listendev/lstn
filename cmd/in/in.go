@@ -78,6 +78,7 @@ The verdicts it returns are listed by the name of each package and its specified
 
 			io := c.Context().Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
 			io.StartProgressIndicator()
+			defer io.StopProgressIndicator()
 
 			// Obtain the target directory that we want to listen in
 			targetDir, err := arguments.GetDirectory(args)

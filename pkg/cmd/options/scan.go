@@ -41,7 +41,6 @@ type Scan struct {
 	flags.DebugFlags `flagset:"Debug"`
 	flags.JSONFlags
 	flags.ConfigFlags
-	flags.RegistryFlags `flagset:"Config"`
 	flags.ReporterFlags `flagset:"Config"`
 }
 

@@ -109,6 +109,7 @@ It lists out the verdicts of all the versions of the input package name.`,
 
 			io := c.Context().Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
 			io.StartProgressIndicator()
+			defer io.StopProgressIndicator()
 
 			versions, multiple := ctx.Value(pkgcontext.VersionsCollection).(semver.Collection)
 			if multiple {

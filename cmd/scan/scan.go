@@ -69,10 +69,6 @@ The verdicts it returns are listed by the name of each package and its specified
 		RunE: func(c *cobra.Command, args []string) error {
 			ctx = c.Context()
 
-			io := c.Context().Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
-			io.StartProgressIndicator()
-			defer io.StopProgressIndicator()
-
 			// Obtain the local options from the context
 			opts, err := pkgcontext.GetOptionsFromContext(ctx, pkgcontext.ScanKey)
 			if err != nil {
