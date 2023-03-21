@@ -55,9 +55,9 @@ type Command struct {
 
 //gocyclo:ignore
 func New(ctx context.Context) (*Command, error) {
-	rootOpts, err := options.NewRoot()
-	if err != nil {
-		return nil, err
+	rootOpts, rootOptsErr := options.NewRoot()
+	if rootOptsErr != nil {
+		return nil, rootOptsErr
 	}
 
 	// rootCmd represents the base command when called without any subcommands
@@ -204,7 +204,7 @@ func New(ctx context.Context) (*Command, error) {
 	rootOpts.Attach(rootCmd)
 
 	// Tell viper to populate variables from the configuration file
-	err = viper.BindPFlags(rootCmd.Flags())
+	err := viper.BindPFlags(rootCmd.Flags())
 	if err != nil {
 		return nil, err
 	}

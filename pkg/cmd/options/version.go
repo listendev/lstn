@@ -57,6 +57,6 @@ func (v *Version) Attach(c *cobra.Command) {
 	flagusages.Set(c)
 }
 
-func (o *Version) AsJSON() string {
-	return flags.AsJSON(o)
+func (v *Version) AsJSON() string {
+	return flags.AsJSON(v)
 }
