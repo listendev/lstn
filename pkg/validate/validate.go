@@ -60,6 +60,9 @@ func init() {
 	if err := Singleton.RegisterValidation("version_constraint", isVersionConstraint); err != nil {
 		panic(err)
 	}
+	if err := Singleton.RegisterValidation("reporter", isReporterAvailable); err != nil {
+		panic(err)
+	}
 
 	Singleton.RegisterAlias("shasum", "len=40")
 	Singleton.RegisterAlias("mandatory", "required")
@@ -155,6 +158,21 @@ func init() {
 		},
 		func(ut ut.Translator, fe validator.FieldError) string {
 			t, _ := ut.T("version_constraint", fe.Field())
+
+			return t
+		},
+	); err != nil {
+		panic(err)
+	}
+
+	if err := Singleton.RegisterTranslation(
+		"reporter",
+		Translator,
+		func(ut ut.Translator) error {
+			return ut.Add("reporter", "{0} is not a valid reporter", true)
+		},
+		func(ut ut.Translator, fe validator.FieldError) string {
+			t, _ := ut.T("reporter", fe.Field())
 
 			return t
 		},
