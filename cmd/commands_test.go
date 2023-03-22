@@ -78,6 +78,12 @@ Debug Flags:
 Registry Flags:
       --npm-registry string   set a custom NPM registry (default "https://registry.npmjs.org")
 
+Reporting Flags:
+      --gh-owner string                                           set the GitHub owner name (org|user)
+      --gh-pull-id int                                            set the GitHub pull request ID
+      --gh-repo string                                            set the GitHub repository name
+  -r, --reporter (gh-pull-check,gh-pull-comment,gh-pull-review)   set one or more reporters to use (default [])
+
 Token Flags:
       --gh-token string   set the GitHub token
 
@@ -92,11 +98,15 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
 	"gh-token": "",
 	"jq": "",
 	"json": false,
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
+	"reporter": null,
 	"timeout": 60
 }
 `),
@@ -111,11 +121,15 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": "https://npm-staging.listen.dev",
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
 	"gh-token": "",
 	"jq": "",
 	"json": false,
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
+	"reporter": null,
 	"timeout": 60
 }
 `),
@@ -123,22 +137,52 @@ Global Flags:
 			errstr: "",
 		},
 		{
-			cmdline: []string{"scan", "--debug-options"},
+			cmdline: []string{"scan", "-e", "dev,peer", "--debug-options"},
 			stdout: heredoc.Doc(`{
-	"GithubPRReviewReporterOwner": "",
-	"GithubPRReviewReporterPRID": 0,
-	"GithubPRReviewReporterRepository": "",
-	"Reporter": "",
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
 	"exclude": [
-		110
+		110,
+		66,
+		88
 	],
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
 	"gh-token": "",
 	"jq": "",
 	"json": false,
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
+	"reporter": null,
+	"timeout": 60
+}
+`),
+			stderr: "Running without a configuration file\n",
+			errstr: "",
+		},
+		{
+			envvar: map[string]string{
+				"LSTN_REPORTER": "gh-pull-check",
+			},
+			cmdline: []string{"scan", "--debug-options"},
+			stdout: heredoc.Doc(`{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"exclude": [
+		110
+	],
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "",
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://registry.npmjs.org",
+	"reporter": [
+		44
+	],
 	"timeout": 60
 }
 `),
@@ -151,30 +195,33 @@ Global Flags:
 				"--debug-options",
 				"--gh-token",
 				"xxx",
-				"--reporter",
-				"github-pr-review",
-				"--github_pr_owner",
-				"fntlnz",
-				"--github_pr_repository",
-				"lstnrepotest",
-				"--github_pr_id",
-				"1",
+				"-r",
+				"gh-pull-review,gh-pull-comment",
+				"--gh-owner",
+				"leodido",
+				"--gh-repo",
+				"go-urn",
+				"--gh-pull-id",
+				"111",
 			},
 			stdout: heredoc.Doc(`{
-	"GithubPRReviewReporterOwner": "fntlnz",
-	"GithubPRReviewReporterPRID": 1,
-	"GithubPRReviewReporterRepository": "lstnrepotest",
-	"Reporter": "github-pr-review",
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
 	"exclude": [
 		110
 	],
+	"gh-owner": "leodido",
+	"gh-pull-id": 111,
+	"gh-repo": "go-urn",
 	"gh-token": "xxx",
 	"jq": "",
 	"json": false,
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
+	"reporter": [
+		33,
+		22
+	],
 	"timeout": 60
 }
 `),
@@ -183,25 +230,69 @@ Global Flags:
 		},
 		{
 			envvar: map[string]string{
-				"LSTN_GH_TOKEN":     "yyy",
-				"LSTN_NPM_REGISTRY": "https://registry.npmjs.com",
+				"LSTN_REPORTER": "gh-pull-check",
 			},
-			cmdline: []string{"scan", "--debug-options"},
+			cmdline: []string{
+				"scan",
+				"--debug-options",
+				"--gh-token",
+				"xxx",
+				"-r",
+				"gh-pull-review",
+				"--gh-owner",
+				"leodido",
+				"--gh-repo",
+				"go-urn",
+				"--gh-pull-id",
+				"111",
+			},
 			stdout: heredoc.Doc(`{
-	"GithubPRReviewReporterOwner": "",
-	"GithubPRReviewReporterPRID": 0,
-	"GithubPRReviewReporterRepository": "",
-	"Reporter": "",
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
 	"exclude": [
 		110
 	],
+	"gh-owner": "leodido",
+	"gh-pull-id": 111,
+	"gh-repo": "go-urn",
+	"gh-token": "xxx",
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://registry.npmjs.org",
+	"reporter": [
+		33,
+		44
+	],
+	"timeout": 60
+}
+`),
+			stderr: "Running without a configuration file\n",
+			errstr: "",
+		},
+		{
+			envvar: map[string]string{
+				"LSTN_GH_OWNER":     "fntlnz",
+				"LSTN_GH_PULL_ID":   "654",
+				"LSTN_GH_TOKEN":     "yyy",
+				"LSTN_NPM_REGISTRY": "https://registry.npmjs.com",
+			},
+			cmdline: []string{"scan", "--debug-options"},
+			stdout: heredoc.Doc(`{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"exclude": [
+		110
+	],
+	"gh-owner": "fntlnz",
+	"gh-pull-id": 654,
+	"gh-repo": "",
 	"gh-token": "yyy",
 	"jq": "",
 	"json": false,
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.com",
+	"reporter": null,
 	"timeout": 60
 }
 `),
