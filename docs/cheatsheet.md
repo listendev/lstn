@@ -133,9 +133,13 @@ Inspect the verdicts for your direct dependencies.
 ### Config Flags
 
 ```
---endpoint string   the listen.dev endpoint emitting the verdicts (default "https://npm.listen.dev")
---loglevel string   set the logging level (default "info")
---timeout int       set the timeout, in seconds (default 60)
+--endpoint string               the listen.dev endpoint emitting the verdicts (default "https://npm.listen.dev")
+--github_pr_id int              PR repository name
+--github_pr_owner string        PR owner name (organization/user)
+--github_pr_repository string   PR repository name
+--loglevel string               set the logging level (default "info")
+--reporter string               use a reporter
+--timeout int                   set the timeout, in seconds (default 60)
 ```
 
 ### Debug Flags
