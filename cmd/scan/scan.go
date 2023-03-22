@@ -182,6 +182,10 @@ The verdicts it returns are listed by the name of each package and its specified
 						return fmt.Errorf("error while executing reporter (%s): %w", r.String(), err)
 					}
 					fmt.Fprintf(io.Out, "%s report successfully sent using the %s reporter\n", cs.SuccessIcon(), cs.Gray(r.String()))
+				case cmd.GitHubPullCheckReport:
+					c.PrintErrf("The %q reporter is coming soon...\n", r.String())
+				case cmd.GitHubPullReviewReport:
+					c.PrintErrf("The %q reporter is coming soon...\n", r.String())
 				}
 			}
 
