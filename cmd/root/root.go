@@ -124,6 +124,7 @@ func New(ctx context.Context) (*Command, error) {
 				fieldName, ok := configFlagsNames[flagName]
 				if ok {
 					v := flags.GetField(cfgOpts, fieldName)
+					defaultVal, hasDefault := configFlagsDefaults[flagName]
 					if v.IsValid() {
 						switch v.Interface().(type) {
 						case int:
@@ -131,12 +132,12 @@ func New(ctx context.Context) (*Command, error) {
 							flagValue, _ := c.Flags().GetInt(flagName)
 							// Set the value coming from environment variable or config file (viper)
 							value := viper.GetInt64(flagName)
-							if value != 0 && fmt.Sprintf("%d", value) != configFlagsDefaults[flagName] {
+							if value != 0 || (hasDefault && fmt.Sprintf("%d", value) != defaultVal) {
 								v.SetInt(value)
 							}
 							// Flag value takes precedence nevertheless
-							// Re-set the field when the flag value was not equal to the default value
-							if fmt.Sprintf("%d", flagValue) != configFlagsDefaults[flagName] {
+							// Re-set the field when the flag value was not equal to the default value or to the zero value
+							if flagValue != 0 || (hasDefault && fmt.Sprintf("%d", flagValue) != defaultVal) {
 								v.SetInt(int64(flagValue))
 							}
 						case string:
@@ -144,12 +145,12 @@ func New(ctx context.Context) (*Command, error) {
 							flagValue, _ := c.Flags().GetString(flagName)
 							// Set the value coming from environment variable or config file (viper)
 							value := viper.GetString(flagName)
-							if value != "" && value != configFlagsDefaults[flagName] {
+							if value != "" && value != defaultVal {
 								v.SetString(value)
 							}
 							// Flag value takes precedence nevertheless
 							// Re-set the field when the flag value was not equal to the default value
-							if flagValue != configFlagsDefaults[flagName] {
+							if flagValue != defaultVal {
 								v.SetString(flagValue)
 							}
 						case []cmd.ReportType:
@@ -158,22 +159,24 @@ func New(ctx context.Context) (*Command, error) {
 							flagValue := enumFlag.Get().([]cmd.ReportType)
 							// Set the value coming from environment variable or config file (viper)
 							value := viper.GetString(flagName)
-							if value != "[]" && value != "" {
+							if value != "[]" && value != defaultVal {
 								reportTypeErr := enumFlag.Set(value)
 								if reportTypeErr != nil {
 									flagErr = fmt.Errorf("%s %s; got %s", flagName, reportTypeErr.Error(), value)
+
 									return
 								}
 								// Substitute the slice
 								v.Set(reflect.ValueOf(enumFlag.Get()))
 							}
-							// Flag value takes precedence nevertheless
+							// Flag value takes precedence nevertheless: merge them with the ones already there...
 							if len(flagValue) > 0 {
 								reportTypeErr := enumFlag.Set(strings.Join(goneric.Map(func(t cmd.ReportType) string {
 									return t.String()
 								}, flagValue...), ","))
 								if reportTypeErr != nil {
 									flagErr = fmt.Errorf("%s %s; got %s", flagName, reportTypeErr.Error(), flagValue)
+
 									return
 								}
 								// Substitute the slice
