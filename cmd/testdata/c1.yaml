@@ -1,0 +1,13 @@
+timeout: 2222
+token:
+  github: zzz
+registry:
+  npm: https://some.io
+reporter:
+  types:
+    - gh-pull-review
+  github:
+    owner: leodido
+    pull:
+      id: 78999
+    repo: go-urn
