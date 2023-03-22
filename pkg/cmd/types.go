@@ -17,9 +17,58 @@ package cmd
 
 import (
 	"context"
+	"fmt"
+
+	"github.com/thediveo/enumflag/v2"
 )
 
 type Options interface {
 	Validate() []error
 	Transform(context.Context) error
+}
+
+type ReportType enumflag.Flag
+
+const (
+	AllReport ReportType = (iota + 1) * 11
+	GitHubPullCommentReport
+	GitHubPullReviewReport
+	GitHubPullCheckReport
+)
+
+var AllReportTypes = []ReportType{
+	GitHubPullCommentReport,
+	GitHubPullReviewReport,
+	GitHubPullCheckReport,
+}
+
+var ReporterTypeIDs = map[ReportType][]string{
+	GitHubPullCommentReport: {GitHubPullCommentReport.String()},
+	GitHubPullCheckReport:   {GitHubPullCheckReport.String()},
+	GitHubPullReviewReport:  {GitHubPullReviewReport.String()},
+}
+
+func (t ReportType) String() string {
+	switch t {
+	case GitHubPullCommentReport:
+		return "gh-pull-comment"
+	case GitHubPullReviewReport:
+		return "gh-pull-review"
+	case GitHubPullCheckReport:
+		return "gh-pull-check"
+	default:
+		return "all"
+	}
+}
+
+func ParseReportType(s string) (ReportType, error) {
+	for t, vals := range ReporterTypeIDs {
+		for _, v := range vals {
+			if s == v {
+				return t, nil
+			}
+		}
+	}
+
+	return AllReport, fmt.Errorf(`a report type with ID "%s" doesn't exist`, s)
 }
