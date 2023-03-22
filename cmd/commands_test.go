@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path"
 	"strings"
 	"testing"
 
@@ -38,6 +39,8 @@ type testCase struct {
 }
 
 func TestChildCommands(t *testing.T) {
+	cwd, _ := os.Getwd()
+
 	cases := []testCase{
 		{
 			cmdline: []string{"in"},
@@ -108,6 +111,29 @@ Global Flags:
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": null,
 	"timeout": 60
+}
+`),
+			stderr: "Running without a configuration file\n",
+			errstr: "",
+		},
+		{
+			envvar: map[string]string{
+				"LSTN_TIMEOUT": "9999",
+			},
+			cmdline: []string{"in", "--debug-options", "--timeout", "8888"},
+			stdout: heredoc.Doc(`{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "",
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://registry.npmjs.org",
+	"reporter": null,
+	"timeout": 8888
 }
 `),
 			stderr: "Running without a configuration file\n",
@@ -300,6 +326,64 @@ Global Flags:
 			errstr: "",
 		},
 		{
+			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "c1.yaml")},
+			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/c1.yaml
+{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"exclude": [
+		110
+	],
+	"gh-owner": "leodido",
+	"gh-pull-id": 78999,
+	"gh-repo": "go-urn",
+	"gh-token": "zzz",
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://some.io",
+	"reporter": [
+		33
+	],
+	"timeout": 2222
+}
+`),
+			stderr: "",
+			errstr: "",
+		},
+		{
+			envvar: map[string]string{
+				"LSTN_GH_PULL_ID": "887755",
+				"LSTN_GH_REPO": "go-conventionalcommits",
+				"LSTN_ENDPOINT": "https://npm-stage.listen.dev",
+				"LSTN_TIMEOUT": "33331",
+			},
+			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "c1.yaml")},
+			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/c1.yaml
+{
+	"debug-options": true,
+	"endpoint": "https://npm-stage.listen.dev",
+	"exclude": [
+		110
+	],
+	"gh-owner": "leodido",
+	"gh-pull-id": 887755,
+	"gh-repo": "go-conventionalcommits",
+	"gh-token": "zzz",
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://some.io",
+	"reporter": [
+		33
+	],
+	"timeout": 33331
+}
+`),
+			stderr: "",
+			errstr: "",
+		},
+		{
 			cmdline: []string{"version", "--debug-options"},
 			stdout: heredoc.Doc(`{
 	"changelog": false,
@@ -333,8 +417,6 @@ Global Flags:
 			errstr: "",
 		},
 	}
-
-	cwd, _ := os.Getwd()
 
 	for _, tc := range cases {
 		tc := tc
