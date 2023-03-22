@@ -53,7 +53,7 @@ func (suite *FlagsBaseSuite) TestGetDefaults() {
 	res := GetDefaults(&ScanOpts{})
 
 	// Only 4 (sub)fields have default values
-	assert.Len(suite.T(), res, 5)
+	assert.Len(suite.T(), res, 4)
 }
 
 func (suite *FlagsBaseSuite) TestGetField() {
