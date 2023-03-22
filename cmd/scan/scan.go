@@ -25,6 +25,7 @@ import (
 	"github.com/cli/cli/pkg/iostreams"
 	"github.com/google/go-github/v50/github"
 	"github.com/listendev/lstn/internal/project"
+	"github.com/listendev/lstn/pkg/cmd"
 	"github.com/listendev/lstn/pkg/cmd/arguments"
 	"github.com/listendev/lstn/pkg/cmd/groups"
 	"github.com/listendev/lstn/pkg/cmd/options"
@@ -145,42 +146,43 @@ The verdicts it returns are listed by the name of each package and its specified
 			}
 
 			err = tablePrinter.RenderPackages((*listen.Response)(&combinedResponse))
-
 			if err != nil {
 				return err
 			}
 
-			if len(scanOpts.Reporter) > 0 {
-				cs := io.ColorScheme()
-				reporterIdentifier := scanOpts.Reporter
-				fmt.Fprintf(io.Out, "sending report using the %s reporter\n", cs.Gray(reporterIdentifier))
-				ts := oauth2.StaticTokenSource(
-					&oauth2.Token{AccessToken: scanOpts.ConfigFlags.GitHub},
-				)
-				tc := oauth2.NewClient(ctx, ts)
-				client := github.NewClient(tc)
+			for _, r := range scanOpts.Reporter.Types {
+				switch r {
+				case cmd.GitHubPullCommentReport:
+					cs := io.ColorScheme()
+					fmt.Fprintf(io.Out, "sending report using the %s reporter\n", cs.Gray(r.String()))
+					ts := oauth2.StaticTokenSource(
+						&oauth2.Token{AccessToken: scanOpts.ConfigFlags.Token.GitHub},
+					)
+					tc := oauth2.NewClient(ctx, ts)
+					client := github.NewClient(tc)
 
-				rep, err := reporter.BuildReporter(reporterIdentifier)
-				if err != nil {
-					return err
-				}
-				rep.WithGithubClient(client)
-				rep.WithContext(ctx)
+					rep, err := reporter.BuildReporter(r.String())
+					if err != nil {
+						return err
+					}
+					rep.WithGithubClient(client)
+					rep.WithContext(ctx)
 
-				req := request.Report{
-					Packages: combinedResponse,
-					GithubPRReviewRequest: request.GithubPRReviewReportRequest{
-						Owner: scanOpts.GithubPRReviewReporterOwner,
-						Repo:  scanOpts.GithubPRReviewReporterRepository,
-						ID:    scanOpts.GithubPRReviewReporterPRID,
-					},
-				}
+					req := request.Report{
+						Packages: combinedResponse,
+						GithubPRReviewRequest: request.GithubPRReviewReportRequest{
+							Owner: scanOpts.Reporter.GitHub.Owner,
+							Repo:  scanOpts.Reporter.GitHub.Repo,
+							ID:    scanOpts.Reporter.GitHub.Pull.ID,
+						},
+					}
 
-				err = rep.Report(&req)
-				if err != nil {
-					return fmt.Errorf("error while executing reporter (%s): %w", reporterIdentifier, err)
+					err = rep.Report(&req)
+					if err != nil {
+						return fmt.Errorf("error while executing reporter (%s): %w", r.String(), err)
+					}
+					fmt.Fprintf(io.Out, "%s report successfully sent using the %s reporter\n", cs.SuccessIcon(), cs.Gray(r.String()))
 				}
-				fmt.Fprintf(io.Out, "%s report successfully sent using the %s reporter\n", cs.SuccessIcon(), cs.Gray(reporterIdentifier))
 			}
 
 			return nil
