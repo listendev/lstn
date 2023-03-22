@@ -19,6 +19,7 @@ require (
 	github.com/google/uuid v1.1.2
 	github.com/imdario/mergo v0.3.13
 	github.com/itchyny/gojq v0.12.11
+	github.com/jarcoal/httpmock v1.3.0
 	github.com/leodido/go-npmpackagename v0.2.0
 	github.com/matishsiao/goInfo v0.0.0-00010101000000-000000000000
 	github.com/muja/goconfig v0.0.0-20180417074348-0a635507dddc
