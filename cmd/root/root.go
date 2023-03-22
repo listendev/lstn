@@ -137,7 +137,7 @@ func New(ctx context.Context) (*Command, error) {
 							}
 							// Flag value takes precedence nevertheless
 							// Re-set the field when the flag value was not equal to the default value or to the zero value
-							if flagValue != 0 || (hasDefault && fmt.Sprintf("%d", flagValue) != defaultVal) {
+							if (!hasDefault && flagValue != 0) || (hasDefault && fmt.Sprintf("%d", flagValue) != defaultVal) {
 								v.SetInt(int64(flagValue))
 							}
 						case string:
