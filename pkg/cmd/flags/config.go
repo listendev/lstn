@@ -40,12 +40,12 @@ type Registry struct {
 }
 
 type Pull struct {
-	ID int `name:"github pull request ID" flag:"gh-pull-id" desc:"set the GitHub pull request ID" validate:"required_if=Reporter github-pr-review" flagset:"Reporting" json:"gh-pull-id"`
+	ID int `name:"github pull request ID" flag:"gh-pull-id" desc:"set the GitHub pull request ID" flagset:"Reporting" json:"gh-pull-id"`
 }
 
 type GitHub struct {
-	Owner string `name:"github owner" flag:"gh-owner" desc:"set the GitHub owner name (org|user)" validate:"required_if=Reporter github-pr-review" flagset:"Reporting" json:"gh-owner"`
-	Repo  string `name:"github repository" flag:"gh-repo" desc:"set the GitHub repository name" validate:"required_if=Reporter github-pr-review" flagset:"Reporting" json:"gh-repo"`
+	Owner string `name:"github owner" flag:"gh-owner" desc:"set the GitHub owner name (org|user)" flagset:"Reporting" json:"gh-owner"`
+	Repo  string `name:"github repository" flag:"gh-repo" desc:"set the GitHub repository name" flagset:"Reporting" json:"gh-repo"`
 	Pull
 }
 
