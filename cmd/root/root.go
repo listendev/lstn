@@ -20,27 +20,33 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"reflect"
 	"runtime"
 	"strings"
 	"time"
 
+	"github.com/XANi/goneric"
 	"github.com/cli/cli/pkg/iostreams"
 	"github.com/listendev/lstn/cmd/in"
 	"github.com/listendev/lstn/cmd/scan"
 	"github.com/listendev/lstn/cmd/to"
 	"github.com/listendev/lstn/cmd/version"
 	"github.com/listendev/lstn/internal/project"
+	"github.com/listendev/lstn/pkg/cmd"
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	"github.com/listendev/lstn/pkg/cmd/flagusages"
 	"github.com/listendev/lstn/pkg/cmd/groups"
 	pkghelp "github.com/listendev/lstn/pkg/cmd/help"
 	"github.com/listendev/lstn/pkg/cmd/options"
+	lstnviper "github.com/listendev/lstn/pkg/cmd/viper"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/jq"
 	lstnversion "github.com/listendev/lstn/pkg/version"
+	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"github.com/thediveo/enumflag/v2"
 )
 
 var (
@@ -71,11 +77,13 @@ func New(ctx context.Context) (*Command, error) {
 		},
 		PersistentPreRunE: func(c *cobra.Command, args []string) error {
 			// Do not check for the config file if the command is not available (eg., help) or not core (eg., version)
+			withConfigFile := false
 			c, _, err := c.Find(os.Args[1:])
 			if err == nil && (c.IsAvailableCommand() && c.GroupID == groups.Core.ID) {
 				// If a config file is found, read it in
 				if err := viper.ReadInConfig(); err == nil {
 					c.Printf("Using config file: %s\n", viper.ConfigFileUsed())
+					withConfigFile = true
 				} else {
 					if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 						// Config file not found, ignore...
@@ -94,7 +102,12 @@ func New(ctx context.Context) (*Command, error) {
 			}
 
 			// Update them with the values in the config file
-			if err := viper.Unmarshal(&cfgOpts); err != nil {
+			viperOpts := viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
+				mapstructure.StringToTimeDurationHookFunc(),
+				mapstructure.StringToSliceHookFunc(","),
+				lstnviper.StringToReportType(),
+			))
+			if err := viper.Unmarshal(&cfgOpts, viperOpts); withConfigFile && err != nil {
 				return err
 			}
 
@@ -104,6 +117,7 @@ func New(ctx context.Context) (*Command, error) {
 			// Obtain the mapping flag name -> default value
 			configFlagsDefaults := flags.GetDefaults(cfgOpts)
 			// Implement flag precedence over environment variables, over configuration file
+			var flagErr error
 			c.Flags().VisitAll(func(f *pflag.Flag) {
 				flagName := f.Name
 				// Only for configuration flags...
@@ -138,11 +152,42 @@ func New(ctx context.Context) (*Command, error) {
 							if flagValue != configFlagsDefaults[flagName] {
 								v.SetString(flagValue)
 							}
+						case []cmd.ReportType:
+							// Store the flag value (it equals to the default when no flag)
+							enumFlag, _ := c.Flags().Lookup(flagName).Value.(*enumflag.EnumFlagValue[cmd.ReportType])
+							flagValue := enumFlag.Get().([]cmd.ReportType)
+							// Set the value coming from environment variable or config file (viper)
+							value := viper.GetString(flagName)
+							if value != "[]" && value != "" {
+								reportTypeErr := enumFlag.Set(value)
+								if reportTypeErr != nil {
+									flagErr = fmt.Errorf("%s %s; got %s", flagName, reportTypeErr.Error(), value)
+									return
+								}
+								// Substitute the slice
+								v.Set(reflect.ValueOf(enumFlag.Get()))
+							}
+							// Flag value takes precedence nevertheless
+							if len(flagValue) > 0 {
+								reportTypeErr := enumFlag.Set(strings.Join(goneric.Map(func(t cmd.ReportType) string {
+									return t.String()
+								}, flagValue...), ","))
+								if reportTypeErr != nil {
+									flagErr = fmt.Errorf("%s %s; got %s", flagName, reportTypeErr.Error(), flagValue)
+									return
+								}
+								// Substitute the slice
+								v.Set(reflect.ValueOf(enumFlag.Get()))
+							}
 						default:
 						}
 					}
 				}
 			})
+			// Some custom flags (eg. enum flags) may have their own validation mechanism
+			if flagErr != nil {
+				return flagErr
+			}
 
 			// Validate the config options
 			// NOTE > It must happen after the precedence mechanism
