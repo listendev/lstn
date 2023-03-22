@@ -60,9 +60,6 @@ func init() {
 	if err := Singleton.RegisterValidation("version_constraint", isVersionConstraint); err != nil {
 		panic(err)
 	}
-	if err := Singleton.RegisterValidation("reporter", isReporterAvailable); err != nil {
-		panic(err)
-	}
 
 	Singleton.RegisterAlias("shasum", "len=40")
 	Singleton.RegisterAlias("mandatory", "required")
