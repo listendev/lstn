@@ -19,13 +19,13 @@ import (
 	"github.com/listendev/lstn/pkg/listen"
 )
 
-type GithubPRReviewReportRequest struct {
+type GitHubPullCommentReport struct {
 	Owner string
 	Repo  string
 	ID    int
 }
 
 type Report struct {
-	Packages              []listen.Package
-	GithubPRReviewRequest GithubPRReviewReportRequest
+	Packages []listen.Package
+	GitHubPullCommentReport
 }

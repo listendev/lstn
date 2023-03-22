@@ -13,7 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package githubprreview
+package comment
 
 import (
 	"bytes"
@@ -24,37 +24,30 @@ import (
 	"github.com/google/go-github/v50/github"
 	"github.com/listendev/lstn/pkg/cmd/report"
 	"github.com/listendev/lstn/pkg/reporter/request"
-	"github.com/listendev/lstn/pkg/validate"
 )
-
-const ReporterIdentifier = "github-pr-review"
-
-func init() {
-	validate.RegisterAvailableReporter(ReporterIdentifier)
-}
 
 const stickyReviewCommentAnnotation = "<!--@lstn-sticky-review-comment-->"
 
-type ReviewReporter struct {
+type Reporter struct {
 	ctx      context.Context
 	ghClient *github.Client
 }
 
-func New() *ReviewReporter {
-	return &ReviewReporter{
+func New() *Reporter {
+	return &Reporter{
 		ghClient: github.NewClient(nil),
 	}
 }
 
-func (r *ReviewReporter) WithGithubClient(client *github.Client) {
+func (r *Reporter) WithGithubClient(client *github.Client) {
 	r.ghClient = client
 }
 
-func (r *ReviewReporter) WithContext(ctx context.Context) {
+func (r *Reporter) WithContext(ctx context.Context) {
 	r.ctx = ctx
 }
 
-func (r *ReviewReporter) stickyComment(owner string, repo string, id int, comment io.Reader) error {
+func (r *Reporter) stickyComment(owner string, repo string, id int, comment io.Reader) error {
 	buf := bytes.Buffer{}
 	_, err := buf.Write([]byte(stickyReviewCommentAnnotation))
 	if err != nil {
@@ -93,7 +86,7 @@ func (r *ReviewReporter) stickyComment(owner string, repo string, id int, commen
 	return commentFn()
 }
 
-func (r *ReviewReporter) Report(req *request.Report) error {
+func (r *Reporter) Report(req *request.Report) error {
 	buf := bytes.Buffer{}
 	fullMarkdownReport := report.NewFullMarkdwonReport()
 	fullMarkdownReport.WithOutput(&buf)
@@ -101,9 +94,9 @@ func (r *ReviewReporter) Report(req *request.Report) error {
 		return err
 	}
 
-	owner := req.GithubPRReviewRequest.Owner
-	repo := req.GithubPRReviewRequest.Repo
-	id := req.GithubPRReviewRequest.ID
+	owner := req.GitHubPullCommentReport.Owner
+	repo := req.GitHubPullCommentReport.Repo
+	id := req.GitHubPullCommentReport.ID
 
 	err := r.stickyComment(owner, repo, id, &buf)
 	if err != nil {

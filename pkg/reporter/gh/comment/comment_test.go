@@ -13,7 +13,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package githubprreview
+package comment
 
 import (
 	"context"
@@ -98,7 +98,7 @@ func TestReviewReporter_stickyComment(t *testing.T) {
 
 			ghClient := github.NewClient(nil)
 
-			r := &ReviewReporter{
+			r := &Reporter{
 				ctx:      context.TODO(),
 				ghClient: ghClient,
 			}

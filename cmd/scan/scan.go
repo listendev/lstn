@@ -161,7 +161,7 @@ The verdicts it returns are listed by the name of each package and its specified
 					tc := oauth2.NewClient(ctx, ts)
 					client := github.NewClient(tc)
 
-					rep, err := reporter.BuildReporter(r.String())
+					rep, err := reporter.BuildReporter(r)
 					if err != nil {
 						return err
 					}
@@ -170,7 +170,7 @@ The verdicts it returns are listed by the name of each package and its specified
 
 					req := request.Report{
 						Packages: combinedResponse,
-						GithubPRReviewRequest: request.GithubPRReviewReportRequest{
+						GitHubPullCommentReport: request.GitHubPullCommentReport{
 							Owner: scanOpts.Reporter.GitHub.Owner,
 							Repo:  scanOpts.Reporter.GitHub.Repo,
 							ID:    scanOpts.Reporter.GitHub.Pull.ID,
