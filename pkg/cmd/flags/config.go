@@ -40,7 +40,7 @@ type Registry struct {
 }
 
 type Pull struct {
-	ID int `name:"github pull request ID" flag:"gh-pull-id" desc:"set the GitHub pull request ID" validate:"required_if=Reporter github-pr-review" flagset:"Reporting" default:"0" json:"gh-pull-id"`
+	ID int `name:"github pull request ID" flag:"gh-pull-id" desc:"set the GitHub pull request ID" validate:"required_if=Reporter github-pr-review" flagset:"Reporting" json:"gh-pull-id"`
 }
 
 type GitHub struct {
