@@ -27,7 +27,6 @@ import (
 )
 
 func TestReviewReporter_stickyComment(t *testing.T) {
-
 	type args struct {
 		owner   string
 		repo    string
