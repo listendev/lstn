@@ -38,13 +38,17 @@ func (suite *FlagsConfigSuite) TestNewConfigFlags() {
 
 func (suite *FlagsConfigSuite) TestGetConfigFlagsNames() {
 	m := GetNames(&ConfigFlags{})
-	assert.Equal(suite.T(), 5, len(m))
+	assert.Equal(suite.T(), 9, len(m))
 
 	expected := make(map[string]string)
 	expected["loglevel"] = "LogLevel"
 	expected["endpoint"] = "Endpoint"
 	expected["timeout"] = "Timeout"
 	expected["gh-token"] = "Token.GitHub"
+	expected["gh-pull-id"] = "Reporter.GitHub.Pull.ID"
+	expected["gh-repo"] = "Reporter.GitHub.Repo"
+	expected["gh-owner"] = "Reporter.GitHub.Owner"
+	expected["reporter"] = "Reporter.Types"
 	expected["npm-registry"] = "Registry.NPM"
 
 	for k, v := range m {
@@ -56,13 +60,14 @@ func (suite *FlagsConfigSuite) TestGetConfigFlagsNames() {
 
 func (suite *FlagsConfigSuite) TestGetConfigFlagsDefaults() {
 	m := GetDefaults(&ConfigFlags{})
-	assert.Equal(suite.T(), 4, len(m))
+	assert.Equal(suite.T(), 5, len(m))
 
 	expected := make(map[string]string)
 	expected["endpoint"] = "https://npm.listen.dev"
 	expected["loglevel"] = "info"
 	expected["timeout"] = "60"
 	expected["npm-registry"] = "https://registry.npmjs.org"
+	expected["gh-pull-id"] = "0"
 
 	for k, v := range m {
 		e, ok := expected[k]
