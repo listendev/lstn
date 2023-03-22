@@ -45,6 +45,7 @@ func NewIn() (*In, error) {
 }
 
 func (o *In) Attach(c *cobra.Command) {
+	o.ConfigFlags.Define(c)
 	flags.Define(c, o, "")
 	flagusages.Set(c)
 }

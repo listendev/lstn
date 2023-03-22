@@ -18,9 +18,15 @@ package flags
 import (
 	"context"
 	"fmt"
+	"sort"
+	"strings"
 
+	"github.com/XANi/goneric"
 	"github.com/creasty/defaults"
 	"github.com/listendev/lstn/pkg/cmd"
+	"github.com/listendev/lstn/pkg/cmd/flagusages"
+	"github.com/spf13/cobra"
+	"github.com/thediveo/enumflag/v2"
 )
 
 var _ cmd.Options = (*ConfigFlags)(nil)
@@ -33,12 +39,30 @@ type Registry struct {
 	NPM string `name:"NPM registry" flag:"npm-registry" desc:"set a custom NPM registry" validate:"omitempty,url" default:"https://registry.npmjs.org" transform:"tsuffix=/" flagset:"Registry" json:"npm-registry"`
 }
 
+type Pull struct {
+	ID int `name:"github pull request ID" flag:"gh-pull-id" desc:"set the GitHub pull request ID" validate:"required_if=Reporter github-pr-review" flagset:"Reporting" default:"0" json:"gh-pull-id"`
+}
+
+type GitHub struct {
+	Owner string `name:"github owner" flag:"gh-owner" desc:"set the GitHub owner name (org|user)" validate:"required_if=Reporter github-pr-review" flagset:"Reporting" json:"gh-owner"`
+	Repo  string `name:"github repository" flag:"gh-repo" desc:"set the GitHub repository name" validate:"required_if=Reporter github-pr-review" flagset:"Reporting" json:"gh-repo"`
+	Pull
+}
+
+type Reporter struct {
+	reporter *enumflag.EnumFlagValue[cmd.ReportType]
+
+	Types []cmd.ReportType `json:"reporter" flag:"reporter"`
+	GitHub
+}
+
 type ConfigFlags struct {
 	LogLevel string `default:"info" name:"log level" flag:"loglevel" desc:"set the logging level" flagset:"Config" json:"loglevel"`                          // TODO > validator
 	Timeout  int    `default:"60" name:"timeout" flag:"timeout" desc:"set the timeout, in seconds" validate:"number,min=30" flagset:"Config" json:"timeout"` // FIXME: change to time.Duration type
 	Endpoint string `default:"https://npm.listen.dev" flag:"endpoint" name:"endpoint" desc:"the listen.dev endpoint emitting the verdicts" validate:"url,endpoint" transform:"tsuffix=/" flagset:"Config" json:"endpoint"`
 	Token
 	Registry
+	Reporter
 }
 
 func NewConfigFlags() (*ConfigFlags, error) {
@@ -49,6 +73,19 @@ func NewConfigFlags() (*ConfigFlags, error) {
 	}
 
 	return o, nil
+}
+
+func (o *ConfigFlags) Define(c *cobra.Command) {
+	// Create the enum flag value for --reporter
+	enumValues := goneric.MapToSlice(func(t cmd.ReportType, v []string) string {
+		return v[0]
+	}, cmd.ReporterTypeIDs)
+	sort.Strings(enumValues)
+	o.Reporter.reporter = enumflag.NewSlice(&o.Reporter.Types, `(`+strings.Join(enumValues, ",")+`)`, cmd.ReporterTypeIDs, enumflag.EnumCaseInsensitive)
+
+	// Manually define the --reporter enum flag
+	c.Flags().VarP(o.Reporter.reporter, "reporter", "r", `set one or more reporters to use`)
+	_ = c.Flags().SetAnnotation("reporter", flagusages.FlagGroupAnnotation, []string{"Reporting"})
 }
 
 func (o *ConfigFlags) Validate() []error {

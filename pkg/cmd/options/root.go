@@ -44,6 +44,7 @@ func NewRoot() (*Root, error) {
 }
 
 func (o *Root) Attach(c *cobra.Command) {
+	o.ConfigFlags.Define(c)
 	flags.Define(c, o, "")
 	flagusages.Set(c)
 }
