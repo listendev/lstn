@@ -18,6 +18,7 @@ package help
 import (
 	"bytes"
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/listendev/lstn/pkg/cmd/flags"
@@ -39,26 +40,67 @@ func configHelpTopicFunc() TopicFunc {
 			cfgFlags := &flags.ConfigFlags{}
 			configFlagsNames := flags.GetNames(cfgFlags)
 			configFlagsDefaults := flags.GetDefaults(cfgFlags)
+			configFlagsTypes := flags.GetTypes(cfgFlags)
+
 			fileContent := ""
 
+			dots := []string{}
 			p.Flags().VisitAll(func(f *pflag.Flag) {
 				flagName := f.Name
 				target, ok := configFlagsNames[flagName]
 				if ok {
-					parts := strings.Split(strings.ToLower(target), ".")
-					num := len(parts)
-					for i, part := range parts {
-						def := configFlagsDefaults[flagName]
-						if def == "" && num == (i+1) {
-							def = "..."
-						}
-						if def != "" && num > (i+1) {
-							def = ""
-						}
-						fileContent += fmt.Sprintf("%s%s: %s\n", strings.Repeat(" ", i*2), part, def)
-					}
+					dots = append(dots, fmt.Sprintf("%s:%s", strings.ToLower(target), flagName))
 				}
 			})
+			sort.Strings(dots)
+
+			keys := map[string]bool{}
+			for _, dot := range dots {
+				components := strings.Split(dot, ":")
+				flagName := components[1]
+				parts := strings.Split(components[0], ".")
+				num := len(parts)
+				for i, part := range parts {
+					path := part
+					if i > 0 {
+						path = strings.Join(parts[:i], ".") + "." + part
+					}
+					if _, found := keys[path]; found {
+						continue
+					}
+
+					def := configFlagsDefaults[flagName]
+					if def == "" && num == (i+1) {
+						def = "..."
+					}
+					if def != "" && num > (i+1) {
+						def = ""
+					}
+
+					switch configFlagsTypes[flagName].String() {
+					case "string":
+						if def != "" {
+							def = fmt.Sprintf("%q", def)
+						}
+					case "int":
+						if def == "..." {
+							def = "0"
+						}
+					}
+
+					if strings.HasPrefix(configFlagsTypes[flagName].String(), "[]") {
+						def = ""
+					}
+
+					fileContent += fmt.Sprintf("%s%s: %s\n", strings.Repeat(" ", i*2), part, def)
+					if strings.HasPrefix(configFlagsTypes[flagName].String(), "[]") {
+						sp := strings.Repeat(" ", (i+1)*2)
+						fileContent += fmt.Sprintf("%s- %q\n%s- %q\n", sp, "...", sp, "...")
+					}
+
+					keys[path] = true
+				}
+			}
 
 			if fileContent != "" {
 				fmt.Fprintf(b, "```yaml\n%s```\n", fileContent)
