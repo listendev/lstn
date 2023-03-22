@@ -354,9 +354,9 @@ Global Flags:
 		{
 			envvar: map[string]string{
 				"LSTN_GH_PULL_ID": "887755",
-				"LSTN_GH_REPO": "go-conventionalcommits",
-				"LSTN_ENDPOINT": "https://npm-stage.listen.dev",
-				"LSTN_TIMEOUT": "33331",
+				"LSTN_GH_REPO":    "go-conventionalcommits",
+				"LSTN_ENDPOINT":   "https://npm-stage.listen.dev",
+				"LSTN_TIMEOUT":    "33331",
 			},
 			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "c1.yaml")},
 			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/c1.yaml

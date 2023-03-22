@@ -20,12 +20,13 @@ import (
 	"errors"
 
 	"github.com/google/go-github/v50/github"
-	"github.com/listendev/lstn/pkg/reporter/githubprreview"
+	"github.com/listendev/lstn/pkg/cmd"
+	ghcomment "github.com/listendev/lstn/pkg/reporter/gh/comment"
 	"github.com/listendev/lstn/pkg/reporter/request"
 )
 
 var (
-	ErrReporterNotFound = errors.New("reporter not found")
+	ErrReporterNotFound = errors.New("unsupported reporter")
 )
 
 type Reporter interface {
@@ -34,10 +35,10 @@ type Reporter interface {
 	WithGithubClient(client *github.Client)
 }
 
-func BuildReporter(reporterIdentifier string) (Reporter, error) {
+func BuildReporter(reporterIdentifier cmd.ReportType) (Reporter, error) {
 	switch reporterIdentifier {
-	case githubprreview.ReporterIdentifier:
-		return githubprreview.New(), nil
+	case cmd.GitHubPullCommentReport:
+		return ghcomment.New(), nil
 	default:
 		return nil, ErrReporterNotFound
 	}
