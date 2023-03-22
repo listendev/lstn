@@ -180,6 +180,33 @@ func GetDefaults(o interface{}) map[string]string {
 	return getDefaults(val)
 }
 
+func getTypes(val reflect.Value) map[string]reflect.Type {
+	ret := make(map[string]reflect.Type)
+
+	for i := 0; i < val.NumField(); i++ {
+		field := val.Type().Field(i)
+		tag := field.Tag.Get("flag")
+
+		if val.Field(i).Kind() == reflect.Struct {
+			for k, v := range getTypes(val.Field(i)) {
+				ret[k] = v
+			}
+		}
+
+		if tag != "" {
+			ret[field.Tag.Get("flag")] = field.Type
+		}
+	}
+
+	return ret
+}
+
+func GetTypes(o interface{}) map[string]reflect.Type {
+	val := getValue(o)
+
+	return getTypes(val)
+}
+
 func getField(val reflect.Value, name string) reflect.Value {
 	parts := strings.Split(name, ".")
 	ret := val.FieldByName(parts[0])
