@@ -8,11 +8,20 @@ Anyways, notice that environment variables, and flags (if any) override the valu
 Here's an example of a configuration file (with the default values):
 
 ```yaml
-endpoint: https://npm.listen.dev
-token: 
-  github: ...
-loglevel: info
+endpoint: "https://npm.listen.dev"
+loglevel: "info"
 registry: 
-  npm: https://registry.npmjs.org
+  npm: "https://registry.npmjs.org"
+reporter: 
+  github: 
+    owner: "..."
+    pull: 
+      id: 0
+    repo: "..."
+  types: 
+    - "..."
+    - "..."
 timeout: 60
+token: 
+  github: "..."
 ```

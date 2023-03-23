@@ -99,6 +99,15 @@ Inspect the verdicts for your dependencies tree.
 --npm-registry string   set a custom NPM registry (default "https://registry.npmjs.org")
 ```
 
+### Reporting Flags
+
+```
+    --gh-owner string                                           set the GitHub owner name (org|user)
+    --gh-pull-id int                                            set the GitHub pull request ID
+    --gh-repo string                                            set the GitHub repository name
+-r, --reporter (gh-pull-check,gh-pull-comment,gh-pull-review)   set one or more reporters to use (default [])
+```
+
 ### Token Flags
 
 ```
@@ -133,13 +142,9 @@ Inspect the verdicts for your direct dependencies.
 ### Config Flags
 
 ```
---endpoint string               the listen.dev endpoint emitting the verdicts (default "https://npm.listen.dev")
---github_pr_id int              PR repository name
---github_pr_owner string        PR owner name (organization/user)
---github_pr_repository string   PR repository name
---loglevel string               set the logging level (default "info")
---reporter string               use a reporter
---timeout int                   set the timeout, in seconds (default 60)
+--endpoint string   the listen.dev endpoint emitting the verdicts (default "https://npm.listen.dev")
+--loglevel string   set the logging level (default "info")
+--timeout int       set the timeout, in seconds (default 60)
 ```
 
 ### Debug Flags
@@ -152,6 +157,15 @@ Inspect the verdicts for your direct dependencies.
 
 ```
 --npm-registry string   set a custom NPM registry (default "https://registry.npmjs.org")
+```
+
+### Reporting Flags
+
+```
+    --gh-owner string                                           set the GitHub owner name (org|user)
+    --gh-pull-id int                                            set the GitHub pull request ID
+    --gh-repo string                                            set the GitHub repository name
+-r, --reporter (gh-pull-check,gh-pull-comment,gh-pull-review)   set one or more reporters to use (default [])
 ```
 
 ### Token Flags
@@ -201,6 +215,15 @@ Get the verdicts of a package.
 
 ```
 --npm-registry string   set a custom NPM registry (default "https://registry.npmjs.org")
+```
+
+### Reporting Flags
+
+```
+    --gh-owner string                                           set the GitHub owner name (org|user)
+    --gh-pull-id int                                            set the GitHub pull request ID
+    --gh-repo string                                            set the GitHub repository name
+-r, --reporter (gh-pull-check,gh-pull-comment,gh-pull-review)   set one or more reporters to use (default [])
 ```
 
 ### Token Flags
