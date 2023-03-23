@@ -45,7 +45,6 @@ func SingleDirectory(c *cobra.Command, args []string) error {
 	if packageJSONErrors != nil {
 		return fmt.Errorf("couldn't find a package.json in %s", args[0])
 	}
-
 	return nil
 }
 
