@@ -255,6 +255,7 @@ func TestRenderContainer(t *testing.T) {
 			err := RenderContainer(outBuf, tt.packages)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("RenderContainer() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
 			require.Equal(t, tt.expectedOutput, outBuf.Bytes())
