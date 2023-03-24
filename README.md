@@ -4,7 +4,7 @@
 
 It lets you analyze the behavior of your dependencies.
 
-TODO: image or asciinema
+<img width="1099" alt="image" src="https://user-images.githubusercontent.com/3413596/227450405-68c09d48-37f5-4bda-b5be-e9a3d642c0a9.png">
 
 ## Documentation
 
@@ -16,7 +16,7 @@ For [installation options see below](#installation), for usage instructions [see
 
 #### GitHub Actions
 
-We recommend using TODO: our GitHub Action for running `lstn` in CI for GitHub projects.
+We recommend using the GitHub Action for running `lstn` in CI for GitHub projects. For integration instructions see this [guide](https://docs.listen.dev/lstn-github-action/quick-start).
 
 #### Other CI
 
