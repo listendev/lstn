@@ -1,14 +1,12 @@
 # lstn
 
-`lstn` is the [listen.dev](https://listen.dev) command line.
+`lstn` is the [listen.dev](https://listen.dev) command line. It lets you analyze the behavior of your dependencies.
 
-It lets you analyze the behavior of your dependencies.
-
-TODO: image or asciinema
+![lstn](docs/assets/lstn-cli.png)
 
 ## Documentation
 
-For [installation options see below](#installation), for usage instructions [see the manual](docs/cheatsheet.md).
+To install `lstn` in your environment, refer to the [Installation](#installation) section below. For usage instructions, see the [Usage manual](docs/cheatsheet.md).
 
 ## Installation
 
@@ -16,13 +14,11 @@ For [installation options see below](#installation), for usage instructions [see
 
 #### GitHub Actions
 
-We recommend using TODO: our GitHub Action for running `lstn` in CI for GitHub projects.
+We recommend using the GitHub Action for running `lstn` in CI for GitHub projects. For integration instructions see this [guide](https://docs.listen.dev/lstn-github-action/quick-start).
 
 #### Other CI
 
-It's highly recommended installing a specific version of `lstn` available on the [releases page](https://github.com/listendev/lstn/releases/latest).
-
-Here are a few ways to install it:
+It's highly recommended to install a specific version of `lstn` available on the [releases page](https://github.com/listendev/lstn/releases/latest). Here are a few ways to install it:
 
 ```bash
 # The binary will be /usr/local/bin/lstn
@@ -43,20 +39,18 @@ lstn version
 
 ### Locally
 
-Wanna install `lstn` on your machine?
-
-See options below.
+To install `lstn` locally, see the options below:
 
 #### Binaries
 
 ```bash
 curl -sSfL https://lstn.dev/get | sh -s -- -b /usr/local/bin
-lstn --version
+lstn version
 ```
 
 #### macOS
 
-`lstn` is available via TODO: Homebrew, ..., and as a downloadable binary from the [releases page](https://github.com/listendev/lstn/releases/latest).
+`lstn` is available via TODO: Homebrew, ..., and as a downloadable binary from our [releases page](https://github.com/listendev/lstn/releases/latest).
 
 #### Linux & BSD
 
