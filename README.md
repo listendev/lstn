@@ -1,14 +1,12 @@
 # lstn
 
-`lstn` is the [listen.dev](https://listen.dev) command line.
+`lstn` is the [listen.dev](https://listen.dev) command line. It lets you analyze the behavior of your dependencies.
 
-It lets you analyze the behavior of your dependencies.
-
-<img width="1099" alt="image" src="https://user-images.githubusercontent.com/3413596/227450405-68c09d48-37f5-4bda-b5be-e9a3d642c0a9.png">
+![lstn](docs/assets/lstn-cli.png)
 
 ## Documentation
 
-For [installation options see below](#installation), for usage instructions [see the manual](docs/cheatsheet.md).
+To install `lstn` in your environment, refer to the [Installation](#installation) section below. For usage instructions, see the [Usage manual](docs/cheatsheet.md).
 
 ## Installation
 
@@ -20,9 +18,7 @@ We recommend using the GitHub Action for running `lstn` in CI for GitHub project
 
 #### Other CI
 
-It's highly recommended installing a specific version of `lstn` available on the [releases page](https://github.com/listendev/lstn/releases/latest).
-
-Here are a few ways to install it:
+It's highly recommended to install a specific version of `lstn` available on the [releases page](https://github.com/listendev/lstn/releases/latest). Here are a few ways to install it:
 
 ```bash
 # The binary will be /usr/local/bin/lstn
@@ -43,9 +39,7 @@ lstn version
 
 ### Locally
 
-Wanna install `lstn` on your machine?
-
-See options below.
+To install `lstn` locally, see the options below:
 
 #### Binaries
 
@@ -56,7 +50,7 @@ lstn version
 
 #### macOS
 
-`lstn` is available via TODO: Homebrew, ..., and as a downloadable binary from the [releases page](https://github.com/listendev/lstn/releases/latest).
+`lstn` is available via TODO: Homebrew, ..., and as a downloadable binary from our [releases page](https://github.com/listendev/lstn/releases/latest).
 
 #### Linux & BSD
 
