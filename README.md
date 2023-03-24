@@ -51,7 +51,7 @@ See options below.
 
 ```bash
 curl -sSfL https://lstn.dev/get | sh -s -- -b /usr/local/bin
-lstn --version
+lstn version
 ```
 
 #### macOS
