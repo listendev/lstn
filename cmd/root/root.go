@@ -26,7 +26,6 @@ import (
 	"time"
 
 	"github.com/XANi/goneric"
-	"github.com/cli/cli/pkg/iostreams"
 	"github.com/listendev/lstn/cmd/in"
 	"github.com/listendev/lstn/cmd/scan"
 	"github.com/listendev/lstn/cmd/to"
@@ -37,6 +36,7 @@ import (
 	"github.com/listendev/lstn/pkg/cmd/flagusages"
 	"github.com/listendev/lstn/pkg/cmd/groups"
 	pkghelp "github.com/listendev/lstn/pkg/cmd/help"
+	"github.com/listendev/lstn/pkg/cmd/iostreams"
 	"github.com/listendev/lstn/pkg/cmd/options"
 	lstnviper "github.com/listendev/lstn/pkg/cmd/viper"
 	pkgcontext "github.com/listendev/lstn/pkg/context"

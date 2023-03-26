@@ -21,10 +21,10 @@ import (
 	"runtime"
 
 	"github.com/Masterminds/semver/v3"
-	"github.com/cli/cli/pkg/iostreams"
 	"github.com/listendev/lstn/internal/project"
 	"github.com/listendev/lstn/pkg/cmd/arguments"
 	"github.com/listendev/lstn/pkg/cmd/groups"
+	"github.com/listendev/lstn/pkg/cmd/iostreams"
 	"github.com/listendev/lstn/pkg/cmd/options"
 	"github.com/listendev/lstn/pkg/cmd/packagesprinter"
 	pkgcontext "github.com/listendev/lstn/pkg/context"

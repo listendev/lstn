@@ -21,8 +21,10 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/cli/cli/pkg/iostreams"
+	genericstreams "github.com/cli/cli/pkg/iostreams"
 	"github.com/cli/cli/utils"
+	"github.com/listendev/lstn/pkg/cmd/iostreams"
+
 	"github.com/listendev/lstn/pkg/listen"
 )
 
@@ -32,7 +34,7 @@ const (
 	verdictPriorityHigh   string = "high"
 )
 
-func verdictPriorityToColorFunc(colorScheme *iostreams.ColorScheme, p string) func(string) string {
+func verdictPriorityToColorFunc(colorScheme *genericstreams.ColorScheme, p string) func(string) string {
 	var fn func(string) string
 	switch p {
 	case verdictPriorityHigh:
@@ -165,7 +167,7 @@ func (t *TablePrinter) printPackages(packages *listen.Response) {
 }
 
 func (t *TablePrinter) printTable(packages *listen.Response) error {
-	tab := utils.NewTablePrinter(t.streams)
+	tab := utils.NewTablePrinter(t.streams.IOStreams)
 
 	cs := t.streams.ColorScheme()
 

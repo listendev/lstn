@@ -18,16 +18,17 @@ package scan
 import (
 	"context"
 	"fmt"
-	"os"
 	"runtime"
 
+	"github.com/Masterminds/semver/v3"
 	"github.com/XANi/goneric"
-	"github.com/cli/cli/pkg/iostreams"
 	"github.com/google/go-github/v50/github"
+	"github.com/jedib0t/go-pretty/text"
 	"github.com/listendev/lstn/internal/project"
 	"github.com/listendev/lstn/pkg/cmd"
 	"github.com/listendev/lstn/pkg/cmd/arguments"
 	"github.com/listendev/lstn/pkg/cmd/groups"
+	"github.com/listendev/lstn/pkg/cmd/iostreams"
 	"github.com/listendev/lstn/pkg/cmd/options"
 	"github.com/listendev/lstn/pkg/cmd/packagesprinter"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
@@ -86,8 +87,9 @@ The verdicts it returns are listed by the name of each package and its specified
 				return nil
 			}
 
-			io := c.Context().Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
-			io.StartProgressIndicator()
+			io := ctx.Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
+			io.StartProgressTracking()
+			defer io.StopProgressTracking()
 
 			// Obtain the target directory that we want to listen in
 			targetDir, err := arguments.GetDirectory(args)
@@ -114,38 +116,29 @@ The verdicts it returns are listed by the name of each package and its specified
 				return fmt.Errorf("there are no dependencies to process for the currently selected sets of dependencies")
 			}
 
-			// Process one dependency set at once
-			tablePrinter := packagesprinter.NewTablePrinter(io)
-			combinedResponse := []listen.Package{}
-			for _, deps := range deps {
-				// Create list of verdicts requests
-				reqs, bulkErr := listen.NewBulkVerdictsRequestsFromMap(deps)
-				if bulkErr != nil {
-					return err
+			packagesResponse, err := processTheStuff(ctx, deps, func(depName string, depVersion *semver.Version) (*listen.Response, error) {
+				depArgs := []string{depName, depVersion.String()}
+				req, err := listen.NewVerdictsRequest(depArgs)
+				if err != nil {
+					return nil, err
 				}
-
-				// Query for verdicts about specific package versions in bulk...
-				res, resJSON, resErr := listen.BulkPackages(reqs, listen.WithContext(ctx), listen.WithJSONOptions(scanOpts.JSONFlags))
-
-				if resErr != nil {
-					return err
-				}
-
+				res, resJSON, err := listen.Packages(
+					req,
+					listen.WithContext(ctx),
+					listen.WithJSONOptions(scanOpts.JSONFlags),
+				)
 				if resJSON != nil {
-					fmt.Fprintf(os.Stdout, "%s", resJSON)
+					fmt.Fprintf(io.Out, "%s", resJSON)
 				}
 
-				// Appending the results of the current dependency set
-				if res != nil {
-					combinedResponse = append(combinedResponse, *res...)
-				}
-			}
+				return res, err
+			})
 
-			if scanOpts.JSON {
-				return nil
+			if err != nil {
+				return err
 			}
-
-			err = tablePrinter.RenderPackages((*listen.Response)(&combinedResponse))
+			tablePrinter := packagesprinter.NewTablePrinter(io)
+			err = tablePrinter.RenderPackages(packagesResponse)
 			if err != nil {
 				return err
 			}
@@ -169,7 +162,7 @@ The verdicts it returns are listed by the name of each package and its specified
 					rep.WithContext(ctx)
 
 					req := request.Report{
-						Packages: combinedResponse,
+						Packages: *packagesResponse,
 						GitHubPullCommentReport: request.GitHubPullCommentReport{
 							Owner: scanOpts.Reporter.GitHub.Owner,
 							Repo:  scanOpts.Reporter.GitHub.Repo,
@@ -211,4 +204,36 @@ The verdicts it returns are listed by the name of each package and its specified
 	scanCmd.SetContext(ctx)
 
 	return scanCmd, nil
+}
+
+func processTheStuff(
+	ctx context.Context,
+	deps map[npm.DependencyType]map[string]*semver.Version,
+	packageRetrievalFunc func(depName string, depVersion *semver.Version) (*listen.Response, error)) (*listen.Response, error) {
+
+	io := ctx.Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
+	// Process one dependency set at once
+	combinedResponse := []listen.Package{}
+
+	for depType, currentDeps := range deps {
+		depTracker := io.CreateProgressTracker(depType.Name(), int64(len(currentDeps)))
+
+		for depName, depVersion := range currentDeps {
+			io.LogProgress(text.Faint.Sprintf("processing %s %s", depName, depVersion))
+
+			res, err := packageRetrievalFunc(depName, depVersion)
+
+			if err != nil {
+				depTracker.IncrementWithError(1)
+				continue
+			}
+
+			if res != nil {
+				combinedResponse = append(combinedResponse, *res...)
+			}
+			depTracker.Increment(1)
+		}
+	}
+
+	return (*listen.Response)(&combinedResponse), nil
 }

@@ -20,7 +20,7 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/cli/cli/pkg/iostreams"
+	"github.com/listendev/lstn/pkg/cmd/iostreams"
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/stretchr/testify/require"
 )
