@@ -2,6 +2,7 @@ package packagestracker
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Masterminds/semver/v3"
 	"github.com/jedib0t/go-pretty/text"
@@ -12,11 +13,10 @@ import (
 )
 
 type PackagesRetrievalFunc func(depName string, depVersion *semver.Version) (*listen.Response, error)
-type PackagesByType map[npm.DependencyType]map[string]*semver.Version
 
-func TrackPackages(
+func TrackPackages[K npm.DependencyType | string](
 	ctx context.Context,
-	deps PackagesByType,
+	deps map[K]map[string]*semver.Version,
 	packageRetrievalFunc PackagesRetrievalFunc) (*listen.Response, error) {
 
 	io := ctx.Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
@@ -28,7 +28,7 @@ func TrackPackages(
 	combinedResponse := []listen.Package{}
 
 	for depType, currentDeps := range deps {
-		depTracker := io.CreateProgressTracker(depType.Name(), int64(len(currentDeps)))
+		depTracker := io.CreateProgressTracker(fmt.Sprintf("%s", depType), int64(len(currentDeps)))
 
 		for depName, depVersion := range currentDeps {
 			io.LogProgress(text.Faint.Sprintf("processing %s %s", depName, depVersion))
