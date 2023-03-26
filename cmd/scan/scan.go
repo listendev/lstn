@@ -23,7 +23,6 @@ import (
 	"github.com/Masterminds/semver/v3"
 	"github.com/XANi/goneric"
 	"github.com/google/go-github/v50/github"
-	"github.com/jedib0t/go-pretty/text"
 	"github.com/listendev/lstn/internal/project"
 	"github.com/listendev/lstn/pkg/cmd"
 	"github.com/listendev/lstn/pkg/cmd/arguments"
@@ -31,6 +30,7 @@ import (
 	"github.com/listendev/lstn/pkg/cmd/iostreams"
 	"github.com/listendev/lstn/pkg/cmd/options"
 	"github.com/listendev/lstn/pkg/cmd/packagesprinter"
+	"github.com/listendev/lstn/pkg/cmd/packagestracker"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/listendev/lstn/pkg/npm"
@@ -88,8 +88,6 @@ The verdicts it returns are listed by the name of each package and its specified
 			}
 
 			io := ctx.Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
-			io.StartProgressTracking()
-			defer io.StopProgressTracking()
 
 			// Obtain the target directory that we want to listen in
 			targetDir, err := arguments.GetDirectory(args)
@@ -116,7 +114,7 @@ The verdicts it returns are listed by the name of each package and its specified
 				return fmt.Errorf("there are no dependencies to process for the currently selected sets of dependencies")
 			}
 
-			packagesResponse, err := processTheStuff(ctx, deps, func(depName string, depVersion *semver.Version) (*listen.Response, error) {
+			packagesResponse, err := packagestracker.TrackPackages(ctx, deps, func(depName string, depVersion *semver.Version) (*listen.Response, error) {
 				depArgs := []string{depName, depVersion.String()}
 				req, err := listen.NewVerdictsRequest(depArgs)
 				if err != nil {
@@ -204,36 +202,4 @@ The verdicts it returns are listed by the name of each package and its specified
 	scanCmd.SetContext(ctx)
 
 	return scanCmd, nil
-}
-
-func processTheStuff(
-	ctx context.Context,
-	deps map[npm.DependencyType]map[string]*semver.Version,
-	packageRetrievalFunc func(depName string, depVersion *semver.Version) (*listen.Response, error)) (*listen.Response, error) {
-
-	io := ctx.Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
-	// Process one dependency set at once
-	combinedResponse := []listen.Package{}
-
-	for depType, currentDeps := range deps {
-		depTracker := io.CreateProgressTracker(depType.Name(), int64(len(currentDeps)))
-
-		for depName, depVersion := range currentDeps {
-			io.LogProgress(text.Faint.Sprintf("processing %s %s", depName, depVersion))
-
-			res, err := packageRetrievalFunc(depName, depVersion)
-
-			if err != nil {
-				depTracker.IncrementWithError(1)
-				continue
-			}
-
-			if res != nil {
-				combinedResponse = append(combinedResponse, *res...)
-			}
-			depTracker.Increment(1)
-		}
-	}
-
-	return (*listen.Response)(&combinedResponse), nil
 }
