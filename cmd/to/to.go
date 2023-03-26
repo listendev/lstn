@@ -27,6 +27,7 @@ import (
 	"github.com/listendev/lstn/pkg/cmd/iostreams"
 	"github.com/listendev/lstn/pkg/cmd/options"
 	"github.com/listendev/lstn/pkg/cmd/packagesprinter"
+	"github.com/listendev/lstn/pkg/cmd/packagestracker"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/listendev/lstn/pkg/npm"
@@ -104,57 +105,57 @@ It lists out the verdicts of all the versions of the input package name.`,
 			}
 
 			var res *listen.Response
-			var resJSON []byte
+
 			var resErr error
 
-			io := c.Context().Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
-			io.StartProgressIndicator()
-			defer io.StopProgressIndicator()
+			io := ctx.Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
 
-			versions, multiple := ctx.Value(pkgcontext.VersionsCollection).(semver.Collection)
-			if multiple {
-				nv := len(versions)
+			versions, _ := ctx.Value(pkgcontext.VersionsCollection).(semver.Collection)
+			depName := args[0]
+			constraints := ""
+			if len(args) > 1 {
+				constraints = args[1]
+			}
+			depsList := packagestracker.ListOfDependencies{}
 
-				names := make([]string, nv)
-				for i := 0; i < nv; i++ {
-					names[i] = args[0]
-				}
-
-				// Create list of verdicts requests
-				reqs, multipleErr := listen.NewBulkVerdictsRequests(names, versions)
-				if multipleErr != nil {
-					return multipleErr
-				}
-
-				// Query for verdicts about specific package versions...
-				res, resJSON, resErr = listen.BulkPackages(reqs, listen.WithContext(ctx), listen.WithJSONOptions(toOpts.JSONFlags))
-
-				goto EXIT
+			if len(versions) == 0 {
+				depsList = append(depsList, packagestracker.Dependency{
+					Name: depName,
+				})
+			}
+			for _, v := range versions {
+				depsList = append(depsList, packagestracker.Dependency{
+					Name:    depName,
+					Version: v,
+				})
+			}
+			allDeps := map[string]packagestracker.ListOfDependencies{
+				constraints: depsList,
 			}
 
-			// Query for one single package version...
-			// Or for all the package versions listen.dev owns of the target package
-			{
-				// New block so it's safe to skip variable declarations
-				req, reqErr := listen.NewVerdictsRequest(args)
-				if reqErr != nil {
-					return reqErr
+			res, resErr = packagestracker.TrackPackages(ctx, allDeps, func(depName string, depVersion *semver.Version) (*listen.Response, error) {
+				depArgs := []string{depName}
+				if depVersion != nil {
+					depArgs = append(depArgs, depVersion.String())
 				}
-
-				res, resJSON, resErr = listen.Packages(
+				req, err := listen.NewVerdictsRequest(depArgs)
+				if err != nil {
+					return nil, err
+				}
+				res, resJSON, err := listen.Packages(
 					req,
 					listen.WithContext(ctx),
 					listen.WithJSONOptions(toOpts.JSONFlags),
 				)
-			}
+				if resJSON != nil {
+					fmt.Fprintf(io.Out, "%s", resJSON)
+				}
 
-		EXIT:
+				return res, err
+			})
+
 			if resErr != nil {
 				return err
-			}
-
-			if resJSON != nil {
-				fmt.Fprintf(io.Out, "%s", resJSON)
 			}
 
 			if res == nil {

@@ -107,3 +107,13 @@ func (pt *ProgressTracker) IncrementWithError(value int64) {
 	}
 	pt.tracker.IncrementWithError(value)
 }
+
+func (pt *ProgressTracker) UpdateMessage(message string) {
+	if pt == nil {
+		return
+	}
+	if pt.tracker == nil {
+		return
+	}
+	pt.tracker.UpdateMessage(message)
+}

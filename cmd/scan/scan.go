@@ -114,7 +114,9 @@ The verdicts it returns are listed by the name of each package and its specified
 				return fmt.Errorf("there are no dependencies to process for the currently selected sets of dependencies")
 			}
 
-			packagesResponse, err := packagestracker.TrackPackages(ctx, deps, func(depName string, depVersion *semver.Version) (*listen.Response, error) {
+			mapDeps := packagestracker.ConvertToMapOfDependencies(deps)
+
+			packagesResponse, err := packagestracker.TrackPackages(ctx, mapDeps, func(depName string, depVersion *semver.Version) (*listen.Response, error) {
 				depArgs := []string{depName, depVersion.String()}
 				req, err := listen.NewVerdictsRequest(depArgs)
 				if err != nil {
