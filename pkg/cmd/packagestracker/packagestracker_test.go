@@ -36,6 +36,7 @@ func testStreams(outBuf io.Writer) *iostreams.IOStreams {
 			Out: outBuf,
 		},
 	}
+
 	return s
 }
 
@@ -95,6 +96,7 @@ func TestTrackPackages(t *testing.T) {
 				if depName == "foo" {
 					return nil, errors.New("error retrieving package foo@1.0.0")
 				}
+
 				return &listen.Response{
 					{
 						Name:     "bar",
@@ -126,7 +128,6 @@ func TestTrackPackages(t *testing.T) {
 			got, err := TrackPackages(ctx, tt.deps, tt.packageRetrievalFunc)
 			require.ErrorIs(t, err, nil)
 			require.Equal(t, tt.want, got)
-
 		})
 	}
 }
