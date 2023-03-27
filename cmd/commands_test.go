@@ -42,12 +42,14 @@ func TestChildCommands(t *testing.T) {
 	cwd, _ := os.Getwd()
 
 	cases := []testCase{
+		// lstn in
 		{
 			cmdline: []string{"in"},
 			stdout:  "",
 			stderr:  "Running without a configuration file\nError: directory _CWD_ does not contain a package.json file\n",
 			errstr:  "directory _CWD_ does not contain a package.json file",
 		},
+		// lstn in --help
 		{
 			cmdline: []string{"in", "--help"},
 			stdout: heredoc.Doc(`Query listen.dev for the verdicts of all the dependencies in your project.
@@ -96,6 +98,7 @@ Global Flags:
 			stderr: "",
 			errstr: "",
 		},
+		// lstn in --debug-options
 		{
 			cmdline: []string{"in", "--debug-options"},
 			stdout: heredoc.Doc(`{
@@ -116,6 +119,7 @@ Global Flags:
 			stderr: "Running without a configuration file\n",
 			errstr: "",
 		},
+		// LSTN_TIMEOUT=9999 lstn in --debug-options --timeout 8888
 		{
 			envvar: map[string]string{
 				"LSTN_TIMEOUT": "9999",
@@ -139,6 +143,7 @@ Global Flags:
 			stderr: "Running without a configuration file\n",
 			errstr: "",
 		},
+		// LSTN_ENDPOINT=https://npm-staging.listen.dev lstn in --debug-options
 		{
 			envvar: map[string]string{
 				"LSTN_ENDPOINT": "https://npm-staging.listen.dev/",
@@ -162,6 +167,7 @@ Global Flags:
 			stderr: "Running without a configuration file\n",
 			errstr: "",
 		},
+		// lstn scan -e dev,peer --debug-options
 		{
 			cmdline: []string{"scan", "-e", "dev,peer", "--debug-options"},
 			stdout: heredoc.Doc(`{
@@ -187,6 +193,7 @@ Global Flags:
 			stderr: "Running without a configuration file\n",
 			errstr: "",
 		},
+		// LSTN_REPORTER=gh-pull-check lstn scan --debug-options
 		{
 			envvar: map[string]string{
 				"LSTN_REPORTER": "gh-pull-check",
@@ -215,6 +222,7 @@ Global Flags:
 			stderr: "Running without a configuration file\n",
 			errstr: "",
 		},
+		// lstn scan --debug-options --gh-token xxx -r gh-pull-review,gh-pull-comment --gh-owner leodido --gh-repo go-urn --gh-pull-id 111
 		{
 			cmdline: []string{
 				"scan",
@@ -254,6 +262,7 @@ Global Flags:
 			stderr: "Running without a configuration file\n",
 			errstr: "",
 		},
+		// LSTN_REPORTER=gh-pull-check lstn scan --debug-options --gh-token xxx -r gh-pull-review --gh-owner leodido --gh-repo go-urn --gh-pull-id 111
 		{
 			envvar: map[string]string{
 				"LSTN_REPORTER": "gh-pull-check",
@@ -296,6 +305,7 @@ Global Flags:
 			stderr: "Running without a configuration file\n",
 			errstr: "",
 		},
+		// LSTN_GH_OWNER=fntlnz LSTN_GH_PULL_ID=654 LSTN_GH_TOKEN=yyy LSTN_NPM_REGISTRY=https://registry.npmjs.com lstn scan --debug-options
 		{
 			envvar: map[string]string{
 				"LSTN_GH_OWNER":     "fntlnz",
@@ -325,6 +335,7 @@ Global Flags:
 			stderr: "Running without a configuration file\n",
 			errstr: "",
 		},
+		// lstn scan --debug-options --config testdata/c1.yaml
 		{
 			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "c1.yaml")},
 			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/c1.yaml
@@ -351,6 +362,7 @@ Global Flags:
 			stderr: "",
 			errstr: "",
 		},
+		// LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/c1.yaml
 		{
 			envvar: map[string]string{
 				"LSTN_GH_PULL_ID": "887755",
@@ -383,6 +395,7 @@ Global Flags:
 			stderr: "",
 			errstr: "",
 		},
+		// lstn version --debug-options
 		{
 			cmdline: []string{"version", "--debug-options"},
 			stdout: heredoc.Doc(`{
@@ -394,6 +407,7 @@ Global Flags:
 			stderr: "",
 			errstr: "",
 		},
+		// lstn version --debug-options -v
 		{
 			cmdline: []string{"version", "--debug-options", "-v"},
 			stdout: heredoc.Doc(`{
@@ -405,6 +419,7 @@ Global Flags:
 			stderr: "",
 			errstr: "",
 		},
+		// lstn version --debug-options -vv
 		{
 			cmdline: []string{"version", "--debug-options", "-vv"},
 			stdout: heredoc.Doc(`{
