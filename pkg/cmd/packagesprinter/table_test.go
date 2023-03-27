@@ -18,12 +18,22 @@ package packagesprinter
 
 import (
 	"bytes"
+	"io"
 	"testing"
 
+	generic "github.com/cli/cli/pkg/iostreams"
 	"github.com/listendev/lstn/pkg/cmd/iostreams"
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/stretchr/testify/require"
 )
+
+func testStreams(outBuf io.Writer) *iostreams.IOStreams {
+	return &iostreams.IOStreams{
+		IOStreams: &generic.IOStreams{
+			Out: outBuf,
+		},
+	}
+}
 
 func TestTablePrinter_printVerdictMetadata(t *testing.T) {
 	tests := []struct {
@@ -82,11 +92,9 @@ func TestTablePrinter_printVerdictMetadata(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			outBuf := &bytes.Buffer{}
+			ts := testStreams(outBuf)
 			tr := &TablePrinter{
-
-				streams: &iostreams.IOStreams{
-					Out: outBuf,
-				},
+				streams: ts,
 			}
 			tr.printVerdictMetadata(tt.metadata)
 
@@ -150,10 +158,9 @@ func TestTablePrinter_printVerdict(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			outBuf := &bytes.Buffer{}
+			ts := testStreams(outBuf)
 			tr := &TablePrinter{
-				streams: &iostreams.IOStreams{
-					Out: outBuf,
-				},
+				streams: ts,
 			}
 			tr.printVerdict(tt.p, tt.verdict)
 
@@ -190,10 +197,9 @@ func TestTablePrinter_printProblem(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			outBuf := &bytes.Buffer{}
+			ts := testStreams(outBuf)
 			tr := &TablePrinter{
-				streams: &iostreams.IOStreams{
-					Out: outBuf,
-				},
+				streams: ts,
 			}
 			tr.printProblem(tt.problem)
 
@@ -313,10 +319,9 @@ func TestTablePrinter_printPackage(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			outBuf := &bytes.Buffer{}
+			ts := testStreams(outBuf)
 			tr := &TablePrinter{
-				streams: &iostreams.IOStreams{
-					Out: outBuf,
-				},
+				streams: ts,
 			}
 			tr.printPackage(tt.p)
 			require.Equal(t, tt.expectedOutput, outBuf.String())
@@ -381,10 +386,9 @@ func TestTablePrinter_printPackages(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			outBuf := &bytes.Buffer{}
+			ts := testStreams(outBuf)
 			tr := &TablePrinter{
-				streams: &iostreams.IOStreams{
-					Out: outBuf,
-				},
+				streams: ts,
 			}
 			tr.printPackages(tt.packages)
 			require.Equal(t, tt.expectedOutput, outBuf.String())
@@ -483,10 +487,9 @@ func TestTablePrinter_printTable(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			outBuf := &bytes.Buffer{}
+			ts := testStreams(outBuf)
 			tr := &TablePrinter{
-				streams: &iostreams.IOStreams{
-					Out: outBuf,
-				},
+				streams: ts,
 			}
 			_ = tr.printTable(tt.packages)
 			require.Equal(t, tt.expectedOutput, outBuf.String())
