@@ -28,9 +28,9 @@ const containerTpl = `{{- $high := .HighPriority }}
 {{- $low := .LowPriority }}
 {{- $problems := .Problems }}
 {{- if and (eq $high.TotalVerdicts 0) (eq $medium.TotalVerdicts 0) (eq $low.TotalVerdicts 0) }}
-**lstn** did not detect any malicious behaviors in the dependency tree at installation time
+No suspicious behavior was detected in the dependency tree during installation
 {{- else }}
-**lstn** detected the following behaviors in the dependency tree at installation time
+The following behavior was detected in the dependency tree during installation
 
 <details>
 <summary>

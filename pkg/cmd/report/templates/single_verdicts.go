@@ -48,10 +48,10 @@ Direct dependency
 Transitive dependency {{ if and $transitivePackageName $transitivePackageVersion }} (<a href="https://www.npmjs.com/package/{{ $transitivePackageName }}/v/{{ $transitivePackageVersion }}">{{ $transitivePackageName }}@{{ $transitivePackageVersion }}</a>){{ end }}
 {{ end }}
 </dd>
-{{ $gpt35turbo := index .Metadata "gpt35turbo" }}
-{{ if $gpt35turbo }}
-{{ $aiContext := index $gpt35turbo "context" }}
-{{ $aiActions := index $gpt35turbo "actions" }}
+{{ $aiCtxMetadata := index .Metadata "ai_ctx" }}
+{{ if $aiCtxMetadata }}
+{{ $aiContext := index $aiCtxMetadata "context" }}
+{{ $aiActions := index $aiCtxMetadata "actions" }}
 {{ if $aiContext }}
 <dt>Context</dt>
 <dd>{{ $aiContext }}</dd>
@@ -71,9 +71,9 @@ Transitive dependency {{ if and $transitivePackageName $transitivePackageVersion
 {{ range $key, $value := .Metadata }}
 {{ if or (eq $key "npm_package_name")
         (eq $key "npm_package_version")
-        (eq $key "gpt35turbo")
+        (eq $key "ai_ctx")
 }}
-    {{ continue }}
+{{ continue }}
 {{ end }}
 {{ if not $value }}
 	{{ continue }}

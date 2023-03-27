@@ -35,9 +35,9 @@ Direct dependency
 </tr>
 
 
-    
 
-    
+
+
 
 
 <tr>

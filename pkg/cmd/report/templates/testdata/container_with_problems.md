@@ -1,5 +1,5 @@
 
-**lstn** did not detect any malicious behaviors in the dependency tree at installation time
+No suspicious behavior was detected in the dependency tree during installation
 
 #### :triangular_flag_on_post: The analysis could not complete because of the following problems:
 
