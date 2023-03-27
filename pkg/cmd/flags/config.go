@@ -23,6 +23,7 @@ import (
 
 	"github.com/XANi/goneric"
 	"github.com/creasty/defaults"
+	"github.com/listendev/lstn/pkg/ci"
 	"github.com/listendev/lstn/pkg/cmd"
 	"github.com/listendev/lstn/pkg/cmd/flagusages"
 	"github.com/spf13/cobra"
@@ -73,6 +74,22 @@ func NewConfigFlags() (*ConfigFlags, error) {
 	}
 
 	return o, nil
+}
+
+func (o *ConfigFlags) SetDefaults() {
+	// Attempt to dynamically set the defaults for the GitHub reporting flags from the environment
+	env, err := ci.NewInfo()
+	if err == nil && env != nil {
+		if defaults.CanUpdate(o.Reporter.GitHub.Owner) {
+			o.Reporter.GitHub.Owner = env.Owner
+		}
+		if defaults.CanUpdate(o.Reporter.GitHub.Repo) {
+			o.Reporter.GitHub.Repo = env.Repo
+		}
+		if defaults.CanUpdate(o.Reporter.GitHub.Pull.ID) && env.IsPullRequest() {
+			o.Reporter.GitHub.Pull.ID = env.Num
+		}
+	}
 }
 
 func (o *ConfigFlags) Define(c *cobra.Command) {
