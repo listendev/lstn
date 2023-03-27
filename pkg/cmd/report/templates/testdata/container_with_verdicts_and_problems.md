@@ -1,5 +1,5 @@
 
-**lstn** detected the following behaviors in the dependency tree at installation time
+The following behavior was detected in the dependency tree during installation
 
 <details>
 <summary>
@@ -41,9 +41,9 @@ Direct dependency
 </tr>
 
 
-    
 
-    
+
+
 
 
 <tr>
@@ -95,9 +95,9 @@ Direct dependency
 </tr>
 
 
-    
 
-    
+
+
 
 
 <tr>

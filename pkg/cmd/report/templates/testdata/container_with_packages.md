@@ -1,5 +1,5 @@
 
-**lstn** detected the following behaviors in the dependency tree at installation time
+The following behavior was detected in the dependency tree during installation
 
 <details>
 <summary>
@@ -41,9 +41,9 @@ Direct dependency
 </tr>
 
 
-    
 
-    
+
+
 
 
 <tr>
@@ -97,9 +97,9 @@ Transitive dependency  (<a href="https://www.npmjs.com/package/foo/v/1.0.0">foo@
 </tr>
 
 
-    
 
-    
+
+
 
 
 <tr>
@@ -151,9 +151,9 @@ Direct dependency
 </tr>
 
 
-    
 
-    
+
+
 
 
 <tr>
@@ -211,9 +211,9 @@ Direct dependency
 </tr>
 
 
-    
 
-    
+
+
 
 
 <tr>
@@ -272,9 +272,9 @@ Direct dependency
 </tr>
 
 
-    
 
-    
+
+
 
 
 <tr>

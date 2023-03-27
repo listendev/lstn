@@ -62,7 +62,7 @@ func TestRenderSingleVerdictsPackage(t *testing.T) {
 			expectedOutput: testdataFileToBytes(t, "testdata/single_verdicts_one_verdict.md"),
 		},
 		{
-			name: "verdicts with gpt35turbo",
+			name: "verdicts with ai_ctx",
 			p: listen.Package{
 				Name:    "foo",
 				Version: "1.0.0",
@@ -77,7 +77,7 @@ func TestRenderSingleVerdictsPackage(t *testing.T) {
 							"executable_path":     "/bin/sh",
 							"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
 							"server_ip":           "",
-							"gpt35turbo": map[string]interface{}{
+							"ai_ctx": map[string]interface{}{
 								"actions": []string{
 									"Do not continue to install this dependency as it could potentially harm your system.",
 									"Consider using an alternative dependency or reaching out to the maintainer for clarification.",
@@ -90,7 +90,7 @@ func TestRenderSingleVerdictsPackage(t *testing.T) {
 					},
 				},
 			},
-			expectedOutput: testdataFileToBytes(t, "testdata/single_verdicts_with_gpt35turbo.md"),
+			expectedOutput: testdataFileToBytes(t, "testdata/single_verdicts_with_aictx.md"),
 		},
 	}
 	for _, tt := range tests {
