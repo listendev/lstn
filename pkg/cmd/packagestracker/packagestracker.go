@@ -62,7 +62,7 @@ func processingMessage(dep Dependency) string {
 
 func processingErrorMessage(dep Dependency, err error) string {
 	if dep.Version == nil {
-		return text.Faint.Sprintf("%s: error processing %s: %s", dep.Name, err.Error())
+		return text.Faint.Sprintf("error processing %s: %s", dep.Name, err.Error())
 	}
 
 	return text.Faint.Sprintf("error processing %s %s: %s", dep.Name, dep.Version, err.Error())
