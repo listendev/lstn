@@ -82,9 +82,10 @@ func TrackPackages[K npm.DependencyType | string, D ListableDependency](
 	combinedResponse := []listen.Package{}
 	cs := io.ColorScheme()
 	for depType, currentDeps := range deps {
-		depTracker := io.CreateProgressTracker(fmt.Sprintf("%s", depType), int64(len(currentDeps)))
+		depsList := currentDeps.List()
+		depTracker := io.CreateProgressTracker(fmt.Sprintf("%s", depType), int64(len(depsList)))
 
-		for _, dep := range currentDeps.List() {
+		for _, dep := range depsList {
 			io.LogProgress(processingMessage(dep))
 
 			res, err := packageRetrievalFunc(dep.Name, dep.Version)
