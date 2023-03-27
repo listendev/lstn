@@ -18,6 +18,7 @@ package flags
 import (
 	"testing"
 
+	internaltesting "github.com/listendev/lstn/internal/testing"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
@@ -34,6 +35,26 @@ func (suite *FlagsConfigSuite) TestNewConfigFlags() {
 	i, err := NewConfigFlags()
 	assert.NoError(suite.T(), err)
 	assert.IsType(suite.T(), &ConfigFlags{}, i)
+}
+
+func (suite *FlagsConfigSuite) TestNewConfigFlagsDefaults() {
+	closer := internaltesting.EnvSetter(map[string]string{
+		"GITHUB_ACTIONS":    "true",
+		"GITHUB_EVENT_PATH": "../../ci/testdata/github_event_pull_request.json",
+	})
+	suite.T().Cleanup(closer)
+
+	i, err := NewConfigFlags()
+	assert.NoError(suite.T(), err)
+	assert.IsType(suite.T(), &ConfigFlags{}, i)
+
+	assert.Equal(suite.T(), 285, i.Reporter.GitHub.Pull.ID)
+	assert.Equal(suite.T(), "reviewdog", i.Reporter.GitHub.Owner)
+	assert.Equal(suite.T(), "reviewdog", i.Reporter.GitHub.Repo)
+	assert.Equal(suite.T(), "https://registry.npmjs.org", i.Registry.NPM)
+	assert.Equal(suite.T(), "info", i.LogLevel)
+	assert.Equal(suite.T(), "https://npm.listen.dev", i.Endpoint)
+	assert.Equal(suite.T(), 60, i.Timeout)
 }
 
 func (suite *FlagsConfigSuite) TestGetConfigFlagsNames() {
