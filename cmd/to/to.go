@@ -104,10 +104,6 @@ It lists out the verdicts of all the versions of the input package name.`,
 				return nil
 			}
 
-			var res *listen.Response
-
-			var resErr error
-
 			io := ctx.Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
 
 			versions, _ := ctx.Value(pkgcontext.VersionsCollection).(semver.Collection)
@@ -133,16 +129,16 @@ It lists out the verdicts of all the versions of the input package name.`,
 				constraints: depsList,
 			}
 
-			res, resErr = packagestracker.TrackPackages(ctx, allDeps, func(depName string, depVersion *semver.Version) (*listen.Response, error) {
+			res, err := packagestracker.TrackPackages(ctx, allDeps, func(depName string, depVersion *semver.Version) (*listen.Response, error) {
 				depArgs := []string{depName}
 				if depVersion != nil {
 					depArgs = append(depArgs, depVersion.String())
 				}
-				req, err := listen.NewVerdictsRequest(depArgs)
-				if err != nil {
-					return nil, err
+				req, reqErr := listen.NewVerdictsRequest(depArgs)
+				if reqErr != nil {
+					return nil, reqErr
 				}
-				res, resJSON, err := listen.Packages(
+				res, resJSON, resErr := listen.Packages(
 					req,
 					listen.WithContext(ctx),
 					listen.WithJSONOptions(toOpts.JSONFlags),
@@ -151,10 +147,10 @@ It lists out the verdicts of all the versions of the input package name.`,
 					fmt.Fprintf(io.Out, "%s", resJSON)
 				}
 
-				return res, err
+				return res, resErr
 			})
 
-			if resErr != nil {
+			if err != nil {
 				return err
 			}
 

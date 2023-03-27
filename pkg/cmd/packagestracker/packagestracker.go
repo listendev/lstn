@@ -1,3 +1,18 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// Copyright © 2023 The listen.dev team <engineering@garnet.ai>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 package packagestracker
 
 import (
@@ -50,6 +65,7 @@ func ConvertToMapOfDependencies[K npm.DependencyType | string](deps map[K]map[st
 	for depType, d := range deps {
 		md[depType] = MapOfDependencies(d)
 	}
+
 	return md
 }
 
@@ -57,6 +73,7 @@ func processingMessage(dep Dependency) string {
 	if dep.Version == nil {
 		return text.Faint.Sprintf("processing %s", dep.Name)
 	}
+
 	return text.Faint.Sprintf("processing %s %s", dep.Name, dep.Version)
 }
 
@@ -72,9 +89,7 @@ func TrackPackages[K npm.DependencyType | string, D ListableDependency](
 	ctx context.Context,
 	deps map[K]D,
 	packageRetrievalFunc PackagesRetrievalFunc) (*listen.Response, error) {
-
 	io := ctx.Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
-
 	io.StartProgressTracking()
 	defer io.StopProgressTracking()
 
@@ -93,6 +108,7 @@ func TrackPackages[K npm.DependencyType | string, D ListableDependency](
 			if err != nil {
 				io.LogProgress(fmt.Sprintf("%s: %s", cs.FailureIconWithColor(cs.Red), processingErrorMessage(dep, err)))
 				depTracker.IncrementWithError(1)
+
 				continue
 			}
 

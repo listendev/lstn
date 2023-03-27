@@ -118,11 +118,11 @@ The verdicts it returns are listed by the name of each package and its specified
 
 			packagesResponse, err := packagestracker.TrackPackages(ctx, mapDeps, func(depName string, depVersion *semver.Version) (*listen.Response, error) {
 				depArgs := []string{depName, depVersion.String()}
-				req, err := listen.NewVerdictsRequest(depArgs)
-				if err != nil {
-					return nil, err
+				req, reqErr := listen.NewVerdictsRequest(depArgs)
+				if reqErr != nil {
+					return nil, reqErr
 				}
-				res, resJSON, err := listen.Packages(
+				res, resJSON, resErr := listen.Packages(
 					req,
 					listen.WithContext(ctx),
 					listen.WithJSONOptions(scanOpts.JSONFlags),
@@ -131,7 +131,7 @@ The verdicts it returns are listed by the name of each package and its specified
 					fmt.Fprintf(io.Out, "%s", resJSON)
 				}
 
-				return res, err
+				return res, resErr
 			})
 
 			if err != nil {
