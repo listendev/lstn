@@ -22,6 +22,7 @@ require (
 	github.com/jarcoal/httpmock v1.3.0
 	github.com/leodido/go-npmpackagename v0.2.0
 	github.com/matishsiao/goInfo v0.0.0-00010101000000-000000000000
+	github.com/mitchellh/mapstructure v1.5.0
 	github.com/muja/goconfig v0.0.0-20180417074348-0a635507dddc
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
@@ -62,7 +63,6 @@ require (
 	github.com/mattn/go-isatty v0.0.16 // indirect
 	github.com/mattn/go-runewidth v0.0.14 // indirect
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect
-	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/muesli/termenv v0.13.0 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.5 // indirect
