@@ -74,6 +74,7 @@ jobs:
           ./lstn config 2> docs/configuration.md
           ./lstn env 2> docs/environment.md
           ./lstn exit 2> docs/exitcodes.md
+          ./lstn reporters 2> docs/reporters.md
 
       - name: Update docs
         if: ${{ github.event_name == 'push' && matrix.goos == 'linux' && matrix.go == '1.20' }}
