@@ -127,6 +127,10 @@ lstn in sub/dir
 
 A comprehensive reference of all the lstn commands.
 
+## `lstn reporters`
+
+A comprehensive guide to the `lstn` reporting mechanisms.
+
 ## `lstn scan <path>`
 
 Inspect the verdicts for your direct dependencies.
