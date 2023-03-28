@@ -55,6 +55,9 @@ var Topics = map[string]map[string]string{
 	"manual": {
 		"short": "A comprehensive reference of all the lstn commands",
 	},
+	"reporters": {
+		"short": "A comprehensive guide to the `lstn` reporting mechanisms",
+	},
 }
 
 type TopicFunc func(*cobra.Command, []string)
@@ -63,6 +66,7 @@ var topicsHelpFuncs = map[string]func() TopicFunc{
 	"manual":      manualHelpTopicFunc,
 	"environment": envHelpTopicFunc,
 	"config":      configHelpTopicFunc,
+	"reporters":   reportersHelpTopicFunc,
 }
 
 // TODO > print out markdown
