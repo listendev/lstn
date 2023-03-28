@@ -6,7 +6,12 @@
 
 ## Documentation
 
-To install `lstn` in your environment, refer to the [Installation](#installation) section below. For usage instructions, see the [Usage manual](docs/cheatsheet.md).
+To install `lstn` in your environment, refer to the [Installation](#installation) section below. For usage instructions, see:
+
+- the [usage manual](docs/cheatsheet.md)
+- the guide about the `~/.lstn.yaml` [config file](docs/configuration.md)
+- the guide about the `LSTN_*` [environment variables](docs/environment.md)
+- the [reporters reference](docs/reporters.md)
 
 ## Installation
 
@@ -14,7 +19,7 @@ To install `lstn` in your environment, refer to the [Installation](#installation
 
 #### GitHub Actions
 
-We recommend using the GitHub Action for running `lstn` in CI for GitHub projects. For integration instructions see this [guide](https://docs.listen.dev/lstn-github-action/quick-start).
+We recommend using the [GitHub Action](https://github.com/listendev/action) for running `lstn` in CI for GitHub projects. For integration instructions see this [guide](https://docs.listen.dev/lstn-github-action/quick-start).
 
 #### Other CI
 
