@@ -124,7 +124,7 @@ The verdicts it returns are listed by the name of each package and its specified
 					return err
 				}
 
-				// Query for verdicts about specific package versions in bulk...
+				// Query for verdicts about the current dependencies set in parallel...
 				res, resJSON, resErr := listen.BulkPackages(reqs, listen.WithContext(ctx), listen.WithJSONOptions(scanOpts.JSONFlags))
 
 				if resErr != nil {

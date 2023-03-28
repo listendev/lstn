@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/MakeNowJust/heredoc"
 	"github.com/thediveo/enumflag/v2"
 )
 
@@ -59,6 +60,55 @@ func (t ReportType) String() string {
 	default:
 		return "all"
 	}
+}
+
+func (t ReportType) Doc() string {
+	lstn := "`lstn`"
+	ghFlags := "`--gh-repo`, `--gh-owner`, `--gh-pull-id`"
+
+	switch t {
+	case GitHubPullCommentReport:
+		ret := heredoc.Docf(`
+It reports results as a sticky comment on the target GitHub pull request.
+
+The target GitHub pull request comes from the values of the GitHub reporter flags (ie., %s).
+Notice those values are automatically set when %s detects it is running in a GitHub Action.
+
+### Status
+
+Working.
+`,
+			ghFlags, lstn)
+
+		return ret
+	case GitHubPullReviewReport:
+		ret := heredoc.Doc(`
+It reports results to GitHub review & suggestion comments on the target GitHub pull request.
+
+### Status
+
+TBD.
+`)
+
+		return ret
+	case GitHubPullCheckReport:
+		ret := heredoc.Docf(`
+It reports results to the GitHub pull requests check tab.
+
+### Limitations
+
+When %s detect it is running from a fork repository, due to [GitHub Actions restrictions](https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token), this reporter will reports the verdicts to the GitHub Actions **log console**.
+
+### Status
+
+TBD.
+`,
+			lstn)
+
+		return ret
+	}
+
+	return ""
 }
 
 func ParseReportType(s string) (ReportType, error) {
