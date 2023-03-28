@@ -17,7 +17,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"path"
 	"strings"
@@ -27,10 +26,10 @@ import (
 	"github.com/listendev/lstn/cmd/root"
 	internaltesting "github.com/listendev/lstn/internal/testing"
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/exp/maps"
 )
 
 type testCase struct {
+	name    string
 	envvar  map[string]string
 	cmdline []string
 	stdout  string
@@ -44,6 +43,7 @@ func TestChildCommands(t *testing.T) {
 	cases := []testCase{
 		// lstn in
 		{
+			name:    "lstn in",
 			cmdline: []string{"in"},
 			stdout:  "",
 			stderr:  "Running without a configuration file\nError: directory _CWD_ does not contain a package.json file\n",
@@ -51,6 +51,7 @@ func TestChildCommands(t *testing.T) {
 		},
 		// lstn in --help
 		{
+			name:    "lstn in --help",
 			cmdline: []string{"in", "--help"},
 			stdout: heredoc.Doc(`Query listen.dev for the verdicts of all the dependencies in your project.
 
@@ -100,6 +101,7 @@ Global Flags:
 		},
 		// lstn in --debug-options
 		{
+			name:    "lstn in --debug-options",
 			cmdline: []string{"in", "--debug-options"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
@@ -121,6 +123,7 @@ Global Flags:
 		},
 		// LSTN_TIMEOUT=9999 lstn in --debug-options --timeout 8888
 		{
+			name: "LSTN_TIMEOUT=9999 lstn in --debug-options --timeout 8888",
 			envvar: map[string]string{
 				"LSTN_TIMEOUT": "9999",
 			},
@@ -145,6 +148,7 @@ Global Flags:
 		},
 		// LSTN_ENDPOINT=https://npm-staging.listen.dev lstn in --debug-options
 		{
+			name: "LSTN_ENDPOINT=https://npm-staging.listen.dev lstn in --debug-options",
 			envvar: map[string]string{
 				"LSTN_ENDPOINT": "https://npm-staging.listen.dev/",
 			},
@@ -169,6 +173,7 @@ Global Flags:
 		},
 		// lstn scan -e dev,peer --debug-options
 		{
+			name:    "lstn scan -e dev,peer --debug-options",
 			cmdline: []string{"scan", "-e", "dev,peer", "--debug-options"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
@@ -195,6 +200,7 @@ Global Flags:
 		},
 		// LSTN_REPORTER=gh-pull-check lstn scan --debug-options
 		{
+			name: "LSTN_REPORTER=gh-pull-check lstn scan --debug-options",
 			envvar: map[string]string{
 				"LSTN_REPORTER": "gh-pull-check",
 			},
@@ -224,6 +230,7 @@ Global Flags:
 		},
 		// lstn scan --debug-options --gh-token xxx -r gh-pull-review,gh-pull-comment --gh-owner leodido --gh-repo go-urn --gh-pull-id 111
 		{
+			name: "lstn scan --debug-options --gh-token xxx -r gh-pull-review,gh-pull-comment --gh-owner leodido --gh-repo go-urn --gh-pull-id 111",
 			cmdline: []string{
 				"scan",
 				"--debug-options",
@@ -264,6 +271,7 @@ Global Flags:
 		},
 		// LSTN_REPORTER=gh-pull-check lstn scan --debug-options --gh-token xxx -r gh-pull-review --gh-owner leodido --gh-repo go-urn --gh-pull-id 111
 		{
+			name: "LSTN_REPORTER=gh-pull-check lstn scan --debug-options --gh-token xxx -r gh-pull-review --gh-owner leodido --gh-repo go-urn --gh-pull-id 111",
 			envvar: map[string]string{
 				"LSTN_REPORTER": "gh-pull-check",
 			},
@@ -307,6 +315,7 @@ Global Flags:
 		},
 		// LSTN_GH_OWNER=fntlnz LSTN_GH_PULL_ID=654 LSTN_GH_TOKEN=yyy LSTN_NPM_REGISTRY=https://registry.npmjs.com lstn scan --debug-options
 		{
+			name: "LSTN_GH_OWNER=fntlnz LSTN_GH_PULL_ID=654 LSTN_GH_TOKEN=yyy LSTN_NPM_REGISTRY=https://registry.npmjs.com lstn scan --debug-options",
 			envvar: map[string]string{
 				"LSTN_GH_OWNER":     "fntlnz",
 				"LSTN_GH_PULL_ID":   "654",
@@ -337,6 +346,7 @@ Global Flags:
 		},
 		// lstn scan --debug-options --config testdata/c1.yaml
 		{
+			name:    "lstn scan --debug-options --config testdata/c1.yaml",
 			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "c1.yaml")},
 			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/c1.yaml
 {
@@ -364,6 +374,7 @@ Global Flags:
 		},
 		// LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/c1.yaml
 		{
+			name: "LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/c1.yaml",
 			envvar: map[string]string{
 				"LSTN_GH_PULL_ID": "887755",
 				"LSTN_GH_REPO":    "go-conventionalcommits",
@@ -397,6 +408,7 @@ Global Flags:
 		},
 		// lstn version --debug-options
 		{
+			name:    "lstn version --debug-options",
 			cmdline: []string{"version", "--debug-options"},
 			stdout: heredoc.Doc(`{
 	"changelog": false,
@@ -409,6 +421,7 @@ Global Flags:
 		},
 		// lstn version --debug-options -v
 		{
+			name:    "lstn version --debug-options -v",
 			cmdline: []string{"version", "--debug-options", "-v"},
 			stdout: heredoc.Doc(`{
 	"changelog": false,
@@ -421,6 +434,7 @@ Global Flags:
 		},
 		// lstn version --debug-options -vv
 		{
+			name:    "lstn version --debug-options -vv",
 			cmdline: []string{"version", "--debug-options", "-vv"},
 			stdout: heredoc.Doc(`{
 	"changelog": false,
@@ -431,21 +445,46 @@ Global Flags:
 			stderr: "",
 			errstr: "",
 		},
+		// GITHUB_ACTIONS=true GITHUB_EVENT_PATH=../pkg/.../github_event_pul_request.json lstn scan --debug-options
+		{
+			name: "GITHUB_ACTIONS=true GITHUB_EVENT_PATH=../pkg/ci/testdata/github_event_pul_request.json lstn scan --debug-options",
+			envvar: map[string]string{
+				"GITHUB_ACTIONS":    "true",
+				"GITHUB_EVENT_PATH": path.Join(cwd, "../pkg/ci/testdata/github_event_pull_request.json"),
+			},
+			cmdline: []string{"scan", "--debug-options"},
+			stdout: heredoc.Doc(`{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"exclude": [
+		110
+	],
+	"gh-owner": "reviewdog",
+	"gh-pull-id": 285,
+	"gh-repo": "reviewdog",
+	"gh-token": "",
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://registry.npmjs.org",
+	"reporter": null,
+	"timeout": 60
+}
+`),
+			stderr: "Running without a configuration file\n",
+			errstr: "",
+		},
 	}
 
 	for _, tc := range cases {
 		tc := tc
-
-		envdesc := strings.Join(maps.Keys(tc.envvar), " ")
-
-		desc := strings.Join(tc.cmdline, " ")
-		rootC, e := root.New(context.Background())
-		assert.Nil(t, e)
-		c := rootC.Command()
-
-		t.Run(fmt.Sprintf("%s %s%s", c.Name(), desc, envdesc), func(t *testing.T) {
+		t.Run(tc.name, func(t *testing.T) {
 			closer := internaltesting.EnvSetter(tc.envvar)
 			t.Cleanup(closer)
+
+			rootC, e := root.New(context.Background())
+			assert.Nil(t, e)
+			c := rootC.Command()
 
 			stdOut, stdErr, err := internaltesting.ExecuteCommand(c, tc.cmdline...)
 
