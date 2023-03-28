@@ -101,14 +101,16 @@ func New(ctx context.Context) (*Command, error) {
 				return fmt.Errorf("couldn't obtain configuration options")
 			}
 
-			// Update them with the values in the config file
-			viperOpts := viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
-				mapstructure.StringToTimeDurationHookFunc(),
-				mapstructure.StringToSliceHookFunc(","),
-				lstnviper.StringToReportType(),
-			))
-			if err := viper.Unmarshal(&cfgOpts, viperOpts); withConfigFile && err != nil {
-				return err
+			// Update them with the values in the config file (if any)
+			if withConfigFile {
+				viperOpts := viper.DecodeHook(mapstructure.ComposeDecodeHookFunc(
+					mapstructure.StringToTimeDurationHookFunc(),
+					mapstructure.StringToSliceHookFunc(","),
+					lstnviper.StringToReportType(),
+				))
+				if err := viper.Unmarshal(&cfgOpts, viperOpts); err != nil {
+					return err
+				}
 			}
 
 			// Update them with environment variable values
@@ -378,6 +380,7 @@ func (c *Command) Command() *cobra.Command {
 
 func init() {
 	cobra.OnInitialize(initConfig)
+	cobra.OnFinalize(cleanConfig)
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -400,4 +403,10 @@ func initConfig() {
 	viper.SetEnvPrefix(flags.EnvPrefix)
 	viper.SetEnvKeyReplacer(flags.EnvReplacer)
 	viper.AutomaticEnv() // Read in environment variables that match
+
+}
+
+func cleanConfig() {
+	cfgFile = ""
+	viper.Reset()
 }
