@@ -51,6 +51,9 @@ func TestChildCommands(t *testing.T) {
 		},
 		// lstn in --help
 		{
+			envvar: map[string]string{
+				"GITHUB_ACTIONS": "",
+			},
 			name:    "lstn in --help",
 			cmdline: []string{"in", "--help"},
 			stdout: heredoc.Doc(`Query listen.dev for the verdicts of all the dependencies in your project.

@@ -16,6 +16,7 @@
 package ci
 
 import (
+	"fmt"
 	"os"
 )
 
@@ -39,7 +40,7 @@ func NewInfo() (*Info, error) {
 
 	// TODO: implement logic for other CI systems
 
-	return nil, nil
+	return nil, fmt.Errorf("CI systems other than GitHub Actions are not supported yet")
 }
 
 // IsRunningInGitHubAction tells whether the current process is running in GitHub actions or not.
