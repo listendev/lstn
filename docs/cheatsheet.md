@@ -102,9 +102,9 @@ Inspect the verdicts for your dependencies tree.
 ### Reporting Flags
 
 ```
-    --gh-owner string                                           set the GitHub owner name (org|user)
+    --gh-owner string                                           set the GitHub owner name (org|user) (default "listendev")
     --gh-pull-id int                                            set the GitHub pull request ID
-    --gh-repo string                                            set the GitHub repository name
+    --gh-repo string                                            set the GitHub repository name (default "lstn")
 -r, --reporter (gh-pull-check,gh-pull-comment,gh-pull-review)   set one or more reporters to use (default [])
 ```
 
@@ -166,9 +166,9 @@ Inspect the verdicts for your direct dependencies.
 ### Reporting Flags
 
 ```
-    --gh-owner string                                           set the GitHub owner name (org|user)
+    --gh-owner string                                           set the GitHub owner name (org|user) (default "listendev")
     --gh-pull-id int                                            set the GitHub pull request ID
-    --gh-repo string                                            set the GitHub repository name
+    --gh-repo string                                            set the GitHub repository name (default "lstn")
 -r, --reporter (gh-pull-check,gh-pull-comment,gh-pull-review)   set one or more reporters to use (default [])
 ```
 
@@ -224,9 +224,9 @@ Get the verdicts of a package.
 ### Reporting Flags
 
 ```
-    --gh-owner string                                           set the GitHub owner name (org|user)
+    --gh-owner string                                           set the GitHub owner name (org|user) (default "listendev")
     --gh-pull-id int                                            set the GitHub pull request ID
-    --gh-repo string                                            set the GitHub repository name
+    --gh-repo string                                            set the GitHub repository name (default "lstn")
 -r, --reporter (gh-pull-check,gh-pull-comment,gh-pull-review)   set one or more reporters to use (default [])
 ```
 
