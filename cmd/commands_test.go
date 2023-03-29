@@ -52,6 +52,7 @@ func TestChildCommands(t *testing.T) {
 		// lstn in --help
 		{
 			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
 				"GITHUB_ACTIONS": "",
 			},
 			name:    "lstn in --help",
@@ -104,6 +105,10 @@ Global Flags:
 		},
 		// lstn in --debug-options
 		{
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
 			name:    "lstn in --debug-options",
 			cmdline: []string{"in", "--debug-options"},
 			stdout: heredoc.Doc(`{
@@ -129,6 +134,8 @@ Global Flags:
 			name: "LSTN_TIMEOUT=9999 lstn in --debug-options --timeout 8888",
 			envvar: map[string]string{
 				"LSTN_TIMEOUT": "9999",
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
 			},
 			cmdline: []string{"in", "--debug-options", "--timeout", "8888"},
 			stdout: heredoc.Doc(`{
@@ -154,6 +161,8 @@ Global Flags:
 			name: "LSTN_ENDPOINT=https://npm-staging.listen.dev lstn in --debug-options",
 			envvar: map[string]string{
 				"LSTN_ENDPOINT": "https://npm-staging.listen.dev/",
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
 			},
 			cmdline: []string{"in", "--debug-options"},
 			stdout: heredoc.Doc(`{
@@ -176,6 +185,10 @@ Global Flags:
 		},
 		// lstn scan -e dev,peer --debug-options
 		{
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
 			name:    "lstn scan -e dev,peer --debug-options",
 			cmdline: []string{"scan", "-e", "dev,peer", "--debug-options"},
 			stdout: heredoc.Doc(`{
@@ -206,6 +219,8 @@ Global Flags:
 			name: "LSTN_REPORTER=gh-pull-check lstn scan --debug-options",
 			envvar: map[string]string{
 				"LSTN_REPORTER": "gh-pull-check",
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
 			},
 			cmdline: []string{"scan", "--debug-options"},
 			stdout: heredoc.Doc(`{
@@ -324,6 +339,8 @@ Global Flags:
 				"LSTN_GH_PULL_ID":   "654",
 				"LSTN_GH_TOKEN":     "yyy",
 				"LSTN_NPM_REGISTRY": "https://registry.npmjs.com",
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
 			},
 			cmdline: []string{"scan", "--debug-options"},
 			stdout: heredoc.Doc(`{
@@ -349,6 +366,10 @@ Global Flags:
 		},
 		// lstn scan --debug-options --config testdata/c1.yaml
 		{
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
 			name:    "lstn scan --debug-options --config testdata/c1.yaml",
 			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "c1.yaml")},
 			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/c1.yaml
@@ -383,6 +404,8 @@ Global Flags:
 				"LSTN_GH_REPO":    "go-conventionalcommits",
 				"LSTN_ENDPOINT":   "https://npm-stage.listen.dev",
 				"LSTN_TIMEOUT":    "33331",
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
 			},
 			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "c1.yaml")},
 			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/c1.yaml
