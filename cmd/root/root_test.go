@@ -35,9 +35,19 @@ type CmdAdditionalHelpSuite struct {
 	rootC        *Command
 	commands     commandsMap
 	expectedOuts expectedOutsMap
+	envCloser    func()
+}
+
+func (suite *CmdAdditionalHelpSuite) TearDownSuite() {
+	suite.T().Cleanup(suite.envCloser)
 }
 
 func (suite *CmdAdditionalHelpSuite) SetupSuite() {
+	suite.envCloser = internaltesting.EnvSetter(map[string]string{
+		"GITHUB_ACTIONS":    "",
+		"GITHUB_EVENT_PATH": "",
+	})
+
 	rootCmd, err := New(context.Background())
 	if err != nil {
 		suite.Fail("couldn't instantiate the root command")
