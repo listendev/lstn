@@ -6,7 +6,7 @@
 
 ## Documentation
 
-To install `lstn` in your environment, refer to the [Installation](#installation) section below. For usage instructions, see:
+To install `lstn` in your environment, refer to the [installation](#installation) section below. For usage instructions, see:
 
 - the [usage manual](docs/cheatsheet.md)
 - the guide about the `~/.lstn.yaml` [config file](docs/configuration.md)
