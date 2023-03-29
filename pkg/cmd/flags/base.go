@@ -90,6 +90,7 @@ func Define(c *cobra.Command, o interface{}, startingGroup string) {
 		case reflect.Struct:
 			// NOTE > field.Interface() doesn't work because it actually returns a copy of the object wrapping the interface
 			Define(c, field.Addr().Interface(), group)
+			continue
 
 		case reflect.Bool:
 			val := field.Interface().(bool)
