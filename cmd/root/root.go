@@ -403,7 +403,6 @@ func initConfig() {
 	viper.SetEnvPrefix(flags.EnvPrefix)
 	viper.SetEnvKeyReplacer(flags.EnvReplacer)
 	viper.AutomaticEnv() // Read in environment variables that match
-
 }
 
 func cleanConfig() {
