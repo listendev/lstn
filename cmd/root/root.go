@@ -17,7 +17,6 @@ package root
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"reflect"
@@ -221,8 +220,7 @@ func New(ctx context.Context) (*Command, error) {
 			c.SetContext(ctx)
 
 			if rootOpts.DebugOptions {
-				s, _ := json.MarshalIndent(rootOpts, "", "\t")
-				c.Println(string(s))
+				c.Println(rootOpts.AsJSON())
 
 				return nil
 			}
