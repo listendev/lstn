@@ -184,7 +184,9 @@ The verdicts it returns are listed by the name of each package and its specified
 					fmt.Fprintf(io.Out, "%s report successfully sent using the %s reporter\n", cs.SuccessIcon(), cs.Gray(r.String()))
 				case cmd.GitHubPullCheckReport:
 					c.PrintErrf("The %q reporter is coming soon...\n", r.String())
+
 				case cmd.GitHubPullReviewReport:
+					// TODO: check we have the gh token + the gh pull ID
 					c.PrintErrf("The %q reporter is coming soon...\n", r.String())
 				}
 			}

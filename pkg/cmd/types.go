@@ -65,6 +65,10 @@ func (t ReportType) String() string {
 func (t ReportType) Doc() string {
 	lstn := "`lstn`"
 	ghFlags := "`--gh-repo`, `--gh-owner`, `--gh-pull-id`"
+	ghTokenFlag := "`--gh-token`"
+	privateRepoScope := "`repo`"
+	publicRepoScope := "`public_repo`"
+	ghPullCheckReporter := "`gh-pull-check`"
 
 	switch t {
 	case GitHubPullCommentReport:
@@ -82,22 +86,31 @@ Working.
 
 		return ret
 	case GitHubPullReviewReport:
-		ret := heredoc.Doc(`
-It reports results to GitHub review & suggestion comments on the target GitHub pull request.
+		ret := heredoc.Docf(`
+It reports results to GitHub review comments on the target GitHub pull request.
+
+### Token
+
+It requires the GitHub token (%s) to contain a [personal access token (PAT)](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token).
+
+For private repositories the GitHub token **MUST** have the %s scope, while for public repositories the %s scope is enough.
+
+### Graceful degradation
+
+When %s detects it is running from a fork repository, due to [GitHub Actions restrictions](https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token) (ie., no write access to the GitHub Review API), this reporter will reports the verdicts to the GitHub Actions **log console**.
+
+In such cases, %s fallbacks to [logging command of GitHub Actions](https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#setting-an-error-message) to post results as [annotations](https://developer.github.com/v3/checks/runs/#annotations-object) similar to the %s reporter.
 
 ### Status
 
 TBD.
-`)
+`,
+			ghTokenFlag, privateRepoScope, publicRepoScope, lstn, lstn, ghPullCheckReporter)
 
 		return ret
 	case GitHubPullCheckReport:
 		ret := heredoc.Docf(`
 It reports results to the GitHub pull requests check tab.
-
-### Limitations
-
-When %s detect it is running from a fork repository, due to [GitHub Actions restrictions](https://docs.github.com/en/actions/security-guides/automatic-token-authentication#permissions-for-the-github_token), this reporter will reports the verdicts to the GitHub Actions **log console**.
 
 ### Status
 
