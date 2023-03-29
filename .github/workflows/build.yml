@@ -69,6 +69,9 @@ jobs:
 
       - name: Generate docs
         if: ${{ github.event_name == 'push' && matrix.goos == 'linux' && matrix.go == '1.20' }}
+        env:
+          GITHUB_ACTIONS: ""
+          GITHUB_EVENT_PATH: ""
         run: |
           ./lstn manual 2> docs/cheatsheet.md
           ./lstn config 2> docs/configuration.md
