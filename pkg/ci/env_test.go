@@ -25,7 +25,8 @@ import (
 
 func TestNewInfo_GitHubActionsWithoutEventPath(t *testing.T) {
 	closer := internaltesting.EnvSetter(map[string]string{
-		"GITHUB_ACTIONS": "true",
+		"GITHUB_ACTIONS":    "true",
+		"GITHUB_EVENT_PATH": "",
 	})
 	t.Cleanup(closer)
 

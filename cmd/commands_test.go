@@ -471,6 +471,19 @@ Global Flags:
 			stderr: "",
 			errstr: "",
 		},
+		// lstn version --debug-options -v=2
+		{
+			name:    "lstn version --debug-options -vv",
+			cmdline: []string{"version", "--debug-options", "-vv"},
+			stdout: heredoc.Doc(`{
+			"changelog": false,
+			"debug-options": true,
+			"verbosity": 2
+		}
+		`),
+			stderr: "",
+			errstr: "",
+		},
 		// GITHUB_ACTIONS=true GITHUB_EVENT_PATH=../pkg/.../github_event_pul_request.json lstn scan --debug-options
 		{
 			name: "GITHUB_ACTIONS=true GITHUB_EVENT_PATH=../pkg/ci/testdata/github_event_pul_request.json lstn scan --debug-options",
