@@ -22,32 +22,41 @@ import (
 	"strings"
 
 	"github.com/google/go-github/v50/github"
+	"github.com/listendev/lstn/pkg/cmd/flags"
 	"github.com/listendev/lstn/pkg/cmd/report"
-	"github.com/listendev/lstn/pkg/reporter/request"
+	"github.com/listendev/lstn/pkg/listen"
+	"github.com/listendev/lstn/pkg/reporter"
 )
 
 const stickyReviewCommentAnnotation = "<!--@lstn-sticky-review-comment-->"
 
-type Reporter struct {
+type rep struct {
 	ctx      context.Context
 	ghClient *github.Client
+	opts     *flags.ConfigFlags
 }
 
-func New() *Reporter {
-	return &Reporter{
-		ghClient: github.NewClient(nil),
+func New(ctx context.Context, opts ...reporter.Option) reporter.Reporter {
+	ret := &rep{
+		ctx: ctx,
 	}
+
+	for _, opt := range opts {
+		ret = opt(ret).(*rep)
+	}
+
+	return ret
 }
 
-func (r *Reporter) WithGithubClient(client *github.Client) {
+func (r *rep) WithGitHubClient(client *github.Client) {
 	r.ghClient = client
 }
 
-func (r *Reporter) WithContext(ctx context.Context) {
-	r.ctx = ctx
+func (r *rep) WithConfigOptions(opts *flags.ConfigFlags) {
+	r.opts = opts
 }
 
-func (r *Reporter) stickyComment(owner string, repo string, id int, comment io.Reader) error {
+func (r *rep) stickyComment(owner string, repo string, id int, comment io.Reader) error {
 	buf := bytes.Buffer{}
 	_, err := buf.Write([]byte(stickyReviewCommentAnnotation))
 	if err != nil {
@@ -86,17 +95,17 @@ func (r *Reporter) stickyComment(owner string, repo string, id int, comment io.R
 	return commentFn()
 }
 
-func (r *Reporter) Report(req *request.Report) error {
+func (r *rep) Run(res listen.Response) error {
 	buf := bytes.Buffer{}
 	fullMarkdownReport := report.NewFullMarkdwonReport()
 	fullMarkdownReport.WithOutput(&buf)
-	if err := fullMarkdownReport.Render(req.Packages); err != nil {
+	if err := fullMarkdownReport.Render(res); err != nil {
 		return err
 	}
 
-	owner := req.GitHubPullCommentReport.Owner
-	repo := req.GitHubPullCommentReport.Repo
-	id := req.GitHubPullCommentReport.ID
+	owner := r.opts.Reporter.GitHub.Owner
+	repo := r.opts.Reporter.GitHub.Repo
+	id := r.opts.Reporter.GitHub.Pull.ID
 
 	err := r.stickyComment(owner, repo, id, &buf)
 	if err != nil {
@@ -104,4 +113,9 @@ func (r *Reporter) Report(req *request.Report) error {
 	}
 
 	return nil
+}
+
+// TODO: do not execute on GitHub push events
+func (r *rep) CanRun() bool {
+	return true
 }
