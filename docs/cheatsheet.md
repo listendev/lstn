@@ -102,9 +102,9 @@ Inspect the verdicts for your dependencies tree.
 ### Reporting Flags
 
 ```
-    --gh-owner string                                           set the GitHub owner name (org|user) (default "listendev")
+    --gh-owner string                                           set the GitHub owner name (org|user)
     --gh-pull-id int                                            set the GitHub pull request ID
-    --gh-repo string                                            set the GitHub repository name (default "lstn")
+    --gh-repo string                                            set the GitHub repository name
 -r, --reporter (gh-pull-check,gh-pull-comment,gh-pull-review)   set one or more reporters to use (default [])
 ```
 
@@ -166,9 +166,9 @@ Inspect the verdicts for your direct dependencies.
 ### Reporting Flags
 
 ```
-    --gh-owner string                                           set the GitHub owner name (org|user) (default "listendev")
+    --gh-owner string                                           set the GitHub owner name (org|user)
     --gh-pull-id int                                            set the GitHub pull request ID
-    --gh-repo string                                            set the GitHub repository name (default "lstn")
+    --gh-repo string                                            set the GitHub repository name
 -r, --reporter (gh-pull-check,gh-pull-comment,gh-pull-review)   set one or more reporters to use (default [])
 ```
 
@@ -224,9 +224,9 @@ Get the verdicts of a package.
 ### Reporting Flags
 
 ```
-    --gh-owner string                                           set the GitHub owner name (org|user) (default "listendev")
+    --gh-owner string                                           set the GitHub owner name (org|user)
     --gh-pull-id int                                            set the GitHub pull request ID
-    --gh-repo string                                            set the GitHub repository name (default "lstn")
+    --gh-repo string                                            set the GitHub repository name
 -r, --reporter (gh-pull-check,gh-pull-comment,gh-pull-review)   set one or more reporters to use (default [])
 ```
 
@@ -261,13 +261,13 @@ Print out version information.
 ### Flags
 
 ```
---changelog   output the relase notes URL
+-v, -- count      increment the verbosity level
+    --changelog   output the relase notes URL
 ```
 
 ### Debug Flags
 
 ```
--v, -- count          increment the verbosity level
-    --debug-options   output the options, then exit
+--debug-options   output the options, then exit
 ```
 
