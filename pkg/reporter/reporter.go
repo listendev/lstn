@@ -16,30 +16,14 @@
 package reporter
 
 import (
-	"context"
-	"errors"
-
 	"github.com/google/go-github/v50/github"
-	"github.com/listendev/lstn/pkg/cmd"
-	ghcomment "github.com/listendev/lstn/pkg/reporter/gh/comment"
-	"github.com/listendev/lstn/pkg/reporter/request"
-)
-
-var (
-	ErrReporterNotFound = errors.New("unsupported reporter")
+	"github.com/listendev/lstn/pkg/cmd/flags"
+	"github.com/listendev/lstn/pkg/listen"
 )
 
 type Reporter interface {
-	Report(req *request.Report) error
-	WithContext(ctx context.Context)
-	WithGithubClient(client *github.Client)
-}
-
-func BuildReporter(reporterIdentifier cmd.ReportType) (Reporter, error) {
-	switch reporterIdentifier {
-	case cmd.GitHubPullCommentReport:
-		return ghcomment.New(), nil
-	default:
-		return nil, ErrReporterNotFound
-	}
+	WithGitHubClient(client *github.Client)
+	WithConfigOptions(opts *flags.ConfigFlags)
+	Run(res listen.Response) error
+	CanRun() bool
 }
