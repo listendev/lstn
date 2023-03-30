@@ -23,7 +23,6 @@ import (
 
 	"github.com/XANi/goneric"
 	"github.com/cli/cli/pkg/iostreams"
-	"github.com/google/go-github/v50/github"
 	"github.com/listendev/lstn/internal/project"
 	"github.com/listendev/lstn/pkg/cmd"
 	"github.com/listendev/lstn/pkg/cmd/arguments"
@@ -33,10 +32,8 @@ import (
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/listendev/lstn/pkg/npm"
-	"github.com/listendev/lstn/pkg/reporter"
-	"github.com/listendev/lstn/pkg/reporter/request"
+	reporterfactory "github.com/listendev/lstn/pkg/reporter/factory"
 	"github.com/spf13/cobra"
-	"golang.org/x/oauth2"
 )
 
 var (
@@ -150,38 +147,28 @@ The verdicts it returns are listed by the name of each package and its specified
 				return err
 			}
 
+			cs := io.ColorScheme()
 			for _, r := range scanOpts.Reporter.Types {
+				c.Printf("reporting using the %s reporter\n", cs.Gray(r.String()))
+
 				switch r {
 				case cmd.GitHubPullCommentReport:
-					cs := io.ColorScheme()
-					fmt.Fprintf(io.Out, "sending report using the %s reporter\n", cs.Gray(r.String()))
-					ts := oauth2.StaticTokenSource(
-						&oauth2.Token{AccessToken: scanOpts.ConfigFlags.Token.GitHub},
-					)
-					tc := oauth2.NewClient(ctx, ts)
-					client := github.NewClient(tc)
-
-					rep, err := reporter.BuildReporter(r)
+					rep, runnable, err := reporterfactory.Make(ctx, r)
 					if err != nil {
 						return err
 					}
-					rep.WithGithubClient(client)
-					rep.WithContext(ctx)
+					// Move on when the current reporter cannot run in the current context
+					if !runnable {
+						c.PrintErr("TODO: explain me why")
 
-					req := request.Report{
-						Packages: combinedResponse,
-						GitHubPullCommentReport: request.GitHubPullCommentReport{
-							Owner: scanOpts.Reporter.GitHub.Owner,
-							Repo:  scanOpts.Reporter.GitHub.Repo,
-							ID:    scanOpts.Reporter.GitHub.Pull.ID,
-						},
+						continue
 					}
 
-					err = rep.Report(&req)
+					err = rep.Run(combinedResponse)
 					if err != nil {
 						return fmt.Errorf("error while executing reporter (%s): %w", r.String(), err)
 					}
-					fmt.Fprintf(io.Out, "%s report successfully sent using the %s reporter\n", cs.SuccessIcon(), cs.Gray(r.String()))
+					c.Printf("%s report successfully sent using the %s reporter\n", cs.SuccessIcon(), cs.Gray(r.String()))
 				case cmd.GitHubPullCheckReport:
 					c.PrintErrf("The %q reporter is coming soon...\n", r.String())
 				case cmd.GitHubPullReviewReport:
