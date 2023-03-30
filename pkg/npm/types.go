@@ -92,7 +92,7 @@ type packageJSON struct {
 	Dependencies         map[string]string `json:"dependencies"`
 	DevDependencies      map[string]string `json:"devDependencies"`
 	PeerDependencies     map[string]string `json:"peerDependencies"`
-	BundleDependencies   map[string]string `json:"bundleDependencies"`
+	BundleDependencies   []string          `json:"bundleDependencies"`
 	OptionalDependencies map[string]string `json:"optionalDependencies"`
 }
 
