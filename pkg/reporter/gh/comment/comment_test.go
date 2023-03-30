@@ -98,7 +98,7 @@ func TestReviewReporter_stickyComment(t *testing.T) {
 
 			ghClient := github.NewClient(nil)
 
-			r := &Reporter{
+			r := &rep{
 				ctx:      context.TODO(),
 				ghClient: ghClient,
 			}
