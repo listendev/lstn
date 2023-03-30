@@ -28,8 +28,9 @@ import (
 )
 
 var (
-	ErrReporterNotFound       = errors.New("unsupported reporter")
-	ErrReporterMissingOptions = errors.New("couldn't retrieve the reporting options")
+	ErrReporterNotFound         = errors.New("unsupported reporter")
+	ErrReporterMissingOptions   = errors.New("couldn't retrieve the reporting options")
+	ErrReporterNotOnPullRequest = errors.New("the reporter is not running against a GitHub pull request")
 )
 
 // Make creates a new reporter.Reporter.
@@ -54,6 +55,9 @@ func Make(ctx context.Context, reportType cmd.ReportType) (r reporter.Reporter, 
 	switch reportType {
 	case cmd.GitHubPullCommentReport:
 		r := ghcomment.New(ctx, reporter.WithConfigOptions(cfgOpts), reporter.WithGitHubClient(client))
+		if !r.CanRun() {
+			return nil, false, ErrReporterNotOnPullRequest
+		}
 
 		return r, true, nil
 	default:
