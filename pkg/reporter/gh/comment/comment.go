@@ -115,7 +115,7 @@ func (r *rep) Run(res listen.Response) error {
 	return nil
 }
 
-// TODO: do not execute on GitHub push events
+// TODO: do not execute on GitHub push events.
 func (r *rep) CanRun() bool {
 	return true
 }
