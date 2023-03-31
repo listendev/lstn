@@ -154,6 +154,24 @@ func New(ctx context.Context) (*Command, error) {
 							if flagValue != defaultVal {
 								v.SetString(flagValue)
 							}
+						case []string:
+							// Store the flag value (it equals to the default when no flag)
+							flagValue, _ := c.Flags().GetStringSlice(flagName)
+							// Merge the value (string slice) coming from environment variable or config file (viper)
+							// This fallbacks to the default value when no environment variable or config file
+							value := viper.GetStringSlice(flagName)
+							actualDefaultVal := v.Interface().([]string)
+							if len(value) > 0 {
+								res := []string{}
+								for _, elem := range value {
+									res = append(res, strings.Split(elem, ",")...)
+								}
+								v.Set(reflect.ValueOf(goneric.SliceDedupe(res)))
+							}
+							// Re-set the field when the flag slice value has more elements than the default slice value
+							if !goneric.CompareSliceSet(flagValue, actualDefaultVal) {
+								v.Set(reflect.ValueOf(flagValue))
+							}
 						case []cmd.ReportType:
 							// Store the flag value (it equals to the default when no flag)
 							enumFlag, _ := c.Flags().Lookup(flagName).Value.(*enumflag.EnumFlagValue[cmd.ReportType])
