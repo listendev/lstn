@@ -18,12 +18,14 @@ package comment
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"strings"
 
 	"github.com/google/go-github/v50/github"
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	"github.com/listendev/lstn/pkg/cmd/report"
+	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/listendev/lstn/pkg/reporter"
 )
@@ -36,16 +38,25 @@ type rep struct {
 	opts     *flags.ConfigFlags
 }
 
-func New(ctx context.Context, opts ...reporter.Option) reporter.Reporter {
+func New(ctx context.Context, opts ...reporter.Option) (reporter.Reporter, error) {
+	// Retrieve the config options from the context
+	// Those are mandatory because they contain the GitHub reporting options
+	cfgOpts, ok := ctx.Value(pkgcontext.ConfigKey).(*flags.ConfigFlags)
+	if cfgOpts == nil || !ok {
+		return nil, fmt.Errorf("couldn't retrieve the reporter options")
+	}
+
 	ret := &rep{
-		ctx: ctx,
+		ctx:      ctx,
+		opts:     cfgOpts,
+		ghClient: github.NewTokenClient(ctx, cfgOpts.Token.GitHub),
 	}
 
 	for _, opt := range opts {
 		ret = opt(ret).(*rep)
 	}
 
-	return ret
+	return ret, nil
 }
 
 func (r *rep) WithGitHubClient(client *github.Client) {
