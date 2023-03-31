@@ -42,7 +42,7 @@ func (suite *FlagsBaseSuite) TestGetNames() {
 	res := GetNames(&ScanOpts{})
 
 	// Expecting all the (sub)fields
-	assert.Len(suite.T(), res, 11)
+	assert.Len(suite.T(), res, 12)
 }
 
 func (suite *FlagsBaseSuite) TestGetDefaults() {
