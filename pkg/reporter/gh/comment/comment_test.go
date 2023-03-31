@@ -24,7 +24,76 @@ import (
 
 	"github.com/google/go-github/v50/github"
 	"github.com/jarcoal/httpmock"
+	"github.com/listendev/lstn/pkg/cmd/flags"
+	pkgcontext "github.com/listendev/lstn/pkg/context"
+	"github.com/listendev/lstn/pkg/reporter"
+	"github.com/stretchr/testify/assert"
 )
+
+func TestReporterCanRun(t *testing.T) {
+	type test struct {
+		desc string
+		opts *flags.ConfigFlags
+		want bool
+		erro string
+	}
+	testCases := []test{
+		{
+			desc: "missing-reporter-github-options",
+			opts: nil,
+			want: false,
+			erro: "aaaa",
+		},
+		{
+			desc: "not-on-pull-request",
+			opts: &flags.ConfigFlags{
+				Reporter: flags.Reporter{
+					GitHub: flags.GitHub{
+						Owner: "",
+						Repo:  "",
+						Pull: flags.Pull{
+							ID: 0,
+						},
+					},
+				},
+			},
+			want: false,
+			erro: "",
+		},
+		{
+			desc: "on-pull-request",
+			opts: &flags.ConfigFlags{
+				Reporter: flags.Reporter{
+					GitHub: flags.GitHub{
+						Owner: "listendev",
+						Repo:  "lstn",
+						Pull: flags.Pull{
+							ID: 205,
+						},
+					},
+				},
+			},
+			want: true,
+			erro: "",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			ctx := context.Background()
+			ctx = context.WithValue(ctx, pkgcontext.ConfigKey, tc.opts)
+
+			r, err := New(ctx, reporter.WithGitHubClient(github.NewClient(nil)))
+			if tc.erro != "" {
+				assert.Nil(t, r)
+				assert.Error(t, err)
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, tc.want, r.CanRun())
+			}
+		})
+	}
+}
 
 func TestReviewReporter_stickyComment(t *testing.T) {
 	type args struct {
