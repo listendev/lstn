@@ -145,6 +145,9 @@ Config Flags:
 Debug Flags:
       --debug-options   output the options, then exit
 
+Filtering Flags:
+      --ignore-packages strings   list of packages to not process
+
 Registry Flags:
       --npm-registry string   set a custom NPM registry (default "https://registry.npmjs.org")
 
@@ -178,6 +181,7 @@ Global Flags:
 	"gh-pull-id": 0,
 	"gh-repo": "",
 	"gh-token": "",
+	"ignore-packages": null,
 	"jq": "",
 	"json": false,
 	"loglevel": "info",
@@ -205,6 +209,7 @@ Global Flags:
 	"gh-pull-id": 0,
 	"gh-repo": "",
 	"gh-token": "",
+	"ignore-packages": null,
 	"jq": "",
 	"json": false,
 	"loglevel": "info",
@@ -232,6 +237,7 @@ Global Flags:
 	"gh-pull-id": 0,
 	"gh-repo": "",
 	"gh-token": "",
+	"ignore-packages": null,
 	"jq": "",
 	"json": false,
 	"loglevel": "info",
@@ -263,6 +269,7 @@ Global Flags:
 	"gh-pull-id": 0,
 	"gh-repo": "",
 	"gh-token": "",
+	"ignore-packages": null,
 	"jq": "",
 	"json": false,
 	"loglevel": "info",
@@ -293,6 +300,7 @@ Global Flags:
 	"gh-pull-id": 0,
 	"gh-repo": "",
 	"gh-token": "",
+	"ignore-packages": null,
 	"jq": "",
 	"json": false,
 	"loglevel": "info",
@@ -333,6 +341,7 @@ Global Flags:
 	"gh-pull-id": 111,
 	"gh-repo": "go-urn",
 	"gh-token": "xxx",
+	"ignore-packages": null,
 	"jq": "",
 	"json": false,
 	"loglevel": "info",
@@ -348,6 +357,7 @@ Global Flags:
 			errstr: "",
 		},
 		// LSTN_REPORTER=gh-pull-check lstn scan --debug-options --gh-token xxx -r gh-pull-review --gh-owner leodido --gh-repo go-urn --gh-pull-id 111
+		// FIXME: for coherence flags MUST always override so -r here should override not merge
 		{
 			name: "LSTN_REPORTER=gh-pull-check lstn scan --debug-options --gh-token xxx -r gh-pull-review --gh-owner leodido --gh-repo go-urn --gh-pull-id 111",
 			envvar: map[string]string{
@@ -377,6 +387,7 @@ Global Flags:
 	"gh-pull-id": 111,
 	"gh-repo": "go-urn",
 	"gh-token": "xxx",
+	"ignore-packages": null,
 	"jq": "",
 	"json": false,
 	"loglevel": "info",
@@ -413,6 +424,7 @@ Global Flags:
 	"gh-pull-id": 654,
 	"gh-repo": "",
 	"gh-token": "yyy",
+	"ignore-packages": null,
 	"jq": "",
 	"json": false,
 	"loglevel": "info",
@@ -443,6 +455,7 @@ Global Flags:
 	"gh-pull-id": 78999,
 	"gh-repo": "go-urn",
 	"gh-token": "zzz",
+	"ignore-packages": null,
 	"jq": "",
 	"json": false,
 	"loglevel": "info",
@@ -479,6 +492,7 @@ Global Flags:
 	"gh-pull-id": 887755,
 	"gh-repo": "go-conventionalcommits",
 	"gh-token": "zzz",
+	"ignore-packages": null,
 	"jq": "",
 	"json": false,
 	"loglevel": "info",
@@ -562,6 +576,175 @@ Global Flags:
 	"gh-pull-id": 285,
 	"gh-repo": "reviewdog",
 	"gh-token": "",
+	"ignore-packages": null,
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://registry.npmjs.org",
+	"reporter": null,
+	"timeout": 60
+}
+`),
+			stderr: "Running without a configuration file\n",
+			errstr: "",
+		},
+		// LSTN_IGNORE_PACKAGES=overriddenbyflag lstn scan --ignore-packages @vue/devtools,anotherpackages --debug-options
+		{
+			name: "LSTN_IGNORE_PACKAGES=overriddenbyflag lstn scan --ignore-packages @vue/devtools,anotherpackage --debug-options",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS":       "",
+				"LSTN_IGNORE_PACKAGES": "overriddenbyflag",
+			},
+			cmdline: []string{"scan", "--debug-options", "--ignore-packages", "@vue/devtools,anotherpackage"},
+			stdout: heredoc.Doc(`{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"exclude": [
+		110
+	],
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "",
+	"ignore-packages": [
+		"@vue/devtools",
+		"anotherpackage"
+	],
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://registry.npmjs.org",
+	"reporter": null,
+	"timeout": 60
+}
+`),
+			stderr: "Running without a configuration file\n",
+			errstr: "",
+		},
+		// LSTN_IGNORE_PACKAGES=overriddenbyflag lstn scan --ignore-packages @vue/devtools --ignore-packages anotherpackage --debug-options
+		{
+			name: "LSTN_IGNORE_PACKAGES=overriddenbyflag lstn scan --ignore-packages @vue/devtools --ignore-packages anotherpackage --debug-options",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS":       "",
+				"LSTN_IGNORE_PACKAGES": "overriddenbyflag",
+			},
+			cmdline: []string{"scan", "--debug-options", "--ignore-packages", "@vue/devtools", "--ignore-packages", "anotherpackage"},
+			stdout: heredoc.Doc(`{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"exclude": [
+		110
+	],
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "",
+	"ignore-packages": [
+		"@vue/devtools",
+		"anotherpackage"
+	],
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://registry.npmjs.org",
+	"reporter": null,
+	"timeout": 60
+}
+`),
+			stderr: "Running without a configuration file\n",
+			errstr: "",
+		},
+		// LSTN_IGNORE_PACKAGES=overriddenbyflag lstn scan --ignore-packages @vue/devtools --debug-options
+		{
+			name: "LSTN_IGNORE_PACKAGES=overriddenbyflag lstn scan --ignore-packages @vue/devtools --debug-options",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS":       "",
+				"LSTN_IGNORE_PACKAGES": "overriddenbyflag",
+			},
+			cmdline: []string{"scan", "--debug-options", "--ignore-packages", "@vue/devtools"},
+			stdout: heredoc.Doc(`{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"exclude": [
+		110
+	],
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "",
+	"ignore-packages": [
+		"@vue/devtools"
+	],
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://registry.npmjs.org",
+	"reporter": null,
+	"timeout": 60
+}
+`),
+			stderr: "Running without a configuration file\n",
+			errstr: "",
+		},
+		// LSTN_IGNORE_PACKAGES=@vue/devtools --debug-options
+		{
+			name: "LSTN_IGNORE_PACKAGES=@vue/devtools lstn scan --debug-options",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS":       "",
+				"LSTN_IGNORE_PACKAGES": "@vue/devtools",
+			},
+			cmdline: []string{"scan", "--debug-options"},
+			stdout: heredoc.Doc(`{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"exclude": [
+		110
+	],
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "",
+	"ignore-packages": [
+		"@vue/devtools"
+	],
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://registry.npmjs.org",
+	"reporter": null,
+	"timeout": 60
+}
+`),
+			stderr: "Running without a configuration file\n",
+			errstr: "",
+		},
+		// LSTN_IGNORE_PACKAGES=@vue/devtools,anotherpackage --debug-options
+		{
+			name: "LSTN_IGNORE_PACKAGES=@vue/devtools,anotherpackage lstn scan --debug-options",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS":       "",
+				"LSTN_IGNORE_PACKAGES": "@vue/devtools,anotherpackage",
+			},
+			cmdline: []string{"scan", "--debug-options"},
+			stdout: heredoc.Doc(`{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"exclude": [
+		110
+	],
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "",
+	"ignore-packages": [
+		"@vue/devtools",
+		"anotherpackage"
+	],
 	"jq": "",
 	"json": false,
 	"loglevel": "info",
@@ -574,6 +757,38 @@ Global Flags:
 			errstr: "",
 		},
 	}
+
+	for _, tc := range cases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			closer := internaltesting.EnvSetter(tc.envvar)
+			t.Cleanup(closer)
+
+			rootC, e := root.New(context.Background())
+			assert.Nil(t, e)
+			c := rootC.Command()
+
+			stdOut, stdErr, err := internaltesting.ExecuteCommand(c, tc.cmdline...)
+
+			tc.stdout = strings.ReplaceAll(tc.stdout, "_CWD_", cwd)
+			tc.stderr = strings.ReplaceAll(tc.stderr, "_CWD_", cwd)
+
+			if tc.errstr != "" {
+				if assert.Error(t, err) {
+					tc.errstr = strings.ReplaceAll(tc.errstr, "_CWD_", cwd)
+					assert.Equal(t, tc.errstr, err.Error())
+				}
+			}
+			assert.Equal(t, tc.stdout, stdOut)
+			assert.Equal(t, tc.stderr, stdErr)
+		})
+	}
+}
+
+func TestChildCommands2(t *testing.T) {
+	cwd, _ := os.Getwd()
+
+	cases := []testCase{}
 
 	for _, tc := range cases {
 		tc := tc
