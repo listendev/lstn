@@ -149,30 +149,31 @@ The verdicts it returns are listed by the name of each package and its specified
 
 			cs := io.ColorScheme()
 			for _, r := range scanOpts.Reporter.Types {
-				c.Printf("reporting using the %s reporter\n", cs.Gray(r.String()))
+				rString := cs.Gray(fmt.Sprintf("%q", r.String()))
+				c.Printf("Reporting using the %s reporter...\n", rString)
 
 				switch r {
 				case cmd.GitHubPullCommentReport:
 					rep, runnable, err := reporterfactory.Make(ctx, r)
-					if err != nil {
+					if runnable && err != nil {
 						return err
 					}
 					// Move on when the current reporter cannot run in the current context
 					if !runnable {
-						c.PrintErr("TODO: explain me why")
+						c.PrintErrf("Exiting: %s.\n", err)
 
 						continue
 					}
 
 					err = rep.Run(combinedResponse)
 					if err != nil {
-						return fmt.Errorf("error while executing reporter (%s): %w", r.String(), err)
+						return fmt.Errorf("error while executing the %q reporter: %w", r.String(), err)
 					}
-					c.Printf("%s report successfully sent using the %s reporter\n", cs.SuccessIcon(), cs.Gray(r.String()))
+					c.Printf("The report has been successfully sent using the %s reporter... %s\n", rString, cs.SuccessIcon())
 				case cmd.GitHubPullCheckReport:
-					c.PrintErrf("The %q reporter is coming soon...\n", r.String())
+					c.PrintErrf("The %s reporter is coming soon...\n", rString)
 				case cmd.GitHubPullReviewReport:
-					c.PrintErrf("The %q reporter is coming soon...\n", r.String())
+					c.PrintErrf("The %s reporter is coming soon...\n", rString)
 				}
 			}
 
