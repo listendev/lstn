@@ -59,7 +59,11 @@ func TestChildCommands(t *testing.T) {
 		},
 		// lstn to --debug-options
 		{
-			name:    "lstn to --debug-options",
+			name: "lstn to --debug-options",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
 			cmdline: []string{"to", "--debug-options"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
@@ -81,7 +85,11 @@ func TestChildCommands(t *testing.T) {
 		},
 		// lstn to --debug-options --npm-registry https://some.io --timeout 2222
 		{
-			name:    "lstn to --debug-options --npm-registry https://some.io --timeout 2222",
+			name: "lstn to --debug-options --npm-registry https://some.io --timeout 2222",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
 			cmdline: []string{"to", "--debug-options", "--npm-registry", "https://some.io", "--timeout", "2222"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
