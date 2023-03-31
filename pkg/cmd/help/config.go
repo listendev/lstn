@@ -93,7 +93,7 @@ func configHelpTopicFunc() TopicFunc {
 					}
 
 					fileContent += fmt.Sprintf("%s%s: %s\n", strings.Repeat(" ", i*2), part, def)
-					if strings.HasPrefix(configFlagsTypes[flagName].String(), "[]") {
+					if strings.HasPrefix(configFlagsTypes[flagName].String(), "[]") && num == (i+1) {
 						sp := strings.Repeat(" ", (i+1)*2)
 						fileContent += fmt.Sprintf("%s- %q\n%s- %q\n", sp, "...", sp, "...")
 					}
