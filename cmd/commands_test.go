@@ -49,6 +49,58 @@ func TestChildCommands(t *testing.T) {
 			stderr:  "Running without a configuration file\nError: directory _CWD_ does not contain a package.json file\n",
 			errstr:  "directory _CWD_ does not contain a package.json file",
 		},
+		// lstn to
+		{
+			name:    "lstn to",
+			cmdline: []string{"to"},
+			stdout:  "",
+			stderr:  "Error: requires at least 1 arg (package name)\n",
+			errstr:  "requires at least 1 arg (package name)",
+		},
+		// lstn to --debug-options
+		{
+			name:    "lstn to --debug-options",
+			cmdline: []string{"to", "--debug-options"},
+			stdout: heredoc.Doc(`{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "",
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://registry.npmjs.org",
+	"reporter": null,
+	"timeout": 60
+}
+`),
+			stderr: "Running without a configuration file\n",
+			errstr: "",
+		},
+		// lstn to --debug-options --npm-registry https://some.io --timeout 2222
+		{
+			name:    "lstn to --debug-options --npm-registry https://some.io --timeout 2222",
+			cmdline: []string{"to", "--debug-options", "--npm-registry", "https://some.io", "--timeout", "2222"},
+			stdout: heredoc.Doc(`{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "",
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://some.io",
+	"reporter": null,
+	"timeout": 2222
+}
+`),
+			stderr: "Running without a configuration file\n",
+			errstr: "",
+		},
 		// lstn in --help
 		{
 			envvar: map[string]string{
