@@ -57,6 +57,10 @@ type Reporter struct {
 	GitHub
 }
 
+type Ignore struct {
+	Packages []string `name:"ignore packages" flag:"ignore-packages" desc:"list of packages to not process" json:"ignore-packages" flagset:"Filtering"` // default:"[\"zzz\"]"
+}
+
 type ConfigFlags struct {
 	LogLevel string `default:"info" name:"log level" flag:"loglevel" desc:"set the logging level" flagset:"Config" json:"loglevel"`                          // TODO > validator
 	Timeout  int    `default:"60" name:"timeout" flag:"timeout" desc:"set the timeout, in seconds" validate:"number,min=30" flagset:"Config" json:"timeout"` // FIXME: change to time.Duration type
@@ -64,6 +68,7 @@ type ConfigFlags struct {
 	Token
 	Registry
 	Reporter
+	Ignore
 }
 
 func NewConfigFlags() (*ConfigFlags, error) {
