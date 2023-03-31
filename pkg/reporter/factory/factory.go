@@ -19,17 +19,13 @@ import (
 	"context"
 	"errors"
 
-	"github.com/google/go-github/v50/github"
 	"github.com/listendev/lstn/pkg/cmd"
-	"github.com/listendev/lstn/pkg/cmd/flags"
-	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/reporter"
 	ghcomment "github.com/listendev/lstn/pkg/reporter/gh/comment"
 )
 
 var (
 	ErrReporterNotFound         = errors.New("unsupported reporter")
-	ErrReporterMissingOptions   = errors.New("couldn't retrieve the reporting options")
 	ErrReporterNotOnPullRequest = errors.New("the reporter is not running against a GitHub pull request")
 )
 
@@ -45,16 +41,12 @@ var (
 // Last but not least, this function takes care of configuring
 // everything the reporter being instantiated needs.
 func Make(ctx context.Context, reportType cmd.ReportType) (r reporter.Reporter, canRun bool, err error) {
-	// Retrieve the config options from the context
-	cfgOpts, ok := ctx.Value(pkgcontext.ConfigKey).(*flags.ConfigFlags)
-	if !ok {
-		return nil, true, ErrReporterMissingOptions
-	}
-	client := github.NewTokenClient(ctx, cfgOpts.Token.GitHub)
-
 	switch reportType {
 	case cmd.GitHubPullCommentReport:
-		r := ghcomment.New(ctx, reporter.WithConfigOptions(cfgOpts), reporter.WithGitHubClient(client))
+		r, err := ghcomment.New(ctx)
+		if err != nil {
+			return nil, true, err
+		}
 		if !r.CanRun() {
 			return nil, false, ErrReporterNotOnPullRequest
 		}
