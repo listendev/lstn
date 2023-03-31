@@ -58,7 +58,7 @@ type Reporter struct {
 }
 
 type Ignore struct {
-	Packages []string `name:"ignore packages" flag:"ignore-packages" desc:"list of packages to not process" json:"ignore-packages" flagset:"Filtering"` // default:"[\"zzz\"]"
+	Packages []string `name:"ignore packages" flag:"ignore-packages" desc:"list of packages to not process" json:"ignore-packages" flagset:"Filtering"`
 }
 
 type ConfigFlags struct {
