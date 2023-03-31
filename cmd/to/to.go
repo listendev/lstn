@@ -106,7 +106,8 @@ It lists out the verdicts of all the versions of the input package name.`,
 			if err != nil {
 				return err
 			}
-			toOpts, ok := opts.(*options.To)
+			var ok bool
+			toOpts, ok = opts.(*options.To)
 			if !ok {
 				return fmt.Errorf("couldn't obtain options for the current child command")
 			}
