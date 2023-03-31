@@ -59,7 +59,7 @@ func (suite *FlagsConfigSuite) TestNewConfigFlagsDefaults() {
 
 func (suite *FlagsConfigSuite) TestGetConfigFlagsNames() {
 	m := GetNames(&ConfigFlags{})
-	assert.Equal(suite.T(), 9, len(m))
+	assert.Equal(suite.T(), 10, len(m))
 
 	expected := make(map[string]string)
 	expected["loglevel"] = "LogLevel"
@@ -71,6 +71,7 @@ func (suite *FlagsConfigSuite) TestGetConfigFlagsNames() {
 	expected["gh-owner"] = "Reporter.GitHub.Owner"
 	expected["reporter"] = "Reporter.Types"
 	expected["npm-registry"] = "Registry.NPM"
+	expected["ignore-packages"] = "Ignore.Packages"
 
 	for k, v := range m {
 		e, ok := expected[k]
