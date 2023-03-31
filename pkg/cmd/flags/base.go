@@ -113,6 +113,14 @@ func Define(c *cobra.Command, o interface{}, startingGroup string) {
 			}
 			c.Flags().IntVarP(ref, tag, short, val, descr)
 
+		case reflect.Slice:
+			switch f.Type.Elem().Kind() {
+			case reflect.String:
+				val := field.Interface().([]string)
+				ref := (*[]string)(unsafe.Pointer(field.UnsafeAddr()))
+				c.Flags().StringSliceVarP(ref, tag, short, val, descr)
+			}
+
 		default:
 			continue
 		}
