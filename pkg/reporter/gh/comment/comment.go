@@ -115,7 +115,10 @@ func (r *rep) Run(res listen.Response) error {
 	return nil
 }
 
-// TODO: do not execute on GitHub push events.
+// CanRun tells whether this reporter is being executed on a GitHub pull request
+// (in which case it returns a true value) or not.
 func (r *rep) CanRun() bool {
-	return true
+	ghOpts := r.opts.Reporter.GitHub
+
+	return ghOpts.Owner != "" && ghOpts.Repo != "" && ghOpts.Pull.ID != 0
 }
