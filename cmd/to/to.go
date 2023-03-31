@@ -38,6 +38,12 @@ var (
 )
 
 func New(ctx context.Context) (*cobra.Command, error) {
+	// Obtain the local options
+	toOpts, err := options.NewTo()
+	if err != nil {
+		return nil, err
+	}
+
 	var toCmd = &cobra.Command{
 		Use:                   "to <name> [[version] [shasum] | [version constraint]]",
 		GroupID:               groups.Core.ID,
@@ -63,7 +69,15 @@ It lists out the verdicts of all the versions of the input package name.`,
   lstn to tap "^16.3.0"
   # Get the verdicts for prettier versions >= 2.7.0 <= 3.0.0
   lstn to prettier ">=2.7.0 <=3.0.0"`,
-		Args:              arguments.PackageTriple, // Executes before RunE
+		// Executes before RunE
+		Args: func(c *cobra.Command, args []string) error {
+			// Do not enforce arguments validation when users uses --debug-options
+			if toOpts.DebugOptions {
+				return nil
+			}
+
+			return arguments.PackageTriple(c, args)
+		},
 		ValidArgsFunction: arguments.PackageTripleActiveHelp,
 		Annotations: map[string]string{
 			"source": project.GetSourceURL(filename),
@@ -165,12 +179,6 @@ It lists out the verdicts of all the versions of the input package name.`,
 
 			return tablePrinter.RenderPackages(res)
 		},
-	}
-
-	// Obtain the local options
-	toOpts, err := options.NewTo()
-	if err != nil {
-		return nil, err
 	}
 
 	// Local flags will only run when this command is called directly
