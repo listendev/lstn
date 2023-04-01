@@ -27,6 +27,11 @@ func StringToReportType() mapstructure.DecodeHookFunc {
 		if f.Kind() != reflect.String {
 			return data, nil
 		}
+		if data == "[]" {
+			var i map[string]interface{}
+
+			return i, nil
+		}
 		if t != reflect.TypeOf(cmd.AllReport) {
 			return data, nil
 		}
