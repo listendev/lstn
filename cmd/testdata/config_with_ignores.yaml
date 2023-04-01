@@ -1,0 +1,9 @@
+timeout: 1111
+token:
+  github: zzz
+registry:
+  npm: https://smtg.io
+ignore:
+  packages:
+    - "donotprocessme"
+    - "metoo"

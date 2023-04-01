@@ -72,6 +72,7 @@ func TestChildCommands(t *testing.T) {
 	"gh-pull-id": 0,
 	"gh-repo": "",
 	"gh-token": "",
+	"ignore-packages": null,
 	"jq": "",
 	"json": false,
 	"loglevel": "info",
@@ -98,6 +99,7 @@ func TestChildCommands(t *testing.T) {
 	"gh-pull-id": 0,
 	"gh-repo": "",
 	"gh-token": "",
+	"ignore-packages": null,
 	"jq": "",
 	"json": false,
 	"loglevel": "info",
@@ -357,7 +359,7 @@ Global Flags:
 			errstr: "",
 		},
 		// LSTN_REPORTER=gh-pull-check lstn scan --debug-options --gh-token xxx -r gh-pull-review --gh-owner leodido --gh-repo go-urn --gh-pull-id 111
-		// FIXME: for coherence flags MUST always override so -r here should override not merge
+		// FIXME: for coherence flags MUST always override so -r here should override not merge // "reporter": [33]
 		{
 			name: "LSTN_REPORTER=gh-pull-check lstn scan --debug-options --gh-token xxx -r gh-pull-review --gh-owner leodido --gh-repo go-urn --gh-pull-id 111",
 			envvar: map[string]string{
@@ -436,15 +438,15 @@ Global Flags:
 			stderr: "Running without a configuration file\n",
 			errstr: "",
 		},
-		// lstn scan --debug-options --config testdata/c1.yaml
+		// lstn scan --debug-options --config testdata/config_with_reporters.yaml
 		{
 			envvar: map[string]string{
 				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
 				"GITHUB_ACTIONS": "",
 			},
-			name:    "lstn scan --debug-options --config testdata/c1.yaml",
-			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "c1.yaml")},
-			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/c1.yaml
+			name:    "lstn scan --debug-options --config testdata/config_with_reporters.yaml",
+			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "config_with_reporters.yaml")},
+			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_with_reporters.yaml
 {
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
@@ -469,9 +471,10 @@ Global Flags:
 			stderr: "",
 			errstr: "",
 		},
-		// LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/c1.yaml
+		// FIXME: Add LSTN_REPORTER=gh-pull-check and see if it merges with the one in the configuration file
+		// LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/config_with_reporters.yaml
 		{
-			name: "LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/c1.yaml",
+			name: "LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/config_with_reporters.yaml",
 			envvar: map[string]string{
 				"LSTN_GH_PULL_ID": "887755",
 				"LSTN_GH_REPO":    "go-conventionalcommits",
@@ -480,8 +483,8 @@ Global Flags:
 				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
 				"GITHUB_ACTIONS": "",
 			},
-			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "c1.yaml")},
-			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/c1.yaml
+			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "config_with_reporters.yaml")},
+			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_with_reporters.yaml
 {
 	"debug-options": true,
 	"endpoint": "https://npm-stage.listen.dev",
@@ -756,6 +759,107 @@ Global Flags:
 			stderr: "Running without a configuration file\n",
 			errstr: "",
 		},
+		// lstn scan --debug-options --ignore-packages aaaaa --config testdata/config_with_ignores.yaml
+		{
+			name: "lstn scan --debug-options --ignore-packages aaaaa --config testdata/config_with_ignores.yaml",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
+			cmdline: []string{"scan", "--debug-options", "--ignore-packages", "aaaaa", "--config", path.Join(cwd, "testdata", "config_with_ignores.yaml")},
+			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_with_ignores.yaml
+{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"exclude": [
+		110
+	],
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "zzz",
+	"ignore-packages": [
+		"aaaaa"
+	],
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://smtg.io",
+	"reporter": null,
+	"timeout": 1111
+}
+`),
+			stderr: "",
+			errstr: "",
+		},
+		// lstn scan --debug-options --config testdata/config_with_ignores.yaml
+		{
+			name: "lstn scan --debug-options --config testdata/config_with_ignores.yaml",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
+			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "config_with_ignores.yaml")},
+			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_with_ignores.yaml
+{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"exclude": [
+		110
+	],
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "zzz",
+	"ignore-packages": [
+		"donotprocessme",
+		"metoo"
+	],
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://smtg.io",
+	"reporter": null,
+	"timeout": 1111
+}
+`),
+			stderr: "",
+			errstr: "",
+		},
+		// LSTN_IGNORE_PACKAGES=vvv lstn scan --debug-options --config testdata/config_with_ignores.yaml
+		{
+			name: "lstn scan --debug-options --config testdata/config_with_ignores.yaml",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS":       "",
+				"LSTN_IGNORE_PACKAGES": "overrideThoseFromConfig",
+			},
+			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "config_with_ignores.yaml")},
+			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_with_ignores.yaml
+{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"exclude": [
+		110
+	],
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "zzz",
+	"ignore-packages": [
+		"overrideThoseFromConfig"
+	],
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://smtg.io",
+	"reporter": null,
+	"timeout": 1111
+}
+`),
+			stderr: "",
+			errstr: "",
+		},
 	}
 
 	for _, tc := range cases {
@@ -785,34 +889,35 @@ Global Flags:
 	}
 }
 
-func TestChildCommands2(t *testing.T) {
-	cwd, _ := os.Getwd()
+// FIXME: remove me
+// func TestChildCommands2(t *testing.T) {
+// 	cwd, _ := os.Getwd()
 
-	cases := []testCase{}
+// 	cases := []testCase{}
 
-	for _, tc := range cases {
-		tc := tc
-		t.Run(tc.name, func(t *testing.T) {
-			closer := internaltesting.EnvSetter(tc.envvar)
-			t.Cleanup(closer)
+// 	for _, tc := range cases {
+// 		tc := tc
+// 		t.Run(tc.name, func(t *testing.T) {
+// 			closer := internaltesting.EnvSetter(tc.envvar)
+// 			t.Cleanup(closer)
 
-			rootC, e := root.New(context.Background())
-			assert.Nil(t, e)
-			c := rootC.Command()
+// 			rootC, e := root.New(context.Background())
+// 			assert.Nil(t, e)
+// 			c := rootC.Command()
 
-			stdOut, stdErr, err := internaltesting.ExecuteCommand(c, tc.cmdline...)
+// 			stdOut, stdErr, err := internaltesting.ExecuteCommand(c, tc.cmdline...)
 
-			tc.stdout = strings.ReplaceAll(tc.stdout, "_CWD_", cwd)
-			tc.stderr = strings.ReplaceAll(tc.stderr, "_CWD_", cwd)
+// 			tc.stdout = strings.ReplaceAll(tc.stdout, "_CWD_", cwd)
+// 			tc.stderr = strings.ReplaceAll(tc.stderr, "_CWD_", cwd)
 
-			if tc.errstr != "" {
-				if assert.Error(t, err) {
-					tc.errstr = strings.ReplaceAll(tc.errstr, "_CWD_", cwd)
-					assert.Equal(t, tc.errstr, err.Error())
-				}
-			}
-			assert.Equal(t, tc.stdout, stdOut)
-			assert.Equal(t, tc.stderr, stdErr)
-		})
-	}
-}
+// 			if tc.errstr != "" {
+// 				if assert.Error(t, err) {
+// 					tc.errstr = strings.ReplaceAll(tc.errstr, "_CWD_", cwd)
+// 					assert.Equal(t, tc.errstr, err.Error())
+// 				}
+// 			}
+// 			assert.Equal(t, tc.stdout, stdOut)
+// 			assert.Equal(t, tc.stderr, stdErr)
+// 		})
+// 	}
+// }
