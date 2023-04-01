@@ -92,7 +92,7 @@ func New(ctx context.Context) (*cobra.Command, error) {
 	}
 
 	// Local flags will only run when this command is called directly
-	localOpts.Attach(c)
+	localOpts.Attach(c, []string{})
 
 	// Pass the options through the context
 	ctx = context.WithValue(ctx, pkgcontext.VersionKey, localOpts)

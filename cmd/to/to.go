@@ -183,7 +183,7 @@ It lists out the verdicts of all the versions of the input package name.`,
 	}
 
 	// Local flags will only run when this command is called directly
-	toOpts.Attach(toCmd)
+	toOpts.Attach(toCmd, []string{"--reporter", "--gh-owner", "--gh-repo", "--gh-pull-id", "--gh-token", "--ignore-packages"})
 
 	// Pass the options through the context
 	ctx = context.WithValue(ctx, pkgcontext.ToKey, toOpts)
