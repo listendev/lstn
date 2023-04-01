@@ -147,20 +147,8 @@ Config Flags:
 Debug Flags:
       --debug-options   output the options, then exit
 
-Filtering Flags:
-      --ignore-packages strings   list of packages to not process
-
 Registry Flags:
       --npm-registry string   set a custom NPM registry (default "https://registry.npmjs.org")
-
-Reporting Flags:
-      --gh-owner string                                           set the GitHub owner name (org|user)
-      --gh-pull-id int                                            set the GitHub pull request ID
-      --gh-repo string                                            set the GitHub repository name
-  -r, --reporter (gh-pull-check,gh-pull-comment,gh-pull-review)   set one or more reporters to use (default [])
-
-Token Flags:
-      --gh-token string   set the GitHub token
 
 Global Flags:
       --config string   config file (default is $HOME/.lstn.yaml)
