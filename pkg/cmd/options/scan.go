@@ -76,8 +76,11 @@ func NewScan() (*Scan, error) {
 
 func (o *Scan) Attach(c *cobra.Command, exclusions []string) {
 	flags.Define(c, o, "", exclusions)
+
 	// Define --exclude enum flag manually
-	c.Flags().VarP(o.exclude, "exclude", "e", `sets of dependencies to exclude (in addition to the default)`)
+	if !goneric.SliceIn(exclusions, "exclude") {
+		c.Flags().VarP(o.exclude, "exclude", "e", `sets of dependencies to exclude (in addition to the default)`)
+	}
 	flagusages.Set(c)
 }
 
