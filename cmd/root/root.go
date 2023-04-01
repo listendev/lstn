@@ -17,6 +17,7 @@ package root
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"reflect"
@@ -160,7 +161,6 @@ func New(ctx context.Context) (*Command, error) {
 							// Merge the value (string slice) coming from environment variable or config file (viper)
 							// This fallbacks to the default value when no environment variable or config file
 							value := viper.GetStringSlice(flagName)
-							actualDefaultVal := v.Interface().([]string)
 							if len(value) > 0 {
 								res := []string{}
 								for _, elem := range value {
@@ -168,7 +168,15 @@ func New(ctx context.Context) (*Command, error) {
 								}
 								v.Set(reflect.ValueOf(goneric.SliceDedupe(res)))
 							}
-							// Re-set the field when the flag slice value has more elements than the default slice value
+							// Re-set the field when the flag slice value is different than the default slice value
+							actualDefaultVal := []string{}
+							if defaultVal != "" && defaultVal != "[]" {
+								if err := json.Unmarshal([]byte(defaultVal), &actualDefaultVal); err != nil {
+									flagErr = err
+
+									return
+								}
+							}
 							if !goneric.CompareSliceSet(flagValue, actualDefaultVal) {
 								v.Set(reflect.ValueOf(flagValue))
 							}
