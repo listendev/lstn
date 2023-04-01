@@ -191,7 +191,7 @@ The verdicts it returns are listed by the name of each package and its specified
 	// scanCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Local flags will only run when this command is called directly
-	scanOpts.Attach(scanCmd)
+	scanOpts.Attach(scanCmd, []string{})
 
 	// Pass the options through the context
 	ctx = context.WithValue(ctx, pkgcontext.ScanKey, scanOpts)

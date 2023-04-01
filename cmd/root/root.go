@@ -275,7 +275,7 @@ func New(ctx context.Context) (*Command, error) {
 	}
 
 	// Cobra also supports local flags, which will only run when this action is called directly
-	rootOpts.Attach(rootCmd)
+	rootOpts.Attach(rootCmd, []string{})
 
 	// Tell viper to populate variables from the configuration file
 	err := viper.BindPFlags(rootCmd.Flags())
