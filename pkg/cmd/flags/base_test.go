@@ -189,7 +189,7 @@ func (suite *FlagsBaseSuite) TestDefine() {
 	for _, tc := range cases {
 		suite.T().Run(tc.desc, func(t *testing.T) {
 			c := &cobra.Command{}
-			Define(c, tc.input, "")
+			Define(c, tc.input, "", []string{})
 			f := c.Flags()
 
 			assert.NotNil(t, f.Lookup("loglevel"))

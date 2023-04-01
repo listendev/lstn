@@ -32,7 +32,7 @@ import (
 	"golang.org/x/exp/maps"
 )
 
-var _ cmd.Options = (*Scan)(nil)
+var _ cmd.CommandOptions = (*Scan)(nil)
 
 type Scan struct {
 	exclude *enumflag.EnumFlagValue[npm.DependencyType]
@@ -74,8 +74,8 @@ func NewScan() (*Scan, error) {
 	return o, nil
 }
 
-func (o *Scan) Attach(c *cobra.Command) {
-	flags.Define(c, o, "")
+func (o *Scan) Attach(c *cobra.Command, exclusions []string) {
+	flags.Define(c, o, "", exclusions)
 	// Define --exclude enum flag manually
 	c.Flags().VarP(o.exclude, "exclude", "e", `sets of dependencies to exclude (in addition to the default)`)
 	flagusages.Set(c)

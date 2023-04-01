@@ -26,7 +26,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var _ cmd.Options = (*Version)(nil)
+var _ cmd.CommandOptions = (*Version)(nil)
 
 type Version struct {
 	Verbosity        int  `name:"verbosity" shorthand:"v" desc:"increment the verbosity level" type:"count" validate:"gte=0" json:"verbosity"`
@@ -52,8 +52,8 @@ func (v *Version) Transform(ctx context.Context) error {
 	return flags.Transform(ctx, v)
 }
 
-func (v *Version) Attach(c *cobra.Command) {
-	flags.Define(c, v, "")
+func (v *Version) Attach(c *cobra.Command, exclusions []string) {
+	flags.Define(c, v, "", exclusions)
 	flagusages.Set(c)
 }
 
