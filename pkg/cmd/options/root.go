@@ -26,7 +26,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var _ cmd.Options = (*Root)(nil)
+var _ cmd.CommandOptions = (*Root)(nil)
 
 type Root struct {
 	flags.ConfigFlags
@@ -43,8 +43,8 @@ func NewRoot() (*Root, error) {
 	return o, nil
 }
 
-func (o *Root) Attach(c *cobra.Command) {
-	flags.Define(c, o, "")
+func (o *Root) Attach(c *cobra.Command, exclusions []string) {
+	flags.Define(c, o, "", exclusions)
 	flagusages.Set(c)
 }
 

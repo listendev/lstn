@@ -98,17 +98,19 @@ func (o *ConfigFlags) SetDefaults() {
 	}
 }
 
-func (o *ConfigFlags) Define(c *cobra.Command) {
-	// Create the enum flag value for --reporter
-	enumValues := goneric.MapToSlice(func(t cmd.ReportType, v []string) string {
-		return v[0]
-	}, cmd.ReporterTypeIDs)
-	sort.Strings(enumValues)
-	o.Reporter.reporter = enumflag.NewSlice(&o.Reporter.Types, `(`+strings.Join(enumValues, ",")+`)`, cmd.ReporterTypeIDs, enumflag.EnumCaseInsensitive)
+func (o *ConfigFlags) Define(c *cobra.Command, exclusions []string) {
+	if !goneric.SliceIn(exclusions, "reporter") {
+		// Create the enum flag value for --reporter
+		enumValues := goneric.MapToSlice(func(t cmd.ReportType, v []string) string {
+			return v[0]
+		}, cmd.ReporterTypeIDs)
+		sort.Strings(enumValues)
+		o.Reporter.reporter = enumflag.NewSlice(&o.Reporter.Types, `(`+strings.Join(enumValues, ",")+`)`, cmd.ReporterTypeIDs, enumflag.EnumCaseInsensitive)
 
-	// Manually define the --reporter enum flag
-	c.Flags().VarP(o.Reporter.reporter, "reporter", "r", `set one or more reporters to use`)
-	_ = c.Flags().SetAnnotation("reporter", flagusages.FlagGroupAnnotation, []string{"Reporting"})
+		// Manually define the --reporter enum flag
+		c.Flags().VarP(o.Reporter.reporter, "reporter", "r", `set one or more reporters to use`)
+		_ = c.Flags().SetAnnotation("reporter", flagusages.FlagGroupAnnotation, []string{"Reporting"})
+	}
 }
 
 func (o *ConfigFlags) Validate() []error {

@@ -20,8 +20,14 @@ import (
 	"fmt"
 
 	"github.com/MakeNowJust/heredoc"
+	"github.com/spf13/cobra"
 	"github.com/thediveo/enumflag/v2"
 )
+
+type CommandOptions interface {
+	Attach(*cobra.Command, []string)
+	Options
+}
 
 type Options interface {
 	Validate() []error

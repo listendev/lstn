@@ -23,10 +23,12 @@ import (
 	"strings"
 	"unsafe"
 
+	"github.com/XANi/goneric"
 	"github.com/listendev/lstn/pkg/cmd/flagusages"
 	t "github.com/listendev/lstn/pkg/transform"
 	v "github.com/listendev/lstn/pkg/validate"
 	"github.com/spf13/cobra"
+	"golang.org/x/exp/maps"
 )
 
 // EnvSeparator is the separator between the env variable prefix and the global flag name.
@@ -71,7 +73,10 @@ func AsJSON(o interface{}) string {
 	return string(data)
 }
 
-func Define(c *cobra.Command, o interface{}, startingGroup string) {
+func Define(c *cobra.Command, o interface{}, startingGroup string, exclusions []string) {
+	ignore := goneric.SliceMapSetFunc(func(e string) string {
+		return strings.TrimPrefix(e, "--")
+	}, exclusions)
 	val := getValue(o)
 
 	// Check if the current value has a ConfigFlags field
@@ -79,7 +84,10 @@ func Define(c *cobra.Command, o interface{}, startingGroup string) {
 	if fld.IsValid() {
 		// Call o.ConfigFlags.Define(c)
 		if fldPtr := getValuePtr(o); fldPtr.IsValid() {
-			fldPtr.MethodByName("Define").Call([]reflect.Value{getValuePtr(c)})
+			fldPtr.MethodByName("Define").Call([]reflect.Value{
+				getValuePtr(c),
+				getValue(maps.Keys(ignore)),
+			})
 		}
 	}
 
@@ -88,6 +96,11 @@ func Define(c *cobra.Command, o interface{}, startingGroup string) {
 		f := val.Type().Field(i)
 		short := f.Tag.Get("shorthand")
 		tag := f.Tag.Get("flag")
+		// Do not define flags which tag is in the ignore list
+		if _, ok := ignore[tag]; ok {
+			continue
+		}
+
 		descr := f.Tag.Get("desc")
 		group := f.Tag.Get("flagset")
 		if startingGroup != "" {
@@ -98,7 +111,7 @@ func Define(c *cobra.Command, o interface{}, startingGroup string) {
 		switch f.Type.Kind() {
 		case reflect.Struct:
 			// NOTE > field.Interface() doesn't work because it actually returns a copy of the object wrapping the interface
-			Define(c, field.Addr().Interface(), group)
+			Define(c, field.Addr().Interface(), group, exclusions)
 
 			continue
 

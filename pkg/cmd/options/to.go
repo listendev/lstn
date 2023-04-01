@@ -26,7 +26,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var _ cmd.Options = (*To)(nil)
+var _ cmd.CommandOptions = (*To)(nil)
 
 type To struct {
 	flags.DebugFlags `flagset:"Debug"`
@@ -44,8 +44,8 @@ func NewTo() (*To, error) {
 	return o, nil
 }
 
-func (o *To) Attach(c *cobra.Command) {
-	flags.Define(c, o, "")
+func (o *To) Attach(c *cobra.Command, exclusions []string) {
+	flags.Define(c, o, "", exclusions)
 	flagusages.Set(c)
 }
 

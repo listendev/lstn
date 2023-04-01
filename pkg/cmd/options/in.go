@@ -26,7 +26,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var _ cmd.Options = (*In)(nil)
+var _ cmd.CommandOptions = (*In)(nil)
 
 type In struct {
 	flags.JSONFlags
@@ -44,8 +44,8 @@ func NewIn() (*In, error) {
 	return o, nil
 }
 
-func (o *In) Attach(c *cobra.Command) {
-	flags.Define(c, o, "")
+func (o *In) Attach(c *cobra.Command, exclusions []string) {
+	flags.Define(c, o, "", exclusions)
 	flagusages.Set(c)
 }
 
