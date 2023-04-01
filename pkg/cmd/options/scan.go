@@ -75,7 +75,6 @@ func NewScan() (*Scan, error) {
 }
 
 func (o *Scan) Attach(c *cobra.Command) {
-	o.ConfigFlags.Define(c)
 	flags.Define(c, o, "")
 	// Define --exclude enum flag manually
 	c.Flags().VarP(o.exclude, "exclude", "e", `sets of dependencies to exclude (in addition to the default)`)

@@ -74,6 +74,15 @@ func AsJSON(o interface{}) string {
 func Define(c *cobra.Command, o interface{}, startingGroup string) {
 	val := getValue(o)
 
+	// Check if the current value has a ConfigFlags field
+	fld := getValue(o).FieldByName("ConfigFlags")
+	if fld.IsValid() {
+		// Call o.ConfigFlags.Define(c)
+		if fldPtr := getValuePtr(o); fldPtr.IsValid() {
+			fldPtr.MethodByName("Define").Call([]reflect.Value{getValuePtr(c)})
+		}
+	}
+
 	for i := 0; i < val.NumField(); i++ {
 		field := val.Field(i)
 		f := val.Type().Field(i)
@@ -250,4 +259,18 @@ func getValue(o interface{}) reflect.Value {
 	}
 
 	return val
+}
+
+func getValuePtr(o interface{}) reflect.Value {
+	val := reflect.ValueOf(o)
+	// When we get a pointer, we want to get the value pointed to.
+	// Otherwise, we need to get a pointer to the value we got.
+	if val.Type().Kind() == reflect.Ptr {
+		return val
+	}
+	// ptr := reflect.New(reflect.TypeOf(o))
+	// temp := ptr.Elem()
+	// temp.Set(val)
+
+	return reflect.New(reflect.TypeOf(o))
 }

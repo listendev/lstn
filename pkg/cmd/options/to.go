@@ -45,7 +45,6 @@ func NewTo() (*To, error) {
 }
 
 func (o *To) Attach(c *cobra.Command) {
-	o.ConfigFlags.Define(c)
 	flags.Define(c, o, "")
 	flagusages.Set(c)
 }
