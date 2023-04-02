@@ -42,7 +42,7 @@ var (
 
 func New(ctx context.Context) (*cobra.Command, error) {
 	var scanCmd = &cobra.Command{
-		Use:                   "scan <path>",
+		Use:                   "scan [path]",
 		GroupID:               groups.Core.ID,
 		DisableFlagsInUseLine: true,
 		Short:                 "Inspect the verdicts for your direct dependencies",
