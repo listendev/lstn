@@ -51,11 +51,123 @@ func TestChildCommands(t *testing.T) {
 		},
 		// lstn to
 		{
-			name:    "lstn to",
+			name: "lstn to",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
 			cmdline: []string{"to"},
 			stdout:  "",
 			stderr:  "Error: requires at least 1 arg (package name)\n",
 			errstr:  "requires at least 1 arg (package name)",
+		},
+		// lstn to --help
+		{
+			name:    "lstn to --help",
+			cmdline: []string{"to", "--help"},
+			stdout:  heredoc.Doc(`Query listen.dev for the verdicts of a package.
+
+Using this command, you can audit a single package version or all the versions of a package and obtain their verdicts.
+
+Specifying the package name is mandatory.
+
+It lists out the verdicts of all the versions of the input package name.
+
+Usage:
+  lstn to <name> [[version] [shasum] | [version constraint]]
+
+Examples:
+  # Get the verdicts for all the chalk versions that listen.dev owns
+  lstn to chalk
+  lstn to debug 4.3.4
+  lstn to react 18.0.0 b468736d1f4a5891f38585ba8e8fb29f91c3cb96
+
+  # Get the verdicts for all the existing chalk versions
+  lstn to chalk "*"
+  # Get the verdicts for nock versions >= 13.2.0 and < 13.3.0
+  lstn to nock "~13.2.x"
+  # Get the verdicts for tap versions >= 16.3.0 and < 16.4.0
+  lstn to tap "^16.3.0"
+  # Get the verdicts for prettier versions >= 2.7.0 <= 3.0.0
+  lstn to prettier ">=2.7.0 <=3.0.0"
+
+Flags:
+  -q, --jq string   filter the output using a jq expression
+      --json        output the verdicts (if any) in JSON form
+
+Config Flags:
+      --endpoint string   the listen.dev endpoint emitting the verdicts (default "https://npm.listen.dev")
+      --loglevel string   set the logging level (default "info")
+      --timeout int       set the timeout, in seconds (default 60)
+
+Debug Flags:
+      --debug-options   output the options, then exit
+
+Registry Flags:
+      --npm-registry string   set a custom NPM registry (default "https://registry.npmjs.org")
+
+Global Flags:
+      --config string   config file (default is $HOME/.lstn.yaml)
+`),
+			stderr:  "",
+			errstr:  "",
+		},
+		// lstn scan --help
+		{
+			name:    "lstn scan --help",
+			cmdline: []string{"scan", "--help"},
+			stdout:  heredoc.Doc(`Query listen.dev for the verdicts of the dependencies in your project.
+
+Using this command, you can audit the first-level dependencies configured for a project and obtain their verdicts.
+This requires a package.json file to fetch the package name and version of the project dependencies.
+
+The verdicts it returns are listed by the name of each package and its specified version.
+
+Usage:
+  lstn scan [path]
+
+Examples:
+  lstn scan
+  lstn scan .
+  lstn scan /we/snitch
+  lstn scan /we/snitch -e peer
+  lstn scan /we/snitch -e dev,peer
+  lstn scan /we/snitch -e dev -e peer
+  lstn scan sub/dir
+
+Flags:
+  -e, --exclude (dep,dev,optional,peer)   sets of dependencies to exclude (in addition to the default) (default [bundle])
+  -q, --jq string                         filter the output using a jq expression
+      --json                              output the verdicts (if any) in JSON form
+
+Config Flags:
+      --endpoint string   the listen.dev endpoint emitting the verdicts (default "https://npm.listen.dev")
+      --loglevel string   set the logging level (default "info")
+      --timeout int       set the timeout, in seconds (default 60)
+
+Debug Flags:
+      --debug-options   output the options, then exit
+
+Filtering Flags:
+      --ignore-packages strings   list of packages to not process
+
+Registry Flags:
+      --npm-registry string   set a custom NPM registry (default "https://registry.npmjs.org")
+
+Reporting Flags:
+      --gh-owner string                                           set the GitHub owner name (org|user)
+      --gh-pull-id int                                            set the GitHub pull request ID
+      --gh-repo string                                            set the GitHub repository name
+  -r, --reporter (gh-pull-check,gh-pull-comment,gh-pull-review)   set one or more reporters to use (default [])
+
+Token Flags:
+      --gh-token string   set the GitHub token
+
+Global Flags:
+      --config string   config file (default is $HOME/.lstn.yaml)
+`),
+			stderr:  "",
+			errstr:  "",
 		},
 		// lstn to --debug-options
 		{
@@ -113,11 +225,11 @@ func TestChildCommands(t *testing.T) {
 		},
 		// lstn in --help
 		{
+			name: "lstn in --help",
 			envvar: map[string]string{
 				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
 				"GITHUB_ACTIONS": "",
 			},
-			name:    "lstn in --help",
 			cmdline: []string{"in", "--help"},
 			stdout: heredoc.Doc(`Query listen.dev for the verdicts of all the dependencies in your project.
 
@@ -127,7 +239,7 @@ This requires a package.json file to fetch the package name and version of the p
 The verdicts it returns are listed by the name of each package and its specified version.
 
 Usage:
-  lstn in <path>
+  lstn in [path]
 
 Examples:
   lstn in
@@ -158,11 +270,11 @@ Global Flags:
 		},
 		// lstn in --debug-options
 		{
+			name: "lstn in --debug-options",
 			envvar: map[string]string{
 				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
 				"GITHUB_ACTIONS": "",
 			},
-			name:    "lstn in --debug-options",
 			cmdline: []string{"in", "--debug-options"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
@@ -241,11 +353,11 @@ Global Flags:
 		},
 		// lstn scan -e dev,peer --debug-options
 		{
+			name: "lstn scan -e dev,peer --debug-options",
 			envvar: map[string]string{
 				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
 				"GITHUB_ACTIONS": "",
 			},
-			name:    "lstn scan -e dev,peer --debug-options",
 			cmdline: []string{"scan", "-e", "dev,peer", "--debug-options"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
@@ -428,11 +540,11 @@ Global Flags:
 		},
 		// lstn scan --debug-options --config testdata/config_with_reporters.yaml
 		{
+			name: "lstn scan --debug-options --config testdata/config_with_reporters.yaml",
 			envvar: map[string]string{
 				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
 				"GITHUB_ACTIONS": "",
 			},
-			name:    "lstn scan --debug-options --config testdata/config_with_reporters.yaml",
 			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "config_with_reporters.yaml")},
 			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_with_reporters.yaml
 {

@@ -38,7 +38,7 @@ var (
 
 func New(ctx context.Context) (*cobra.Command, error) {
 	var inCmd = &cobra.Command{
-		Use:                   "in <path>",
+		Use:                   "in [path]",
 		GroupID:               groups.Core.ID,
 		DisableFlagsInUseLine: true,
 		Short:                 "Inspect the verdicts for your dependencies tree",

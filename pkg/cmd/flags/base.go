@@ -276,14 +276,9 @@ func getValue(o interface{}) reflect.Value {
 
 func getValuePtr(o interface{}) reflect.Value {
 	val := reflect.ValueOf(o)
-	// When we get a pointer, we want to get the value pointed to.
-	// Otherwise, we need to get a pointer to the value we got.
 	if val.Type().Kind() == reflect.Ptr {
 		return val
 	}
-	// ptr := reflect.New(reflect.TypeOf(o))
-	// temp := ptr.Elem()
-	// temp.Set(val)
 
 	return reflect.New(reflect.TypeOf(o))
 }
