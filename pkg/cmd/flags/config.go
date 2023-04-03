@@ -50,15 +50,21 @@ type GitHub struct {
 	Pull
 }
 
-type Reporter struct {
+// NOTE > Struct can't have the same name of a flag
+type Reporting struct {
 	reporter *enumflag.EnumFlagValue[cmd.ReportType]
 
-	Types []cmd.ReportType `json:"reporter" flag:"reporter"`
+	Types []cmd.ReportType `json:"reporter" flag:"reporter" transform:"unique"`
 	GitHub
 }
 
 type Ignore struct {
-	Packages []string `name:"ignore packages" flag:"ignore-packages" desc:"list of packages to not process" json:"ignore-packages" flagset:"Filtering"`
+	Packages []string `name:"ignore packages" flag:"ignore-packages" desc:"list of packages to not process" transform:"unique" default:"[]" json:"ignore-packages"`
+	// Types []string `name:"ignore dependency types" flag:"ignore-types" desc:"list of dependencies types to ignore" transform:"unique" json:"ignore-types"`
+}
+
+type Filters struct {
+	Ignore `flagset:"Filtering"`
 }
 
 type ConfigFlags struct {
@@ -67,8 +73,8 @@ type ConfigFlags struct {
 	Endpoint string `default:"https://npm.listen.dev" flag:"endpoint" name:"endpoint" desc:"the listen.dev endpoint emitting the verdicts" validate:"url,endpoint" transform:"tsuffix=/" flagset:"Config" json:"endpoint"`
 	Token
 	Registry
-	Reporter
-	Ignore
+	Reporting
+	Filters
 }
 
 func NewConfigFlags() (*ConfigFlags, error) {
@@ -86,14 +92,14 @@ func (o *ConfigFlags) SetDefaults() {
 	env, err := ci.NewInfo()
 	if err == nil && env != nil {
 		// TODO: actually check (env.IsGitHubAction() or env.Type() == env.GitHubAction) that CI is GitHub Actions
-		if defaults.CanUpdate(o.Reporter.GitHub.Owner) {
-			o.Reporter.GitHub.Owner = env.Owner
+		if defaults.CanUpdate(o.Reporting.GitHub.Owner) {
+			o.Reporting.GitHub.Owner = env.Owner
 		}
-		if defaults.CanUpdate(o.Reporter.GitHub.Repo) {
-			o.Reporter.GitHub.Repo = env.Repo
+		if defaults.CanUpdate(o.Reporting.GitHub.Repo) {
+			o.Reporting.GitHub.Repo = env.Repo
 		}
-		if defaults.CanUpdate(o.Reporter.GitHub.Pull.ID) && env.IsPullRequest() {
-			o.Reporter.GitHub.Pull.ID = env.Num
+		if defaults.CanUpdate(o.Reporting.GitHub.Pull.ID) && env.IsPullRequest() {
+			o.Reporting.GitHub.Pull.ID = env.Num
 		}
 	}
 }
@@ -105,10 +111,10 @@ func (o *ConfigFlags) Define(c *cobra.Command, exclusions []string) {
 			return v[0]
 		}, cmd.ReporterTypeIDs)
 		sort.Strings(enumValues)
-		o.Reporter.reporter = enumflag.NewSlice(&o.Reporter.Types, `(`+strings.Join(enumValues, ",")+`)`, cmd.ReporterTypeIDs, enumflag.EnumCaseInsensitive)
+		o.Reporting.reporter = enumflag.NewSlice(&o.Reporting.Types, `(`+strings.Join(enumValues, ",")+`)`, cmd.ReporterTypeIDs, enumflag.EnumCaseInsensitive)
 
 		// Manually define the --reporter enum flag
-		c.Flags().VarP(o.Reporter.reporter, "reporter", "r", `set one or more reporters to use`)
+		c.Flags().VarP(o.Reporting.reporter, "reporter", "r", `set one or more reporters to use`)
 		_ = c.Flags().SetAnnotation("reporter", flagusages.FlagGroupAnnotation, []string{"Reporting"})
 	}
 }

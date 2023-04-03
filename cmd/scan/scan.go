@@ -143,7 +143,7 @@ The verdicts it returns are listed by the name of each package and its specified
 			}
 
 			cs := io.ColorScheme()
-			for _, r := range scanOpts.Reporter.Types {
+			for _, r := range scanOpts.Reporting.Types {
 				rString := cs.Gray(fmt.Sprintf("%q", r.String()))
 				c.Printf("Reporting using the %s reporter...\n", rString)
 

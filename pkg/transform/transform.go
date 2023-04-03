@@ -20,13 +20,12 @@ import (
 	"reflect"
 
 	"github.com/XANi/goneric"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/go-playground/mold/v4"
 	"github.com/go-playground/mold/v4/modifiers"
 	"github.com/listendev/lstn/pkg/cmd"
 )
 
-// Singleton it the transformers singleton instance.
+// Singleton is the mold.Transformer singleton instance.
 var Singleton *mold.Transformer
 
 func init() {
@@ -38,7 +37,7 @@ func init() {
 			unique := fl.Field().Interface()
 			switch fl.Field().Type().Elem().String() {
 			case "string":
-				spew.Dump("SLICE STRINGS")
+				unique = goneric.SliceDedupe(unique.([]string))
 			case "cmd.ReportType":
 				intermediate := []string{}
 				for _, i := range unique.([]cmd.ReportType) {
