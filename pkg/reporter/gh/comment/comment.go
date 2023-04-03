@@ -114,9 +114,9 @@ func (r *rep) Run(res listen.Response) error {
 		return err
 	}
 
-	owner := r.opts.Reporter.GitHub.Owner
-	repo := r.opts.Reporter.GitHub.Repo
-	id := r.opts.Reporter.GitHub.Pull.ID
+	owner := r.opts.Reporting.GitHub.Owner
+	repo := r.opts.Reporting.GitHub.Repo
+	id := r.opts.Reporting.GitHub.Pull.ID
 
 	err := r.stickyComment(owner, repo, id, &buf)
 	if err != nil {
@@ -129,7 +129,7 @@ func (r *rep) Run(res listen.Response) error {
 // CanRun tells whether this reporter is being executed on a GitHub pull request
 // (in which case it returns a true value) or not.
 func (r *rep) CanRun() bool {
-	ghOpts := r.opts.Reporter.GitHub
+	ghOpts := r.opts.Reporting.GitHub
 
 	return ghOpts.Owner != "" && ghOpts.Repo != "" && ghOpts.Pull.ID != 0
 }
