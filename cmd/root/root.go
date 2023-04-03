@@ -278,12 +278,6 @@ func New(ctx context.Context) (*Command, error) {
 	// Cobra also supports local flags, which will only run when this action is called directly
 	rootOpts.Attach(rootCmd, []string{})
 
-	// Tell viper to bind...
-	err := viper.BindPFlags(rootCmd.Flags()) // FIXME: bind only config flags as to avoid having to filter non-config flags above?
-	if err != nil {
-		return nil, err
-	}
-
 	// Pass the configuration options through the context
 	ctx = context.WithValue(ctx, pkgcontext.ConfigKey, &rootOpts.ConfigFlags)
 
@@ -424,10 +418,6 @@ func initConfig() {
 		viper.SetConfigType("yaml")
 		viper.SetConfigName(".lstn")
 	}
-
-	viper.SetEnvPrefix(flags.EnvPrefix)
-	viper.SetEnvKeyReplacer(flags.EnvReplacer)
-	viper.AutomaticEnv() // Read in environment variables that match
 }
 
 func cleanConfig() {
