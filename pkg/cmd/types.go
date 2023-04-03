@@ -128,3 +128,16 @@ func ParseReportType(s string) (ReportType, error) {
 
 	return AllReport, fmt.Errorf(`a report type with ID "%s" doesn't exist`, s)
 }
+
+func ParseReportTypes(in []string) ([]ReportType, error) {
+	res := []ReportType{}
+	for _, i := range in {
+		val, err := ParseReportType(i)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, val)
+	}
+
+	return res, nil
+}
