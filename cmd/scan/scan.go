@@ -21,7 +21,6 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/XANi/goneric"
 	"github.com/cli/cli/pkg/iostreams"
 	"github.com/listendev/lstn/internal/project"
 	"github.com/listendev/lstn/pkg/cmd"
@@ -97,18 +96,14 @@ The verdicts it returns are listed by the name of each package and its specified
 				return err
 			}
 
-			// Exclude dependencies sets
-			dependenciesTypes, _ := goneric.SliceDiff(npm.AllDependencyTypes, scanOpts.Excludes)
+			// Exclude dependencies
+			packageJSON.FilterOutByTypes(scanOpts.Excludes...) // TODO: scanOpts.ConfigFlags.Ignore.Deps
+			packageJSON.FilterOutByNames(scanOpts.ConfigFlags.Ignore.Packages...)
 
-			// We don't want to fallback to process all the dependencies sets by default when the user excluded all of them
-			if len(dependenciesTypes) == 0 {
-				return fmt.Errorf("no dependencies sets to process")
-			}
-
-			deps := packageJSON.Deps(ctx, npm.DefaultVersionResolutionStrategy, dependenciesTypes...)
-
+			// Retrieve dependencies to process
+			deps := packageJSON.Deps(ctx, npm.DefaultVersionResolutionStrategy)
 			if len(deps) == 0 {
-				return fmt.Errorf("there are no dependencies to process for the currently selected sets of dependencies")
+				return fmt.Errorf("there are no dependencies to process")
 			}
 
 			// Process one dependency set at once
