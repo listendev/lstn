@@ -188,7 +188,7 @@ func New(ctx context.Context) (*Command, error) {
 							// Set the value coming from environment variable or config file (viper)
 							value := viper.GetString(flagName)
 							if value != "[]" && value != defaultVal {
-								reportTypeErr := enumFlag.Set(value)
+								reportTypeErr := enumFlag.Set(strings.TrimSuffix(strings.TrimPrefix(value, "["), "]"))
 								if reportTypeErr != nil {
 									flagErr = fmt.Errorf("%s %s; got %s", flagName, reportTypeErr.Error(), value)
 
