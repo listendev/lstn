@@ -65,7 +65,7 @@ func TestChildCommands(t *testing.T) {
 		{
 			name:    "lstn to --help",
 			cmdline: []string{"to", "--help"},
-			stdout:  heredoc.Doc(`Query listen.dev for the verdicts of a package.
+			stdout: heredoc.Doc(`Query listen.dev for the verdicts of a package.
 
 Using this command, you can audit a single package version or all the versions of a package and obtain their verdicts.
 
@@ -109,14 +109,14 @@ Registry Flags:
 Global Flags:
       --config string   config file (default is $HOME/.lstn.yaml)
 `),
-			stderr:  "",
-			errstr:  "",
+			stderr: "",
+			errstr: "",
 		},
 		// lstn scan --help
 		{
 			name:    "lstn scan --help",
 			cmdline: []string{"scan", "--help"},
-			stdout:  heredoc.Doc(`Query listen.dev for the verdicts of the dependencies in your project.
+			stdout: heredoc.Doc(`Query listen.dev for the verdicts of the dependencies in your project.
 
 Using this command, you can audit the first-level dependencies configured for a project and obtain their verdicts.
 This requires a package.json file to fetch the package name and version of the project dependencies.
@@ -166,8 +166,8 @@ Token Flags:
 Global Flags:
       --config string   config file (default is $HOME/.lstn.yaml)
 `),
-			stderr:  "",
-			errstr:  "",
+			stderr: "",
+			errstr: "",
 		},
 		// lstn to --debug-options
 		{
@@ -189,7 +189,7 @@ Global Flags:
 	"json": false,
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
-	"reporter": null,
+	"reporter": [],
 	"timeout": 60
 }
 `),
@@ -216,7 +216,7 @@ Global Flags:
 	"json": false,
 	"loglevel": "info",
 	"npm-registry": "https://some.io",
-	"reporter": null,
+	"reporter": [],
 	"timeout": 2222
 }
 `),
@@ -288,7 +288,7 @@ Global Flags:
 	"json": false,
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
-	"reporter": null,
+	"reporter": [],
 	"timeout": 60
 }
 `),
@@ -316,7 +316,7 @@ Global Flags:
 	"json": false,
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
-	"reporter": null,
+	"reporter": [],
 	"timeout": 8888
 }
 `),
@@ -344,7 +344,7 @@ Global Flags:
 	"json": false,
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
-	"reporter": null,
+	"reporter": [],
 	"timeout": 60
 }
 `),
@@ -376,7 +376,7 @@ Global Flags:
 	"json": false,
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
-	"reporter": null,
+	"reporter": [],
 	"timeout": 60
 }
 `),
@@ -459,7 +459,9 @@ Global Flags:
 			errstr: "",
 		},
 		// LSTN_REPORTER=gh-pull-check lstn scan --debug-options --gh-token xxx -r gh-pull-review --gh-owner leodido --gh-repo go-urn --gh-pull-id 111
-		// FIXME: for coherence flags MUST always override so -r here should override not merge // "reporter": [33]
+		// FIXME: for coherence flags MUST always override so -r here should override not merge
+		// FIXME: we would like to have `"reporter": [33]` here
+		// FIXME: the problem is that the enum setter always merges after the first set invocation
 		{
 			name: "LSTN_REPORTER=gh-pull-check lstn scan --debug-options --gh-token xxx -r gh-pull-review --gh-owner leodido --gh-repo go-urn --gh-pull-id 111",
 			envvar: map[string]string{
@@ -531,7 +533,7 @@ Global Flags:
 	"json": false,
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.com",
-	"reporter": null,
+	"reporter": [],
 	"timeout": 60
 }
 `),
@@ -571,7 +573,6 @@ Global Flags:
 			stderr: "",
 			errstr: "",
 		},
-		// FIXME: Add LSTN_REPORTER=gh-pull-check and see if it merges with the one in the configuration file
 		// LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/config_with_reporters.yaml
 		{
 			name: "LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/config_with_reporters.yaml",
@@ -609,6 +610,77 @@ Global Flags:
 			stderr: "",
 			errstr: "",
 		},
+		// LSTN_REPORTER=gh-pull-check LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/config_with_reporters.yaml
+		{
+			name: "LSTN_REPORTER=gh-pull-check LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/config_with_reporters.yaml",
+			envvar: map[string]string{
+				"LSTN_GH_PULL_ID": "887755",
+				"LSTN_GH_REPO":    "go-conventionalcommits",
+				"LSTN_ENDPOINT":   "https://npm-stage.listen.dev",
+				"LSTN_TIMEOUT":    "33331",
+				"LSTN_REPORTER":   "gh-pull-check",
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
+			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "config_with_reporters.yaml")},
+			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_with_reporters.yaml
+{
+	"debug-options": true,
+	"endpoint": "https://npm-stage.listen.dev",
+	"exclude": [
+		110
+	],
+	"gh-owner": "leodido",
+	"gh-pull-id": 887755,
+	"gh-repo": "go-conventionalcommits",
+	"gh-token": "zzz",
+	"ignore-packages": null,
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://some.io",
+	"reporter": [
+		44
+	],
+	"timeout": 33331
+}
+`),
+			stderr: "",
+			errstr: "",
+		},
+				// lstn scan --debug-options --reporter gh-pull-comment,gh-pull-comment  -r gh-pull-check,gh-pull-comment
+				{
+					name: "lstn scan --debug-options --reporter gh-pull-comment,gh-pull-comment -r gh-pull-check,gh-pull-comment",
+					envvar: map[string]string{
+						// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+						"GITHUB_ACTIONS": "",
+					},
+					cmdline: []string{"scan", "--debug-options", "--reporter", "gh-pull-comment,gh-pull-comment", "-r", "gh-pull-check,gh-pull-comment"},
+					stdout: heredoc.Doc(`{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"exclude": [
+		110
+	],
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "",
+	"ignore-packages": null,
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://registry.npmjs.org",
+	"reporter": [
+		22,
+		44
+	],
+	"timeout": 60
+}
+`),
+					stderr: "Running without a configuration file\n",
+					errstr: "",
+				},
 		// lstn version --debug-options
 		{
 			name:    "lstn version --debug-options",
@@ -684,7 +756,7 @@ Global Flags:
 	"json": false,
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
-	"reporter": null,
+	"reporter": [],
 	"timeout": 60
 }
 `),
@@ -718,7 +790,7 @@ Global Flags:
 	"json": false,
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
-	"reporter": null,
+	"reporter": [],
 	"timeout": 60
 }
 `),
@@ -752,7 +824,7 @@ Global Flags:
 	"json": false,
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
-	"reporter": null,
+	"reporter": [],
 	"timeout": 60
 }
 `),
@@ -785,7 +857,7 @@ Global Flags:
 	"json": false,
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
-	"reporter": null,
+	"reporter": [],
 	"timeout": 60
 }
 `),
@@ -818,7 +890,7 @@ Global Flags:
 	"json": false,
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
-	"reporter": null,
+	"reporter": [],
 	"timeout": 60
 }
 `),
@@ -852,7 +924,7 @@ Global Flags:
 	"json": false,
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
-	"reporter": null,
+	"reporter": [],
 	"timeout": 60
 }
 `),
@@ -885,7 +957,7 @@ Global Flags:
 	"json": false,
 	"loglevel": "info",
 	"npm-registry": "https://smtg.io",
-	"reporter": null,
+	"reporter": [],
 	"timeout": 1111
 }
 `),
@@ -919,7 +991,7 @@ Global Flags:
 	"json": false,
 	"loglevel": "info",
 	"npm-registry": "https://smtg.io",
-	"reporter": null,
+	"reporter": [],
 	"timeout": 1111
 }
 `),
@@ -953,12 +1025,25 @@ Global Flags:
 	"json": false,
 	"loglevel": "info",
 	"npm-registry": "https://smtg.io",
-	"reporter": null,
+	"reporter": [],
 	"timeout": 1111
 }
 `),
 			stderr: "",
 			errstr: "",
+		},
+		// LSTN_REPORTER=wrong lstn scan --debug-options
+		{
+			name: "LSTN_REPORTER=wrong lstn scan --debug-options",
+			envvar: map[string]string{
+				"LSTN_REPORTER": "wrong",
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
+			cmdline: []string{"scan", "--debug-options"},
+			stdout:  "",
+			stderr:  "Running without a configuration file\nError: reporter must be 'gh-pull-check', 'gh-pull-comment', 'gh-pull-review'; got wrong\n",
+			errstr:  "reporter must be 'gh-pull-check', 'gh-pull-comment', 'gh-pull-review'; got wrong",
 		},
 	}
 
@@ -993,7 +1078,9 @@ Global Flags:
 // func TestChildCommands2(t *testing.T) {
 // 	cwd, _ := os.Getwd()
 
-// 	cases := []testCase{}
+// 	cases := []testCase{
+
+// 	}
 
 // 	for _, tc := range cases {
 // 		tc := tc
