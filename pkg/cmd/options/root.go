@@ -18,12 +18,15 @@ package options
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/creasty/defaults"
 	"github.com/listendev/lstn/pkg/cmd"
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	"github.com/listendev/lstn/pkg/cmd/flagusages"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
 var _ cmd.CommandOptions = (*Root)(nil)
@@ -46,6 +49,23 @@ func NewRoot() (*Root, error) {
 func (o *Root) Attach(c *cobra.Command, exclusions []string) {
 	flags.Define(c, o, "", exclusions)
 	flagusages.Set(c)
+
+	configFlagsNames := flags.GetNames(o.ConfigFlags)
+	c.Flags().VisitAll(func(flag *pflag.Flag) {
+		_, ok := configFlagsNames[flag.Name]
+		if ok {
+			// Binding flags
+			if err := viper.BindPFlag(flag.Name, flag); err != nil {
+				panic(fmt.Sprintf("error while binding flag: %v", err))
+			}
+			// Binding environment variables
+			// Examples:
+			// `LSTN_ENDPOINT` -> `--endpoint`
+			// `LSTN_IGNORE_PACKAGES` -> `--ignore-packages`
+			envName := strings.ToUpper(fmt.Sprintf("%s%s%s", flags.EnvPrefix, flags.EnvSeparator, flags.EnvReplacer.Replace(flag.Name)))
+			viper.MustBindEnv(flag.Name, envName)
+		}
+	})
 }
 
 func (o *Root) Validate() []error {
