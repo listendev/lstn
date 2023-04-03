@@ -22,16 +22,110 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestFilterOutByNames(t *testing.T) {
+	cases := []struct {
+		des        string
+		exclusions []string
+		expect     *packageJSON
+	}{
+		{
+			des:        "no-exclusions",
+			exclusions: []string{},
+			expect: &packageJSON{
+				Dependencies: map[string]string{
+					"tap-parser":       "^11.0.2",
+					"@types/react":     "^17.0.52",
+					"chokidar":         "^3.3.0",
+					"findit":           "^2.0.0",
+					"foreground-child": "^2.0.0",
+					"fs-exists-cached": "^1.0.0",
+					"glob":             "^7.2.3",
+				},
+				BundleDependencies: []string{
+					"ink",
+					"treport",
+					"@types/react",
+				},
+			},
+		},
+		{
+			des:        "ignore-packages-not-in-packagejson",
+			exclusions: []string{"not", "in", "list"},
+			expect: &packageJSON{
+				Dependencies: map[string]string{
+					"tap-parser":       "^11.0.2",
+					"@types/react":     "^17.0.52",
+					"chokidar":         "^3.3.0",
+					"findit":           "^2.0.0",
+					"foreground-child": "^2.0.0",
+					"fs-exists-cached": "^1.0.0",
+					"glob":             "^7.2.3",
+				},
+				BundleDependencies: []string{
+					"ink",
+					"treport",
+					"@types/react",
+				},
+			},
+		},
+		{
+			des:        "remove-2-bundles-2-deps",
+			exclusions: []string{"@types/react", "findit", "foreground-child", "treport"},
+			expect: &packageJSON{
+				Dependencies: map[string]string{
+					"tap-parser":       "^11.0.2",
+					"chokidar":         "^3.3.0",
+					"fs-exists-cached": "^1.0.0",
+					"glob":             "^7.2.3",
+				},
+				BundleDependencies: []string{
+					"ink",
+				},
+			},
+		},
+	}
+
+	for _, tc := range cases {
+		tc := tc
+		pack := &packageJSON{
+			Dependencies: map[string]string{
+				"tap-parser":       "^11.0.2",
+				"@types/react":     "^17.0.52",
+				"chokidar":         "^3.3.0",
+				"findit":           "^2.0.0",
+				"foreground-child": "^2.0.0",
+				"fs-exists-cached": "^1.0.0",
+				"glob":             "^7.2.3",
+			},
+			BundleDependencies: []string{
+				"ink",
+				"treport",
+				"@types/react",
+			},
+		}
+
+		t.Run(tc.des, func(t *testing.T) {
+			pack.FilterOutByNames(tc.exclusions...)
+			assert.Equal(t, tc.expect, pack)
+		})
+	}
+}
+
 func TestGetDepsByType(t *testing.T) {
-	e1 := map[string]string{
+	ed1 := map[string]string{
 		"react": "18.0.0",
+	}
+	eb1 := map[string]string{
+		"ink":     "",
+		"treport": "",
 	}
 
 	p1 := &packageJSON{
-		Dependencies: e1,
+		Dependencies:       ed1,
+		BundleDependencies: []string{"ink", "treport"},
 	}
-
-	assert.Equal(t, e1, p1.getDepsByType(Dependencies))
+	assert.Equal(t, ed1, p1.getDepsByType(Dependencies))
+	assert.Equal(t, eb1, p1.getDepsByType(BundleDependencies))
 	assert.Equal(t, map[string]string{}, p1.getDepsByType(DevDependencies))
 
 	e2 := map[string]string{
@@ -42,7 +136,6 @@ func TestGetDepsByType(t *testing.T) {
 	p2 := &packageJSON{
 		DevDependencies: e2,
 	}
-
 	assert.Equal(t, map[string]string{}, p2.getDepsByType(Dependencies))
 	assert.Equal(t, e2, p2.getDepsByType(DevDependencies))
 }
