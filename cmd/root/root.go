@@ -158,7 +158,7 @@ func New(ctx context.Context) (*Command, error) {
 						case []string:
 							// Store the flag value (it equals to the default when no flag)
 							flagValue, _ := c.Flags().GetStringSlice(flagName)
-							// Merge the value (string slice) coming from environment variable or config file (viper)
+							// Set the value (string slice) coming from environment variable or config file (viper)
 							// This fallbacks to the default value when no environment variable or config file
 							value := viper.GetStringSlice(flagName)
 							if len(value) > 0 {
@@ -168,7 +168,7 @@ func New(ctx context.Context) (*Command, error) {
 								}
 								v.Set(reflect.ValueOf(goneric.SliceDedupe(res)))
 							}
-							// Re-set the field when the flag slice value is different than the default slice value
+							// Grab the actual default value
 							actualDefaultVal := []string{}
 							if defaultVal != "" && defaultVal != "[]" {
 								if err := json.Unmarshal([]byte(defaultVal), &actualDefaultVal); err != nil {
@@ -177,7 +177,8 @@ func New(ctx context.Context) (*Command, error) {
 									return
 								}
 							}
-							if !goneric.CompareSliceSet(flagValue, actualDefaultVal) {
+							// Use the flag slice value when it's not empty and it's different (order doesn't matter) than the default
+							if len(flagValue) > 0 && !goneric.CompareSliceSet(flagValue, actualDefaultVal) {
 								v.Set(reflect.ValueOf(flagValue))
 							}
 						case []cmd.ReportType:
@@ -196,7 +197,7 @@ func New(ctx context.Context) (*Command, error) {
 								// Substitute the slice
 								v.Set(reflect.ValueOf(enumFlag.Get()))
 							}
-							// Flag value takes precedence nevertheless: merge them with the ones already there...
+							// Use the flag slice value when it's not empty
 							if len(flagValue) > 0 {
 								reportTypeErr := enumFlag.Set(strings.Join(goneric.Map(func(t cmd.ReportType) string {
 									return t.String()
@@ -277,8 +278,8 @@ func New(ctx context.Context) (*Command, error) {
 	// Cobra also supports local flags, which will only run when this action is called directly
 	rootOpts.Attach(rootCmd, []string{})
 
-	// Tell viper to populate variables from the configuration file
-	err := viper.BindPFlags(rootCmd.Flags())
+	// Tell viper to bind...
+	err := viper.BindPFlags(rootCmd.Flags()) // FIXME: bind only config flags as to avoid having to filter non-config flags above?
 	if err != nil {
 		return nil, err
 	}
