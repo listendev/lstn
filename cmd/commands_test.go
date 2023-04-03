@@ -897,6 +897,39 @@ Global Flags:
 			stderr: "Running without a configuration file\n",
 			errstr: "",
 		},
+		// LSTN_IGNORE_PACKAGES=@vue/devtools --debug-options
+		{
+			name: "LSTN_IGNORE_PACKAGES=@vue/devtools,@vue/devtools lstn scan --debug-options",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS":       "",
+				"LSTN_IGNORE_PACKAGES": "@vue/devtools,@vue/devtools",
+			},
+			cmdline: []string{"scan", "--debug-options"},
+			stdout: heredoc.Doc(`{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"exclude": [
+		110
+	],
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "",
+	"ignore-packages": [
+		"@vue/devtools"
+	],
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://registry.npmjs.org",
+	"reporter": [],
+	"timeout": 60
+}
+`),
+			stderr: "Running without a configuration file\n",
+			errstr: "",
+		},
 		// LSTN_IGNORE_PACKAGES=@vue/devtools,anotherpackage --debug-options
 		{
 			name: "LSTN_IGNORE_PACKAGES=@vue/devtools,anotherpackage lstn scan --debug-options",
