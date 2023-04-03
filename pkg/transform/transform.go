@@ -16,8 +16,14 @@
 package transform
 
 import (
+	"context"
+	"reflect"
+
+	"github.com/XANi/goneric"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/go-playground/mold/v4"
 	"github.com/go-playground/mold/v4/modifiers"
+	"github.com/listendev/lstn/pkg/cmd"
 )
 
 // Singleton it the transformers singleton instance.
@@ -26,4 +32,24 @@ var Singleton *mold.Transformer
 func init() {
 	Singleton = modifiers.New()
 	Singleton.SetTagName("transform")
+
+	Singleton.Register("unique", func(ctx context.Context, fl mold.FieldLevel) error {
+		if fl.Field().Kind() == reflect.Slice {
+			unique := fl.Field().Interface()
+			switch fl.Field().Type().Elem().String() {
+			case "string":
+				spew.Dump("SLICE STRINGS")
+			case "cmd.ReportType":
+				intermediate := []string{}
+				for _, i := range unique.([]cmd.ReportType) {
+					intermediate = append(intermediate, i.String())
+				}
+				unique, _ = cmd.ParseReportTypes(goneric.SliceDedupe(intermediate))
+			}
+
+			fl.Field().Set(reflect.ValueOf(unique))
+		}
+
+		return nil
+	})
 }
