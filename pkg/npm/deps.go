@@ -23,6 +23,7 @@ import (
 
 	"github.com/Masterminds/semver/v3"
 	"github.com/XANi/goneric"
+	"golang.org/x/exp/maps"
 )
 
 // Deps gets you the package lock dependencies.
@@ -46,13 +47,23 @@ func (p *packageJSON) getDepsByType(t DependencyType) map[string]string {
 	f := reflect.Indirect(r).FieldByName(t.Name())
 
 	ret := map[string]string{}
-	if f.Kind() == reflect.Map {
+	switch f.Kind() {
+	case reflect.Map:
 		for _, e := range f.MapKeys() {
 			v := f.MapIndex(e)
 			if v.Kind().String() == "string" {
 				packageName := e.String()
 				versionConstraint := v.Interface().(string)
 				ret[packageName] = versionConstraint
+			}
+		}
+	// BundleDependencies case
+	case reflect.Slice:
+		if f.Type().Elem().Kind() == reflect.String {
+			for i := 0; i < f.Len(); i++ {
+				packageName := f.Index(i).String()
+				// BundleDependencies do not have a specific version because of their nature
+				ret[packageName] = ""
 			}
 		}
 	}
@@ -95,12 +106,10 @@ func getDepsMapFromDepList(list []*dep, t DependencyType, out map[DependencyType
 	}
 }
 
-func (p *packageJSON) Deps(ctx context.Context, resolve VersionResolutionStrategy, types ...DependencyType) map[DependencyType]map[string]*semver.Version {
-	ret := map[DependencyType]map[string]*semver.Version{}
-
-	// No input dependency types means give me all the dependencies for all the dependency types
+func (p *packageJSON) FilterOutByTypes(types ...DependencyType) {
+	// No dependencies to filter out at all
 	if len(types) == 0 {
-		types = []DependencyType{All}
+		return
 	}
 
 	// Sort (ascending) dependency types
@@ -113,7 +122,59 @@ func (p *packageJSON) Deps(ctx context.Context, resolve VersionResolutionStrateg
 		types = AllDependencyTypes
 	}
 
+	r := reflect.ValueOf(p)
 	for _, t := range types {
+		f := reflect.Indirect(r).FieldByName(t.Name())
+		switch f.Kind() {
+		case reflect.Map:
+			f.Set(reflect.ValueOf(make(map[string]string)))
+		case reflect.Slice:
+			if f.Type().Elem().Kind() == reflect.String {
+				f.Set(reflect.ValueOf(make([]string, 0)))
+			}
+		}
+	}
+}
+
+func (p *packageJSON) FilterOutByNames(names ...string) {
+	if len(names) == 0 {
+		return
+	}
+
+	r := reflect.ValueOf(p)
+	for _, t := range AllDependencyTypes {
+		depsByType := p.getDepsByType(t)
+
+		if len(depsByType) == 0 {
+			continue
+		}
+
+		f := reflect.Indirect(r).FieldByName(t.Name())
+		for _, name := range names {
+			if found := goneric.SliceIn(maps.Keys(depsByType), name); found {
+				switch f.Kind() {
+				case reflect.Map:
+					// Delete element from map
+					f.SetMapIndex(reflect.ValueOf(name), reflect.Value{})
+				// BundleDependencies case
+				case reflect.Slice:
+					if f.Type().Elem().Kind() == reflect.String {
+						bundleDeps := f.Interface().([]string)
+						// Sorting is mandatory
+						sort.Strings(bundleDeps)
+						i := sort.SearchStrings(bundleDeps, name)
+						// Delete element from slice
+						f.Set(reflect.AppendSlice(f.Slice(0, i), f.Slice(i+1, f.Len())))
+					}
+				}
+			}
+		}
+	}
+}
+
+func (p *packageJSON) Deps(ctx context.Context, resolve VersionResolutionStrategy) map[DependencyType]map[string]*semver.Version {
+	ret := map[DependencyType]map[string]*semver.Version{}
+	for _, t := range AllDependencyTypes {
 		depsByType := p.getDepsByType(t)
 
 		if len(depsByType) == 0 {
