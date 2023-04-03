@@ -60,10 +60,10 @@ type Reporting struct {
 
 type Ignore struct {
 	Packages []string `name:"ignore packages" flag:"ignore-packages" desc:"list of packages to not process" transform:"unique" default:"[]" json:"ignore-packages"`
-	// Types []string `name:"ignore dependency types" flag:"ignore-types" desc:"list of dependencies types to ignore" transform:"unique" json:"ignore-types"`
+	// Types    []string `name:"ignore dependency types" flag:"ignore-types" desc:"list of dependencies types to ignore" transform:"unique" json:"ignore-types"`
 }
 
-type Filters struct {
+type Filtering struct {
 	Ignore `flagset:"Filtering"`
 }
 
@@ -74,7 +74,7 @@ type ConfigFlags struct {
 	Token
 	Registry
 	Reporting
-	Filters
+	Filtering
 }
 
 func NewConfigFlags() (*ConfigFlags, error) {

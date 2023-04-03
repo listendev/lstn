@@ -97,8 +97,8 @@ The verdicts it returns are listed by the name of each package and its specified
 			}
 
 			// Exclude dependencies
-			packageJSON.FilterOutByTypes(scanOpts.Excludes...) // TODO: scanOpts.ConfigFlags.Ignore.Deps
-			packageJSON.FilterOutByNames(scanOpts.ConfigFlags.Ignore.Packages...)
+			packageJSON.FilterOutByTypes(scanOpts.Excludes...) // TODO: scanOpts.ConfigFlags.Filtering.Ignore.Deps
+			packageJSON.FilterOutByNames(scanOpts.ConfigFlags.Filtering.Ignore.Packages...)
 
 			// Retrieve dependencies to process
 			deps := packageJSON.Deps(ctx, npm.DefaultVersionResolutionStrategy)

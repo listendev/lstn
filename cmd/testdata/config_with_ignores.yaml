@@ -3,7 +3,10 @@ token:
   github: zzz
 registry:
   npm: https://smtg.io
-ignore:
-  packages:
-    - "donotprocessme"
-    - "metoo"
+filtering:
+  ignore:
+    packages:
+      - "donotprocessme"
+      - "metoo"
+    # types:
+    #   - "dev"
