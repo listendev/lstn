@@ -48,9 +48,9 @@ func (suite *FlagsConfigSuite) TestNewConfigFlagsDefaults() {
 	assert.NoError(suite.T(), err)
 	assert.IsType(suite.T(), &ConfigFlags{}, i)
 
-	assert.Equal(suite.T(), 285, i.Reporter.GitHub.Pull.ID)
-	assert.Equal(suite.T(), "reviewdog", i.Reporter.GitHub.Owner)
-	assert.Equal(suite.T(), "reviewdog", i.Reporter.GitHub.Repo)
+	assert.Equal(suite.T(), 285, i.Reporting.GitHub.Pull.ID)
+	assert.Equal(suite.T(), "reviewdog", i.Reporting.GitHub.Owner)
+	assert.Equal(suite.T(), "reviewdog", i.Reporting.GitHub.Repo)
 	assert.Equal(suite.T(), "https://registry.npmjs.org", i.Registry.NPM)
 	assert.Equal(suite.T(), "info", i.LogLevel)
 	assert.Equal(suite.T(), "https://npm.listen.dev", i.Endpoint)
@@ -59,19 +59,20 @@ func (suite *FlagsConfigSuite) TestNewConfigFlagsDefaults() {
 
 func (suite *FlagsConfigSuite) TestGetConfigFlagsNames() {
 	m := GetNames(&ConfigFlags{})
-	assert.Equal(suite.T(), 10, len(m))
+	assert.Equal(suite.T(), 11, len(m))
 
 	expected := make(map[string]string)
 	expected["loglevel"] = "LogLevel"
 	expected["endpoint"] = "Endpoint"
 	expected["timeout"] = "Timeout"
 	expected["gh-token"] = "Token.GitHub"
-	expected["gh-pull-id"] = "Reporter.GitHub.Pull.ID"
-	expected["gh-repo"] = "Reporter.GitHub.Repo"
-	expected["gh-owner"] = "Reporter.GitHub.Owner"
-	expected["reporter"] = "Reporter.Types"
+	expected["gh-pull-id"] = "Reporting.GitHub.Pull.ID"
+	expected["gh-repo"] = "Reporting.GitHub.Repo"
+	expected["gh-owner"] = "Reporting.GitHub.Owner"
+	expected["reporter"] = "Reporting.Types"
 	expected["npm-registry"] = "Registry.NPM"
-	expected["ignore-packages"] = "Ignore.Packages"
+	expected["ignore-packages"] = "Filtering.Ignore.Packages"
+	expected["ignore-deptypes"] = "Filtering.Ignore.Deptypes"
 
 	for k, v := range m {
 		e, ok := expected[k]
@@ -82,13 +83,14 @@ func (suite *FlagsConfigSuite) TestGetConfigFlagsNames() {
 
 func (suite *FlagsConfigSuite) TestGetConfigFlagsDefaults() {
 	m := GetDefaults(&ConfigFlags{})
-	assert.Equal(suite.T(), 4, len(m))
+	assert.Equal(suite.T(), 5, len(m))
 
 	expected := make(map[string]string)
 	expected["endpoint"] = "https://npm.listen.dev"
 	expected["loglevel"] = "info"
 	expected["timeout"] = "60"
 	expected["npm-registry"] = "https://registry.npmjs.org"
+	expected["ignore-packages"] = "[]"
 
 	for k, v := range m {
 		e, ok := expected[k]

@@ -47,7 +47,7 @@ func TestReporterCanRun(t *testing.T) {
 		{
 			desc: "not-on-pull-request",
 			opts: &flags.ConfigFlags{
-				Reporter: flags.Reporter{
+				Reporting: flags.Reporting{
 					GitHub: flags.GitHub{
 						Owner: "",
 						Repo:  "",
@@ -63,7 +63,7 @@ func TestReporterCanRun(t *testing.T) {
 		{
 			desc: "on-pull-request",
 			opts: &flags.ConfigFlags{
-				Reporter: flags.Reporter{
+				Reporting: flags.Reporting{
 					GitHub: flags.GitHub{
 						Owner: "listendev",
 						Repo:  "lstn",
