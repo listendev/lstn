@@ -19,6 +19,7 @@ import (
 	"reflect"
 
 	"github.com/listendev/lstn/pkg/cmd"
+	npmdeptype "github.com/listendev/lstn/pkg/npm/deptype"
 	"github.com/mitchellh/mapstructure"
 )
 
@@ -37,5 +38,18 @@ func StringToReportType() mapstructure.DecodeHookFunc {
 		}
 
 		return cmd.ParseReportType(data.(string))
+	}
+}
+
+func StringToNPMDependencyType() mapstructure.DecodeHookFunc {
+	return func(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+		if f.Kind() != reflect.String {
+			return data, nil
+		}
+		if t != reflect.TypeOf(npmdeptype.All) {
+			return data, nil
+		}
+
+		return npmdeptype.Parse(data.(string))
 	}
 }
