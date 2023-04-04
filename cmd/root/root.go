@@ -41,12 +41,12 @@ import (
 	lstnviper "github.com/listendev/lstn/pkg/cmd/viper"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/jq"
+	npmdeptype "github.com/listendev/lstn/pkg/npm/deptype"
 	lstnversion "github.com/listendev/lstn/pkg/version"
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	"github.com/thediveo/enumflag/v2"
 )
 
 var (
@@ -107,6 +107,7 @@ func New(ctx context.Context) (*Command, error) {
 					mapstructure.StringToTimeDurationHookFunc(),
 					mapstructure.StringToSliceHookFunc(","),
 					lstnviper.StringToReportType(),
+					lstnviper.StringToNPMDependencyType(),
 				))
 				if err := viper.Unmarshal(&cfgOpts, viperOpts); err != nil {
 					return err
@@ -182,33 +183,18 @@ func New(ctx context.Context) (*Command, error) {
 								v.Set(reflect.ValueOf(flagValue))
 							}
 						case []cmd.ReportType:
-							// Store the flag value (it equals to the default when no flag)
-							enumFlag, _ := c.Flags().Lookup(flagName).Value.(*enumflag.EnumFlagValue[cmd.ReportType])
-							flagValue := enumFlag.Get().([]cmd.ReportType)
-							// Set the value coming from environment variable or config file (viper)
-							value := viper.GetString(flagName)
-							if value != "[]" && value != defaultVal {
-								reportTypeErr := enumFlag.Set(strings.TrimSuffix(strings.TrimPrefix(value, "["), "]"))
-								if reportTypeErr != nil {
-									flagErr = fmt.Errorf("%s %s; got %s", flagName, reportTypeErr.Error(), value)
+							reportTypeErr := lstnviper.HandleEnumFlagPrecedence[cmd.ReportType](v, c.Flags().Lookup(flagName), defaultVal)
+							if reportTypeErr != nil {
+								flagErr = reportTypeErr
 
-									return
-								}
-								// Substitute the slice
-								v.Set(reflect.ValueOf(enumFlag.Get()))
+								return
 							}
-							// Use the flag slice value when it's not empty
-							if len(flagValue) > 0 {
-								reportTypeErr := enumFlag.Set(strings.Join(goneric.Map(func(t cmd.ReportType) string {
-									return t.String()
-								}, flagValue...), ","))
-								if reportTypeErr != nil {
-									flagErr = fmt.Errorf("%s %s; got %s", flagName, reportTypeErr.Error(), flagValue)
+						case []npmdeptype.Enum:
+							reportTypeErr := lstnviper.HandleEnumFlagPrecedence[npmdeptype.Enum](v, c.Flags().Lookup(flagName), defaultVal)
+							if reportTypeErr != nil {
+								flagErr = reportTypeErr
 
-									return
-								}
-								// Substitute the slice
-								v.Set(reflect.ValueOf(enumFlag.Get()))
+								return
 							}
 						default:
 						}
