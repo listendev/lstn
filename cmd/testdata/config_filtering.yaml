@@ -8,5 +8,5 @@ filtering:
     packages:
       - "donotprocessme"
       - "metoo"
-    # types:
-    #   - "dev"
+    deptypes:
+      - "peer"
