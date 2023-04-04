@@ -16,6 +16,8 @@
 package deptype
 
 import (
+	"fmt"
+
 	"github.com/thediveo/enumflag/v2"
 )
 
@@ -78,4 +80,29 @@ func (e Enum) Name() string {
 	default:
 		return ""
 	}
+}
+
+func Parse(s string) (Enum, error) {
+	for t, vals := range IDs {
+		for _, v := range vals {
+			if s == v {
+				return t, nil
+			}
+		}
+	}
+
+	return All, fmt.Errorf(`couldn't parse "%s" in an NPM dependency type`, s)
+}
+
+func ParseMultiple(in ...string) ([]Enum, error) {
+	res := []Enum{}
+	for _, i := range in {
+		val, err := Parse(i)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, val)
+	}
+
+	return res, nil
 }
