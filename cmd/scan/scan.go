@@ -53,11 +53,13 @@ This requires a package.json file to fetch the package name and version of the p
 The verdicts it returns are listed by the name of each package and its specified version.`,
 		Example: `  lstn scan
   lstn scan .
+  lstn scan sub/dir
   lstn scan /we/snitch
-  lstn scan /we/snitch -e peer
-  lstn scan /we/snitch -e dev,peer
-  lstn scan /we/snitch -e dev -e peer
-  lstn scan sub/dir`,
+  lstn scan /we/snitch --ignore-deptypes peer
+  lstn scan /we/snitch --ignore-deptypes dev,peer
+  lstn scan /we/snitch --ignore-deptypes dev --ignore-deptypes peer
+  lstn scan /we/snitch --ignore-packages react,glob --ignore-deptypes peer
+  lstn scan /we/snitch --ignore-packages react --ignore-packages glob,@vue/devtools`,
 		Args:              arguments.SingleDirectory, // Executes before RunE
 		ValidArgsFunction: arguments.SingleDirectoryActiveHelp,
 		Annotations: map[string]string{
@@ -97,7 +99,7 @@ The verdicts it returns are listed by the name of each package and its specified
 			}
 
 			// Exclude dependencies
-			packageJSON.FilterOutByTypes(scanOpts.Excludes...) // TODO: scanOpts.ConfigFlags.Filtering.Ignore.Deps
+			packageJSON.FilterOutByTypes(scanOpts.ConfigFlags.Filtering.Ignore.Deptypes...)
 			packageJSON.FilterOutByNames(scanOpts.ConfigFlags.Filtering.Ignore.Packages...)
 
 			// Retrieve dependencies to process
