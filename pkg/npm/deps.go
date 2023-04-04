@@ -23,6 +23,7 @@ import (
 
 	"github.com/Masterminds/semver/v3"
 	"github.com/XANi/goneric"
+	npmdeptype "github.com/listendev/lstn/pkg/npm/deptype"
 	"golang.org/x/exp/maps"
 )
 
@@ -40,7 +41,7 @@ func (p *packageLockJSON) Deps() map[string]PackageLockDependency {
 	}
 }
 
-func (p *packageJSON) getDepsByType(t DependencyType) map[string]string {
+func (p *packageJSON) getDepsByType(t npmdeptype.Enum) map[string]string {
 	// TODO: assert t != All
 
 	r := reflect.ValueOf(p)
@@ -91,7 +92,7 @@ func getDepInstance(packageName, versionConstraint string) *dep {
 	}
 }
 
-func getDepsMapFromDepList(list []*dep, t DependencyType, out map[DependencyType]map[string]*semver.Version) {
+func getDepsMapFromDepList(list []*dep, t npmdeptype.Enum, out map[npmdeptype.Enum]map[string]*semver.Version) {
 	for _, resol := range list {
 		// Ignore dependency if we were unable to resolve its version
 		if resol == nil {
@@ -106,7 +107,7 @@ func getDepsMapFromDepList(list []*dep, t DependencyType, out map[DependencyType
 	}
 }
 
-func (p *packageJSON) FilterOutByTypes(types ...DependencyType) {
+func (p *packageJSON) FilterOutByTypes(types ...npmdeptype.Enum) {
 	// No dependencies to filter out at all
 	if len(types) == 0 {
 		return
@@ -118,8 +119,8 @@ func (p *packageJSON) FilterOutByTypes(types ...DependencyType) {
 	})
 
 	// We assume the All type is the one with the lowest value
-	if types[0] == All {
-		types = AllDependencyTypes
+	if types[0] == npmdeptype.All {
+		types = npmdeptype.AllTypes
 	}
 
 	r := reflect.ValueOf(p)
@@ -142,7 +143,7 @@ func (p *packageJSON) FilterOutByNames(names ...string) {
 	}
 
 	r := reflect.ValueOf(p)
-	for _, t := range AllDependencyTypes {
+	for _, t := range npmdeptype.AllTypes {
 		depsByType := p.getDepsByType(t)
 
 		if len(depsByType) == 0 {
@@ -172,9 +173,9 @@ func (p *packageJSON) FilterOutByNames(names ...string) {
 	}
 }
 
-func (p *packageJSON) Deps(ctx context.Context, resolve VersionResolutionStrategy) map[DependencyType]map[string]*semver.Version {
-	ret := map[DependencyType]map[string]*semver.Version{}
-	for _, t := range AllDependencyTypes {
+func (p *packageJSON) Deps(ctx context.Context, resolve VersionResolutionStrategy) map[npmdeptype.Enum]map[string]*semver.Version {
+	ret := map[npmdeptype.Enum]map[string]*semver.Version{}
+	for _, t := range npmdeptype.AllTypes {
 		depsByType := p.getDepsByType(t)
 
 		if len(depsByType) == 0 {

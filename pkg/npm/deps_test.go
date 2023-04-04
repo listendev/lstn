@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/Masterminds/semver/v3"
+	npmdeptype "github.com/listendev/lstn/pkg/npm/deptype"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -124,9 +125,9 @@ func TestGetDepsByType(t *testing.T) {
 		Dependencies:       ed1,
 		BundleDependencies: []string{"ink", "treport"},
 	}
-	assert.Equal(t, ed1, p1.getDepsByType(Dependencies))
-	assert.Equal(t, eb1, p1.getDepsByType(BundleDependencies))
-	assert.Equal(t, map[string]string{}, p1.getDepsByType(DevDependencies))
+	assert.Equal(t, ed1, p1.getDepsByType(npmdeptype.Dependencies))
+	assert.Equal(t, eb1, p1.getDepsByType(npmdeptype.BundleDependencies))
+	assert.Equal(t, map[string]string{}, p1.getDepsByType(npmdeptype.DevDependencies))
 
 	e2 := map[string]string{
 		"react":      "18.0.0",
@@ -136,13 +137,13 @@ func TestGetDepsByType(t *testing.T) {
 	p2 := &packageJSON{
 		DevDependencies: e2,
 	}
-	assert.Equal(t, map[string]string{}, p2.getDepsByType(Dependencies))
-	assert.Equal(t, e2, p2.getDepsByType(DevDependencies))
+	assert.Equal(t, map[string]string{}, p2.getDepsByType(npmdeptype.Dependencies))
+	assert.Equal(t, e2, p2.getDepsByType(npmdeptype.DevDependencies))
 }
 
 func TestGetDepsMapFromDepList(t *testing.T) {
-	ret := map[DependencyType]map[string]*semver.Version{}
-	getDepsMapFromDepList([]*dep{}, DevDependencies, ret)
+	ret := map[npmdeptype.Enum]map[string]*semver.Version{}
+	getDepsMapFromDepList([]*dep{}, npmdeptype.DevDependencies, ret)
 	assert.Empty(t, ret)
 
 	depList := []*dep{
@@ -160,11 +161,11 @@ func TestGetDepsMapFromDepList(t *testing.T) {
 			version: semver.MustParse("18.2.0"),
 		},
 	}
-	getDepsMapFromDepList(depList, Dependencies, ret)
+	getDepsMapFromDepList(depList, npmdeptype.Dependencies, ret)
 	assert.Len(t, ret, 1)
-	assert.Len(t, ret[Dependencies], 3)
-	assert.Equal(t, map[DependencyType]map[string]*semver.Version{
-		Dependencies: map[string]*semver.Version{
+	assert.Len(t, ret[npmdeptype.Dependencies], 3)
+	assert.Equal(t, map[npmdeptype.Enum]map[string]*semver.Version{
+		npmdeptype.Dependencies: map[string]*semver.Version{
 			"react":   semver.MustParse("18.2.0"),
 			"vue":     semver.MustParse("3.2.47"),
 			"core-js": semver.MustParse("3.29.1"),
