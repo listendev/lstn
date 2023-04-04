@@ -114,7 +114,11 @@ Global Flags:
 		},
 		// lstn scan --help
 		{
-			name:    "lstn scan --help",
+			name: "lstn scan --help",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
 			cmdline: []string{"scan", "--help"},
 			stdout: heredoc.Doc(`Query listen.dev for the verdicts of the dependencies in your project.
 
