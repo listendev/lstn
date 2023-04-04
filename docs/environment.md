@@ -14,6 +14,10 @@ But flags override them.
 
 `LSTN_GH_TOKEN`: set the GitHub token
 
+`LSTN_IGNORE_DEPTYPES`: list of dependencies types to not process
+
+`LSTN_IGNORE_PACKAGES`: list of packages to not process
+
 `LSTN_LOGLEVEL`: set the logging level
 
 `LSTN_NPM_REGISTRY`: set a custom NPM registry

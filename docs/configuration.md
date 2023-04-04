@@ -9,10 +9,18 @@ Here's an example of a configuration file (with the default values):
 
 ```yaml
 endpoint: "https://npm.listen.dev"
+filtering: 
+  ignore: 
+    deptypes: 
+      - "..."
+      - "..."
+    packages: 
+      - "..."
+      - "..."
 loglevel: "info"
 registry: 
   npm: "https://registry.npmjs.org"
-reporter: 
+reporting: 
   github: 
     owner: "..."
     pull: 

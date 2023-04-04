@@ -68,7 +68,7 @@ Details about the lstn exit codes.
 
 Help about any command.
 
-## `lstn in <path>`
+## `lstn in [path]`
 
 Inspect the verdicts for your dependencies tree.
 
@@ -99,21 +99,6 @@ Inspect the verdicts for your dependencies tree.
 --npm-registry string   set a custom NPM registry (default "https://registry.npmjs.org")
 ```
 
-### Reporting Flags
-
-```
-    --gh-owner string                                           set the GitHub owner name (org|user)
-    --gh-pull-id int                                            set the GitHub pull request ID
-    --gh-repo string                                            set the GitHub repository name
--r, --reporter (gh-pull-check,gh-pull-comment,gh-pull-review)   set one or more reporters to use (default [])
-```
-
-### Token Flags
-
-```
---gh-token string   set the GitHub token
-```
-
 For example:
 
 ```bash
@@ -131,16 +116,15 @@ A comprehensive reference of all the lstn commands.
 
 A comprehensive guide to the `lstn` reporting mechanisms.
 
-## `lstn scan <path>`
+## `lstn scan [path]`
 
 Inspect the verdicts for your direct dependencies.
 
 ### Flags
 
 ```
--e, --exclude (dep,dev,optional,peer)   sets of dependencies to exclude (in addition to the default) (default [bundle])
--q, --jq string                         filter the output using a jq expression
-    --json                              output the verdicts (if any) in JSON form
+-q, --jq string   filter the output using a jq expression
+    --json        output the verdicts (if any) in JSON form
 ```
 
 ### Config Flags
@@ -155,6 +139,13 @@ Inspect the verdicts for your direct dependencies.
 
 ```
 --debug-options   output the options, then exit
+```
+
+### Filtering Flags
+
+```
+--ignore-deptypes (dep,dev,optional,peer)   list of dependencies types to not process (default [bundle])
+--ignore-packages strings                   list of packages to not process
 ```
 
 ### Registry Flags
@@ -183,11 +174,13 @@ For example:
 ```bash
 lstn scan
 lstn scan .
-lstn scan /we/snitch
-lstn scan /we/snitch -e peer
-lstn scan /we/snitch -e dev,peer
-lstn scan /we/snitch -e dev -e peer
 lstn scan sub/dir
+lstn scan /we/snitch
+lstn scan /we/snitch --ignore-deptypes peer
+lstn scan /we/snitch --ignore-deptypes dev,peer
+lstn scan /we/snitch --ignore-deptypes dev --ignore-deptypes peer
+lstn scan /we/snitch --ignore-packages react,glob --ignore-deptypes peer
+lstn scan /we/snitch --ignore-packages react --ignore-packages glob,@vue/devtools
 ```
 
 ## `lstn to <name> [[version] [shasum] | [version constraint]]`
@@ -219,21 +212,6 @@ Get the verdicts of a package.
 
 ```
 --npm-registry string   set a custom NPM registry (default "https://registry.npmjs.org")
-```
-
-### Reporting Flags
-
-```
-    --gh-owner string                                           set the GitHub owner name (org|user)
-    --gh-pull-id int                                            set the GitHub pull request ID
-    --gh-repo string                                            set the GitHub repository name
--r, --reporter (gh-pull-check,gh-pull-comment,gh-pull-review)   set one or more reporters to use (default [])
-```
-
-### Token Flags
-
-```
---gh-token string   set the GitHub token
 ```
 
 For example:
