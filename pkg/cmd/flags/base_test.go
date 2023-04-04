@@ -21,6 +21,7 @@ import (
 
 	"github.com/listendev/lstn/pkg/cmd"
 	"github.com/listendev/lstn/pkg/cmd/flagusages"
+	npmdeptype "github.com/listendev/lstn/pkg/npm/deptype"
 	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
@@ -42,7 +43,7 @@ func (suite *FlagsBaseSuite) TestGetNames() {
 	res := GetNames(&ScanOpts{})
 
 	// Expecting all the (sub)fields
-	assert.Len(suite.T(), res, 12)
+	assert.Len(suite.T(), res, 13)
 }
 
 func (suite *FlagsBaseSuite) TestGetDefaults() {
@@ -53,7 +54,7 @@ func (suite *FlagsBaseSuite) TestGetDefaults() {
 	res := GetDefaults(&ScanOpts{})
 
 	// Only 4 (sub)fields have default values
-	assert.Len(suite.T(), res, 4)
+	assert.Len(suite.T(), res, 5)
 }
 
 func (suite *FlagsBaseSuite) TestGetField() {
@@ -122,7 +123,16 @@ func (suite *FlagsBaseSuite) TestTransform() {
 		{
 			"empty config flags",
 			&ConfigFlags{},
-			&ConfigFlags{},
+			&ConfigFlags{
+				Reporting: Reporting{
+					Types: []cmd.ReportType{},
+				},
+				Filtering: Filtering{
+					Ignore: Ignore{
+						Deptypes: []npmdeptype.Enum{},
+					},
+				},
+			},
 			nil,
 		},
 		{
@@ -132,6 +142,14 @@ func (suite *FlagsBaseSuite) TestTransform() {
 			},
 			&ConfigFlags{
 				Endpoint: "https://npm.listen.dev",
+				Reporting: Reporting{
+					Types: []cmd.ReportType{},
+				},
+				Filtering: Filtering{
+					Ignore: Ignore{
+						Deptypes: []npmdeptype.Enum{},
+					},
+				},
 			},
 			nil,
 		},
@@ -145,6 +163,36 @@ func (suite *FlagsBaseSuite) TestTransform() {
 			&ConfigFlags{
 				Registry: Registry{
 					NPM: "https://registry.npm.org",
+				},
+				Reporting: Reporting{
+					Types: []cmd.ReportType{},
+				},
+				Filtering: Filtering{
+					Ignore: Ignore{
+						Deptypes: []npmdeptype.Enum{},
+					},
+				},
+			},
+			nil,
+		},
+		{
+			"duplicate packages to ignore",
+			&ConfigFlags{
+				Filtering: Filtering{
+					Ignore: Ignore{
+						Packages: []string{"a", "a"},
+					},
+				},
+			},
+			&ConfigFlags{
+				Filtering: Filtering{
+					Ignore: Ignore{
+						Packages: []string{"a"},
+						Deptypes: []npmdeptype.Enum{},
+					},
+				},
+				Reporting: Reporting{
+					Types: []cmd.ReportType{},
 				},
 			},
 			nil,
