@@ -23,70 +23,9 @@ import (
 	"strings"
 
 	"github.com/Masterminds/semver/v3"
+	npmdeptype "github.com/listendev/lstn/pkg/npm/deptype"
 	"github.com/listendev/lstn/pkg/validate"
-	"github.com/thediveo/enumflag/v2"
 )
-
-type DependencyType enumflag.Flag
-
-const (
-	All DependencyType = (iota + 1) * 22
-	Dependencies
-	DevDependencies
-	PeerDependencies
-	BundleDependencies
-	OptionalDependencies
-)
-
-var AllDependencyTypes = []DependencyType{
-	Dependencies,
-	DevDependencies,
-	PeerDependencies,
-	BundleDependencies,
-	OptionalDependencies,
-}
-
-var DependencyTypeIDs = map[DependencyType][]string{
-	Dependencies:         {Dependencies.String()},
-	DevDependencies:      {DevDependencies.String()},
-	PeerDependencies:     {PeerDependencies.String()},
-	BundleDependencies:   {BundleDependencies.String()},
-	OptionalDependencies: {OptionalDependencies.String()},
-}
-
-func (dt DependencyType) String() string {
-	switch dt {
-	case Dependencies:
-		return "dep"
-	case DevDependencies:
-		return "dev"
-	case PeerDependencies:
-		return "peer"
-	case BundleDependencies:
-		return "bundle"
-	case OptionalDependencies:
-		return "optional"
-	default:
-		return "all"
-	}
-}
-
-func (dt DependencyType) Name() string {
-	switch dt {
-	case Dependencies:
-		return "Dependencies"
-	case DevDependencies:
-		return "DevDependencies"
-	case PeerDependencies:
-		return "PeerDependencies"
-	case BundleDependencies:
-		return "BundleDependencies"
-	case OptionalDependencies:
-		return "OptionalDependencies"
-	default:
-		return ""
-	}
-}
 
 type packageJSON struct {
 	Dependencies         map[string]string `json:"dependencies"`
@@ -97,9 +36,9 @@ type packageJSON struct {
 }
 
 type PackageJSON interface {
-	FilterOutByTypes(...DependencyType)
+	FilterOutByTypes(...npmdeptype.Enum)
 	FilterOutByNames(...string)
-	Deps(context.Context, VersionResolutionStrategy) map[DependencyType]map[string]*semver.Version
+	Deps(context.Context, VersionResolutionStrategy) map[npmdeptype.Enum]map[string]*semver.Version
 }
 
 // The VersionResolutionStrategy is a function that, given a version constraints,
