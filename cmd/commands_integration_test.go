@@ -129,16 +129,17 @@ Usage:
 Examples:
   lstn scan
   lstn scan .
-  lstn scan /we/snitch
-  lstn scan /we/snitch -e peer
-  lstn scan /we/snitch -e dev,peer
-  lstn scan /we/snitch -e dev -e peer
   lstn scan sub/dir
+  lstn scan /we/snitch
+  lstn scan /we/snitch --ignore-deptypes peer
+  lstn scan /we/snitch --ignore-deptypes dev,peer
+  lstn scan /we/snitch --ignore-deptypes dev --ignore-deptypes peer
+  lstn scan /we/snitch --ignore-packages react,glob --ignore-deptypes peer
+  lstn scan /we/snitch --ignore-packages react --ignore-packages glob,@vue/devtools
 
 Flags:
-  -e, --exclude (dep,dev,optional,peer)   sets of dependencies to exclude (in addition to the default) (default [bundle])
-  -q, --jq string                         filter the output using a jq expression
-      --json                              output the verdicts (if any) in JSON form
+  -q, --jq string   filter the output using a jq expression
+      --json        output the verdicts (if any) in JSON form
 
 Config Flags:
       --endpoint string   the listen.dev endpoint emitting the verdicts (default "https://npm.listen.dev")
@@ -149,7 +150,8 @@ Debug Flags:
       --debug-options   output the options, then exit
 
 Filtering Flags:
-      --ignore-packages strings   list of packages to not process
+      --ignore-deptypes (dep,dev,optional,peer)   list of dependencies types to not process (default [bundle])
+      --ignore-packages strings                   list of packages to not process
 
 Registry Flags:
       --npm-registry string   set a custom NPM registry (default "https://registry.npmjs.org")
@@ -184,6 +186,9 @@ Global Flags:
 	"gh-pull-id": 0,
 	"gh-repo": "",
 	"gh-token": "",
+	"ignore-deptypes": [
+		110
+	],
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
@@ -211,6 +216,9 @@ Global Flags:
 	"gh-pull-id": 0,
 	"gh-repo": "",
 	"gh-token": "",
+	"ignore-deptypes": [
+		110
+	],
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
@@ -283,6 +291,9 @@ Global Flags:
 	"gh-pull-id": 0,
 	"gh-repo": "",
 	"gh-token": "",
+	"ignore-deptypes": [
+		110
+	],
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
@@ -311,6 +322,9 @@ Global Flags:
 	"gh-pull-id": 0,
 	"gh-repo": "",
 	"gh-token": "",
+	"ignore-deptypes": [
+		110
+	],
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
@@ -339,38 +353,9 @@ Global Flags:
 	"gh-pull-id": 0,
 	"gh-repo": "",
 	"gh-token": "",
-	"ignore-packages": null,
-	"jq": "",
-	"json": false,
-	"loglevel": "info",
-	"npm-registry": "https://registry.npmjs.org",
-	"reporter": [],
-	"timeout": 60
-}
-`),
-			stderr: "Running without a configuration file\n",
-			errstr: "",
-		},
-		// lstn scan -e dev,peer --debug-options
-		{
-			name: "lstn scan -e dev,peer --debug-options",
-			envvar: map[string]string{
-				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
-				"GITHUB_ACTIONS": "",
-			},
-			cmdline: []string{"scan", "-e", "dev,peer", "--debug-options"},
-			stdout: heredoc.Doc(`{
-	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
-	"exclude": [
-		110,
-		66,
-		88
+	"ignore-deptypes": [
+		110
 	],
-	"gh-owner": "",
-	"gh-pull-id": 0,
-	"gh-repo": "",
-	"gh-token": "",
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
@@ -395,13 +380,13 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
-	"exclude": [
-		110
-	],
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
 	"gh-token": "",
+	"ignore-deptypes": [
+		110
+	],
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
@@ -436,13 +421,13 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
-	"exclude": [
-		110
-	],
 	"gh-owner": "leodido",
 	"gh-pull-id": 111,
 	"gh-repo": "go-urn",
 	"gh-token": "xxx",
+	"ignore-deptypes": [
+		110
+	],
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
@@ -484,13 +469,13 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
-	"exclude": [
-		110
-	],
 	"gh-owner": "leodido",
 	"gh-pull-id": 111,
 	"gh-repo": "go-urn",
 	"gh-token": "xxx",
+	"ignore-deptypes": [
+		110
+	],
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
@@ -521,13 +506,13 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
-	"exclude": [
-		110
-	],
 	"gh-owner": "fntlnz",
 	"gh-pull-id": 654,
 	"gh-repo": "",
 	"gh-token": "yyy",
+	"ignore-deptypes": [
+		110
+	],
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
@@ -540,25 +525,25 @@ Global Flags:
 			stderr: "Running without a configuration file\n",
 			errstr: "",
 		},
-		// lstn scan --debug-options --config testdata/config_with_reporters.yaml
+		// lstn scan --debug-options --config testdata/config_reporting.yaml
 		{
-			name: "lstn scan --debug-options --config testdata/config_with_reporters.yaml",
+			name: "lstn scan --debug-options --config testdata/config_reporting.yaml",
 			envvar: map[string]string{
 				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
 				"GITHUB_ACTIONS": "",
 			},
-			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "config_with_reporters.yaml")},
-			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_with_reporters.yaml
+			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "config_reporting.yaml")},
+			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_reporting.yaml
 {
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
-	"exclude": [
-		110
-	],
 	"gh-owner": "leodido",
 	"gh-pull-id": 78999,
 	"gh-repo": "go-urn",
 	"gh-token": "zzz",
+	"ignore-deptypes": [
+		110
+	],
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
@@ -573,9 +558,9 @@ Global Flags:
 			stderr: "",
 			errstr: "",
 		},
-		// LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/config_with_reporters.yaml
+		// LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/config_reporting.yaml
 		{
-			name: "LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/config_with_reporters.yaml",
+			name: "LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/config_reporting.yaml",
 			envvar: map[string]string{
 				"LSTN_GH_PULL_ID": "887755",
 				"LSTN_GH_REPO":    "go-conventionalcommits",
@@ -584,18 +569,18 @@ Global Flags:
 				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
 				"GITHUB_ACTIONS": "",
 			},
-			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "config_with_reporters.yaml")},
-			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_with_reporters.yaml
+			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "config_reporting.yaml")},
+			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_reporting.yaml
 {
 	"debug-options": true,
 	"endpoint": "https://npm-stage.listen.dev",
-	"exclude": [
-		110
-	],
 	"gh-owner": "leodido",
 	"gh-pull-id": 887755,
 	"gh-repo": "go-conventionalcommits",
 	"gh-token": "zzz",
+	"ignore-deptypes": [
+		110
+	],
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
@@ -610,9 +595,9 @@ Global Flags:
 			stderr: "",
 			errstr: "",
 		},
-		// LSTN_REPORTER=gh-pull-check LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/config_with_reporters.yaml
+		// LSTN_REPORTER=gh-pull-check LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/config_reporting.yaml
 		{
-			name: "LSTN_REPORTER=gh-pull-check LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/config_with_reporters.yaml",
+			name: "LSTN_REPORTER=gh-pull-check LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/config_reporting.yaml",
 			envvar: map[string]string{
 				"LSTN_GH_PULL_ID": "887755",
 				"LSTN_GH_REPO":    "go-conventionalcommits",
@@ -622,18 +607,18 @@ Global Flags:
 				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
 				"GITHUB_ACTIONS": "",
 			},
-			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "config_with_reporters.yaml")},
-			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_with_reporters.yaml
+			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "config_reporting.yaml")},
+			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_reporting.yaml
 {
 	"debug-options": true,
 	"endpoint": "https://npm-stage.listen.dev",
-	"exclude": [
-		110
-	],
 	"gh-owner": "leodido",
 	"gh-pull-id": 887755,
 	"gh-repo": "go-conventionalcommits",
 	"gh-token": "zzz",
+	"ignore-deptypes": [
+		110
+	],
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
@@ -648,24 +633,24 @@ Global Flags:
 			stderr: "",
 			errstr: "",
 		},
-				// lstn scan --debug-options --reporter gh-pull-comment,gh-pull-comment  -r gh-pull-check,gh-pull-comment
-				{
-					name: "lstn scan --debug-options --reporter gh-pull-comment,gh-pull-comment -r gh-pull-check,gh-pull-comment",
-					envvar: map[string]string{
-						// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
-						"GITHUB_ACTIONS": "",
-					},
-					cmdline: []string{"scan", "--debug-options", "--reporter", "gh-pull-comment,gh-pull-comment", "-r", "gh-pull-check,gh-pull-comment"},
-					stdout: heredoc.Doc(`{
+		// lstn scan --debug-options --reporter gh-pull-comment,gh-pull-comment -r gh-pull-check,gh-pull-comment
+		{
+			name: "lstn scan --debug-options --reporter gh-pull-comment,gh-pull-comment -r gh-pull-check,gh-pull-comment",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
+			cmdline: []string{"scan", "--debug-options", "--reporter", "gh-pull-comment,gh-pull-comment", "-r", "gh-pull-check,gh-pull-comment"},
+			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
-	"exclude": [
-		110
-	],
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
 	"gh-token": "",
+	"ignore-deptypes": [
+		110
+	],
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
@@ -678,9 +663,42 @@ Global Flags:
 	"timeout": 60
 }
 `),
-					stderr: "Running without a configuration file\n",
-					errstr: "",
-				},
+			stderr: "Running without a configuration file\n",
+			errstr: "",
+		},
+		// FIXME: COMPLETE ME
+		// lstn scan --debug-options --ignore-deptypes dev,dev --ignore-deptypes optional,dev
+		{
+			name: "lstn scan --debug-options --ignore-deptypes dev,dev --ignore-deptypes optional,dev",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
+			cmdline: []string{"scan", "--debug-options", "--ignore-deptypes", "dev,dev", "--ignore-deptypes", "optional,dev"},
+			stdout: heredoc.Doc(`{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "",
+	"ignore-deptypes": [
+		110,
+		66,
+		132
+	],
+	"ignore-packages": null,
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://registry.npmjs.org",
+	"reporter": [],
+	"timeout": 60
+}
+`),
+			stderr: "Running without a configuration file\n",
+			errstr: "",
+		},
 		// lstn version --debug-options
 		{
 			name:    "lstn version --debug-options",
@@ -722,7 +740,7 @@ Global Flags:
 		},
 		// lstn version --debug-options -v=2
 		{
-			name:    "lstn version --debug-options -vv",
+			name:    "lstn version --debug-options -v=2",
 			cmdline: []string{"version", "--debug-options", "-vv"},
 			stdout: heredoc.Doc(`{
 			"changelog": false,
@@ -733,7 +751,7 @@ Global Flags:
 			stderr: "",
 			errstr: "",
 		},
-		// GITHUB_ACTIONS=true GITHUB_EVENT_PATH=../pkg/.../github_event_pul_request.json lstn scan --debug-options
+		// GITHUB_ACTIONS=true GITHUB_EVENT_PATH=../pkg/ci/testdata/github_event_pul_request.json lstn scan --debug-options
 		{
 			name: "GITHUB_ACTIONS=true GITHUB_EVENT_PATH=../pkg/ci/testdata/github_event_pul_request.json lstn scan --debug-options",
 			envvar: map[string]string{
@@ -744,13 +762,13 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
-	"exclude": [
-		110
-	],
 	"gh-owner": "reviewdog",
 	"gh-pull-id": 285,
 	"gh-repo": "reviewdog",
 	"gh-token": "",
+	"ignore-deptypes": [
+		110
+	],
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
@@ -763,7 +781,7 @@ Global Flags:
 			stderr: "Running without a configuration file\n",
 			errstr: "",
 		},
-		// LSTN_IGNORE_PACKAGES=overriddenbyflag lstn scan --ignore-packages @vue/devtools,anotherpackages --debug-options
+		// LSTN_IGNORE_PACKAGES=overriddenbyflag lstn scan --ignore-packages @vue/devtools,anotherpackage --debug-options
 		{
 			name: "LSTN_IGNORE_PACKAGES=overriddenbyflag lstn scan --ignore-packages @vue/devtools,anotherpackage --debug-options",
 			envvar: map[string]string{
@@ -775,13 +793,13 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
-	"exclude": [
-		110
-	],
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
 	"gh-token": "",
+	"ignore-deptypes": [
+		110
+	],
 	"ignore-packages": [
 		"@vue/devtools",
 		"anotherpackage"
@@ -809,13 +827,13 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
-	"exclude": [
-		110
-	],
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
 	"gh-token": "",
+	"ignore-deptypes": [
+		110
+	],
 	"ignore-packages": [
 		"@vue/devtools",
 		"anotherpackage"
@@ -843,13 +861,13 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
-	"exclude": [
-		110
-	],
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
 	"gh-token": "",
+	"ignore-deptypes": [
+		110
+	],
 	"ignore-packages": [
 		"@vue/devtools"
 	],
@@ -864,7 +882,7 @@ Global Flags:
 			stderr: "Running without a configuration file\n",
 			errstr: "",
 		},
-		// LSTN_IGNORE_PACKAGES=@vue/devtools --debug-options
+		// LSTN_IGNORE_PACKAGES=@vue/devtools lstn scan --debug-options
 		{
 			name: "LSTN_IGNORE_PACKAGES=@vue/devtools lstn scan --debug-options",
 			envvar: map[string]string{
@@ -876,13 +894,13 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
-	"exclude": [
-		110
-	],
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
 	"gh-token": "",
+	"ignore-deptypes": [
+		110
+	],
 	"ignore-packages": [
 		"@vue/devtools"
 	],
@@ -897,7 +915,7 @@ Global Flags:
 			stderr: "Running without a configuration file\n",
 			errstr: "",
 		},
-		// LSTN_IGNORE_PACKAGES=@vue/devtools --debug-options
+		// LSTN_IGNORE_PACKAGES=@vue/devtools,@vue/devtools lstn scan --debug-options
 		{
 			name: "LSTN_IGNORE_PACKAGES=@vue/devtools,@vue/devtools lstn scan --debug-options",
 			envvar: map[string]string{
@@ -909,13 +927,13 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
-	"exclude": [
-		110
-	],
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
 	"gh-token": "",
+	"ignore-deptypes": [
+		110
+	],
 	"ignore-packages": [
 		"@vue/devtools"
 	],
@@ -942,13 +960,13 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
-	"exclude": [
-		110
-	],
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
 	"gh-token": "",
+	"ignore-deptypes": [
+		110
+	],
 	"ignore-packages": [
 		"@vue/devtools",
 		"anotherpackage"
@@ -964,25 +982,26 @@ Global Flags:
 			stderr: "Running without a configuration file\n",
 			errstr: "",
 		},
-		// lstn scan --debug-options --ignore-packages aaaaa --config testdata/config_with_ignores.yaml
+		// lstn scan --debug-options --ignore-packages aaaaa --config testdata/config_filtering.yaml
 		{
-			name: "lstn scan --debug-options --ignore-packages aaaaa --config testdata/config_with_ignores.yaml",
+			name: "lstn scan --debug-options --ignore-packages aaaaa --config testdata/config_filtering.yaml",
 			envvar: map[string]string{
 				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
 				"GITHUB_ACTIONS": "",
 			},
-			cmdline: []string{"scan", "--debug-options", "--ignore-packages", "aaaaa", "--config", path.Join(cwd, "testdata", "config_with_ignores.yaml")},
-			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_with_ignores.yaml
+			cmdline: []string{"scan", "--debug-options", "--ignore-packages", "aaaaa", "--config", path.Join(cwd, "testdata", "config_filtering.yaml")},
+			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_filtering.yaml
 {
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
-	"exclude": [
-		110
-	],
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
 	"gh-token": "zzz",
+	"ignore-deptypes": [
+		110,
+		88
+	],
 	"ignore-packages": [
 		"aaaaa"
 	],
@@ -997,25 +1016,26 @@ Global Flags:
 			stderr: "",
 			errstr: "",
 		},
-		// lstn scan --debug-options --config testdata/config_with_ignores.yaml
+		// lstn scan --debug-options --config testdata/config_filtering.yaml
 		{
-			name: "lstn scan --debug-options --config testdata/config_with_ignores.yaml",
+			name: "lstn scan --debug-options --config testdata/config_filtering.yaml",
 			envvar: map[string]string{
 				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
 				"GITHUB_ACTIONS": "",
 			},
-			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "config_with_ignores.yaml")},
-			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_with_ignores.yaml
+			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "config_filtering.yaml")},
+			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_filtering.yaml
 {
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
-	"exclude": [
-		110
-	],
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
 	"gh-token": "zzz",
+	"ignore-deptypes": [
+		110,
+		88
+	],
 	"ignore-packages": [
 		"donotprocessme",
 		"metoo"
@@ -1031,26 +1051,27 @@ Global Flags:
 			stderr: "",
 			errstr: "",
 		},
-		// LSTN_IGNORE_PACKAGES=vvv lstn scan --debug-options --config testdata/config_with_ignores.yaml
+		// LSTN_IGNORE_PACKAGES=vvv lstn scan --debug-options --config testdata/config_filtering.yaml
 		{
-			name: "lstn scan --debug-options --config testdata/config_with_ignores.yaml",
+			name: "LSTN_IGNORE_PACKAGES=overrideThoseFromConfig lstn scan --debug-options --config testdata/config_filtering.yaml",
 			envvar: map[string]string{
 				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
 				"GITHUB_ACTIONS":       "",
 				"LSTN_IGNORE_PACKAGES": "overrideThoseFromConfig",
 			},
-			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "config_with_ignores.yaml")},
-			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_with_ignores.yaml
+			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "config_filtering.yaml")},
+			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_filtering.yaml
 {
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
-	"exclude": [
-		110
-	],
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
 	"gh-token": "zzz",
+	"ignore-deptypes": [
+		110,
+		88
+	],
 	"ignore-packages": [
 		"overrideThoseFromConfig"
 	],
@@ -1077,6 +1098,253 @@ Global Flags:
 			stdout:  "",
 			stderr:  "Running without a configuration file\nError: reporter must be 'gh-pull-check', 'gh-pull-comment', 'gh-pull-review'; got wrong\n",
 			errstr:  "reporter must be 'gh-pull-check', 'gh-pull-comment', 'gh-pull-review'; got wrong",
+		},
+		// lstn scan --ignore-deptypes dev,peer,dev --debug-options
+		{
+			name: "lstn scan --ignore-deptypes dev,peer,dev --debug-options",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
+			cmdline: []string{"scan", "--ignore-deptypes", "dev,peer,dev", "--debug-options"},
+			stdout: heredoc.Doc(`{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "",
+	"ignore-deptypes": [
+		110,
+		66,
+		88
+	],
+	"ignore-packages": null,
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://registry.npmjs.org",
+	"reporter": [],
+	"timeout": 60
+}
+`),
+			stderr: "Running without a configuration file\n",
+			errstr: "",
+		},
+		// LSTN_IGNORE_DEPTYPES=dev,peer lstn scan --debug-options
+		{
+			name: "LSTN_IGNORE_DEPTYPES=dev,peer lstn scan --debug-options",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS":       "",
+				"LSTN_IGNORE_DEPTYPES": "dev,peer",
+			},
+			cmdline: []string{"scan", "--debug-options"},
+			stdout: heredoc.Doc(`{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "",
+	"ignore-deptypes": [
+		110,
+		66,
+		88
+	],
+	"ignore-packages": null,
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://registry.npmjs.org",
+	"reporter": [],
+	"timeout": 60
+}
+`),
+			stderr: "Running without a configuration file\n",
+			errstr: "",
+		},
+		// FIXME: the flag does not override the env var
+		// FIXME: same issue as for other enum flags (their setters merge in)
+		// LSTN_IGNORE_DEPTYPES=dev,peer lstn scan --debug-options --ignore-deptypes optional
+		{
+			name: "LSTN_IGNORE_DEPTYPES=dev,peer,dev lstn scan --debug-options --ignore-deptypes optional",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS":       "",
+				"LSTN_IGNORE_DEPTYPES": "dev,peer,dev",
+			},
+			cmdline: []string{"scan", "--debug-options", "--ignore-deptypes", "optional"},
+			stdout: heredoc.Doc(`{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "",
+	"ignore-deptypes": [
+		110,
+		132,
+		66,
+		88
+	],
+	"ignore-packages": null,
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://registry.npmjs.org",
+	"reporter": [],
+	"timeout": 60
+}
+`),
+			stderr: "Running without a configuration file\n",
+			errstr: "",
+		},
+		// lstn scan --debug-options --config testdata/config_filtering.yaml
+		{
+			name: "lstn scan --debug-options --config testdata/config_filtering.yaml",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
+			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "config_filtering.yaml")},
+			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_filtering.yaml
+{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "zzz",
+	"ignore-deptypes": [
+		110,
+		88
+	],
+	"ignore-packages": [
+		"donotprocessme",
+		"metoo"
+	],
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://smtg.io",
+	"reporter": [],
+	"timeout": 1111
+}
+`),
+			stderr: "",
+			errstr: "",
+		},
+		// LSTN_IGNORE_DEPTYPES=dev lstn scan --debug-options --config testdata/config_filtering.yaml
+		{
+			name: "LSTN_IGNORE_DEPTYPES=dev lstn scan --debug-options --config testdata/config_filtering.yaml",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS":       "",
+				"LSTN_IGNORE_DEPTYPES": "dev",
+			},
+			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "config_filtering.yaml")},
+			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_filtering.yaml
+{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "zzz",
+	"ignore-deptypes": [
+		110,
+		66
+	],
+	"ignore-packages": [
+		"donotprocessme",
+		"metoo"
+	],
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://smtg.io",
+	"reporter": [],
+	"timeout": 1111
+}
+`),
+			stderr: "",
+			errstr: "",
+		},
+		// LSTN_IGNORE_PACKAGES=overrideThoseFromConfig LSTN_IGNORE_DEPTYPES=dev lstn scan --debug-options --config testdata/config_filtering.yaml
+		{
+			name: "LSTN_IGNORE_PACKAGES=overrideThoseFromConfig LSTN_IGNORE_DEPTYPES=dev lstn scan --debug-options --config testdata/config_filtering.yaml",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS":       "",
+				"LSTN_IGNORE_DEPTYPES": "dev",
+				"LSTN_IGNORE_PACKAGES": "overrideThoseFromConfig",
+			},
+			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "config_filtering.yaml")},
+			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_filtering.yaml
+{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "zzz",
+	"ignore-deptypes": [
+		110,
+		66
+	],
+	"ignore-packages": [
+		"overrideThoseFromConfig"
+	],
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://smtg.io",
+	"reporter": [],
+	"timeout": 1111
+}
+`),
+			stderr: "",
+			errstr: "",
+		},
+		// FIXME: the flag does not override the config value
+		// FIXME: same issue as for other enum flags (their setters merge in)
+		// lstn scan --debug-options --config testdata/config_filtering.yaml --ignore-deptypes dev,optional
+		{
+			name: "lstn scan --debug-options --config testdata/config_filtering.yaml --ignore-deptypes dev,optional",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
+			cmdline: []string{"scan", "--debug-options", "--config", path.Join(cwd, "testdata", "config_filtering.yaml"), "--ignore-deptypes", "dev,optional"},
+			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_filtering.yaml
+{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "zzz",
+	"ignore-deptypes": [
+		110,
+		66,
+		132,
+		88
+	],
+	"ignore-packages": [
+		"donotprocessme",
+		"metoo"
+	],
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://smtg.io",
+	"reporter": [],
+	"timeout": 1111
+}
+`),
+			stderr: "",
+			errstr: "",
 		},
 	}
 
@@ -1106,38 +1374,3 @@ Global Flags:
 		})
 	}
 }
-
-// FIXME: remove me
-// func TestChildCommands2(t *testing.T) {
-// 	cwd, _ := os.Getwd()
-
-// 	cases := []testCase{
-
-// 	}
-
-// 	for _, tc := range cases {
-// 		tc := tc
-// 		t.Run(tc.name, func(t *testing.T) {
-// 			closer := internaltesting.EnvSetter(tc.envvar)
-// 			t.Cleanup(closer)
-
-// 			rootC, e := root.New(context.Background())
-// 			assert.Nil(t, e)
-// 			c := rootC.Command()
-
-// 			stdOut, stdErr, err := internaltesting.ExecuteCommand(c, tc.cmdline...)
-
-// 			tc.stdout = strings.ReplaceAll(tc.stdout, "_CWD_", cwd)
-// 			tc.stderr = strings.ReplaceAll(tc.stderr, "_CWD_", cwd)
-
-// 			if tc.errstr != "" {
-// 				if assert.Error(t, err) {
-// 					tc.errstr = strings.ReplaceAll(tc.errstr, "_CWD_", cwd)
-// 					assert.Equal(t, tc.errstr, err.Error())
-// 				}
-// 			}
-// 			assert.Equal(t, tc.stdout, stdOut)
-// 			assert.Equal(t, tc.stderr, stdErr)
-// 		})
-// 	}
-// }
