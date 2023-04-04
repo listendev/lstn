@@ -25,9 +25,10 @@ import (
 	"github.com/creasty/defaults"
 	"github.com/listendev/lstn/pkg/ci"
 	"github.com/listendev/lstn/pkg/cmd"
-	"github.com/listendev/lstn/pkg/cmd/flagusages"
+	npmdeptype "github.com/listendev/lstn/pkg/npm/deptype"
 	"github.com/spf13/cobra"
 	"github.com/thediveo/enumflag/v2"
+	"golang.org/x/exp/maps"
 )
 
 var _ cmd.Options = (*ConfigFlags)(nil)
@@ -50,17 +51,19 @@ type GitHub struct {
 	Pull
 }
 
-// NOTE > Struct can't have the same name of a flag
+// NOTE > Struct can't have the same name of a flag.
 type Reporting struct {
 	reporter *enumflag.EnumFlagValue[cmd.ReportType]
 
-	Types []cmd.ReportType `json:"reporter" flag:"reporter" transform:"unique"`
+	Types []cmd.ReportType `json:"reporter" flag:"reporter" shorthand:"r" transform:"unique" desc:"set one or more reporters to use" flagset:"Reporting"`
 	GitHub
 }
 
 type Ignore struct {
-	Packages []string `name:"ignore packages" flag:"ignore-packages" desc:"list of packages to not process" transform:"unique" default:"[]" json:"ignore-packages"`
-	// Types    []string `name:"ignore dependency types" flag:"ignore-types" desc:"list of dependencies types to ignore" transform:"unique" json:"ignore-types"`
+	Packages []string          `name:"ignore packages" flag:"ignore-packages" desc:"list of packages to not process" transform:"unique" default:"[]" json:"ignore-packages"`
+	Deptypes []npmdeptype.Enum `name:"ignore dependency types" flag:"ignore-deptypes" desc:"list of dependencies types to not process" transform:"unique" json:"ignore-deptypes"`
+
+	types *enumflag.EnumFlagValue[npmdeptype.Enum]
 }
 
 type Filtering struct {
@@ -102,20 +105,54 @@ func (o *ConfigFlags) SetDefaults() {
 			o.Reporting.GitHub.Pull.ID = env.Num
 		}
 	}
-}
-
-func (o *ConfigFlags) Define(c *cobra.Command, exclusions []string) {
-	if !goneric.SliceIn(exclusions, "reporter") {
+	if defaults.CanUpdate(o.Reporting.Types) {
 		// Create the enum flag value for --reporter
 		enumValues := goneric.MapToSlice(func(t cmd.ReportType, v []string) string {
 			return v[0]
 		}, cmd.ReporterTypeIDs)
 		sort.Strings(enumValues)
 		o.Reporting.reporter = enumflag.NewSlice(&o.Reporting.Types, `(`+strings.Join(enumValues, ",")+`)`, cmd.ReporterTypeIDs, enumflag.EnumCaseInsensitive)
+	}
+	if defaults.CanUpdate(o.Filtering.Ignore.types) {
+		// Create the enum flag value for --ignore-deptypes
+		alwaysInSet := npmdeptype.BundleDependencies
+		ignoreValues := goneric.MapSliceSkip(
+			func(identifiers []string) (string, bool) {
+				t := identifiers[0]
+				if t == alwaysInSet.String() {
+					return "", true
+				}
 
+				return t, false
+			},
+			maps.Values(npmdeptype.IDs),
+		)
+		sort.Strings(ignoreValues)
+		o.Filtering.Ignore.types = enumflag.NewSlice(&o.Filtering.Ignore.Deptypes, `(`+strings.Join(ignoreValues, ",")+`)`, npmdeptype.IDs, enumflag.EnumCaseInsensitive)
+		_ = o.Filtering.Ignore.types.Set(alwaysInSet.String())
+	}
+}
+
+func (o *ConfigFlags) Define(c *cobra.Command, exclusions []string) {
+	if !goneric.SliceIn(exclusions, "reporter") {
 		// Manually define the --reporter enum flag
-		c.Flags().VarP(o.Reporting.reporter, "reporter", "r", `set one or more reporters to use`)
-		_ = c.Flags().SetAnnotation("reporter", flagusages.FlagGroupAnnotation, []string{"Reporting"})
+		fld, found := getValue(o.Reporting).Type().FieldByName("Types")
+		if found && o.Reporting.reporter != nil {
+			desc := fld.Tag.Get("desc")
+			flag := fld.Tag.Get("flag")
+			shrt := fld.Tag.Get("shorthand")
+			c.Flags().VarP(o.Reporting.reporter, flag, shrt, desc)
+		}
+	}
+	if !goneric.SliceIn(exclusions, "ignore-deptypes") {
+		// Manually define the --ignore-deptypes enum flag
+		fld, found := getValue(o.Filtering.Ignore).Type().FieldByName("Deptypes")
+		if found && o.Filtering.Ignore.types != nil {
+			desc := fld.Tag.Get("desc")
+			flag := fld.Tag.Get("flag")
+			shrt := fld.Tag.Get("shorthand")
+			c.Flags().VarP(o.Filtering.Ignore.types, flag, shrt, desc)
+		}
 	}
 }
 
