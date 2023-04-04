@@ -192,9 +192,11 @@ func (p *packageJSON) Deps(ctx context.Context, resolve VersionResolutionStrateg
 			if input == nil {
 				return nil
 			}
+
 			// Get all the versions matching the constraint
 			collect, err := GetVersionsFromRegistry(ctx, input.name, input.constraints)
 			// TODO: understand what to do when the HTTP call to the registry fails
+			// TODO: how to propagate the error `err`?
 			if err != nil {
 				return nil
 			}
