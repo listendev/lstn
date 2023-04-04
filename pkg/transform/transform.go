@@ -23,6 +23,7 @@ import (
 	"github.com/go-playground/mold/v4"
 	"github.com/go-playground/mold/v4/modifiers"
 	"github.com/listendev/lstn/pkg/cmd"
+	npmdeptype "github.com/listendev/lstn/pkg/npm/deptype"
 )
 
 // Singleton is the mold.Transformer singleton instance.
@@ -44,6 +45,12 @@ func init() {
 					intermediate = append(intermediate, i.String())
 				}
 				unique, _ = cmd.ParseReportTypes(goneric.SliceDedupe(intermediate))
+			case "deptype.Enum":
+				intermediate := []string{}
+				for _, i := range unique.([]npmdeptype.Enum) {
+					intermediate = append(intermediate, i.String())
+				}
+				unique, _ = npmdeptype.ParseMultiple(goneric.SliceDedupe(intermediate)...)
 			}
 
 			fl.Field().Set(reflect.ValueOf(unique))
