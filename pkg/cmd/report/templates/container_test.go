@@ -45,7 +45,7 @@ func TestRenderContainer(t *testing.T) {
 					Verdicts: []listen.Verdict{
 						{
 							Message:  "outbound network connection",
-							Priority: "high",
+							Severity: "high",
 							Metadata: map[string]interface{}{
 								"npm_package_name":    "foo",
 								"npm_package_version": "1.0.0",
@@ -63,7 +63,7 @@ func TestRenderContainer(t *testing.T) {
 					Verdicts: []listen.Verdict{
 						{
 							Message:  "outbound network connection",
-							Priority: "high",
+							Severity: "high",
 							Metadata: map[string]interface{}{
 								"npm_package_name":    "foo",
 								"npm_package_version": "1.0.0",
@@ -81,7 +81,7 @@ func TestRenderContainer(t *testing.T) {
 					Verdicts: []listen.Verdict{
 						{
 							Message:  "outbound network connection",
-							Priority: "high",
+							Severity: "high",
 							Metadata: map[string]interface{}{
 								"npm_package_name":    "foobar",
 								"npm_package_version": "1.0.0",
@@ -93,7 +93,7 @@ func TestRenderContainer(t *testing.T) {
 						},
 						{
 							Message:  "outbound network connection",
-							Priority: "medium",
+							Severity: "medium",
 							Metadata: map[string]interface{}{
 								"npm_package_name":    "foobar",
 								"npm_package_version": "1.0.0",
@@ -105,7 +105,7 @@ func TestRenderContainer(t *testing.T) {
 						},
 						{
 							Message:  "outbound network connection",
-							Priority: "medium",
+							Severity: "medium",
 							Metadata: map[string]interface{}{
 								"npm_package_name":    "foobar",
 								"npm_package_version": "1.0.0",
@@ -117,7 +117,7 @@ func TestRenderContainer(t *testing.T) {
 						},
 						{
 							Message:  "outbound network connection",
-							Priority: "low",
+							Severity: "low",
 							Metadata: map[string]interface{}{
 								"npm_package_name":    "foobar",
 								"npm_package_version": "1.0.0",
@@ -186,7 +186,7 @@ func TestRenderContainer(t *testing.T) {
 					Verdicts: []listen.Verdict{
 						{
 							Message:  "outbound network connection",
-							Priority: "high",
+							Severity: "high",
 							Metadata: map[string]interface{}{
 								"npm_package_name":    "foo",
 								"npm_package_version": "1.0.0",
@@ -220,7 +220,7 @@ func TestRenderContainer(t *testing.T) {
 					Verdicts: []listen.Verdict{
 						{
 							Message:  "outbound network connection",
-							Priority: "high",
+							Severity: "high",
 							Metadata: map[string]interface{}{
 								"npm_package_name":    "baz",
 								"npm_package_version": "1.0.0",

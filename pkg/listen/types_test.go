@@ -443,7 +443,7 @@ func (suite *TypesSuite) TestResponseMarshalJSON() {
 		},
 		{
 			desc:   "with verdicts",
-			reader: strings.NewReader(`[{"name":"name","version":"version","shasum":"shasum","verdicts":[{"message":"message","priority":"priority","metadata":{}}]}]`),
+			reader: strings.NewReader(`[{"name":"name","version":"version","shasum":"shasum","verdicts":[{"message":"message","severity":"severity","metadata":{}}]}]`),
 			expected: Response{
 				Package{
 					Name:    "name",
@@ -452,7 +452,7 @@ func (suite *TypesSuite) TestResponseMarshalJSON() {
 					Verdicts: []Verdict{
 						{
 							Message:  "message",
-							Priority: "priority",
+							Severity: "severity",
 							Metadata: make(map[string]interface{}),
 						},
 					},
@@ -461,7 +461,7 @@ func (suite *TypesSuite) TestResponseMarshalJSON() {
 		},
 		{
 			desc:   "metadata accept any type",
-			reader: strings.NewReader(`[{"name":"name","version":"version","shasum":"shasum","verdicts":[{"message":"message","priority":"priority","metadata":{"number":42,"string":"foo"}}]}]`),
+			reader: strings.NewReader(`[{"name":"name","version":"version","shasum":"shasum","verdicts":[{"message":"message","severity":"severity","metadata":{"number":42,"string":"foo"}}]}]`),
 			expected: Response{
 				Package{
 					Name:    "name",
@@ -470,7 +470,7 @@ func (suite *TypesSuite) TestResponseMarshalJSON() {
 					Verdicts: []Verdict{
 						{
 							Message:  "message",
-							Priority: "priority",
+							Severity: "severity",
 							Metadata: metadata,
 						},
 					},

@@ -171,7 +171,7 @@ func TestEval(t *testing.T) {
 					"verdicts": [
 						{
 							"message": "npm install spawned a process",
-							"priority": "medium",
+							"severity": "medium",
 							"metadata": {
 								"npm_package_name": "@coreui/react",
 								"npm_package_version": "3.4.6",
@@ -181,7 +181,7 @@ func TestEval(t *testing.T) {
 						},
 						{
 							"message": "npm install spawned a process",
-							"priority": "medium",
+							"severity": "medium",
 							"metadata": {
 								"npm_package_name": "core-js",
 								"npm_package_version": "3.26.1",
@@ -193,7 +193,7 @@ func TestEval(t *testing.T) {
 				}`)),
 				expr: `.verdicts[0]`,
 			},
-			wantW: "{\"message\":\"npm install spawned a process\",\"metadata\":{\"commandline\":\"sh -c node npm-postinstall\",\"npm_package_name\":\"@coreui/react\",\"npm_package_version\":\"3.4.6\",\"parent_name\":\"node\"},\"priority\":\"medium\"}\n",
+			wantW: "{\"message\":\"npm install spawned a process\",\"metadata\":{\"commandline\":\"sh -c node npm-postinstall\",\"npm_package_name\":\"@coreui/react\",\"npm_package_version\":\"3.4.6\",\"parent_name\":\"node\"},\"severity\":\"medium\"}\n",
 		},
 		{
 			name: "complex-1",
@@ -206,7 +206,7 @@ func TestEval(t *testing.T) {
 						"verdicts": [
 							{
 								"message": "npm install spawned a process",
-								"priority": "medium",
+								"severity": "medium",
 								"metadata": {
 									"npm_package_name": "@coreui/react",
 									"npm_package_version": "3.4.6",
@@ -216,7 +216,7 @@ func TestEval(t *testing.T) {
 							},
 							{
 								"message": "npm install spawned a process",
-								"priority": "medium",
+								"severity": "medium",
 								"metadata": {
 									"npm_package_name": "core-js",
 									"npm_package_version": "3.26.1",
@@ -243,7 +243,7 @@ func TestEval(t *testing.T) {
 						"verdicts": [
 							{
 								"message": "npm install spawned a process",
-								"priority": "medium",
+								"severity": "medium",
 								"metadata": {
 									"npm_package_name": "@coreui/react",
 									"npm_package_version": "3.4.6",
@@ -253,7 +253,7 @@ func TestEval(t *testing.T) {
 							},
 							{
 								"message": "npm install spawned a process",
-								"priority": "medium",
+								"severity": "medium",
 								"metadata": {
 									"npm_package_name": "core-js",
 									"npm_package_version": "3.26.1",

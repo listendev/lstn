@@ -53,7 +53,7 @@ func main() {
 			Verdicts: []listen.Verdict{
 				{
 					Message:  "unexpected outbound connection destination",
-					Priority: "high",
+					Severity: "high",
 					Metadata: map[string]interface{}{
 						"commandline":      "/usr/local/bin/node",
 						"file_descriptor:": "10.0.2.100:47326->142.251.111.128:0",

@@ -27,19 +27,19 @@ import (
 )
 
 const (
-	verdictPriorityLow    string = "low"
-	verdictPriorityMedium string = "medium"
-	verdictPriorityHigh   string = "high"
+	verdictSeverityLow    string = "low"
+	verdictSeverityMedium string = "medium"
+	verdictSeverityHigh   string = "high"
 )
 
-func verdictPriorityToColorFunc(colorScheme *iostreams.ColorScheme, p string) func(string) string {
+func verdictSeverityToColorFunc(colorScheme *iostreams.ColorScheme, sev string) func(string) string {
 	var fn func(string) string
-	switch p {
-	case verdictPriorityHigh:
+	switch sev {
+	case verdictSeverityHigh:
 		fn = colorScheme.Red
-	case verdictPriorityMedium:
+	case verdictSeverityMedium:
 		fn = colorScheme.Yellow
-	case verdictPriorityLow:
+	case verdictSeverityLow:
 		fn = colorScheme.Cyan
 	default:
 		fn = func(s string) string {
@@ -103,8 +103,8 @@ func (t *TablePrinter) printVerdictMetadata(metadata map[string]interface{}) {
 func (t *TablePrinter) printVerdict(p *listen.Package, verdict listen.Verdict) {
 	cs := t.streams.ColorScheme()
 	out := t.streams.Out
-	prioColor := verdictPriorityToColorFunc(cs, verdict.Priority)
-	fmt.Fprintf(out, "  %s %s", prioColor(fmt.Sprintf("[%s]", verdict.Priority)), verdict.Message)
+	prioColor := verdictSeverityToColorFunc(cs, verdict.Severity)
+	fmt.Fprintf(out, "  %s %s", prioColor(fmt.Sprintf("[%s]", verdict.Severity)), verdict.Message)
 	metadataPackageName := ""
 	metadataPackageVersion := ""
 	if packageName, ok := verdict.Metadata["npm_package_name"]; ok {
