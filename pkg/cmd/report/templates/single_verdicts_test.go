@@ -47,7 +47,7 @@ func TestRenderSingleVerdictsPackage(t *testing.T) {
 				Verdicts: []listen.Verdict{
 					{
 						Message:  "outbound network connection",
-						Priority: "high",
+						Severity: "high",
 						Metadata: map[string]interface{}{
 							"npm_package_name":    "foo",
 							"npm_package_version": "1.0.0",
@@ -69,7 +69,7 @@ func TestRenderSingleVerdictsPackage(t *testing.T) {
 				Verdicts: []listen.Verdict{
 					{
 						Message:  "unexpected outbound connection destination",
-						Priority: "high",
+						Severity: "high",
 						Metadata: map[string]interface{}{
 							"npm_package_name":    "foo",
 							"npm_package_version": "1.0.0",

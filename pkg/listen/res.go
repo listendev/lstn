@@ -17,7 +17,7 @@ package listen
 
 type Verdict struct {
 	Message  string                 `json:"message"`
-	Priority string                 `json:"priority"`
+	Severity string                 `json:"severity"`
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 }
 

@@ -27,16 +27,16 @@ const singleVerdictsTpl = `
 ## <b><a href="https://www.npmjs.com/package/{{ .Name }}/v/{{ .Version }}">{{ .Name }}@{{ .Version }}</a></b><br>
 
 {{ range .Verdicts }}
-{{ $priority := .Priority}}
-{{ $priorityEmoji := ":large_blue_diamond:" }}
-{{ if eq $priority "high" }}
-	{{ $priorityEmoji = ":stop_sign:" }}
-{{ else if eq $priority "medium" }}
-	{{ $priorityEmoji = ":warning:" }}
-{{ else if eq $priority "low" }}
-	{{ $priorityEmoji = ":large_blue_diamond:" }}
+{{ $severity := .Severity}}
+{{ $severityEmoji := ":large_blue_diamond:" }}
+{{ if eq $severity "high" }}
+	{{ $severityEmoji = ":stop_sign:" }}
+{{ else if eq $severity "medium" }}
+	{{ $severityEmoji = ":warning:" }}
+{{ else if eq $severity "low" }}
+	{{ $severityEmoji = ":large_blue_diamond:" }}
 {{ end }}
-### {{ $priorityEmoji }} {{ .Message }}
+### {{ $severityEmoji }} {{ .Message }}
 <dl>
 <dt>Dependency type</dt>
 <dd>
