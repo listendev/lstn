@@ -15,29 +15,29 @@
 // limitations under the License.
 package listen
 
-type Verdict struct {
-	Message  string                 `json:"message"`
-	Severity string                 `json:"severity"`
-	Metadata map[string]interface{} `json:"metadata,omitempty"`
-}
+import "github.com/listendev/pkg/models"
 
-type Problem struct {
-	Type   string `json:"type"`
-	Title  string `json:"title"`
-	Detail string `json:"detail"`
-}
+type Verdict = models.Verdict
+type Problem = models.Problem
 
 type Package struct {
-	Name     string    `json:"name"`
-	Version  string    `json:"version"`
-	Shasum   string    `json:"shasum"`
-	Verdicts []Verdict `json:"verdicts"`
-	Problems []Problem `json:"problems,omitempty"`
-}
+	// Name name of the package
+	Name string `json:"name"`
 
+	// Problems A list of problems
+	Problems []Problem `json:"problems,omitempty"`
+
+	// Shasum shasum of the package
+	Shasum *string `json:"shasum,omitempty"`
+
+	// Verdicts A list of verdicts
+	Verdicts []Verdict `json:"verdicts"`
+
+	// Version version of the package
+	Version *string `json:"version,omitempty"`
+}
 type Response []Package
 
 type responseError struct {
-	Message   string `json:"message"`
-	RequestID string `json:"request_id"`
+	Message string `json:"message"`
 }
