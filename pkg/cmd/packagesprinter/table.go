@@ -24,6 +24,7 @@ import (
 	"github.com/cli/cli/pkg/iostreams"
 	"github.com/cli/cli/utils"
 	"github.com/listendev/lstn/pkg/listen"
+	"github.com/listendev/pkg/verdictcode"
 )
 
 const (
@@ -80,7 +81,7 @@ func (t *TablePrinter) printVerdictMetadata(metadata map[string]interface{}) {
 	cs := t.streams.ColorScheme()
 	for _, mdkey := range keys {
 		md := metadata[mdkey]
-		if mdkey == "npm_package_name" || mdkey == "npm_package_version" {
+		if mdkey == "npm_package_name" || mdkey == "npm_package_version" || mdkey == "file_content" || mdkey == "lines" {
 			continue
 		}
 		if md == nil {
@@ -103,7 +104,7 @@ func (t *TablePrinter) printVerdictMetadata(metadata map[string]interface{}) {
 func (t *TablePrinter) printVerdict(p *listen.Package, verdict listen.Verdict) {
 	cs := t.streams.ColorScheme()
 	out := t.streams.Out
-	prioColor := verdictSeverityToColorFunc(cs, verdict.Severity)
+	prioColor := verdictSeverityToColorFunc(cs, verdict.Severity.String())
 	fmt.Fprintf(out, "  %s %s", prioColor(fmt.Sprintf("[%s]", verdict.Severity)), verdict.Message)
 	metadataPackageName := ""
 	metadataPackageVersion := ""
@@ -114,7 +115,11 @@ func (t *TablePrinter) printVerdict(p *listen.Package, verdict listen.Verdict) {
 		metadataPackageVersion = packageVersion.(string)
 	}
 
-	if metadataPackageName != "" && metadataPackageVersion != "" && metadataPackageName != p.Name && metadataPackageVersion != p.Version {
+	if metadataPackageName != "" &&
+		metadataPackageVersion != "" &&
+		metadataPackageName != p.Name &&
+		p.Version != nil &&
+		metadataPackageVersion != *p.Version {
 		fmt.Fprintf(out, cs.Bold(" (from transitive dependency %s@%s)"), cs.CyanBold(metadataPackageName), cs.CyanBold(metadataPackageVersion))
 	}
 	fmt.Fprintln(out, "")
@@ -141,9 +146,17 @@ func (t *TablePrinter) printPackage(p *listen.Package) {
 	if len(p.Problems) == 1 {
 		problemsWord = "problem"
 	}
-	fmt.Fprintf(out, "There %s %s %s and %s %s for %s@%s\n", thereIsAre, cs.Bold(strconv.Itoa(len(p.Verdicts))), verdictsWord, cs.Bold(strconv.Itoa(len(p.Problems))), problemsWord, cs.CyanBold(p.Name), cs.CyanBold(p.Version))
+	versionStr := ""
+	if p.Version != nil {
+		versionStr = fmt.Sprintf("@%s", cs.CyanBold(*p.Version))
+	}
+
+	fmt.Fprintf(out, "There %s %s %s and %s %s for %s%s\n", thereIsAre, cs.Bold(strconv.Itoa(len(p.Verdicts))), verdictsWord, cs.Bold(strconv.Itoa(len(p.Problems))), problemsWord, cs.CyanBold(p.Name), versionStr)
 	fmt.Fprintln(out, "")
 	for _, verdict := range p.Verdicts {
+		if verdict.Code == verdictcode.UNK {
+			continue
+		}
 		t.printVerdict(p, verdict)
 	}
 
@@ -185,7 +198,12 @@ func (t *TablePrinter) printTable(packages *listen.Response) error {
 		}
 
 		tab.AddField(p.Name, nil, cs.Bold)
-		tab.AddField(p.Version, nil, nil)
+
+		version := ""
+		if p.Version != nil {
+			version = *p.Version
+		}
+		tab.AddField(version, nil, nil)
 
 		tab.AddField(fmt.Sprintf("%s %d verdicts", verdictsIcon, len(p.Verdicts)), nil, verdictsColor)
 		tab.AddField(fmt.Sprintf("%s %d problems", problemsIcon, len(p.Problems)), nil, problemsColor)

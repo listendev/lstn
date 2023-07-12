@@ -107,7 +107,7 @@ func filterPackagesByVerdictSeverity(packages []listen.Package, sev string) []li
 		currentPackage := p
 		currentPackage.Verdicts = []listen.Verdict{}
 		for _, v := range p.Verdicts {
-			if v.Severity == sev {
+			if v.Severity.String() == sev {
 				currentPackage.Verdicts = append(currentPackage.Verdicts, v)
 
 				break
