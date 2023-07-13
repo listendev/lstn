@@ -35,7 +35,6 @@ jobs:
       - name: Check out the source code
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           fetch-depth: 0 # Avoid running against a shallow clone
 
       - name: Force fetch upstream tags
@@ -110,7 +109,6 @@ jobs:
       - name: Check out the source code
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           fetch-depth: 0 # Avoid running against a shallow clone
 
       - name: Get binaries
@@ -137,7 +135,6 @@ jobs:
       - name: Check out the source code
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           fetch-depth: 0 # Avoid running against a shallow clone
 
       - name: Get binaries
@@ -164,7 +161,6 @@ jobs:
       - name: Check out the source code
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           fetch-depth: 0 # Avoid running against a shallow clone
 
       - name: Get binaries
