@@ -24,7 +24,7 @@ import (
 
 const singleProblemsTpl = `
 {{ if gt (len .Problems) 0 }}
-### <b><a href="https://www.npmjs.com/package/{{ .Name }}/v/{{ .Version }}">{{ .Name }}@{{ .Version }}</a></b><br>
+### <b><a href="https://verdicts.listen.dev/npm/{{ .Name }}/{{ .Version }}">{{ .Name }}@{{ .Version }}</a></b><br>
 
 {{ range .Problems }}
 {{ $title := .Title}}

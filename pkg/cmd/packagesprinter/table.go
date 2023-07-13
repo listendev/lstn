@@ -82,7 +82,13 @@ func (t *TablePrinter) printVerdictMetadata(metadata map[string]interface{}) {
 	cs := t.streams.ColorScheme()
 	for _, mdkey := range keys {
 		md := metadata[mdkey]
-		if mdkey == "npm_package_name" || mdkey == "npm_package_version" || mdkey == "file_content" || mdkey == "lines" {
+		if mdkey == "npm_package_name" ||
+			mdkey == "npm_package_version" ||
+			mdkey == "file_content" ||
+			mdkey == "end" ||
+			mdkey == "start" ||
+			mdkey == "diff" ||
+			mdkey == "lines" {
 			continue
 		}
 		if md == nil {
@@ -175,7 +181,15 @@ func (t *TablePrinter) printPackage(p *listen.Package) {
 func (t *TablePrinter) printPackages(packages *listen.Response) {
 	out := t.streams.Out
 	for _, p := range *packages {
-		if len(p.Verdicts) == 0 && len(p.Problems) == 0 {
+		verdicts := []models.Verdict{}
+		for _, v := range p.Verdicts {
+			if v.Code == verdictcode.UNK {
+				continue
+			}
+			verdicts = append(verdicts, v)
+		}
+
+		if len(verdicts) == 0 && len(p.Problems) == 0 {
 			continue
 		}
 		fmt.Fprintln(out, "")
@@ -191,7 +205,14 @@ func (t *TablePrinter) printTable(packages *listen.Response) error {
 	for _, p := range *packages {
 		verdictsColor := cs.ColorFromString("green")
 		verdictsIcon := cs.SuccessIcon()
-		if len(p.Verdicts) > 0 {
+		verdicts := []models.Verdict{}
+		for _, v := range p.Verdicts {
+			if v.Code == verdictcode.UNK {
+				continue
+			}
+			verdicts = append(verdicts, v)
+		}
+		if len(verdicts) > 0 {
 			verdictsColor = cs.ColorFromString("red")
 			verdictsIcon = cs.FailureIcon()
 		}
@@ -211,7 +232,15 @@ func (t *TablePrinter) printTable(packages *listen.Response) error {
 		}
 		tab.AddField(version, nil, nil)
 
-		tab.AddField(fmt.Sprintf("%s %d verdicts", verdictsIcon, len(p.Verdicts)), nil, verdictsColor)
+		verdictsCount := 0
+		for _, v := range p.Verdicts {
+			if v.Code == verdictcode.UNK {
+				continue
+			}
+			verdictsCount++
+		}
+
+		tab.AddField(fmt.Sprintf("%s %d verdicts", verdictsIcon, verdictsCount), nil, verdictsColor)
 		tab.AddField(fmt.Sprintf("%s %d problems", problemsIcon, len(p.Problems)), nil, problemsColor)
 
 		tab.EndRow()

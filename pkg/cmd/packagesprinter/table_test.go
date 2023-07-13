@@ -435,6 +435,7 @@ func TestTablePrinter_printTable(t *testing.T) {
 					Version: strPtr("1.0.0"),
 					Verdicts: []listen.Verdict{
 						{
+							Code:     verdictcode.FNI001,
 							Message:  "unexpected outbound connection destination",
 							Severity: "high",
 							Metadata: map[string]interface{}{
@@ -454,6 +455,7 @@ func TestTablePrinter_printTable(t *testing.T) {
 						{
 							Message:  "npm spawned a child process",
 							Severity: "high",
+							Code:     verdictcode.FNI001,
 							Metadata: map[string]interface{}{
 								"npm_package_name":    "react",
 								"npm_package_version": "0.18.0",
@@ -466,6 +468,7 @@ func TestTablePrinter_printTable(t *testing.T) {
 						{
 							Message:  "unexpected outbound connection destination",
 							Severity: "high",
+							Code:     verdictcode.FNI001,
 							Metadata: map[string]interface{}{
 								"commandline":      "/usr/local/bin/node",
 								"file_descriptor:": "10.0.2.100:47326->142.251.111.128:0",

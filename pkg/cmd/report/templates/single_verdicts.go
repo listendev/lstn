@@ -24,7 +24,7 @@ import (
 
 const singleVerdictsTpl = `
 {{ if gt (len .Verdicts) 0 }}
-## <b><a href="https://www.npmjs.com/package/{{ .Name }}/v/{{ .Version }}">{{ .Name }}@{{ .Version }}</a></b><br>
+## <b><a href="https://verdicts.listen.dev/npm/{{ .Name }}/{{ .Version }}">{{ .Name }}@{{ .Version }}</a></b><br>
 
 {{ range .Verdicts }}
 {{ $severity := .Severity}}
@@ -46,7 +46,7 @@ Direct dependency
 {{ else }}
 {{ $transitivePackageName := index .Metadata "npm_package_name" }}
 {{ $transitivePackageVersion := index .Metadata "npm_package_version" }}
-Transitive dependency {{ if and $transitivePackageName $transitivePackageVersion }} (<a href="https://www.npmjs.com/package/{{ $transitivePackageName }}/v/{{ $transitivePackageVersion }}">{{ $transitivePackageName }}@{{ $transitivePackageVersion }}</a>){{ end }}
+Transitive dependency {{ if and $transitivePackageName $transitivePackageVersion }} (<a href="https://verdicts.listen.dev/npm/{{ $transitivePackageName }}/{{ $transitivePackageVersion }}">{{ $transitivePackageName }}@{{ $transitivePackageVersion }}</a>){{ end }}
 {{ end }}
 </dd>
 {{ $aiCtxMetadata := index .Metadata "ai_ctx" }}
@@ -73,6 +73,11 @@ Transitive dependency {{ if and $transitivePackageName $transitivePackageVersion
 {{ if or (eq $key "npm_package_name")
         (eq $key "npm_package_version")
         (eq $key "ai_ctx")
+		(eq $key "file_content")
+		(eq $key "lines")
+		(eq $key "diff")
+		(eq $key "end")
+		(eq $key "start")
 }}
 {{ continue }}
 {{ end }}

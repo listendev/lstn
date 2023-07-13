@@ -21,6 +21,8 @@ import (
 	"text/template"
 
 	"github.com/listendev/lstn/pkg/listen"
+	"github.com/listendev/pkg/models"
+	"github.com/listendev/pkg/verdictcode"
 )
 
 const containerTpl = `{{- $high := .HighSeverity }}
@@ -83,7 +85,14 @@ type containerData struct {
 func countVerdicts(packages []listen.Package) int {
 	var count int
 	for _, p := range packages {
-		count += len(p.Verdicts)
+		verdicts := []models.Verdict{}
+		for _, v := range p.Verdicts {
+			if v.Code == verdictcode.UNK {
+				continue
+			}
+			verdicts = append(verdicts, v)
+		}
+		count += len(verdicts)
 	}
 
 	return count
