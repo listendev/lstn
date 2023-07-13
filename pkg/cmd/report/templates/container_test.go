@@ -23,6 +23,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func strPtr(s string) *string {
+	return &s
+}
+
 func TestRenderContainer(t *testing.T) {
 	tests := []struct {
 		name           string
@@ -41,7 +45,7 @@ func TestRenderContainer(t *testing.T) {
 			packages: []listen.Package{
 				{
 					Name:    "foo",
-					Version: "1.0.0",
+					Version: strPtr("1.0.0"),
 					Verdicts: []listen.Verdict{
 						{
 							Message:  "outbound network connection",
@@ -59,7 +63,7 @@ func TestRenderContainer(t *testing.T) {
 				},
 				{
 					Name:    "bar",
-					Version: "1.0.0",
+					Version: strPtr("1.0.0"),
 					Verdicts: []listen.Verdict{
 						{
 							Message:  "outbound network connection",
@@ -77,7 +81,7 @@ func TestRenderContainer(t *testing.T) {
 				},
 				{
 					Name:    "foobar",
-					Version: "1.0.0",
+					Version: strPtr("1.0.0"),
 					Verdicts: []listen.Verdict{
 						{
 							Message:  "outbound network connection",
@@ -138,7 +142,7 @@ func TestRenderContainer(t *testing.T) {
 			packages: []listen.Package{
 				{
 					Name:    "foo",
-					Version: "1.0.0",
+					Version: strPtr("1.0.0"),
 					Problems: []listen.Problem{
 						{
 							Type:   "https://listen.dev/probs/invalid-name",
@@ -154,7 +158,7 @@ func TestRenderContainer(t *testing.T) {
 				},
 				{
 					Name:    "bar",
-					Version: "1.2.0",
+					Version: strPtr("1.2.0"),
 					Problems: []listen.Problem{
 						{
 							Type:   "https://listen.dev/probs/invalid-name",
@@ -182,7 +186,7 @@ func TestRenderContainer(t *testing.T) {
 			packages: []listen.Package{
 				{
 					Name:    "foo",
-					Version: "1.0.0",
+					Version: strPtr("1.0.0"),
 					Verdicts: []listen.Verdict{
 						{
 							Message:  "outbound network connection",
@@ -200,7 +204,7 @@ func TestRenderContainer(t *testing.T) {
 				},
 				{
 					Name:    "foobar",
-					Version: "1.0.0",
+					Version: strPtr("1.0.0"),
 					Problems: []listen.Problem{
 						{
 							Type:   "https://listen.dev/probs/invalid-name",
@@ -216,7 +220,7 @@ func TestRenderContainer(t *testing.T) {
 				},
 				{
 					Name:    "baz",
-					Version: "1.0.0",
+					Version: strPtr("1.0.0"),
 					Verdicts: []listen.Verdict{
 						{
 							Message:  "outbound network connection",

@@ -34,7 +34,7 @@ func TestRenderSingleVerdictsPackage(t *testing.T) {
 			name: "no verdicts",
 			p: listen.Package{
 				Name:     "foo",
-				Version:  "1.0.0",
+				Version:  strPtr("1.0.0"),
 				Verdicts: []listen.Verdict{},
 			},
 			expectedOutput: testdataFileToBytes(t, "testdata/single_verdicts_no_verdicts.md"),
@@ -43,7 +43,7 @@ func TestRenderSingleVerdictsPackage(t *testing.T) {
 			name: "one verdict",
 			p: listen.Package{
 				Name:    "foo",
-				Version: "1.0.0",
+				Version: strPtr("1.0.0"),
 				Verdicts: []listen.Verdict{
 					{
 						Message:  "outbound network connection",
@@ -65,7 +65,7 @@ func TestRenderSingleVerdictsPackage(t *testing.T) {
 			name: "verdicts with ai_ctx",
 			p: listen.Package{
 				Name:    "foo",
-				Version: "1.0.0",
+				Version: strPtr("1.0.0"),
 				Verdicts: []listen.Verdict{
 					{
 						Message:  "unexpected outbound connection destination",
