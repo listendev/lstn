@@ -24,6 +24,7 @@ import (
 	"github.com/cli/cli/pkg/iostreams"
 	"github.com/cli/cli/utils"
 	"github.com/listendev/lstn/pkg/listen"
+	"github.com/listendev/pkg/models"
 	"github.com/listendev/pkg/verdictcode"
 )
 
@@ -134,11 +135,19 @@ func (t *TablePrinter) printProblem(problem listen.Problem) {
 }
 
 func (t *TablePrinter) printPackage(p *listen.Package) {
+	verdicts := []models.Verdict{}
+	for _, v := range p.Verdicts {
+		if v.Code == verdictcode.UNK {
+			continue
+		}
+		verdicts = append(verdicts, v)
+	}
+
 	cs := t.streams.ColorScheme()
 	out := t.streams.Out
 	thereIsAre := "are"
 	verdictsWord := "verdicts"
-	if len(p.Verdicts) == 1 {
+	if len(verdicts) == 1 {
 		verdictsWord = "verdict"
 		thereIsAre = "is"
 	}
@@ -151,12 +160,9 @@ func (t *TablePrinter) printPackage(p *listen.Package) {
 		versionStr = fmt.Sprintf("@%s", cs.CyanBold(*p.Version))
 	}
 
-	fmt.Fprintf(out, "There %s %s %s and %s %s for %s%s\n", thereIsAre, cs.Bold(strconv.Itoa(len(p.Verdicts))), verdictsWord, cs.Bold(strconv.Itoa(len(p.Problems))), problemsWord, cs.CyanBold(p.Name), versionStr)
+	fmt.Fprintf(out, "There %s %s %s and %s %s for %s%s\n", thereIsAre, cs.Bold(strconv.Itoa(len(verdicts))), verdictsWord, cs.Bold(strconv.Itoa(len(p.Problems))), problemsWord, cs.CyanBold(p.Name), versionStr)
 	fmt.Fprintln(out, "")
-	for _, verdict := range p.Verdicts {
-		if verdict.Code == verdictcode.UNK {
-			continue
-		}
+	for _, verdict := range verdicts {
 		t.printVerdict(p, verdict)
 	}
 

@@ -22,6 +22,7 @@ import (
 
 	"github.com/cli/cli/pkg/iostreams"
 	"github.com/listendev/lstn/pkg/listen"
+	"github.com/listendev/pkg/ecosystem"
 	"github.com/listendev/pkg/verdictcode"
 	"github.com/stretchr/testify/require"
 )
@@ -213,6 +214,20 @@ func TestTablePrinter_printPackage(t *testing.T) {
 		p              *listen.Package
 		expectedOutput string
 	}{
+		{
+			name: "empty verdicts content prints nothing",
+			p: &listen.Package{
+				Name:    "my-package",
+				Version: strPtr("1.0.0"),
+				Verdicts: []listen.Verdict{
+					{
+						Ecosystem: ecosystem.Npm,
+					},
+				},
+				Problems: []listen.Problem{},
+			},
+			expectedOutput: "There are 0 verdicts and 0 problems for my-package@1.0.0\n\n\n",
+		},
 		{
 			name: "package with no problems or verdicts gives this information along with the package name and version",
 			p: &listen.Package{
