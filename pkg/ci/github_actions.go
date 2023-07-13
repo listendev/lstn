@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/google/go-github/v50/github"
+	"github.com/google/go-github/v53/github"
 )
 
 // NewInfoFromGitHubEvent creates an Info instance using the the file on the GitHub action runner

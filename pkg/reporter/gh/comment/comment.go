@@ -22,7 +22,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/google/go-github/v50/github"
+	"github.com/google/go-github/v53/github"
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	"github.com/listendev/lstn/pkg/cmd/report"
 	pkgcontext "github.com/listendev/lstn/pkg/context"

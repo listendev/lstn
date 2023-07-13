@@ -22,7 +22,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/google/go-github/v50/github"
+	"github.com/google/go-github/v53/github"
 	"github.com/jarcoal/httpmock"
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
