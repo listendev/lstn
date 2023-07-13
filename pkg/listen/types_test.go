@@ -22,12 +22,16 @@ import (
 	"path"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/Masterminds/semver/v3"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/listendev/lstn/pkg/npm"
+	"github.com/listendev/pkg/ecosystem"
+	"github.com/listendev/pkg/models/category"
+	"github.com/listendev/pkg/verdictcode"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 )
@@ -435,24 +439,35 @@ func (suite *TypesSuite) TestResponseMarshalJSON() {
 			expected: Response{
 				Package{
 					Name:     "name",
-					Version:  "version",
-					Shasum:   "shasum",
+					Version:  strPtr("version"),
+					Shasum:   strPtr("shasum"),
 					Verdicts: []Verdict{},
 				},
 			},
 		},
 		{
 			desc:   "with verdicts",
-			reader: strings.NewReader(`[{"name":"name","version":"version","shasum":"shasum","verdicts":[{"message":"message","severity":"severity","metadata":{}}]}]`),
+			reader: strings.NewReader(`[{"name":"name","version":"1.0.0","shasum":"036bfebd9748309772b79753d2e9924af7707d00","verdicts":[{"pkg": "name", "version": "1.0.0", "shasum": "036bfebd9748309772b79753d2e9924af7707d00", "created_at": "2023-06-22T20:12:58.911537+00:00", "categories": ["process"], "code": "STN001", "file": "static(exfiltrate_env).json", "ecosystem": "npm", "message":"message","severity":"medium","metadata":{}}]}]`),
 			expected: Response{
 				Package{
 					Name:    "name",
-					Version: "version",
-					Shasum:  "shasum",
+					Version: strPtr("1.0.0"),
+					Shasum:  strPtr("036bfebd9748309772b79753d2e9924af7707d00"),
 					Verdicts: []Verdict{
 						{
-							Message:  "message",
-							Severity: "severity",
+							File:       "static(exfiltrate_env).json",
+							Pkg:        "name",
+							Shasum:     "036bfebd9748309772b79753d2e9924af7707d00",
+							Version:    "1.0.0",
+							Categories: []category.Category{category.Process},
+							Code:       verdictcode.STN001,
+							Ecosystem:  ecosystem.Npm,
+							Message:    "message",
+							Severity:   "medium",
+							CreatedAt: func() *time.Time {
+								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+								return &t
+							}(),
 							Metadata: make(map[string]interface{}),
 						},
 					},
@@ -461,16 +476,27 @@ func (suite *TypesSuite) TestResponseMarshalJSON() {
 		},
 		{
 			desc:   "metadata accept any type",
-			reader: strings.NewReader(`[{"name":"name","version":"version","shasum":"shasum","verdicts":[{"message":"message","severity":"severity","metadata":{"number":42,"string":"foo"}}]}]`),
+			reader: strings.NewReader(`[{"name":"name","version":"1.0.0","shasum":"036bfebd9748309772b79753d2e9924af7707d00","verdicts":[{"pkg": "name", "version": "1.0.0", "shasum": "036bfebd9748309772b79753d2e9924af7707d00", "created_at": "2023-06-22T20:12:58.911537+00:00", "categories": ["process"], "code": "STN001", "file": "static(exfiltrate_env).json", "ecosystem": "npm", "message":"message","severity":"medium","metadata":{"number":42,"string":"foo"}}]}]`),
 			expected: Response{
 				Package{
 					Name:    "name",
-					Version: "version",
-					Shasum:  "shasum",
+					Version: strPtr("1.0.0"),
+					Shasum:  strPtr("036bfebd9748309772b79753d2e9924af7707d00"),
 					Verdicts: []Verdict{
 						{
-							Message:  "message",
-							Severity: "severity",
+							File:       "static(exfiltrate_env).json",
+							Pkg:        "name",
+							Shasum:     "036bfebd9748309772b79753d2e9924af7707d00",
+							Version:    "1.0.0",
+							Categories: []category.Category{category.Process},
+							Code:       verdictcode.STN001,
+							Ecosystem:  ecosystem.Npm,
+							Message:    "message",
+							Severity:   "medium",
+							CreatedAt: func() *time.Time {
+								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+								return &t
+							}(),
 							Metadata: metadata,
 						},
 					},
@@ -483,8 +509,8 @@ func (suite *TypesSuite) TestResponseMarshalJSON() {
 			expected: Response{
 				Package{
 					Name:    "name",
-					Version: "version",
-					Shasum:  "shasum",
+					Version: strPtr("version"),
+					Shasum:  strPtr("shasum"),
 					Problems: []Problem{
 						{
 							Type:   "type",

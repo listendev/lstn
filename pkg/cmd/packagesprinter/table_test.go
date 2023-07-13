@@ -22,8 +22,13 @@ import (
 
 	"github.com/cli/cli/pkg/iostreams"
 	"github.com/listendev/lstn/pkg/listen"
+	"github.com/listendev/pkg/verdictcode"
 	"github.com/stretchr/testify/require"
 )
+
+func strPtr(s string) *string {
+	return &s
+}
 
 func TestTablePrinter_printVerdictMetadata(t *testing.T) {
 	tests := []struct {
@@ -106,7 +111,7 @@ func TestTablePrinter_printVerdict(t *testing.T) {
 			name: "verdict with metadata prints the verdict and metadata",
 			p: &listen.Package{
 				Name:     "my-package",
-				Version:  "1.0.0",
+				Version:  strPtr("1.0.0"),
 				Verdicts: []listen.Verdict{},
 
 				Problems: []listen.Problem{},
@@ -127,7 +132,7 @@ func TestTablePrinter_printVerdict(t *testing.T) {
 			name: "verdict with transitive metadata marks the verdict as transitive",
 			p: &listen.Package{
 				Name:     "my-package",
-				Version:  "1.0.0",
+				Version:  strPtr("1.0.0"),
 				Verdicts: []listen.Verdict{},
 
 				Problems: []listen.Problem{},
@@ -212,7 +217,7 @@ func TestTablePrinter_printPackage(t *testing.T) {
 			name: "package with no problems or verdicts gives this information along with the package name and version",
 			p: &listen.Package{
 				Name:     "my-package",
-				Version:  "1.0.0",
+				Version:  strPtr("1.0.0"),
 				Verdicts: []listen.Verdict{},
 				Problems: []listen.Problem{},
 			},
@@ -222,11 +227,12 @@ func TestTablePrinter_printPackage(t *testing.T) {
 			name: "package with a single verdict prints the verdict",
 			p: &listen.Package{
 				Name:    "my-package",
-				Version: "1.0.0",
+				Version: strPtr("1.0.0"),
 				Verdicts: []listen.Verdict{
 					{
 						Message:  "unexpected outbound connection destination",
 						Severity: "high",
+						Code:     verdictcode.FNI001,
 						Metadata: map[string]interface{}{
 							"commandline":      "/usr/local/bin/node",
 							"file_descriptor:": "10.0.2.100:47326->142.251.111.128:0",
@@ -243,11 +249,12 @@ func TestTablePrinter_printPackage(t *testing.T) {
 			name: "package with verdicts prints the verdicts recognizing transient dependencies",
 			p: &listen.Package{
 				Name:    "my-package",
-				Version: "1.0.0",
+				Version: strPtr("1.0.0"),
 				Verdicts: []listen.Verdict{
 					{
 						Message:  "npm spawned a child process",
 						Severity: "high",
+						Code:     verdictcode.FNI001,
 						Metadata: map[string]interface{}{
 							"npm_package_name":    "react",
 							"npm_package_version": "0.18.0",
@@ -260,6 +267,7 @@ func TestTablePrinter_printPackage(t *testing.T) {
 					{
 						Message:  "unexpected outbound connection destination",
 						Severity: "high",
+						Code:     verdictcode.FNI001,
 						Metadata: map[string]interface{}{
 							"commandline":      "/usr/local/bin/node",
 							"file_descriptor:": "10.0.2.100:47326->142.251.111.128:0",
@@ -276,7 +284,7 @@ func TestTablePrinter_printPackage(t *testing.T) {
 			name: "package with a single problem prints the problem",
 			p: &listen.Package{
 				Name:     "my-package",
-				Version:  "1.0.0",
+				Version:  strPtr("1.0.0"),
 				Verdicts: []listen.Verdict{},
 				Problems: []listen.Problem{
 					{
@@ -292,7 +300,7 @@ func TestTablePrinter_printPackage(t *testing.T) {
 			name: "package with many problems prints the problems",
 			p: &listen.Package{
 				Name:     "my-package",
-				Version:  "1.0.0",
+				Version:  strPtr("1.0.0"),
 				Verdicts: []listen.Verdict{},
 				Problems: []listen.Problem{
 					{
@@ -335,7 +343,7 @@ func TestTablePrinter_printPackages(t *testing.T) {
 			packages: &listen.Response{
 				{
 					Name:     "my-package",
-					Version:  "1.0.0",
+					Version:  strPtr("1.0.0"),
 					Verdicts: []listen.Verdict{},
 					Problems: []listen.Problem{
 						{
@@ -352,7 +360,7 @@ func TestTablePrinter_printPackages(t *testing.T) {
 				},
 				{
 					Name:     "my-package",
-					Version:  "1.0.0",
+					Version:  strPtr("1.0.0"),
 					Verdicts: []listen.Verdict{},
 					Problems: []listen.Problem{
 						{
@@ -370,7 +378,7 @@ func TestTablePrinter_printPackages(t *testing.T) {
 			packages: &listen.Response{
 				{
 					Name:     "my-package",
-					Version:  "1.0.0",
+					Version:  strPtr("1.0.0"),
 					Verdicts: []listen.Verdict{},
 					Problems: []listen.Problem{},
 				},
@@ -409,7 +417,7 @@ func TestTablePrinter_printTable(t *testing.T) {
 			packages: &listen.Response{
 				{
 					Name:    "react",
-					Version: "1.0.0",
+					Version: strPtr("1.0.0"),
 					Verdicts: []listen.Verdict{
 						{
 							Message:  "unexpected outbound connection destination",
@@ -426,7 +434,7 @@ func TestTablePrinter_printTable(t *testing.T) {
 				},
 				{
 					Name:    "my-package",
-					Version: "1.0.0",
+					Version: strPtr("1.0.0"),
 					Verdicts: []listen.Verdict{
 						{
 							Message:  "npm spawned a child process",
@@ -466,7 +474,7 @@ func TestTablePrinter_printTable(t *testing.T) {
 				},
 				{
 					Name:     "my-package",
-					Version:  "1.0.0",
+					Version:  strPtr("1.0.0"),
 					Verdicts: []listen.Verdict{},
 					Problems: []listen.Problem{
 						{

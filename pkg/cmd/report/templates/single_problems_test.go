@@ -44,7 +44,7 @@ func TestRenderSingleProblemsPackage(t *testing.T) {
 			name: "no problems",
 			p: listen.Package{
 				Name:     "foo",
-				Version:  "1.0.0",
+				Version:  strPtr("1.0.0"),
 				Problems: []listen.Problem{},
 			},
 			expectedOutput: testdataFileToBytes(t, "testdata/single_problems_no_problems.md"),
@@ -53,7 +53,7 @@ func TestRenderSingleProblemsPackage(t *testing.T) {
 			name: "with problems",
 			p: listen.Package{
 				Name:    "foo",
-				Version: "1.0.0",
+				Version: strPtr("1.0.0"),
 				Problems: []listen.Problem{
 					{
 						Type:   "https://listen.dev/probs/invalid-name",

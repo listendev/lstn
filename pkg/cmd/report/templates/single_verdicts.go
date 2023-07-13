@@ -40,7 +40,8 @@ const singleVerdictsTpl = `
 <dl>
 <dt>Dependency type</dt>
 <dd>
-{{ if and (eq (index .Metadata "npm_package_name") $.Name) (eq (index .Metadata "npm_package_version") $.Version) }}
+{{ $isDirect := (IsDirectDependencyVerdict .) -}}
+{{ if $isDirect }}
 Direct dependency
 {{ else }}
 {{ $transitivePackageName := index .Metadata "npm_package_name" }}
@@ -92,7 +93,21 @@ Nothing to see here, lucky us! :tada:
 `
 
 func RenderSingleVerdictsPackage(w io.Writer, p listen.Package) error {
-	ct := template.Must(template.New("single_verdict").Parse(singleVerdictsTpl))
+	ct := template.Must(template.New("single_verdict").Funcs(template.FuncMap{
+		"IsDirectDependencyVerdict": func(v listen.Verdict) bool {
+			if _, ok := v.Metadata["npm_package_name"]; !ok {
+				return true
+			}
+			if _, ok := v.Metadata["npm_package_version"]; !ok {
+				return true
+			}
+			if v.Metadata["npm_package_name"] != p.Name &&
+				v.Metadata["npm_package_version"] != p.Version {
+				return false
+			}
+			return true
+		},
+	}).Parse(singleVerdictsTpl))
 	err := ct.Execute(w, p)
 	if err != nil {
 		return err
