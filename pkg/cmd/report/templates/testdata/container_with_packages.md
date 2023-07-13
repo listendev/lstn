@@ -6,7 +6,7 @@ The following behavior was detected in the dependency tree during installation
 :stop_sign: <b>3</b> critical activities detected
 </summary>
 
-## <b><a href="https://www.npmjs.com/package/foo/v/1.0.0">foo@1.0.0</a></b><br>
+## <b><a href="https://verdicts.listen.dev/npm/foo/1.0.0">foo@1.0.0</a></b><br>
 
 
 
@@ -60,7 +60,7 @@ Direct dependency
 
 
 
-## <b><a href="https://www.npmjs.com/package/bar/v/1.0.0">bar@1.0.0</a></b><br>
+## <b><a href="https://verdicts.listen.dev/npm/bar/1.0.0">bar@1.0.0</a></b><br>
 
 
 
@@ -75,7 +75,7 @@ Direct dependency
 
 
 
-Transitive dependency  (<a href="https://www.npmjs.com/package/foo/v/1.0.0">foo@1.0.0</a>)
+Transitive dependency  (<a href="https://verdicts.listen.dev/npm/foo/1.0.0">foo@1.0.0</a>)
 
 </dd>
 
@@ -116,7 +116,7 @@ Transitive dependency  (<a href="https://www.npmjs.com/package/foo/v/1.0.0">foo@
 
 
 
-## <b><a href="https://www.npmjs.com/package/foobar/v/1.0.0">foobar@1.0.0</a></b><br>
+## <b><a href="https://verdicts.listen.dev/npm/foobar/1.0.0">foobar@1.0.0</a></b><br>
 
 
 
@@ -176,7 +176,7 @@ Direct dependency
 :warning: <b>1</b> medium activities detected
 </summary>
 
-## <b><a href="https://www.npmjs.com/package/foobar/v/1.0.0">foobar@1.0.0</a></b><br>
+## <b><a href="https://verdicts.listen.dev/npm/foobar/1.0.0">foobar@1.0.0</a></b><br>
 
 
 
@@ -237,7 +237,7 @@ Direct dependency
 </summary>
 
 
-## <b><a href="https://www.npmjs.com/package/foobar/v/1.0.0">foobar@1.0.0</a></b><br>
+## <b><a href="https://verdicts.listen.dev/npm/foobar/1.0.0">foobar@1.0.0</a></b><br>
 
 
 

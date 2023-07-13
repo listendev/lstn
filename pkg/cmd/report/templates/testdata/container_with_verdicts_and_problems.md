@@ -6,7 +6,7 @@ The following behavior was detected in the dependency tree during installation
 :stop_sign: <b>2</b> critical activities detected
 </summary>
 
-## <b><a href="https://www.npmjs.com/package/foo/v/1.0.0">foo@1.0.0</a></b><br>
+## <b><a href="https://verdicts.listen.dev/npm/foo/1.0.0">foo@1.0.0</a></b><br>
 
 
 
@@ -60,7 +60,7 @@ Direct dependency
 
 
 
-## <b><a href="https://www.npmjs.com/package/baz/v/1.0.0">baz@1.0.0</a></b><br>
+## <b><a href="https://verdicts.listen.dev/npm/baz/1.0.0">baz@1.0.0</a></b><br>
 
 
 
@@ -131,7 +131,7 @@ Direct dependency
 #### :triangular_flag_on_post: The analysis could not complete because of the following problems:
 
 
-### <b><a href="https://www.npmjs.com/package/foobar/v/1.0.0">foobar@1.0.0</a></b><br>
+### <b><a href="https://verdicts.listen.dev/npm/foobar/1.0.0">foobar@1.0.0</a></b><br>
 
 
 
@@ -145,7 +145,7 @@ Direct dependency
 
 
 
-### <b><a href="https://www.npmjs.com/package/baz/v/1.0.0">baz@1.0.0</a></b><br>
+### <b><a href="https://verdicts.listen.dev/npm/baz/1.0.0">baz@1.0.0</a></b><br>
 
 
 

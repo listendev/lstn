@@ -18,8 +18,10 @@ package templates
 import (
 	"bytes"
 	"testing"
+	"time"
 
 	"github.com/listendev/lstn/pkg/listen"
+	"github.com/listendev/pkg/verdictcode"
 	"github.com/stretchr/testify/require"
 )
 
@@ -48,6 +50,14 @@ func TestRenderContainer(t *testing.T) {
 					Version: strPtr("1.0.0"),
 					Verdicts: []listen.Verdict{
 						{
+							Pkg:     "foo",
+							Version: "1.0.0",
+							Shasum:  "555bd98592883255fa00de14f1151a917b5d77d5",
+							CreatedAt: func() *time.Time {
+								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+								return &t
+							}(),
+							Code:     verdictcode.FNI001,
 							Message:  "outbound network connection",
 							Severity: "high",
 							Metadata: map[string]interface{}{
@@ -66,6 +76,14 @@ func TestRenderContainer(t *testing.T) {
 					Version: strPtr("1.0.0"),
 					Verdicts: []listen.Verdict{
 						{
+							Pkg:     "bar",
+							Version: "1.0.0",
+							Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
+							CreatedAt: func() *time.Time {
+								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+								return &t
+							}(),
+							Code:     verdictcode.FNI001,
 							Message:  "outbound network connection",
 							Severity: "high",
 							Metadata: map[string]interface{}{
@@ -84,6 +102,14 @@ func TestRenderContainer(t *testing.T) {
 					Version: strPtr("1.0.0"),
 					Verdicts: []listen.Verdict{
 						{
+							Pkg:     "foobar",
+							Version: "1.0.0",
+							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
+							CreatedAt: func() *time.Time {
+								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+								return &t
+							}(),
+							Code:     verdictcode.FNI001,
 							Message:  "outbound network connection",
 							Severity: "high",
 							Metadata: map[string]interface{}{
@@ -96,6 +122,14 @@ func TestRenderContainer(t *testing.T) {
 							},
 						},
 						{
+							Pkg:     "foobar",
+							Version: "1.0.0",
+							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
+							CreatedAt: func() *time.Time {
+								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+								return &t
+							}(),
+							Code:     verdictcode.FNI001,
 							Message:  "outbound network connection",
 							Severity: "medium",
 							Metadata: map[string]interface{}{
@@ -108,6 +142,14 @@ func TestRenderContainer(t *testing.T) {
 							},
 						},
 						{
+							Pkg:     "foobar",
+							Version: "1.0.0",
+							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
+							CreatedAt: func() *time.Time {
+								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+								return &t
+							}(),
+							Code:     verdictcode.FNI001,
 							Message:  "outbound network connection",
 							Severity: "medium",
 							Metadata: map[string]interface{}{
@@ -120,6 +162,14 @@ func TestRenderContainer(t *testing.T) {
 							},
 						},
 						{
+							Pkg:     "foobar",
+							Version: "1.0.0",
+							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
+							CreatedAt: func() *time.Time {
+								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+								return &t
+							}(),
+							Code:     verdictcode.FNI001,
 							Message:  "outbound network connection",
 							Severity: "low",
 							Metadata: map[string]interface{}{
@@ -189,6 +239,14 @@ func TestRenderContainer(t *testing.T) {
 					Version: strPtr("1.0.0"),
 					Verdicts: []listen.Verdict{
 						{
+							Pkg:     "foo",
+							Version: "1.0.0",
+							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
+							CreatedAt: func() *time.Time {
+								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+								return &t
+							}(),
+							Code:     verdictcode.FNI001,
 							Message:  "outbound network connection",
 							Severity: "high",
 							Metadata: map[string]interface{}{
@@ -223,6 +281,14 @@ func TestRenderContainer(t *testing.T) {
 					Version: strPtr("1.0.0"),
 					Verdicts: []listen.Verdict{
 						{
+							Pkg:     "baz",
+							Version: "1.0.0",
+							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
+							CreatedAt: func() *time.Time {
+								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+								return &t
+							}(),
+							Code:     verdictcode.FNI001,
 							Message:  "outbound network connection",
 							Severity: "high",
 							Metadata: map[string]interface{}{
