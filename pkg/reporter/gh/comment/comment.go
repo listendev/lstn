@@ -110,9 +110,11 @@ func (r *rep) Run(res listen.Response) error {
 	buf := bytes.Buffer{}
 	fullMarkdownReport := report.NewFullMarkdwonReport()
 	fullMarkdownReport.WithOutput(&buf)
+
 	if err := fullMarkdownReport.Render(res); err != nil {
 		return err
 	}
+	fmt.Println("BUF LEN: %d", buf.Len())
 
 	owner := r.opts.Reporting.GitHub.Owner
 	repo := r.opts.Reporting.GitHub.Repo
