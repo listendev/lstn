@@ -55,6 +55,7 @@ func TestRenderContainer(t *testing.T) {
 							Shasum:  "555bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+
 								return &t
 							}(),
 							Code:     verdictcode.FNI001,
@@ -81,6 +82,7 @@ func TestRenderContainer(t *testing.T) {
 							Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+
 								return &t
 							}(),
 							Code:     verdictcode.FNI001,
@@ -107,6 +109,7 @@ func TestRenderContainer(t *testing.T) {
 							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+
 								return &t
 							}(),
 							Code:     verdictcode.FNI001,
@@ -127,6 +130,7 @@ func TestRenderContainer(t *testing.T) {
 							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+
 								return &t
 							}(),
 							Code:     verdictcode.FNI001,
@@ -147,6 +151,7 @@ func TestRenderContainer(t *testing.T) {
 							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+
 								return &t
 							}(),
 							Code:     verdictcode.FNI001,
@@ -167,6 +172,7 @@ func TestRenderContainer(t *testing.T) {
 							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+
 								return &t
 							}(),
 							Code:     verdictcode.FNI001,
@@ -244,6 +250,7 @@ func TestRenderContainer(t *testing.T) {
 							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+
 								return &t
 							}(),
 							Code:     verdictcode.FNI001,
@@ -286,6 +293,7 @@ func TestRenderContainer(t *testing.T) {
 							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+
 								return &t
 							}(),
 							Code:     verdictcode.FNI001,

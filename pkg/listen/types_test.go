@@ -466,6 +466,7 @@ func (suite *TypesSuite) TestResponseMarshalJSON() {
 							Severity:   "medium",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+
 								return &t
 							}(),
 							Metadata: make(map[string]interface{}),
@@ -495,6 +496,7 @@ func (suite *TypesSuite) TestResponseMarshalJSON() {
 							Severity:   "medium",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+
 								return &t
 							}(),
 							Metadata: metadata,

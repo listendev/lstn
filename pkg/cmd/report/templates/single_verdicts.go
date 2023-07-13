@@ -110,6 +110,7 @@ func RenderSingleVerdictsPackage(w io.Writer, p listen.Package) error {
 				v.Metadata["npm_package_version"] != p.Version {
 				return false
 			}
+
 			return true
 		},
 	}).Parse(singleVerdictsTpl))
