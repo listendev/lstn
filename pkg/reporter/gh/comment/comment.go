@@ -114,8 +114,6 @@ func (r *rep) Run(res listen.Response) error {
 	if err := fullMarkdownReport.Render(res); err != nil {
 		return err
 	}
-	fmt.Println("BUF LEN: %d", buf.Len())
-
 	owner := r.opts.Reporting.GitHub.Owner
 	repo := r.opts.Reporting.GitHub.Repo
 	id := r.opts.Reporting.GitHub.Pull.ID

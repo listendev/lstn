@@ -4,7 +4,7 @@ No suspicious behavior was detected in the dependency tree during installation
 #### :triangular_flag_on_post: The analysis could not complete because of the following problems:
 
 
-### <b><a href="https://www.npmjs.com/package/foo/v/1.0.0">foo@1.0.0</a></b><br>
+### <b><a href="https://verdicts.listen.dev/npm/foo/1.0.0">foo@1.0.0</a></b><br>
 
 
 
@@ -18,7 +18,7 @@ No suspicious behavior was detected in the dependency tree during installation
 
 
 
-### <b><a href="https://www.npmjs.com/package/bar/v/1.2.0">bar@1.2.0</a></b><br>
+### <b><a href="https://verdicts.listen.dev/npm/bar/1.2.0">bar@1.2.0</a></b><br>
 
 
 
