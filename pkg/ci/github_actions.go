@@ -75,6 +75,7 @@ type GitHubEvent struct {
 	HeadCommit  github.HeadCommit          `json:"head_commit"`
 	PullRequest github.PullRequest         `json:"pull_request"`
 	CheckSuite  github.CheckSuite          `json:"check_suite"`
+	ActionName  string                     `json:"-"` // From GITHUB_EVENT_NAME env var
 }
 
 // NewGitHubEventFromPath creates a GitHubEvent by reading the GITHUB_EVENT_PATH file.
@@ -83,11 +84,21 @@ func NewGitHubEventFromPath(eventPath string) (*GitHubEvent, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer f.Close()
 
 	e := &GitHubEvent{}
 	if err := json.NewDecoder(f).Decode(e); err != nil {
 		return nil, err
 	}
+	e.ActionName = os.Getenv("GITHUB_EVENT_NAME")
 
 	return e, nil
 }
+
+// IsRunningInGitHubAction tells whether the current process is running in GitHub actions or not.
+//
+// See https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables.
+func IsRunningInGitHubAction() bool {
+	return os.Getenv("GITHUB_ACTIONS") != ""
+}
+
