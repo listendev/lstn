@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	internaltesting "github.com/listendev/lstn/internal/testing"
 	"github.com/stretchr/testify/assert"
 )
@@ -56,7 +57,7 @@ func TestNewInfo_GitHubActionsPushEvent(t *testing.T) {
 		Repo:  "reviewdog",
 		SHA:   "febdd4bf26c6e8856c792303cfc66fa5e7bc975b",
 	}
-	if diff := cmp.Diff(exp, got); diff != "" {
+	if diff := cmp.Diff(exp, got, cmpopts.IgnoreFields(Info{}, "EventName")); diff != "" {
 		t.Errorf("info mismatch (-want +got):\n%s", diff)
 	}
 
@@ -82,7 +83,34 @@ func TestNewInfo_GitHubActionsPullRequestEvent(t *testing.T) {
 		Num:    285,
 		Branch: "go1.13",
 	}
-	if diff := cmp.Diff(exp, got); diff != "" {
+	if diff := cmp.Diff(exp, got, cmpopts.IgnoreFields(Info{}, "EventName")); diff != "" {
+		t.Errorf("info mismatch (-want +got):\n%s", diff)
+	}
+
+	assert.True(t, got.IsGitHubPullRequest())
+}
+
+func TestNewInfo_GitHubActionsPullRequestForkEvent(t *testing.T) {
+	closer := internaltesting.EnvSetter(map[string]string{
+		"GITHUB_ACTIONS":    "true",
+		"GITHUB_EVENT_PATH": "testdata/github_event_pull_request_from_fork.json",
+	})
+	t.Cleanup(closer)
+
+	assert.True(t, IsRunningInGitHubAction())
+
+	got, err := NewInfo()
+	assert.Nil(t, err)
+
+	exp := &Info{
+		Owner:  "listendev",
+		Repo:   "lstn",
+		SHA:    "5864e328f129b98726813940b5bfa44707963bdc",
+		Num:    217,
+		Branch: "build/pkg",
+		Fork:   true,
+	}
+	if diff := cmp.Diff(exp, got, cmpopts.IgnoreFields(Info{}, "EventName")); diff != "" {
 		t.Errorf("info mismatch (-want +got):\n%s", diff)
 	}
 
@@ -108,7 +136,7 @@ func TestNewInfo_GitHubActionsReRunEvent(t *testing.T) {
 		Num:    286,
 		Branch: "github-actions-env",
 	}
-	if diff := cmp.Diff(exp, got); diff != "" {
+	if diff := cmp.Diff(exp, got, cmpopts.IgnoreFields(Info{}, "EventName")); diff != "" {
 		t.Errorf("info mismatch (-want +got):\n%s", diff)
 	}
 

@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	internaltesting "github.com/listendev/lstn/internal/testing"
 	"github.com/stretchr/testify/assert"
 )
@@ -38,7 +39,7 @@ func TestNewInfoFromGitHubEvent_PushEvent(t *testing.T) {
 		SHA:   "febdd4bf26c6e8856c792303cfc66fa5e7bc975b",
 		Fork:  false,
 	}
-	if diff := cmp.Diff(exp, got); diff != "" {
+	if diff := cmp.Diff(exp, got, cmpopts.IgnoreFields(Info{}, "EventName")); diff != "" {
 		t.Errorf("info mismatch (-want +got):\n%s", diff)
 	}
 }
@@ -60,7 +61,7 @@ func TestNewInfoFromGitHubEvent_PullRequestEvent(t *testing.T) {
 		Branch: "go1.13",
 		Fork:   false,
 	}
-	if diff := cmp.Diff(exp, got); diff != "" {
+	if diff := cmp.Diff(exp, got, cmpopts.IgnoreFields(Info{}, "EventName")); diff != "" {
 		t.Errorf("info mismatch (-want +got):\n%s", diff)
 	}
 }
@@ -82,7 +83,7 @@ func TestNewInfoFromGitHubEvent_PullRequestEventFork(t *testing.T) {
 		Branch: "build/pkg",
 		Fork:   true,
 	}
-	if diff := cmp.Diff(exp, got); diff != "" {
+	if diff := cmp.Diff(exp, got, cmpopts.IgnoreFields(Info{}, "EventName")); diff != "" {
 		t.Errorf("info mismatch (-want +got):\n%s", diff)
 	}
 }
@@ -104,7 +105,7 @@ func TestNewInfoFromGitHubEvent_ReRunEvent(t *testing.T) {
 		Branch: "github-actions-env",
 		Fork:   false,
 	}
-	if diff := cmp.Diff(exp, got); diff != "" {
+	if diff := cmp.Diff(exp, got, cmpopts.IgnoreFields(Info{}, "EventName")); diff != "" {
 		t.Errorf("info mismatch (-want +got):\n%s", diff)
 	}
 }
