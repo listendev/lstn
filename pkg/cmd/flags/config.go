@@ -94,14 +94,13 @@ func (o *ConfigFlags) SetDefaults() {
 	// Attempt to dynamically set the defaults for the GitHub reporting flags from the environment
 	env, err := ci.NewInfo()
 	if err == nil && env != nil {
-		// TODO: actually check (env.IsGitHubAction() or env.Type() == env.GitHubAction) that CI is GitHub Actions
 		if defaults.CanUpdate(o.Reporting.GitHub.Owner) {
 			o.Reporting.GitHub.Owner = env.Owner
 		}
 		if defaults.CanUpdate(o.Reporting.GitHub.Repo) {
 			o.Reporting.GitHub.Repo = env.Repo
 		}
-		if defaults.CanUpdate(o.Reporting.GitHub.Pull.ID) && env.IsPullRequest() {
+		if defaults.CanUpdate(o.Reporting.GitHub.Pull.ID) && env.IsGitHubPullRequest() {
 			o.Reporting.GitHub.Pull.ID = env.Num
 		}
 	}
