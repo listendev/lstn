@@ -40,12 +40,22 @@ func NewInfoFromGitHubEvent() (*Info, error) {
 
 	info := &Info{}
 
+	// Pull request events
 	info.Owner = *evt.Repo.Owner.Login
 	info.Repo = *evt.Repo.Name
 	if pullRequestNum := evt.PullRequest.Number; pullRequestNum != nil {
-		// Pull request events
 		info.Num = *pullRequestNum
 	}
+
+	// Re-run events
+	if info.Num == 0 && len(evt.CheckSuite.PullRequests) > 0 && evt.CheckSuite.PullRequests[0] != nil {
+		pullRequest := evt.CheckSuite.PullRequests[0]
+		info.Num = *pullRequest.Number
+		info.Branch = *pullRequest.Head.Ref
+		info.SHA = *pullRequest.Head.SHA
+	}
+
+	// Complete info from GitHub event...
 	if pullRequestBranch := evt.PullRequest.Head; pullRequestBranch != nil {
 		// Pull request events
 		if pullRequestShasum := pullRequestBranch.SHA; pullRequestShasum != nil {
@@ -58,13 +68,8 @@ func NewInfoFromGitHubEvent() (*Info, error) {
 		// Push events
 		info.SHA = *headCommitShasum
 	}
-
-	// Re-run events
-	if info.Num == 0 && len(evt.CheckSuite.PullRequests) > 0 && evt.CheckSuite.PullRequests[0] != nil {
-		pullRequest := evt.CheckSuite.PullRequests[0]
-		info.Num = *pullRequest.Number
-		info.Branch = *pullRequest.Head.Ref
-		info.SHA = *pullRequest.Head.SHA
+	if info.SHA == "" {
+		info.SHA = os.Getenv("GITHUB_SHA")
 	}
 
 	return info, nil
@@ -101,4 +106,3 @@ func NewGitHubEventFromPath(eventPath string) (*GitHubEvent, error) {
 func IsRunningInGitHubAction() bool {
 	return os.Getenv("GITHUB_ACTIONS") != ""
 }
-
