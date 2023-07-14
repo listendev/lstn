@@ -20,16 +20,25 @@ import (
 )
 
 type Info struct {
-	Owner  string
-	Repo   string
-	SHA    string
-	Num    int // Pull (merge) request number
-	Branch string
-	Fork   bool
+	Owner     string
+	Repo      string
+	SHA       string
+	Num       int // Pull (merge) request number
+	Branch    string
+	Fork      bool
+	EventName string
 }
 
-func (i *Info) IsPullRequest() bool {
-	return i.Num != 0
+func (i *Info) IsGitHubPullRequest() bool {
+	return i.Num != 0 && i.Owner != "" && i.Repo != ""
+}
+
+// HasReadOnlyGitHubToken tells whether the current process is running in GitHub Actions on a GitHub PullRequest
+// sent from a fork, with a read-only token.
+//
+// See https://docs.github.com/en/actions/reference/events-that-trigger-workflows#pull_request_target.
+func (i *Info) HasReadOnlyGitHubToken() bool {
+	return i.Fork && i.EventName == "pull_request_target"
 }
 
 // NewInfo creates a Info from environment variables.

@@ -60,7 +60,7 @@ func TestNewInfo_GitHubActionsPushEvent(t *testing.T) {
 		t.Errorf("info mismatch (-want +got):\n%s", diff)
 	}
 
-	assert.False(t, got.IsPullRequest())
+	assert.False(t, got.IsGitHubPullRequest())
 }
 
 func TestNewInfo_GitHubActionsPullRequestEvent(t *testing.T) {
@@ -86,7 +86,7 @@ func TestNewInfo_GitHubActionsPullRequestEvent(t *testing.T) {
 		t.Errorf("info mismatch (-want +got):\n%s", diff)
 	}
 
-	assert.True(t, got.IsPullRequest())
+	assert.True(t, got.IsGitHubPullRequest())
 }
 
 func TestNewInfo_GitHubActionsReRunEvent(t *testing.T) {
@@ -112,5 +112,5 @@ func TestNewInfo_GitHubActionsReRunEvent(t *testing.T) {
 		t.Errorf("info mismatch (-want +got):\n%s", diff)
 	}
 
-	assert.True(t, got.IsPullRequest())
+	assert.True(t, got.IsGitHubPullRequest())
 }
