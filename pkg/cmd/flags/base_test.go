@@ -232,7 +232,7 @@ func (suite *FlagsBaseSuite) TestDefine() {
 		},
 	}
 
-	expectedAnnotations := map[string][]string{flagusages.FlagGroupAnnotation: []string{"Config"}}
+	expectedAnnotations := map[string][]string{flagusages.FlagGroupAnnotation: {"Config"}}
 
 	for _, tc := range cases {
 		suite.T().Run(tc.desc, func(t *testing.T) {

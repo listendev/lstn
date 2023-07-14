@@ -36,6 +36,7 @@ func TestNewInfoFromGitHubEvent_PushEvent(t *testing.T) {
 		Owner: "reviewdog",
 		Repo:  "reviewdog",
 		SHA:   "febdd4bf26c6e8856c792303cfc66fa5e7bc975b",
+		Fork:  false,
 	}
 	if diff := cmp.Diff(exp, got); diff != "" {
 		t.Errorf("info mismatch (-want +got):\n%s", diff)
@@ -57,6 +58,29 @@ func TestNewInfoFromGitHubEvent_PullRequestEvent(t *testing.T) {
 		SHA:    "cb23119096646023c05e14ea708b7f20cee906d5",
 		Num:    285,
 		Branch: "go1.13",
+		Fork:   false,
+	}
+	if diff := cmp.Diff(exp, got); diff != "" {
+		t.Errorf("info mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestNewInfoFromGitHubEvent_PullRequestEventFork(t *testing.T) {
+	closer := internaltesting.EnvSetter(map[string]string{
+		"GITHUB_EVENT_PATH": "testdata/github_event_pull_request_from_fork.json",
+	})
+	t.Cleanup(closer)
+
+	got, err := NewInfoFromGitHubEvent()
+	assert.Nil(t, err)
+
+	exp := &Info{
+		Owner:  "listendev",
+		Repo:   "lstn",
+		SHA:    "5864e328f129b98726813940b5bfa44707963bdc",
+		Num:    217,
+		Branch: "build/pkg",
+		Fork:   true,
 	}
 	if diff := cmp.Diff(exp, got); diff != "" {
 		t.Errorf("info mismatch (-want +got):\n%s", diff)
@@ -78,6 +102,7 @@ func TestNewInfoFromGitHubEvent_ReRunEvent(t *testing.T) {
 		SHA:    "ba8f36cd3eb401e9de9ee5718e11d390fdbe4afa",
 		Num:    286,
 		Branch: "github-actions-env",
+		Fork:   false,
 	}
 	if diff := cmp.Diff(exp, got); diff != "" {
 		t.Errorf("info mismatch (-want +got):\n%s", diff)
