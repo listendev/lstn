@@ -17,14 +17,13 @@ package ci
 
 import (
 	"fmt"
-	"os"
 )
 
 type Info struct {
 	Owner  string
 	Repo   string
 	SHA    string
-	Num    int
+	Num    int // Pull (merge) request number
 	Branch string
 }
 
@@ -41,11 +40,4 @@ func NewInfo() (*Info, error) {
 	// TODO: implement logic for other CI systems
 
 	return nil, fmt.Errorf("CI systems other than GitHub Actions are not supported yet")
-}
-
-// IsRunningInGitHubAction tells whether the current process is running in GitHub actions or not.
-//
-// See https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables.
-func IsRunningInGitHubAction() bool {
-	return os.Getenv("GITHUB_ACTIONS") != ""
 }
