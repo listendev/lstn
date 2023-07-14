@@ -41,8 +41,8 @@ func NewInfoFromGitHubEvent() (*Info, error) {
 	info := &Info{}
 
 	// Pull request events
-	info.Owner = *evt.Repo.Owner.Login
-	info.Repo = *evt.Repo.Name
+	info.Owner = *evt.Repo.Owner.Login // FIXME: .Owner can be nil
+	info.Repo = *evt.Repo.Name         // FIXME: .Name can be nil
 	if pullRequestNum := evt.PullRequest.Number; pullRequestNum != nil {
 		info.Num = *pullRequestNum
 	}
@@ -64,6 +64,26 @@ func NewInfoFromGitHubEvent() (*Info, error) {
 		if pullRequestRef := pullRequestBranch.Ref; pullRequestRef != nil {
 			info.Branch = *pullRequestRef
 		}
+		// Detect whether it's a fork
+		var baseID int64
+		if pullRequestBase := evt.PullRequest.Base; pullRequestBase != nil {
+			if pullRequestBaseRepo := pullRequestBase.Repo; pullRequestBaseRepo != nil {
+				if pullRequestBaseRepoOwner := pullRequestBaseRepo.Owner; pullRequestBaseRepoOwner != nil {
+					if pullRequestBaseRepoOwnerID := pullRequestBaseRepoOwner.ID; pullRequestBaseRepoOwnerID != nil {
+						baseID = *pullRequestBaseRepoOwnerID
+					}
+				}
+			}
+		}
+		var headID int64
+		if pullRequestBranchRepo := pullRequestBranch.Repo; pullRequestBranchRepo != nil {
+			if pullRequestBranchRepoOwner := pullRequestBranchRepo.Owner; pullRequestBranchRepoOwner != nil {
+				if pullRequestBranchRepoOwnerID := pullRequestBranchRepoOwner.ID; pullRequestBranchRepoOwnerID != nil {
+					headID = *pullRequestBranchRepoOwnerID
+				}
+			}
+		}
+		info.Fork = headID != baseID
 	} else if headCommitShasum := evt.HeadCommit.ID; headCommitShasum != nil {
 		// Push events
 		info.SHA = *headCommitShasum
@@ -106,3 +126,13 @@ func NewGitHubEventFromPath(eventPath string) (*GitHubEvent, error) {
 func IsRunningInGitHubAction() bool {
 	return os.Getenv("GITHUB_ACTIONS") != ""
 }
+
+// HasReadOnlyGitHubToken tells whether the current process is running in GitHub Actions on a GitHub PullRequest
+// sent from a fork, with a read-only token.
+//
+// See https://docs.github.com/en/actions/reference/events-that-trigger-workflows#pull_request_target.
+// func HasReadOnlyGitHubToken() bool {
+// 	// FIXME: implement (this way or with a GitHubEvent receiver?)
+
+// 	return true
+// }
