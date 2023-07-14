@@ -21,7 +21,7 @@ require (
 	github.com/itchyny/gojq v0.12.11
 	github.com/jarcoal/httpmock v1.3.0
 	github.com/leodido/go-npmpackagename v0.2.0
-	github.com/listendev/pkg v0.0.0-20230711232341-4a61965ccc13
+	github.com/listendev/pkg v0.0.0-20230713220359-28931b93041d
 	github.com/matishsiao/goInfo v0.0.0-00010101000000-000000000000
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/muja/goconfig v0.0.0-20180417074348-0a635507dddc
