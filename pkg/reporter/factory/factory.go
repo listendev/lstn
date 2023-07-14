@@ -19,14 +19,17 @@ import (
 	"context"
 	"errors"
 
+	"github.com/listendev/lstn/pkg/ci"
 	"github.com/listendev/lstn/pkg/cmd"
 	"github.com/listendev/lstn/pkg/reporter"
 	ghcomment "github.com/listendev/lstn/pkg/reporter/gh/comment"
 )
 
 var (
-	ErrReporterNotFound         = errors.New("unsupported reporter")
-	ErrReporterNotOnPullRequest = errors.New("the reporter is not running against a GitHub pull request")
+	ErrReporterNotFound               = errors.New("unsupported reporter")
+	ErrReporterUnsupportedEnvironment = errors.New("the reporter is not running in a supported environment")
+	ErrReporterNotOnPullRequest       = errors.New("the reporter is not running against a GitHub pull request")
+	ErrReporterCantWrite              = errors.New("the GitHub token the reporter is running with is read-only")
 )
 
 // Make creates a new reporter.Reporter.
@@ -47,8 +50,22 @@ func Make(ctx context.Context, reportType cmd.ReportType) (r reporter.Reporter, 
 		if err != nil {
 			return nil, true, err
 		}
-		if !r.CanRun() {
+
+		env, envErr := ci.NewInfo()
+		if envErr != nil {
+			return nil, false, ErrReporterUnsupportedEnvironment
+		}
+
+		if !env.IsGitHubPullRequest() {
 			return nil, false, ErrReporterNotOnPullRequest
+		}
+
+		if env.HasReadOnlyGitHubToken() {
+			// TODO: here we could fallback to another GitHub reporter (not existing yet) (ie., GitHubLoggingReport)
+			// NOTE: see links below
+			// https://docs.github.com/en/actions/reference/events-that-trigger-workflows#pull_request_target
+			// https://help.github.com/en/actions/automating-your-workflow-with-github-actions/development-tools-for-github-actions#logging-commands.
+			return nil, false, ErrReporterCantWrite
 		}
 
 		return r, true, nil
