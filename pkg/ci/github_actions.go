@@ -38,7 +38,9 @@ func NewInfoFromGitHubEvent() (*Info, error) {
 		return nil, fmt.Errorf("couldn't decode the GITHUB_EVENT_PATH file")
 	}
 
-	info := &Info{}
+	info := &Info{
+		EventName: evt.Name,
+	}
 
 	// Pull request events
 	info.Owner = *evt.Repo.Owner.Login // FIXME: .Owner can be nil
@@ -100,7 +102,7 @@ type GitHubEvent struct {
 	HeadCommit  github.HeadCommit          `json:"head_commit"`
 	PullRequest github.PullRequest         `json:"pull_request"`
 	CheckSuite  github.CheckSuite          `json:"check_suite"`
-	ActionName  string                     `json:"-"` // From GITHUB_EVENT_NAME env var
+	Name        string                     `json:"-"` // From GITHUB_EVENT_NAME env var
 }
 
 // NewGitHubEventFromPath creates a GitHubEvent by reading the GITHUB_EVENT_PATH file.
@@ -115,7 +117,7 @@ func NewGitHubEventFromPath(eventPath string) (*GitHubEvent, error) {
 	if err := json.NewDecoder(f).Decode(e); err != nil {
 		return nil, err
 	}
-	e.ActionName = os.Getenv("GITHUB_EVENT_NAME")
+	e.Name = os.Getenv("GITHUB_EVENT_NAME")
 
 	return e, nil
 }
@@ -126,13 +128,3 @@ func NewGitHubEventFromPath(eventPath string) (*GitHubEvent, error) {
 func IsRunningInGitHubAction() bool {
 	return os.Getenv("GITHUB_ACTIONS") != ""
 }
-
-// HasReadOnlyGitHubToken tells whether the current process is running in GitHub Actions on a GitHub PullRequest
-// sent from a fork, with a read-only token.
-//
-// See https://docs.github.com/en/actions/reference/events-that-trigger-workflows#pull_request_target.
-// func HasReadOnlyGitHubToken() bool {
-// 	// FIXME: implement (this way or with a GitHubEvent receiver?)
-
-// 	return true
-// }
