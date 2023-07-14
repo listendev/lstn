@@ -25,6 +25,7 @@ type Info struct {
 	SHA    string
 	Num    int // Pull (merge) request number
 	Branch string
+	Fork   bool
 }
 
 func (i *Info) IsPullRequest() bool {
