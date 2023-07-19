@@ -25,12 +25,22 @@ import (
 	"github.com/listendev/pkg/verdictcode"
 )
 
-const containerTpl = `{{- $high := .HighSeverity }}
-{{- $medium := .MediumSeverity }}
-{{- $low := .LowSeverity }}
-{{- $problems := .Problems }}
+const containerTpl = `{{- $high := .HighSeverity -}}
+{{- $medium := .MediumSeverity -}}
+{{- $low := .LowSeverity -}}
+{{- $problems := .Problems -}}
+<table align=center>
+  <tr>
+    <td><b>critical</b> 🚨 {{ $high.TotalVerdicts -}}</td>
+    <td><b>medium</b> ⚠️ {{ $medium.TotalVerdicts -}}</td>
+    <td><b>low</b> 🔷 {{ $low.TotalVerdicts -}}</td>
+  </tr>
+</table>
 {{- if and (eq $high.TotalVerdicts 0) (eq $medium.TotalVerdicts 0) (eq $low.TotalVerdicts 0) }}
-No suspicious behavior was detected in the dependency tree during installation
+
+- 🌟 No signs of suspicious behavior were found in the dependency tree during installation.
+- 🔒 Your meticulous approach ensures a secure codebase.
+- 🚀 Keep up the excellent work!
 {{- else }}
 The following behavior was detected in the dependency tree during installation
 
@@ -62,8 +72,8 @@ The following behavior was detected in the dependency tree during installation
 {{ $problems.DetailsRender }}
 {{- end }}
 
-<i>Powered by</i> <b><a href="https://listen.dev">listen.dev</a> <img height=14 src="https://listen.dev/assets/images/dolphin-noborder.png"></b>
-`
+***
+<i>Powered by</i> <b><a href="https://listen.dev">listen.dev</a> <img height=14 src="https://listen.dev/assets/images/dolphin-noborder.png"></b>`
 
 type severityData struct {
 	Packages      []listen.Package
