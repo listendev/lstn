@@ -1,5 +1,11 @@
-
-The following behavior was detected in the dependency tree during installation
+<table align=center>
+  <tr>
+    <td><b>critical</b> 🚨 3</td>
+    <td><b>medium</b> ⚠️ 1</td>
+    <td><b>low</b> 🔷 1</td>
+  </tr>
+</table>
+🔍 The following behaviors have been detected in the dependency tree during installation.
 
 <details>
 <summary>
@@ -292,4 +298,5 @@ Direct dependency
 
 </details>
 
+***
 <i>Powered by</i> <b><a href="https://listen.dev">listen.dev</a> <img height=14 src="https://listen.dev/assets/images/dolphin-noborder.png"></b>

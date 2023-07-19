@@ -41,10 +41,15 @@ type problemsData struct {
 	DetailsRender string
 }
 type containerData struct {
+	Icons          containerDataIcons
 	LowSeverity    severityData
 	MediumSeverity severityData
 	HighSeverity   severityData
 	Problems       problemsData
+}
+
+type containerDataIcons struct {
+	HighSeverity, MediumSeverity, LowSeverity string
 }
 
 func countVerdicts(packages []listen.Package) int {
@@ -174,6 +179,11 @@ func RenderContainer(
 	}
 
 	cdata := containerData{
+		Icons: containerDataIcons{
+			HighSeverity:   "🚨",
+			MediumSeverity: "⚠️",
+			LowSeverity:    "🔷",
+		},
 		LowSeverity:    lowSeverityData,
 		MediumSeverity: mediumSeverityData,
 		HighSeverity:   highSeverityData,

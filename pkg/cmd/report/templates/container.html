@@ -4,9 +4,9 @@
 {{- $problems := .Problems -}}
 <table align=center>
   <tr>
-    <td><b>critical</b> 🚨 {{ $high.TotalVerdicts -}}</td>
-    <td><b>medium</b> ⚠️ {{ $medium.TotalVerdicts -}}</td>
-    <td><b>low</b> 🔷 {{ $low.TotalVerdicts -}}</td>
+    <td><b>critical</b> {{ .Icons.HighSeverity }} {{ $high.TotalVerdicts -}}</td>
+    <td><b>medium</b> {{ .Icons.MediumSeverity }} {{ $medium.TotalVerdicts -}}</td>
+    <td><b>low</b> {{ .Icons.LowSeverity }} {{ $low.TotalVerdicts -}}</td>
   </tr>
 </table>
 {{- if and (eq $high.TotalVerdicts 0) (eq $medium.TotalVerdicts 0) (eq $low.TotalVerdicts 0) }}
@@ -15,7 +15,7 @@
 - 🔒 Your meticulous approach ensures a secure codebase.
 - 🚀 Keep up the excellent work!
 {{- else }}
-The following behavior was detected in the dependency tree during installation
+🔍 The following behaviors have been detected in the **dependency tree** during installation.
 
 <details>
 <summary>
