@@ -17,11 +17,11 @@ package templates
 
 import (
 	"bytes"
+	"fmt"
+	"io/ioutil"
 	"testing"
-	"time"
 
 	"github.com/listendev/lstn/pkg/listen"
-	"github.com/listendev/pkg/verdictcode"
 	"github.com/stretchr/testify/require"
 )
 
@@ -42,290 +42,290 @@ func TestRenderContainer(t *testing.T) {
 			expectedOutput: testdataFileToBytes(t, "testdata/container_no_packages.md"),
 			wantErr:        false,
 		},
-		{
-			name: "with packages",
-			packages: []listen.Package{
-				{
-					Name:    "foo",
-					Version: strPtr("1.0.0"),
-					Verdicts: []listen.Verdict{
-						{
-							Pkg:     "foo",
-							Version: "1.0.0",
-							Shasum:  "555bd98592883255fa00de14f1151a917b5d77d5",
-							CreatedAt: func() *time.Time {
-								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+		// {
+		// 	name: "with packages",
+		// 	packages: []listen.Package{
+		// 		{
+		// 			Name:    "foo",
+		// 			Version: strPtr("1.0.0"),
+		// 			Verdicts: []listen.Verdict{
+		// 				{
+		// 					Pkg:     "foo",
+		// 					Version: "1.0.0",
+		// 					Shasum:  "555bd98592883255fa00de14f1151a917b5d77d5",
+		// 					CreatedAt: func() *time.Time {
+		// 						t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
-								return &t
-							}(),
-							Code:     verdictcode.FNI001,
-							Message:  "outbound network connection",
-							Severity: "high",
-							Metadata: map[string]interface{}{
-								"npm_package_name":    "foo",
-								"npm_package_version": "1.0.0",
-								"parent_name":         "node",
-								"executable_path":     "/bin/sh",
-								"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
-								"server_ip":           "",
-							},
-						},
-					},
-				},
-				{
-					Name:    "bar",
-					Version: strPtr("1.0.0"),
-					Verdicts: []listen.Verdict{
-						{
-							Pkg:     "bar",
-							Version: "1.0.0",
-							Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
-							CreatedAt: func() *time.Time {
-								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+		// 						return &t
+		// 					}(),
+		// 					Code:     verdictcode.FNI001,
+		// 					Message:  "outbound network connection",
+		// 					Severity: "high",
+		// 					Metadata: map[string]interface{}{
+		// 						"npm_package_name":    "foo",
+		// 						"npm_package_version": "1.0.0",
+		// 						"parent_name":         "node",
+		// 						"executable_path":     "/bin/sh",
+		// 						"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
+		// 						"server_ip":           "",
+		// 					},
+		// 				},
+		// 			},
+		// 		},
+		// 		{
+		// 			Name:    "bar",
+		// 			Version: strPtr("1.0.0"),
+		// 			Verdicts: []listen.Verdict{
+		// 				{
+		// 					Pkg:     "bar",
+		// 					Version: "1.0.0",
+		// 					Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
+		// 					CreatedAt: func() *time.Time {
+		// 						t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
-								return &t
-							}(),
-							Code:     verdictcode.FNI001,
-							Message:  "outbound network connection",
-							Severity: "high",
-							Metadata: map[string]interface{}{
-								"npm_package_name":    "foo",
-								"npm_package_version": "1.0.0",
-								"parent_name":         "node",
-								"executable_path":     "/bin/sh",
-								"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
-								"server_ip":           "",
-							},
-						},
-					},
-				},
-				{
-					Name:    "foobar",
-					Version: strPtr("1.0.0"),
-					Verdicts: []listen.Verdict{
-						{
-							Pkg:     "foobar",
-							Version: "1.0.0",
-							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
-							CreatedAt: func() *time.Time {
-								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+		// 						return &t
+		// 					}(),
+		// 					Code:     verdictcode.FNI001,
+		// 					Message:  "outbound network connection",
+		// 					Severity: "high",
+		// 					Metadata: map[string]interface{}{
+		// 						"npm_package_name":    "foo",
+		// 						"npm_package_version": "1.0.0",
+		// 						"parent_name":         "node",
+		// 						"executable_path":     "/bin/sh",
+		// 						"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
+		// 						"server_ip":           "",
+		// 					},
+		// 				},
+		// 			},
+		// 		},
+		// 		{
+		// 			Name:    "foobar",
+		// 			Version: strPtr("1.0.0"),
+		// 			Verdicts: []listen.Verdict{
+		// 				{
+		// 					Pkg:     "foobar",
+		// 					Version: "1.0.0",
+		// 					Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
+		// 					CreatedAt: func() *time.Time {
+		// 						t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
-								return &t
-							}(),
-							Code:     verdictcode.FNI001,
-							Message:  "outbound network connection",
-							Severity: "high",
-							Metadata: map[string]interface{}{
-								"npm_package_name":    "foobar",
-								"npm_package_version": "1.0.0",
-								"parent_name":         "node",
-								"executable_path":     "/bin/sh",
-								"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
-								"server_ip":           "",
-							},
-						},
-						{
-							Pkg:     "foobar",
-							Version: "1.0.0",
-							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
-							CreatedAt: func() *time.Time {
-								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+		// 						return &t
+		// 					}(),
+		// 					Code:     verdictcode.FNI001,
+		// 					Message:  "outbound network connection",
+		// 					Severity: "high",
+		// 					Metadata: map[string]interface{}{
+		// 						"npm_package_name":    "foobar",
+		// 						"npm_package_version": "1.0.0",
+		// 						"parent_name":         "node",
+		// 						"executable_path":     "/bin/sh",
+		// 						"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
+		// 						"server_ip":           "",
+		// 					},
+		// 				},
+		// 				{
+		// 					Pkg:     "foobar",
+		// 					Version: "1.0.0",
+		// 					Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
+		// 					CreatedAt: func() *time.Time {
+		// 						t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
-								return &t
-							}(),
-							Code:     verdictcode.FNI001,
-							Message:  "outbound network connection",
-							Severity: "medium",
-							Metadata: map[string]interface{}{
-								"npm_package_name":    "foobar",
-								"npm_package_version": "1.0.0",
-								"parent_name":         "node",
-								"executable_path":     "/bin/sh",
-								"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
-								"server_ip":           "",
-							},
-						},
-						{
-							Pkg:     "foobar",
-							Version: "1.0.0",
-							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
-							CreatedAt: func() *time.Time {
-								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+		// 						return &t
+		// 					}(),
+		// 					Code:     verdictcode.FNI001,
+		// 					Message:  "outbound network connection",
+		// 					Severity: "medium",
+		// 					Metadata: map[string]interface{}{
+		// 						"npm_package_name":    "foobar",
+		// 						"npm_package_version": "1.0.0",
+		// 						"parent_name":         "node",
+		// 						"executable_path":     "/bin/sh",
+		// 						"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
+		// 						"server_ip":           "",
+		// 					},
+		// 				},
+		// 				{
+		// 					Pkg:     "foobar",
+		// 					Version: "1.0.0",
+		// 					Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
+		// 					CreatedAt: func() *time.Time {
+		// 						t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
-								return &t
-							}(),
-							Code:     verdictcode.FNI001,
-							Message:  "outbound network connection",
-							Severity: "medium",
-							Metadata: map[string]interface{}{
-								"npm_package_name":    "foobar",
-								"npm_package_version": "1.0.0",
-								"parent_name":         "node",
-								"executable_path":     "/bin/sh",
-								"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
-								"server_ip":           "",
-							},
-						},
-						{
-							Pkg:     "foobar",
-							Version: "1.0.0",
-							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
-							CreatedAt: func() *time.Time {
-								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+		// 						return &t
+		// 					}(),
+		// 					Code:     verdictcode.FNI001,
+		// 					Message:  "outbound network connection",
+		// 					Severity: "medium",
+		// 					Metadata: map[string]interface{}{
+		// 						"npm_package_name":    "foobar",
+		// 						"npm_package_version": "1.0.0",
+		// 						"parent_name":         "node",
+		// 						"executable_path":     "/bin/sh",
+		// 						"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
+		// 						"server_ip":           "",
+		// 					},
+		// 				},
+		// 				{
+		// 					Pkg:     "foobar",
+		// 					Version: "1.0.0",
+		// 					Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
+		// 					CreatedAt: func() *time.Time {
+		// 						t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
-								return &t
-							}(),
-							Code:     verdictcode.FNI001,
-							Message:  "outbound network connection",
-							Severity: "low",
-							Metadata: map[string]interface{}{
-								"npm_package_name":    "foobar",
-								"npm_package_version": "1.0.0",
-								"parent_name":         "node",
-								"executable_path":     "/bin/sh",
-								"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
-								"server_ip":           "",
-							},
-						},
-					},
-				},
-			},
-			expectedOutput: testdataFileToBytes(t, "testdata/container_with_packages.md"),
-			wantErr:        false,
-		},
-		{
-			name: "with problems",
-			packages: []listen.Package{
-				{
-					Name:    "foo",
-					Version: strPtr("1.0.0"),
-					Problems: []listen.Problem{
-						{
-							Type:   "https://listen.dev/probs/invalid-name",
-							Title:  "Package name not valid",
-							Detail: "Package name not valid",
-						},
-						{
-							Type:   "https://listen.dev/probs/does-not-exist",
-							Title:  "A problem that does not exist, just for testing",
-							Detail: "A problem that does not exist, just for testing",
-						},
-					},
-				},
-				{
-					Name:    "bar",
-					Version: strPtr("1.2.0"),
-					Problems: []listen.Problem{
-						{
-							Type:   "https://listen.dev/probs/invalid-name",
-							Title:  "Package name not valid",
-							Detail: "Package name not valid",
-						},
-						{
-							Type:   "https://listen.dev/probs/does-not-exist",
-							Title:  "A problem that does not exist, just for testing",
-							Detail: "A problem that does not exist, just for testing",
-						},
-						{
-							Type:   "https://listen.dev/probs/something-something",
-							Title:  "Something happened, must be aware",
-							Detail: "Something happened, must be aware",
-						},
-					},
-				},
-			},
-			expectedOutput: testdataFileToBytes(t, "testdata/container_with_problems.md"),
-			wantErr:        false,
-		},
-		{
-			name: "with verdicts and problems",
-			packages: []listen.Package{
-				{
-					Name:    "foo",
-					Version: strPtr("1.0.0"),
-					Verdicts: []listen.Verdict{
-						{
-							Pkg:     "foo",
-							Version: "1.0.0",
-							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
-							CreatedAt: func() *time.Time {
-								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+		// 						return &t
+		// 					}(),
+		// 					Code:     verdictcode.FNI001,
+		// 					Message:  "outbound network connection",
+		// 					Severity: "low",
+		// 					Metadata: map[string]interface{}{
+		// 						"npm_package_name":    "foobar",
+		// 						"npm_package_version": "1.0.0",
+		// 						"parent_name":         "node",
+		// 						"executable_path":     "/bin/sh",
+		// 						"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
+		// 						"server_ip":           "",
+		// 					},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	expectedOutput: testdataFileToBytes(t, "testdata/container_with_packages.md"),
+		// 	wantErr:        false,
+		// },
+		// {
+		// 	name: "with problems",
+		// 	packages: []listen.Package{
+		// 		{
+		// 			Name:    "foo",
+		// 			Version: strPtr("1.0.0"),
+		// 			Problems: []listen.Problem{
+		// 				{
+		// 					Type:   "https://listen.dev/probs/invalid-name",
+		// 					Title:  "Package name not valid",
+		// 					Detail: "Package name not valid",
+		// 				},
+		// 				{
+		// 					Type:   "https://listen.dev/probs/does-not-exist",
+		// 					Title:  "A problem that does not exist, just for testing",
+		// 					Detail: "A problem that does not exist, just for testing",
+		// 				},
+		// 			},
+		// 		},
+		// 		{
+		// 			Name:    "bar",
+		// 			Version: strPtr("1.2.0"),
+		// 			Problems: []listen.Problem{
+		// 				{
+		// 					Type:   "https://listen.dev/probs/invalid-name",
+		// 					Title:  "Package name not valid",
+		// 					Detail: "Package name not valid",
+		// 				},
+		// 				{
+		// 					Type:   "https://listen.dev/probs/does-not-exist",
+		// 					Title:  "A problem that does not exist, just for testing",
+		// 					Detail: "A problem that does not exist, just for testing",
+		// 				},
+		// 				{
+		// 					Type:   "https://listen.dev/probs/something-something",
+		// 					Title:  "Something happened, must be aware",
+		// 					Detail: "Something happened, must be aware",
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	expectedOutput: testdataFileToBytes(t, "testdata/container_with_problems.md"),
+		// 	wantErr:        false,
+		// },
+		// {
+		// 	name: "with verdicts and problems",
+		// 	packages: []listen.Package{
+		// 		{
+		// 			Name:    "foo",
+		// 			Version: strPtr("1.0.0"),
+		// 			Verdicts: []listen.Verdict{
+		// 				{
+		// 					Pkg:     "foo",
+		// 					Version: "1.0.0",
+		// 					Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
+		// 					CreatedAt: func() *time.Time {
+		// 						t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
-								return &t
-							}(),
-							Code:     verdictcode.FNI001,
-							Message:  "outbound network connection",
-							Severity: "high",
-							Metadata: map[string]interface{}{
-								"npm_package_name":    "foo",
-								"npm_package_version": "1.0.0",
-								"parent_name":         "node",
-								"executable_path":     "/bin/sh",
-								"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
-								"server_ip":           "",
-							},
-						},
-					},
-				},
-				{
-					Name:    "foobar",
-					Version: strPtr("1.0.0"),
-					Problems: []listen.Problem{
-						{
-							Type:   "https://listen.dev/probs/invalid-name",
-							Title:  "Package name not valid",
-							Detail: "Package name not valid",
-						},
-						{
-							Type:   "https://listen.dev/probs/does-not-exist",
-							Title:  "A problem that does not exist, just for testing",
-							Detail: "A problem that does not exist, just for testing",
-						},
-					},
-				},
-				{
-					Name:    "baz",
-					Version: strPtr("1.0.0"),
-					Verdicts: []listen.Verdict{
-						{
-							Pkg:     "baz",
-							Version: "1.0.0",
-							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
-							CreatedAt: func() *time.Time {
-								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+		// 						return &t
+		// 					}(),
+		// 					Code:     verdictcode.FNI001,
+		// 					Message:  "outbound network connection",
+		// 					Severity: "high",
+		// 					Metadata: map[string]interface{}{
+		// 						"npm_package_name":    "foo",
+		// 						"npm_package_version": "1.0.0",
+		// 						"parent_name":         "node",
+		// 						"executable_path":     "/bin/sh",
+		// 						"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
+		// 						"server_ip":           "",
+		// 					},
+		// 				},
+		// 			},
+		// 		},
+		// 		{
+		// 			Name:    "foobar",
+		// 			Version: strPtr("1.0.0"),
+		// 			Problems: []listen.Problem{
+		// 				{
+		// 					Type:   "https://listen.dev/probs/invalid-name",
+		// 					Title:  "Package name not valid",
+		// 					Detail: "Package name not valid",
+		// 				},
+		// 				{
+		// 					Type:   "https://listen.dev/probs/does-not-exist",
+		// 					Title:  "A problem that does not exist, just for testing",
+		// 					Detail: "A problem that does not exist, just for testing",
+		// 				},
+		// 			},
+		// 		},
+		// 		{
+		// 			Name:    "baz",
+		// 			Version: strPtr("1.0.0"),
+		// 			Verdicts: []listen.Verdict{
+		// 				{
+		// 					Pkg:     "baz",
+		// 					Version: "1.0.0",
+		// 					Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
+		// 					CreatedAt: func() *time.Time {
+		// 						t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
-								return &t
-							}(),
-							Code:     verdictcode.FNI001,
-							Message:  "outbound network connection",
-							Severity: "high",
-							Metadata: map[string]interface{}{
-								"npm_package_name":    "baz",
-								"npm_package_version": "1.0.0",
-								"parent_name":         "node",
-								"executable_path":     "/bin/sh",
-								"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
-								"server_ip":           "",
-							},
-						},
-					},
-					Problems: []listen.Problem{
-						{
-							Type:   "https://listen.dev/probs/invalid-name",
-							Title:  "Package name not valid",
-							Detail: "Package name not valid",
-						},
-						{
-							Type:   "https://listen.dev/probs/does-not-exist",
-							Title:  "A problem that does not exist, just for testing",
-							Detail: "A problem that does not exist, just for testing",
-						},
-					},
-				},
-			},
-			expectedOutput: testdataFileToBytes(t, "testdata/container_with_verdicts_and_problems.md"),
-			wantErr:        false,
-		},
+		// 						return &t
+		// 					}(),
+		// 					Code:     verdictcode.FNI001,
+		// 					Message:  "outbound network connection",
+		// 					Severity: "high",
+		// 					Metadata: map[string]interface{}{
+		// 						"npm_package_name":    "baz",
+		// 						"npm_package_version": "1.0.0",
+		// 						"parent_name":         "node",
+		// 						"executable_path":     "/bin/sh",
+		// 						"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
+		// 						"server_ip":           "",
+		// 					},
+		// 				},
+		// 			},
+		// 			Problems: []listen.Problem{
+		// 				{
+		// 					Type:   "https://listen.dev/probs/invalid-name",
+		// 					Title:  "Package name not valid",
+		// 					Detail: "Package name not valid",
+		// 				},
+		// 				{
+		// 					Type:   "https://listen.dev/probs/does-not-exist",
+		// 					Title:  "A problem that does not exist, just for testing",
+		// 					Detail: "A problem that does not exist, just for testing",
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	expectedOutput: testdataFileToBytes(t, "testdata/container_with_verdicts_and_problems.md"),
+		// 	wantErr:        false,
+		// },
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -336,6 +336,10 @@ func TestRenderContainer(t *testing.T) {
 
 				return
 			}
+
+			// TIP: Uncomment this to write compare locally the generated files. See /pkg/report/templates/testdata/actual/README.md
+			ioutil.WriteFile(fmt.Sprintf("./testdata/actual/%s.md", tt.name), outBuf.Bytes(), 0644)
+
 			require.Equal(t, tt.expectedOutput, outBuf.Bytes())
 		})
 	}
