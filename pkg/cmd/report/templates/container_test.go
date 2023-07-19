@@ -114,7 +114,7 @@ func TestRenderContainer(t *testing.T) {
 
 								return &t
 							}(),
-							Code:     verdictcode.FNI001,
+							Code:     verdictcode.FNI002,
 							Message:  "outbound network connection",
 							Severity: "high",
 							Metadata: map[string]interface{}{
@@ -135,7 +135,7 @@ func TestRenderContainer(t *testing.T) {
 
 								return &t
 							}(),
-							Code:     verdictcode.FNI001,
+							Code:     verdictcode.MDN01,
 							Message:  "outbound network connection",
 							Severity: "medium",
 							Metadata: map[string]interface{}{
@@ -156,7 +156,7 @@ func TestRenderContainer(t *testing.T) {
 
 								return &t
 							}(),
-							Code:     verdictcode.FNI001,
+							Code:     verdictcode.MDN03,
 							Message:  "outbound network connection",
 							Severity: "medium",
 							Metadata: map[string]interface{}{
@@ -177,7 +177,7 @@ func TestRenderContainer(t *testing.T) {
 
 								return &t
 							}(),
-							Code:     verdictcode.FNI001,
+							Code:     verdictcode.STN002,
 							Message:  "outbound network connection",
 							Severity: "low",
 							Metadata: map[string]interface{}{

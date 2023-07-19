@@ -19,10 +19,12 @@ import (
 	"bytes"
 	"embed"
 	"io"
+	"strings"
 	"text/template"
 
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/listendev/pkg/models"
+	"github.com/listendev/pkg/models/severity"
 	"github.com/listendev/pkg/verdictcode"
 )
 
@@ -40,15 +42,19 @@ type problemsData struct {
 	TotalProblems int
 	DetailsRender string
 }
+
+type groupedByCodesSeverity map[string]map[severity.Severity][]models.Verdict
+
 type containerData struct {
-	Icons          containerDataIcons
+	Icons          icons
+	GroupedRender  string
 	LowSeverity    severityData
 	MediumSeverity severityData
 	HighSeverity   severityData
 	Problems       problemsData
 }
 
-type containerDataIcons struct {
+type icons struct {
 	HighSeverity, MediumSeverity, LowSeverity string
 }
 
@@ -100,6 +106,24 @@ func filterPackagesByVerdictSeverity(packages []listen.Package, sev string) []li
 	return filteredPackages
 }
 
+func renderGrouped(codesMap groupedByCodesSeverity, icons icons) (string, error) {
+	var render bytes.Buffer
+
+	for code, severitiesMap := range codesMap {
+		if len(severitiesMap) == 0 {
+			continue
+		}
+
+		// TODO make renderer a struct and add methods on it. This way you can set icons (and any other thing) in the struct and make it available in all renders.
+		err := RenderCodeGroup(&render, code, severitiesMap, icons)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	return render.String(), nil
+}
+
 func renderDetails(packages []listen.Package) (string, error) {
 	var detailsRender bytes.Buffer
 	for _, p := range packages {
@@ -134,6 +158,41 @@ func RenderContainer(
 	w io.Writer,
 	packages []listen.Package,
 ) error {
+	codesMap := groupedByCodesSeverity{
+		"DDN": make(map[severity.Severity][]models.Verdict),
+		"FNI": make(map[severity.Severity][]models.Verdict),
+		"MDN": make(map[severity.Severity][]models.Verdict),
+		"STN": make(map[severity.Severity][]models.Verdict),
+		"TSN": make(map[severity.Severity][]models.Verdict),
+		"UNK": make(map[severity.Severity][]models.Verdict),
+	}
+
+	for _, pkg := range packages {
+		for _, verdict := range pkg.Verdicts {
+
+		code:
+			for codePrefix, severitiesMap := range codesMap {
+				if strings.HasPrefix(verdict.Code.String(), codePrefix) {
+					severitiesMap[verdict.Severity] = append(severitiesMap[verdict.Severity], verdict)
+
+					break code
+				}
+			}
+
+		}
+	}
+
+	icons := icons{
+		HighSeverity:   "🚨",
+		MediumSeverity: "⚠️",
+		LowSeverity:    "🔷",
+	}
+
+	groupedRender, err := renderGrouped(codesMap, icons)
+	if err != nil {
+		return err
+	}
+
 	highAlertPackages := filterPackagesByVerdictSeverity(packages, "high")
 	mediumAlertPackages := filterPackagesByVerdictSeverity(packages, "medium")
 	lowAlertPacakges := filterPackagesByVerdictSeverity(packages, "low")
@@ -179,11 +238,8 @@ func RenderContainer(
 	}
 
 	cdata := containerData{
-		Icons: containerDataIcons{
-			HighSeverity:   "🚨",
-			MediumSeverity: "⚠️",
-			LowSeverity:    "🔷",
-		},
+		Icons:          icons,
+		GroupedRender:  groupedRender,
 		LowSeverity:    lowSeverityData,
 		MediumSeverity: mediumSeverityData,
 		HighSeverity:   highSeverityData,

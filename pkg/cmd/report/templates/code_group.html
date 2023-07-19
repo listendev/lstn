@@ -1,0 +1,16 @@
+<details>
+  <summary>
+    {{ .Code }}
+    <table align="right">
+      <tr>
+        <td>{{- .Icons.HighSeverity }} {{ .CumulatedSeverities.High -}}</td>
+        <td>{{- .Icons.MediumSeverity }} {{ .CumulatedSeverities.Medium -}}</td>
+        <td>{{- .Icons.LowSeverity }} {{ .CumulatedSeverities.Low -}}</td>
+      </tr>
+    </table>
+    <p>expand</p>
+  </summary>
+
+  <div>Internal</div>
+</details>
+<hr />

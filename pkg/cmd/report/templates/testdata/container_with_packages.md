@@ -7,6 +7,57 @@
 </table>
 🔍 The following behaviors have been detected in the dependency tree during installation.
 
+<hr>
+<details>
+  <summary>
+    MDN
+    <table align="right">
+      <tr>
+        <td>🚨 0</td>
+        <td>⚠️ 2</td>
+        <td>🔷 0</td>
+      </tr>
+    </table>
+    <p>expand</p>
+  </summary>
+
+  <div>Internal</div>
+</details>
+<hr />
+<details>
+  <summary>
+    STN
+    <table align="right">
+      <tr>
+        <td>🚨 0</td>
+        <td>⚠️ 0</td>
+        <td>🔷 1</td>
+      </tr>
+    </table>
+    <p>expand</p>
+  </summary>
+
+  <div>Internal</div>
+</details>
+<hr />
+<details>
+  <summary>
+    FNI
+    <table align="right">
+      <tr>
+        <td>🚨 3</td>
+        <td>⚠️ 0</td>
+        <td>🔷 0</td>
+      </tr>
+    </table>
+    <p>expand</p>
+  </summary>
+
+  <div>Internal</div>
+</details>
+<hr />
+
+
 <details>
 <summary>
 :stop_sign: <b>3</b> critical activities detected
