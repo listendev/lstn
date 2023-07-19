@@ -17,6 +17,7 @@ package templates
 
 import (
 	"bytes"
+	"embed"
 	"io"
 	"text/template"
 
@@ -25,56 +26,10 @@ import (
 	"github.com/listendev/pkg/verdictcode"
 )
 
-const containerTpl = `{{- $high := .HighSeverity -}}
-{{- $medium := .MediumSeverity -}}
-{{- $low := .LowSeverity -}}
-{{- $problems := .Problems -}}
-<table align=center>
-  <tr>
-    <td><b>critical</b> 🚨 {{ $high.TotalVerdicts -}}</td>
-    <td><b>medium</b> ⚠️ {{ $medium.TotalVerdicts -}}</td>
-    <td><b>low</b> 🔷 {{ $low.TotalVerdicts -}}</td>
-  </tr>
-</table>
-{{- if and (eq $high.TotalVerdicts 0) (eq $medium.TotalVerdicts 0) (eq $low.TotalVerdicts 0) }}
+//go:embed container.html
+var tmplContainer embed.FS
 
-- 🌟 No signs of suspicious behavior were found in the dependency tree during installation.
-- 🔒 Your meticulous approach ensures a secure codebase.
-- 🚀 Keep up the excellent work!
-{{- else }}
-The following behavior was detected in the dependency tree during installation
-
-<details>
-<summary>
-:stop_sign: <b>{{ $high.TotalVerdicts }}</b> critical activities detected
-</summary>
-{{- $high.DetailsRender }}
-</details>
-
-<details>
-<summary>
-:warning: <b>{{ $medium.TotalVerdicts }}</b> medium activities detected
-</summary>
-{{- $medium.DetailsRender }}
-</details>
-
-<details>
-<summary>
-:large_blue_diamond: <b>{{ $low.TotalVerdicts }}</b> low activities detected
-</summary>
-{{ $low.DetailsRender }}
-</details>
-{{- end }}
-
-{{- if gt $problems.TotalProblems 0 }}
-
-#### :triangular_flag_on_post: The analysis could not complete because of the following problems:
-{{ $problems.DetailsRender }}
-{{- end }}
-
-***
-<i>Powered by</i> <b><a href="https://listen.dev">listen.dev</a> <img height=14 src="https://listen.dev/assets/images/dolphin-noborder.png"></b>`
-
+// TODO No signs of suspicious behavior - should we first ensure there are no problems?!
 type severityData struct {
 	Packages      []listen.Package
 	TotalVerdicts int
@@ -224,11 +179,16 @@ func RenderContainer(
 		HighSeverity:   highSeverityData,
 		Problems:       pdata,
 	}
-	ct := template.Must(template.New("container").Parse(containerTpl))
-	err = ct.Execute(w, cdata)
+
+	tmplData, err := tmplContainer.ReadFile("container.html")
 	if err != nil {
 		return err
 	}
 
-	return nil
+	tmpl, err := template.New("container").Parse(string(tmplData))
+	if err != nil {
+		return err
+	}
+
+	return tmpl.Execute(w, cdata)
 }
