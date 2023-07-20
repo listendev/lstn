@@ -46,16 +46,30 @@ type problemsData struct {
 type groupedByCodesSeverity map[string]map[severity.Severity][]models.Verdict
 
 type containerData struct {
-	Icons          icons
+	Icons          map[string]string
 	GroupedRender  string
+	Amounts        amounts
 	LowSeverity    severityData
 	MediumSeverity severityData
 	HighSeverity   severityData
 	Problems       problemsData
 }
 
-type icons struct {
-	HighSeverity, MediumSeverity, LowSeverity string
+type amounts struct {
+	Map   map[string]uint
+	Total uint
+}
+
+func newAmounts(packages []listen.Package) amounts {
+	m := make(map[string]uint)
+	var t uint
+	for _, p := range packages {
+		for _, v := range p.Verdicts {
+			m[v.Severity.String()]++
+			t++
+		}
+	}
+	return amounts{m, t}
 }
 
 func countVerdicts(packages []listen.Package) int {
@@ -106,7 +120,7 @@ func filterPackagesByVerdictSeverity(packages []listen.Package, sev string) []li
 	return filteredPackages
 }
 
-func renderGrouped(codesMap groupedByCodesSeverity, icons icons) (string, error) {
+func renderGrouped(codesMap groupedByCodesSeverity, icons map[string]string) (string, error) {
 	var render bytes.Buffer
 
 	for code, severitiesMap := range codesMap {
@@ -155,13 +169,13 @@ func renderProblems(packages []listen.Package) (string, error) {
 }
 
 func nestGroupCodeSeverity(packages []listen.Package) groupedByCodesSeverity {
+	// Ignore UNK
 	codesMap := groupedByCodesSeverity{
 		"DDN": make(map[severity.Severity][]models.Verdict),
 		"FNI": make(map[severity.Severity][]models.Verdict),
 		"MDN": make(map[severity.Severity][]models.Verdict),
 		"STN": make(map[severity.Severity][]models.Verdict),
 		"TSN": make(map[severity.Severity][]models.Verdict),
-		"UNK": make(map[severity.Severity][]models.Verdict),
 	}
 
 	for _, pkg := range packages {
@@ -188,12 +202,12 @@ func RenderContainer(
 ) error {
 	nestedGroups := nestGroupCodeSeverity(packages)
 
-	icons := icons{
-		HighSeverity:   "🚨",
-		MediumSeverity: "⚠️",
-		LowSeverity:    "🔷",
+	icons := map[string]string{
+		"high":    "🚨",
+		"medium":  "⚠️",
+		"low":     "🔷",
+		"package": "📦",
 	}
-
 	groupedRender, err := renderGrouped(nestedGroups, icons)
 	if err != nil {
 		return err
@@ -246,6 +260,7 @@ func RenderContainer(
 	cdata := containerData{
 		Icons:          icons,
 		GroupedRender:  groupedRender,
+		Amounts:        newAmounts(packages),
 		LowSeverity:    lowSeverityData,
 		MediumSeverity: mediumSeverityData,
 		HighSeverity:   highSeverityData,

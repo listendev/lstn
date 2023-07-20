@@ -1,13 +1,14 @@
+{{- $icons := .Icons -}}
 <details>
   <summary>
     {{ .CodeData.Icon }} {{ .CodeData.Label }}
     <table align="right">
       <tr>
-        <td>{{- .Icons.HighSeverity }} {{ len .CumulatedSeverities.High -}}</td>
+        <td>{{- index .Icons "high" }} {{ len .CumulatedSeverities.High -}}</td>
         <td>
-          {{- .Icons.MediumSeverity }} {{ len .CumulatedSeverities.Medium -}}
+          {{- index .Icons "medium" }} {{ len .CumulatedSeverities.Medium -}}
         </td>
-        <td>{{- .Icons.LowSeverity }} {{ len .CumulatedSeverities.Low -}}</td>
+        <td>{{- index .Icons "low" }} {{ len .CumulatedSeverities.Low -}}</td>
       </tr>
     </table>
     <p>
@@ -15,73 +16,40 @@
     </p>
   </summary>
 
-{{- with .CumulatedSeverities.SingleSeverity }}
-
-{{ .Icon }} {{ .Label }} ∙ {{ len .Verdicts }} issue{{- len .Verdicts | pluralize }}
-
-| Package | Message |
-|---|---|
-{{ range .Verdicts -}}
-| [{{ .Pkg }}@{{ .Version }}](https://verdicts.listen.dev/npm/{{- .Pkg -}}/{{- .Version -}}) | {{ .Message }} |
-{{ end }}
-
-{{- else -}}
-
-  {{ if gt (len .CumulatedSeverities.High) 0 }}
-  <details>
-    <summary>
-      {{- .Icons.HighSeverity }} Critical severity ∙ {{ len .CumulatedSeverities.High }}
-      issue{{- len .CumulatedSeverities.High | pluralize -}}
-    </summary>
-
+{{ range $severity, $packages := .CumulatedSeverities.Severities }}
+{{ if gt (len $packages) 0 }}
+<details>
+<summary>
+{{- (printf "%s" $severity) | icon }} {{ $severity | severityLabel }} ∙ {{ len $packages }} package{{- len $packages | pluralize }}
+</summary>
 <br />
 
-| Package | Message |
-|---|---|
-{{ range .CumulatedSeverities.High -}}
-| [{{ .Pkg }}@{{ .Version }}](https://verdicts.listen.dev/npm/{{- .Pkg -}}/{{- .Version -}}) | {{ .Message }} |
-{{ end }}
+{{ range $nameVersion, $code := $packages }}
+<details>
+<summary>~ {{ index $icons "package" }} {{ $nameVersion -}}</summary>
 
-  </details>
-  {{ end }}
+{{ range $c, $grouped := $code }}
 
-  {{ if gt (len .CumulatedSeverities.Medium) 0 }}
-  <details>
-    <summary>
-      {{- .Icons.MediumSeverity }} Medium severity ∙ {{ len .CumulatedSeverities.Medium }}
-      issue{{- len .CumulatedSeverities.Medium | pluralize -}}
-    </summary>
+{{- $groupedAmount := $grouped | transitiveAndNonAmount -}}
+`{{- $grouped | extractMessage -}}` ∙ {{ $groupedAmount }} occurrence{{- $groupedAmount | pluralize }}
 
-<br />
-
-| Package | Message |
-|---|---|
-{{ range .CumulatedSeverities.Medium -}}
-| [{{ .Pkg }}@{{ .Version }}](https://verdicts.listen.dev/npm/{{- .Pkg -}}/{{- .Version -}}) | {{ .Message }} |
-{{ end }}
-
-  </details>
-  {{ end }}
-
-  {{ if gt (len .CumulatedSeverities.Low) 0 }}
-  <details>
-    <summary>
-      {{- .Icons.LowSeverity }} Low Severity ∙ {{ len .CumulatedSeverities.Low }}
-      issue{{- len .CumulatedSeverities.Low | pluralize -}}
-    </summary>
-
-<br />
-
-| Package | Message |
-|---|---|
-{{ range .CumulatedSeverities.Low -}}
-| [{{ .Pkg }}@{{ .Version }}](https://verdicts.listen.dev/npm/{{- .Pkg -}}/{{- .Version -}}) | {{ .Message }} |
-{{ end }}
-
-  </details>
-  {{ end }}
-  
+| Name | Version | Transitive Dependency | More |
+|---|---|---|---|
+{{ range $grouped.Transitive -}}
+{{- $name := index .Metadata "npm_package_name" -}}
+{{- $version := index .Metadata "npm_package_version" -}}
+| {{ $name }} | {{ $version }} | ✔️ | [🔗](https://verdicts.listen.dev/npm/{{- $name -}}/{{- $version -}}) |
 {{ end -}}
+{{- range $grouped.NonTransitive -}}
+| {{ .Pkg }} | {{ .Version }} | | [🔗](https://verdicts.listen.dev/npm/{{- $nameVersion -}}) |
+{{ end }}
+
+{{ end }}
 </details>
+{{ end }}
+</details>
+{{ end }}
+{{ end }}
+</details> 
 
 <hr />
