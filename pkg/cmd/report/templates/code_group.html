@@ -15,6 +15,18 @@
     </p>
   </summary>
 
+{{- with .CumulatedSeverities.SingleSeverity }}
+
+{{ .Icon }} {{ .Label }} ∙ {{ len .Verdicts }} issue{{- len .Verdicts | pluralize }}
+
+| Package | Message |
+|---|---|
+{{ range .Verdicts -}}
+| [{{ .Pkg }}@{{ .Version }}](https://verdicts.listen.dev/npm/{{- .Pkg -}}/{{- .Version -}}) | {{ .Message }} |
+{{ end }}
+
+{{- else -}}
+
   {{ if gt (len .CumulatedSeverities.High) 0 }}
   <details>
     <summary>
@@ -68,5 +80,8 @@
 
   </details>
   {{ end }}
+  
+{{ end -}}
 </details>
+
 <hr />

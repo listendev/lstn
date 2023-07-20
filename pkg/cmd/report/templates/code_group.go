@@ -17,6 +17,7 @@ package templates
 
 import (
 	"embed"
+	"fmt"
 	"io"
 	"text/template"
 
@@ -32,20 +33,49 @@ type cumulatedSeverities struct {
 	Medium         []models.Verdict
 	Low            []models.Verdict
 	TotalAmount    int
-	SingleSeverity *[]models.Verdict
+	SingleSeverity *singleSeverity
 }
 
-func newCumulatedSeverities(severityGroups map[severity.Severity][]models.Verdict) cumulatedSeverities {
+type singleSeverity struct {
+	Severity severity.Severity
+	Verdicts []models.Verdict
+	Label    string
+	Icon     string
+}
+
+func newCumulatedSeverities(severityGroups map[severity.Severity][]models.Verdict, icons icons) cumulatedSeverities {
 	m := make(map[severity.Severity][]models.Verdict)
+	t := 0
 	for severity, verdicts := range severityGroups {
+		t += len(verdicts)
 		m[severity] = append(m[severity], verdicts...)
 	}
 
 	cs := cumulatedSeverities{
-		High:        m[severity.High],
-		Medium:      m[severity.Medium],
-		Low:         m[severity.Low],
-		TotalAmount: len(m[severity.High]) + len(m[severity.Medium]) + len(m[severity.Low]),
+		High:           m[severity.High],
+		Medium:         m[severity.Medium],
+		Low:            m[severity.Low],
+		TotalAmount:    t,
+		SingleSeverity: nil,
+	}
+
+	for s, v := range severityGroups {
+		if len(v) == t {
+			i := icons.LowSeverity
+
+			if s == severity.Medium {
+				i = icons.MediumSeverity
+			}
+
+			l := fmt.Sprintf("%s severity", s)
+			if s == severity.High {
+				l = "Critical severity"
+				i = icons.HighSeverity
+			}
+
+			cs.SingleSeverity = &singleSeverity{s, v, l, i}
+			break
+		}
 	}
 
 	return cs
@@ -94,6 +124,6 @@ func RenderCodeGroup(w io.Writer, code string, severitiesMap map[severity.Severi
 		Code:                code,
 		CodeData:            codeDataMap[code],
 		Icons:               i,
-		CumulatedSeverities: newCumulatedSeverities(severitiesMap),
+		CumulatedSeverities: newCumulatedSeverities(severitiesMap, i),
 	})
 }
