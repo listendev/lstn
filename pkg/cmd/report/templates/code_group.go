@@ -28,9 +28,24 @@ import (
 var tmpCodeGroup embed.FS
 
 type cumulatedSeverities struct {
-	High   int
-	Medium int
-	Low    int
+	High   uint
+	Medium uint
+	Low    uint
+	Total  uint
+}
+
+type codeData struct {
+	Label string
+	Icon  string
+}
+
+var codeDataMap = map[string]codeData{
+	"UNK": {"Unknown", "👽"},
+	"FNI": {"Dynamic instrumentation", "📡"},
+	"TSN": {"Typosquatting", "🔀"},
+	"MDN": {"Metadata", "📑"},
+	"STN": {"Static analysis", "🔎"},
+	"DDN": {"Advisories", "🛡️"},
 }
 
 func RenderCodeGroup(w io.Writer, code string, severitiesMap map[severity.Severity][]models.Verdict, i icons) error {
@@ -44,22 +59,25 @@ func RenderCodeGroup(w io.Writer, code string, severitiesMap map[severity.Severi
 		return err
 	}
 
-	severitiesCounter := make(map[severity.Severity]int)
+	severitiesCounter := make(map[severity.Severity]uint)
 	for severity, verdicts := range severitiesMap {
-		severitiesCounter[severity] += len(verdicts)
+		severitiesCounter[severity] += uint(len(verdicts))
 	}
 
 	return tmpl.Execute(w, struct {
 		Code                string
+		CodeData            codeData
 		Icons               icons
 		CumulatedSeverities cumulatedSeverities
 	}{
-		Code:  code,
-		Icons: i,
+		Code:     code,
+		CodeData: codeDataMap[code],
+		Icons:    i,
 		CumulatedSeverities: cumulatedSeverities{
 			High:   severitiesCounter[severity.High],
 			Medium: severitiesCounter[severity.Medium],
 			Low:    severitiesCounter[severity.Low],
+			Total:  severitiesCounter[severity.High] + severitiesCounter[severity.Medium] + severitiesCounter[severity.Low],
 		},
 	})
 }

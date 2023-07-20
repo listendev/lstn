@@ -1,6 +1,6 @@
 <details>
   <summary>
-    {{ .Code }}
+    {{ .CodeData.Icon }} {{ .CodeData.Label }}
     <table align="right">
       <tr>
         <td>{{- .Icons.HighSeverity }} {{ .CumulatedSeverities.High -}}</td>
@@ -8,7 +8,7 @@
         <td>{{- .Icons.LowSeverity }} {{ .CumulatedSeverities.Low -}}</td>
       </tr>
     </table>
-    <p>expand</p>
+    <p>{{- .CumulatedSeverities.Total }} issue{{- if gt .CumulatedSeverities.Total 1 -}}s{{- end }} found.</p>
   </summary>
 
   <div>Internal</div>

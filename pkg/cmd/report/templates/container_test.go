@@ -75,6 +75,33 @@ func TestRenderContainer(t *testing.T) {
 					},
 				},
 				{
+					Name:    "foo",
+					Version: strPtr("1.0.0"),
+					Verdicts: []listen.Verdict{
+						{
+							Pkg:     "foo",
+							Version: "1.0.0",
+							Shasum:  "555bd98592883255fa00de14f1151a917b5d77d5",
+							CreatedAt: func() *time.Time {
+								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+
+								return &t
+							}(),
+							Code:     verdictcode.FNI002,
+							Message:  "outbound network connection",
+							Severity: "high",
+							Metadata: map[string]interface{}{
+								"npm_package_name":    "foo",
+								"npm_package_version": "1.0.0",
+								"parent_name":         "node",
+								"executable_path":     "/bin/sh",
+								"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
+								"server_ip":           "",
+							},
+						},
+					},
+				},
+				{
 					Name:    "bar",
 					Version: strPtr("1.0.0"),
 					Verdicts: []listen.Verdict{
@@ -87,7 +114,7 @@ func TestRenderContainer(t *testing.T) {
 
 								return &t
 							}(),
-							Code:     verdictcode.FNI001,
+							Code:     verdictcode.DDN01,
 							Message:  "outbound network connection",
 							Severity: "high",
 							Metadata: map[string]interface{}{
@@ -114,7 +141,7 @@ func TestRenderContainer(t *testing.T) {
 
 								return &t
 							}(),
-							Code:     verdictcode.FNI002,
+							Code:     verdictcode.MDN01,
 							Message:  "outbound network connection",
 							Severity: "high",
 							Metadata: map[string]interface{}{
@@ -135,7 +162,7 @@ func TestRenderContainer(t *testing.T) {
 
 								return &t
 							}(),
-							Code:     verdictcode.MDN01,
+							Code:     verdictcode.STN001,
 							Message:  "outbound network connection",
 							Severity: "medium",
 							Metadata: map[string]interface{}{
@@ -156,7 +183,7 @@ func TestRenderContainer(t *testing.T) {
 
 								return &t
 							}(),
-							Code:     verdictcode.MDN03,
+							Code:     verdictcode.TSN01,
 							Message:  "outbound network connection",
 							Severity: "medium",
 							Metadata: map[string]interface{}{
@@ -177,7 +204,7 @@ func TestRenderContainer(t *testing.T) {
 
 								return &t
 							}(),
-							Code:     verdictcode.STN002,
+							Code:     verdictcode.UNK,
 							Message:  "outbound network connection",
 							Severity: "low",
 							Metadata: map[string]interface{}{
