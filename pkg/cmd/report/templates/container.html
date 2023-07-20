@@ -1,3 +1,4 @@
+
 # <img height=14 src="https://listen.dev/assets/images/dolphin-noborder.png"> listen.dev ∙ Security Report
 
 {{ $high := .HighSeverity -}}
@@ -6,9 +7,9 @@
 {{- $problems := .Problems -}}
 <table align=center>
   <tr>
-    <td><b>critical</b> {{ .Icons.HighSeverity }} {{ $high.TotalVerdicts -}}</td>
-    <td><b>medium</b> {{ .Icons.MediumSeverity }} {{ $medium.TotalVerdicts -}}</td>
-    <td><b>low</b> {{ .Icons.LowSeverity }} {{ $low.TotalVerdicts -}}</td>
+    <td><b>critical</b> {{ index .Icons "high" }} {{ index .Amounts.Map "high" -}}</td>
+    <td><b>medium</b> {{ index .Icons "medium" }} {{ index .Amounts.Map "medium" -}}</td>
+    <td><b>low</b> {{ index .Icons "low" }} {{ index .Amounts.Map "low" -}}</td>
   </tr>
 </table>
 {{- if and (eq $high.TotalVerdicts 0) (eq $medium.TotalVerdicts 0) (eq $low.TotalVerdicts 0) }}
