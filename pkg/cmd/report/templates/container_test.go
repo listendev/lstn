@@ -102,12 +102,60 @@ func TestRenderContainer(t *testing.T) {
 					},
 				},
 				{
-					Name:    "bar",
-					Version: strPtr("1.0.0"),
+					Name:    "bufferutil",
+					Version: strPtr("4.0.7"),
 					Verdicts: []listen.Verdict{
 						{
-							Pkg:     "bar",
-							Version: "1.0.0",
+							Pkg:     "bufferutil",
+							Version: "4.0.7",
+							Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
+							CreatedAt: func() *time.Time {
+								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+
+								return &t
+							}(),
+							Code:     verdictcode.DDN01,
+							Message:  "outbound network connection",
+							Severity: "high",
+							Metadata: map[string]interface{}{
+								"npm_package_name":    "foo",
+								"npm_package_version": "1.0.0",
+								"parent_name":         "node",
+								"executable_path":     "/bin/sh",
+								"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
+								"server_ip":           "",
+							},
+						},
+						{
+							Pkg:     "bufferutil",
+							Version: "4.0.7",
+							Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
+							CreatedAt: func() *time.Time {
+								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+
+								return &t
+							}(),
+							Code:     verdictcode.DDN01,
+							Message:  "outbound network connection",
+							Severity: "medium",
+							Metadata: map[string]interface{}{
+								"npm_package_name":    "foo",
+								"npm_package_version": "1.0.0",
+								"parent_name":         "node",
+								"executable_path":     "/bin/sh",
+								"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
+								"server_ip":           "",
+							},
+						},
+					},
+				},
+				{
+					Name:    "vu3",
+					Version: strPtr("0.0.1"),
+					Verdicts: []listen.Verdict{
+						{
+							Pkg:     "vu3",
+							Version: "0.0.1",
 							Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")

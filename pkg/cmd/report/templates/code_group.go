@@ -28,10 +28,27 @@ import (
 var tmpCodeGroup embed.FS
 
 type cumulatedSeverities struct {
-	High        []models.Verdict
-	Medium      []models.Verdict
-	Low         []models.Verdict
-	TotalAmount int
+	High           []models.Verdict
+	Medium         []models.Verdict
+	Low            []models.Verdict
+	TotalAmount    int
+	SingleSeverity *[]models.Verdict
+}
+
+func newCumulatedSeverities(severityGroups map[severity.Severity][]models.Verdict) cumulatedSeverities {
+	m := make(map[severity.Severity][]models.Verdict)
+	for severity, verdicts := range severityGroups {
+		m[severity] = append(m[severity], verdicts...)
+	}
+
+	cs := cumulatedSeverities{
+		High:        m[severity.High],
+		Medium:      m[severity.Medium],
+		Low:         m[severity.Low],
+		TotalAmount: len(m[severity.High]) + len(m[severity.Medium]) + len(m[severity.Low]),
+	}
+
+	return cs
 }
 
 type codeData struct {
@@ -48,20 +65,24 @@ var codeDataMap = map[string]codeData{
 	"DDN": {"Advisories", "🛡️"},
 }
 
+func pluralize(count int) string {
+	if count == 1 {
+		return ""
+	}
+	return "s"
+}
+
 func RenderCodeGroup(w io.Writer, code string, severitiesMap map[severity.Severity][]models.Verdict, i icons) error {
 	tmplData, err := tmpCodeGroup.ReadFile("code_group.html")
 	if err != nil {
 		return err
 	}
 
-	tmpl, err := template.New("code_group").Parse(string(tmplData))
+	tmpl, err := template.New("code_group").Funcs(template.FuncMap{
+		"pluralize": pluralize,
+	}).Parse(string(tmplData))
 	if err != nil {
 		return err
-	}
-
-	m := make(map[severity.Severity][]models.Verdict)
-	for severity, verdicts := range severitiesMap {
-		m[severity] = append(m[severity], verdicts...)
 	}
 
 	return tmpl.Execute(w, struct {
@@ -70,14 +91,9 @@ func RenderCodeGroup(w io.Writer, code string, severitiesMap map[severity.Severi
 		Icons               icons
 		CumulatedSeverities cumulatedSeverities
 	}{
-		Code:     code,
-		CodeData: codeDataMap[code],
-		Icons:    i,
-		CumulatedSeverities: cumulatedSeverities{
-			High:        m[severity.High],
-			Medium:      m[severity.Medium],
-			Low:         m[severity.Low],
-			TotalAmount: len(m[severity.High]) + len(m[severity.Medium]) + len(m[severity.Low]),
-		},
+		Code:                code,
+		CodeData:            codeDataMap[code],
+		Icons:               i,
+		CumulatedSeverities: newCumulatedSeverities(severitiesMap),
 	})
 }
