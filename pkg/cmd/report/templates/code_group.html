@@ -3,14 +3,59 @@
     {{ .CodeData.Icon }} {{ .CodeData.Label }}
     <table align="right">
       <tr>
-        <td>{{- .Icons.HighSeverity }} {{ .CumulatedSeverities.High -}}</td>
-        <td>{{- .Icons.MediumSeverity }} {{ .CumulatedSeverities.Medium -}}</td>
-        <td>{{- .Icons.LowSeverity }} {{ .CumulatedSeverities.Low -}}</td>
+        <td>{{- .Icons.HighSeverity }} {{ len .CumulatedSeverities.High -}}</td>
+        <td>
+          {{- .Icons.MediumSeverity }} {{ len .CumulatedSeverities.Medium -}}
+        </td>
+        <td>{{- .Icons.LowSeverity }} {{ len .CumulatedSeverities.Low -}}</td>
       </tr>
     </table>
-    <p>{{- .CumulatedSeverities.Total }} issue{{- if gt .CumulatedSeverities.Total 1 -}}s{{- end }} found.</p>
+    <p>
+      {{- .CumulatedSeverities.TotalAmount }} issue{{- if gt
+      .CumulatedSeverities.TotalAmount 1 -}}s{{- end }} found
+    </p>
   </summary>
 
-  <div>Internal</div>
+  {{ if gt (len .CumulatedSeverities.High) 0 }}
+  <details>
+    <summary>
+      {{- .Icons.HighSeverity -}} Critical severity {{ len .CumulatedSeverities.High }}
+      issue{{- if gt .CumulatedSeverities.TotalAmount 1 -}}s{{- end }}
+    </summary>
+
+- item 0
+- item 1
+- item 2
+
+  </details>
+  {{ end }}
+
+  {{ if gt (len .CumulatedSeverities.Medium) 0 }}
+  <details>
+    <summary>
+      {{- .Icons.MediumSeverity -}} Medium severity {{ len .CumulatedSeverities.Medium }}
+      issue{{- if gt .CumulatedSeverities.TotalAmount 1 -}}s{{- end }}
+    </summary>
+
+- item 0
+- item 1
+- item 2
+
+  </details>
+  {{ end }}
+
+  {{ if gt (len .CumulatedSeverities.Low) 0 }}
+  <details>
+    <summary>
+      {{- .Icons.LowSeverity -}} Low severity {{ len .CumulatedSeverities.Low }}
+      issue{{- if gt .CumulatedSeverities.TotalAmount 1 -}}s{{- end }}
+    </summary>
+
+- item 0
+- item 1
+- item 2
+
+  </details>
+  {{ end }}
 </details>
 <hr />

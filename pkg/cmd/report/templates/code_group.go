@@ -28,10 +28,10 @@ import (
 var tmpCodeGroup embed.FS
 
 type cumulatedSeverities struct {
-	High   uint
-	Medium uint
-	Low    uint
-	Total  uint
+	High        []models.Verdict
+	Medium      []models.Verdict
+	Low         []models.Verdict
+	TotalAmount int
 }
 
 type codeData struct {
@@ -59,9 +59,9 @@ func RenderCodeGroup(w io.Writer, code string, severitiesMap map[severity.Severi
 		return err
 	}
 
-	severitiesCounter := make(map[severity.Severity]uint)
+	m := make(map[severity.Severity][]models.Verdict)
 	for severity, verdicts := range severitiesMap {
-		severitiesCounter[severity] += uint(len(verdicts))
+		m[severity] = append(m[severity], verdicts...)
 	}
 
 	return tmpl.Execute(w, struct {
@@ -74,10 +74,10 @@ func RenderCodeGroup(w io.Writer, code string, severitiesMap map[severity.Severi
 		CodeData: codeDataMap[code],
 		Icons:    i,
 		CumulatedSeverities: cumulatedSeverities{
-			High:   severitiesCounter[severity.High],
-			Medium: severitiesCounter[severity.Medium],
-			Low:    severitiesCounter[severity.Low],
-			Total:  severitiesCounter[severity.High] + severitiesCounter[severity.Medium] + severitiesCounter[severity.Low],
+			High:        m[severity.High],
+			Medium:      m[severity.Medium],
+			Low:         m[severity.Low],
+			TotalAmount: len(m[severity.High]) + len(m[severity.Medium]) + len(m[severity.Low]),
 		},
 	})
 }

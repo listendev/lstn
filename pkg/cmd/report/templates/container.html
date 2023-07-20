@@ -11,11 +11,11 @@
 </table>
 {{- if and (eq $high.TotalVerdicts 0) (eq $medium.TotalVerdicts 0) (eq $low.TotalVerdicts 0) }}
 
-- 🌟 No signs of suspicious behavior were found in the dependency tree during installation.
-- 🔒 Your meticulous approach ensures a secure codebase.
+- 🌟 No signs of suspicious behavior were found in the dependency tree during installation
+- 🔒 Your meticulous approach ensures a secure codebase
 - 🚀 Keep up the excellent work!
 {{- else }}
-🔍 The following behaviors have been detected in the dependency tree during installation.
+🔍 The following behaviors have been detected in the dependency tree during installation
 
 <hr>
 {{ .GroupedRender }}
