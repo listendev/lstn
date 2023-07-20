@@ -1,4 +1,6 @@
-{{- $high := .HighSeverity -}}
+# <img height=14 src="https://listen.dev/assets/images/dolphin-noborder.png"> listen.dev ∙ Security Report
+
+{{ $high := .HighSeverity -}}
 {{- $medium := .MediumSeverity -}}
 {{- $low := .LowSeverity -}}
 {{- $problems := .Problems -}}
@@ -20,7 +22,7 @@
 <hr>
 {{ .GroupedRender }}
 
-<details>
+<!-- <details>
 <summary>
 :stop_sign: <b>{{ $high.TotalVerdicts }}</b> critical activities detected
 </summary>
@@ -46,7 +48,7 @@
 
 #### :triangular_flag_on_post: The analysis could not complete because of the following problems:
 {{ $problems.DetailsRender }}
-{{- end }}
+{{- end }} -->
 
 ***
 <i>Powered by</i> <b><a href="https://listen.dev">listen.dev</a> <img height=14 src="https://listen.dev/assets/images/dolphin-noborder.png"></b>

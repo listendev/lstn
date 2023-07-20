@@ -11,21 +11,24 @@
       </tr>
     </table>
     <p>
-      {{- .CumulatedSeverities.TotalAmount }} issue{{- if gt
-      .CumulatedSeverities.TotalAmount 1 -}}s{{- end }} found
+      {{- .CumulatedSeverities.TotalAmount }} issue{{- .CumulatedSeverities.TotalAmount | pluralize }} found
     </p>
   </summary>
 
   {{ if gt (len .CumulatedSeverities.High) 0 }}
   <details>
     <summary>
-      {{- .Icons.HighSeverity -}} Critical severity {{ len .CumulatedSeverities.High }}
-      issue{{- if gt .CumulatedSeverities.TotalAmount 1 -}}s{{- end }}
+      {{- .Icons.HighSeverity }} Critical severity ∙ {{ len .CumulatedSeverities.High }}
+      issue{{- len .CumulatedSeverities.High | pluralize -}}
     </summary>
 
-- item 0
-- item 1
-- item 2
+<br />
+
+| Package | Message |
+|---|---|
+{{ range .CumulatedSeverities.High -}}
+| [{{ .Pkg }}@{{ .Version }}](https://verdicts.listen.dev/npm/{{- .Pkg -}}/{{- .Version -}}) | {{ .Message }} |
+{{ end }}
 
   </details>
   {{ end }}
@@ -33,13 +36,17 @@
   {{ if gt (len .CumulatedSeverities.Medium) 0 }}
   <details>
     <summary>
-      {{- .Icons.MediumSeverity -}} Medium severity {{ len .CumulatedSeverities.Medium }}
-      issue{{- if gt .CumulatedSeverities.TotalAmount 1 -}}s{{- end }}
+      {{- .Icons.MediumSeverity }} Medium severity ∙ {{ len .CumulatedSeverities.Medium }}
+      issue{{- len .CumulatedSeverities.Medium | pluralize -}}
     </summary>
 
-- item 0
-- item 1
-- item 2
+<br />
+
+| Package | Message |
+|---|---|
+{{ range .CumulatedSeverities.Medium -}}
+| [{{ .Pkg }}@{{ .Version }}](https://verdicts.listen.dev/npm/{{- .Pkg -}}/{{- .Version -}}) | {{ .Message }} |
+{{ end }}
 
   </details>
   {{ end }}
@@ -47,13 +54,17 @@
   {{ if gt (len .CumulatedSeverities.Low) 0 }}
   <details>
     <summary>
-      {{- .Icons.LowSeverity -}} Low severity {{ len .CumulatedSeverities.Low }}
-      issue{{- if gt .CumulatedSeverities.TotalAmount 1 -}}s{{- end }}
+      {{- .Icons.LowSeverity }} Low Severity ∙ {{ len .CumulatedSeverities.Low }}
+      issue{{- len .CumulatedSeverities.Low | pluralize -}}
     </summary>
 
-- item 0
-- item 1
-- item 2
+<br />
+
+| Package | Message |
+|---|---|
+{{ range .CumulatedSeverities.Low -}}
+| [{{ .Pkg }}@{{ .Version }}](https://verdicts.listen.dev/npm/{{- .Pkg -}}/{{- .Version -}}) | {{ .Message }} |
+{{ end }}
 
   </details>
   {{ end }}

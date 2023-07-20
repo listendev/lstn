@@ -154,10 +154,7 @@ func renderProblems(packages []listen.Package) (string, error) {
 	return detailsRender.String(), nil
 }
 
-func RenderContainer(
-	w io.Writer,
-	packages []listen.Package,
-) error {
+func nestGroupCodeSeverity(packages []listen.Package) groupedByCodesSeverity {
 	codesMap := groupedByCodesSeverity{
 		"DDN": make(map[severity.Severity][]models.Verdict),
 		"FNI": make(map[severity.Severity][]models.Verdict),
@@ -182,13 +179,22 @@ func RenderContainer(
 		}
 	}
 
+	return codesMap
+}
+
+func RenderContainer(
+	w io.Writer,
+	packages []listen.Package,
+) error {
+	nestedGroups := nestGroupCodeSeverity(packages)
+
 	icons := icons{
 		HighSeverity:   "🚨",
 		MediumSeverity: "⚠️",
 		LowSeverity:    "🔷",
 	}
 
-	groupedRender, err := renderGrouped(codesMap, icons)
+	groupedRender, err := renderGrouped(nestedGroups, icons)
 	if err != nil {
 		return err
 	}
