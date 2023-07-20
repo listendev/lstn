@@ -20,13 +20,13 @@
 {{ if gt (len $packages) 0 }}
 <details>
 <summary>
-{{- (printf "%s" $severity) | icon }} {{ $severity | severityLabel }} ∙ {{ len $packages }} package{{- len $packages | pluralize }}
+{{- (printf "%s" $severity) | icon }} <b>{{ $severity | severityLabel }}</b> ∙ {{ len $packages }} package{{- len $packages | pluralize }}
 </summary>
 <br />
 
 {{ range $nameVersion, $code := $packages }}
 <details>
-<summary>~ {{ index $icons "package" }} {{ $nameVersion -}}</summary>
+<summary>~ {{ index $icons "package" }} <i>{{ $nameVersion -}}</i></summary>
 
 {{ range $c, $grouped := $code }}
 
