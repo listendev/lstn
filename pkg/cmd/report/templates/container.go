@@ -25,8 +25,6 @@ import (
 	"github.com/listendev/pkg/models/severity"
 )
 
-// TODO No signs of suspicious behavior - should we first ensure there are no problems?!
-
 type amounts struct {
 	Map      map[string]uint
 	Total    uint
