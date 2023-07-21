@@ -1,6 +1,6 @@
 <details>
 <summary>
-<code>{{ .Verdicts | getCodeMessage }}</code> ∙ {{ len .Verdicts }} total occurence{{ len .Verdicts | pluralize }}
+<code>{{ .Verdicts | getCodeMessage }}</code> ∙ {{ len .Verdicts }} total occurrence{{ pluralize (len .Verdicts) "" "s" }}
 </summary>
 <br>
 

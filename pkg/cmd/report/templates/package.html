@@ -1,5 +1,14 @@
 <details>
-<summary>{{ index .Icons "package" }} <i>{{ .Name }}@{{ .Version }}</i></summary>
+<summary>{{ index .Icons "package" }} <i>{{ .Name }}@{{ .Version }}</i>
+<table align="right">
+<tr>
+<td>{{ .Occurrences }} occurrence{{ pluralize .Occurrences "" "s" }}</td>
+<td>{{ len .RenderCodes }} kind of {{ pluralize (len .RenderCodes) "issue" "issues" }}</td>
+<td><a href="https://verdicts.listen.dev/npm/{{- .Name -}}/{{- .Version -}}">🔗</a></td>
+</tr>
+</table>
+</summary>
+<br>    
 
 <ul>
 {{ range .RenderCodes }}

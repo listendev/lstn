@@ -227,7 +227,7 @@ func nestSeverityCodeGroupCode(packages []listen.Package) nestedSeverityCodeGrou
 			}
 
 			var foundCodeGroup string
-			for codeGroup := range codeDataMap {
+			for codeGroup := range codeDataLabel {
 				if strings.HasPrefix(v.Code.String(), codeGroup) {
 					foundCodeGroup = codeGroup
 					break
@@ -293,6 +293,7 @@ func (r *render) Severity(s severity.Severity) (string, error) {
 		return "", nil
 	}
 
+	codeGroupsIcons := []string{}
 	rCodeGroups := []string{}
 	for codeGroup, nameVersions := range codeGroups {
 		rCodeGroup, err := r.CodeGroup(codeGroup, nameVersions)
@@ -301,15 +302,18 @@ func (r *render) Severity(s severity.Severity) (string, error) {
 		}
 
 		rCodeGroups = append(rCodeGroups, rCodeGroup)
+		codeGroupsIcons = append(codeGroupsIcons, r.icons[codeGroup])
 	}
 
 	if err := tmpl.Execute(&render, struct {
-		Severity         severity.Severity
 		Icons            map[string]string
+		Severity         severity.Severity
+		CodeGroupIcons   []string
 		RenderCodeGroups []string
 	}{
 		Icons:            r.icons,
 		Severity:         s,
+		CodeGroupIcons:   codeGroupsIcons,
 		RenderCodeGroups: rCodeGroups,
 	}); err != nil {
 		return "", err
@@ -370,6 +374,7 @@ func (r *render) Package(nameVersion string, codes map[verdictcode.Code][]models
 
 	li := strings.LastIndex(nameVersion, "/")
 
+	occurrences := 0
 	rCodes := []string{}
 	for code, verdicts := range codes {
 		rCode, err := r.Code(code, verdicts)
@@ -377,6 +382,7 @@ func (r *render) Package(nameVersion string, codes map[verdictcode.Code][]models
 			return "", err
 		}
 		rCodes = append(rCodes, rCode)
+		occurrences += len(verdicts)
 	}
 
 	if err := tmpl.Execute(&render, struct {
@@ -384,11 +390,13 @@ func (r *render) Package(nameVersion string, codes map[verdictcode.Code][]models
 		Name        string
 		Version     string
 		RenderCodes []string
+		Occurrences int
 	}{
 		Icons:       r.icons,
 		Name:        nameVersion[:li],
 		Version:     nameVersion[li+1:],
 		RenderCodes: rCodes,
+		Occurrences: occurrences,
 	}); err != nil {
 		return "", err
 	}
@@ -465,6 +473,11 @@ var icons = map[string]string{
 	"medium":  "⚠️",
 	"low":     "🔷",
 	"package": "📦",
+	"FNI":     "📡",
+	"TSN":     "🔀",
+	"MDN":     "📑",
+	"STN":     "🔎",
+	"DDN":     "🛡️",
 }
 
 type codeData struct {
@@ -472,13 +485,13 @@ type codeData struct {
 	Icon  string
 }
 
-var codeDataMap = map[string]codeData{
+var codeDataLabel = map[string]string{
 	// Ignore UNK
-	"FNI": {"Dynamic instrumentation", "📡"},
-	"TSN": {"Typosquatting", "🔀"},
-	"MDN": {"Metadata", "📑"},
-	"STN": {"Static analysis", "🔎"},
-	"DDN": {"Advisories", "🛡️"},
+	"FNI": "Dynamic instrumentation",
+	"TSN": "Typosquatting",
+	"MDN": "Metadata",
+	"STN": "Static analysis",
+	"DDN": "Advisories",
 }
 
 type nameVersion struct {
@@ -487,7 +500,12 @@ type nameVersion struct {
 }
 
 var funcs = template.FuncMap{
-	"pluralize": pluralize,
+	"pluralize": func(count int, singular, plural string) string {
+		if count == 1 {
+			return singular
+		}
+		return plural
+	},
 	"icon": func(key string) string {
 		return icons[key]
 	},
@@ -500,8 +518,8 @@ var funcs = template.FuncMap{
 		}
 		return "Critical severity"
 	},
-	"codeGroupData": func(codeGroup string) codeData {
-		return codeDataMap[codeGroup]
+	"codeGroupLabel": func(codeGroup string) string {
+		return codeDataLabel[codeGroup]
 	},
 	"getCodeMessage": func(verdict []models.Verdict) string {
 		return verdict[0].Message

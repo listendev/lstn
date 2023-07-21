@@ -177,8 +177,8 @@ func RenderCodeGroup(w io.Writer, code string, severitiesMap map[severity.Severi
 		Icons               map[string]string
 		CumulatedSeverities cumulatedSeverities
 	}{
-		Code:                code,
-		CodeData:            codeDataMap[code],
+		Code: code,
+		// CodeData:            codeDataMap[code],
 		Icons:               icons,
 		CumulatedSeverities: newCumulatedSeverities(severitiesMap, icons),
 	})
