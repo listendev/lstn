@@ -19,6 +19,7 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"testing"
 	"time"
 
@@ -26,6 +27,15 @@ import (
 	"github.com/listendev/pkg/verdictcode"
 	"github.com/stretchr/testify/require"
 )
+
+func testdataFileToBytes(t *testing.T, dataFile string) []byte {
+	b, err := os.ReadFile(dataFile)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return b
+}
 
 func strPtr(s string) *string {
 	return &s
