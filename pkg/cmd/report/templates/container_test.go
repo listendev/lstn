@@ -46,16 +46,19 @@ func TestRenderContainer(t *testing.T) {
 		name           string
 		packages       []listen.Package
 		expectedOutput []byte
+		snapshot       bool
 		wantErr        bool
 	}{
-		// {
-		// 	name:           "no packages",
-		// 	packages:       []listen.Package{},
-		// 	expectedOutput: testdataFileToBytes(t, "testdata/container_no_packages.md"),
-		// 	wantErr:        false,
-		// },
 		{
-			name: "with packages",
+			snapshot:       false,
+			name:           "no packages",
+			packages:       []listen.Package{},
+			expectedOutput: testdataFileToBytes(t, "testdata/container_no_packages.md"),
+			wantErr:        false,
+		},
+		{
+			snapshot: true,
+			name:     "with packages",
 			packages: []listen.Package{
 				{
 					Name:    "react",
@@ -448,8 +451,9 @@ func TestRenderContainer(t *testing.T) {
 				return
 			}
 
-			// TIP: Uncomment this to write compare locally the generated files. See /pkg/report/templates/testdata/actual/README.md
-			ioutil.WriteFile(fmt.Sprintf("./testdata/actual/%s.md", tt.name), outBuf.Bytes(), 0644)
+			if tt.snapshot {
+				ioutil.WriteFile(fmt.Sprintf("./testdata/snapshots/%s.md", tt.name), outBuf.Bytes(), 0644)
+			}
 
 			require.Equal(t, tt.expectedOutput, outBuf.Bytes())
 		})

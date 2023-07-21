@@ -1,353 +1,222 @@
+
+# <img height=20 src="https://listen.dev/assets/images/dolphin-noborder.png"> listen.dev ∙ Security Report
 <table align=center>
   <tr>
-    <td><b>critical</b> 🚨 3</td>
-    <td><b>medium</b> ⚠️ 1</td>
-    <td><b>low</b> 🔷 1</td>
+    <td><b>critical</b> 🚨 7</td>
+    <td><b>medium</b> ⚠️ 4</td>
+    <td><b>low</b> 🔷 0</td>
   </tr>
 </table>
-🔍 The following behaviors have been detected in the dependency tree during installation.
+
+🔍 The following behaviors have been detected in the dependency tree during installation
 
 <hr>
 <details>
-  <summary>
-    MDN
-    <table align="right">
-      <tr>
-        <td>🚨 0</td>
-        <td>⚠️ 2</td>
-        <td>🔷 0</td>
-      </tr>
-    </table>
-    <p>expand</p>
-  </summary>
+<summary>🚨 <b>Critical severity</b>
+<table align="right">
+<tr>
+<td>📑</td>
+<td>1 category</td>
+</tr>
+</table>
+</summary>
+<br>
 
-  <div>Internal</div>
-</details>
-<hr />
-<details>
-  <summary>
-    STN
-    <table align="right">
-      <tr>
-        <td>🚨 0</td>
-        <td>⚠️ 0</td>
-        <td>🔷 1</td>
-      </tr>
-    </table>
-    <p>expand</p>
-  </summary>
-
-  <div>Internal</div>
-</details>
-<hr />
-<details>
-  <summary>
-    FNI
-    <table align="right">
-      <tr>
-        <td>🚨 3</td>
-        <td>⚠️ 0</td>
-        <td>🔷 0</td>
-      </tr>
-    </table>
-    <p>expand</p>
-  </summary>
-
-  <div>Internal</div>
-</details>
-<hr />
-
-
+<ul>
+  
+<li>
 <details>
 <summary>
-:stop_sign: <b>3</b> critical activities detected
+📑 <b>Metadata</b> ∙ 1 package
 </summary>
+<br>
 
-## <b><a href="https://verdicts.listen.dev/npm/foo/1.0.0">foo@1.0.0</a></b><br>
+<ul>
 
-
-
-
-
-	
-
-### :stop_sign: outbound network connection
-<dl>
-<dt>Dependency type</dt>
-<dd>
-
-Direct dependency
-
-</dd>
-
-
-<dt>Metadata</dt>
-<dd>
-<table>
-
-
-
+<li>
+<details>
+<summary>📦 <i>bufferutil@4.0.7</i>
+<table align="right">
 <tr>
-<td>commandline:</td><td>sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0</td>
+<td>7 occurrences</td>
+<td>2 kind of issues</td>
+<td><a href="https://verdicts.listen.dev/npm/bufferutil/4.0.7">🔗</a></td>
 </tr>
-
-
-
-<tr>
-<td>executable_path:</td><td>/bin/sh</td>
-</tr>
-
-
-
-
-
-
-
-<tr>
-<td>parent_name:</td><td>node</td>
-</tr>
-
-
-
-	
 </table>
-</dd>
-</dl>
+</summary>
+<br>    
 
+<ul>
 
-
-
-## <b><a href="https://verdicts.listen.dev/npm/bar/1.0.0">bar@1.0.0</a></b><br>
-
-
-
-
-
-	
-
-### :stop_sign: outbound network connection
-<dl>
-<dt>Dependency type</dt>
-<dd>
-
-
-
-Transitive dependency  (<a href="https://verdicts.listen.dev/npm/foo/1.0.0">foo@1.0.0</a>)
-
-</dd>
-
-
-<dt>Metadata</dt>
-<dd>
-<table>
-
-
-
-<tr>
-<td>commandline:</td><td>sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0</td>
-</tr>
-
-
-
-<tr>
-<td>executable_path:</td><td>/bin/sh</td>
-</tr>
-
-
-
-
-
-
-
-<tr>
-<td>parent_name:</td><td>node</td>
-</tr>
-
-
-
-	
-</table>
-</dd>
-</dl>
-
-
-
-
-## <b><a href="https://verdicts.listen.dev/npm/foobar/1.0.0">foobar@1.0.0</a></b><br>
-
-
-
-
-
-	
-
-### :stop_sign: outbound network connection
-<dl>
-<dt>Dependency type</dt>
-<dd>
-
-Direct dependency
-
-</dd>
-
-
-<dt>Metadata</dt>
-<dd>
-<table>
-
-
-
-<tr>
-<td>commandline:</td><td>sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0</td>
-</tr>
-
-
-
-<tr>
-<td>executable_path:</td><td>/bin/sh</td>
-</tr>
-
-
-
-
-
-
-
-<tr>
-<td>parent_name:</td><td>node</td>
-</tr>
-
-
-
-	
-</table>
-</dd>
-</dl>
-
-
-
-</details>
-
+<li>
 <details>
 <summary>
-:warning: <b>1</b> medium activities detected
+<code>Empty description</code> ∙ 5 total occurrences
 </summary>
+<br>
 
-## <b><a href="https://verdicts.listen.dev/npm/foobar/1.0.0">foobar@1.0.0</a></b><br>
-
-
-
-
-
-	
-
-### :warning: outbound network connection
-<dl>
-<dt>Dependency type</dt>
-<dd>
-
-Direct dependency
-
-</dd>
-
-
-<dt>Metadata</dt>
-<dd>
-<table>
-
-
-
-<tr>
-<td>commandline:</td><td>sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0</td>
-</tr>
-
-
-
-<tr>
-<td>executable_path:</td><td>/bin/sh</td>
-</tr>
-
-
-
-
-
-
-
-<tr>
-<td>parent_name:</td><td>node</td>
-</tr>
-
-
-
-	
-</table>
-</dd>
-</dl>
-
-
+| Name | Version | Transitive Dependency | Occurrences | More |
+|---|---|---|---|---|
+| bufferutil | 4.0.7 || 3 | [🔗](https://verdicts.listen.dev/npm/bufferutil/4.0.7) |
+| farrukh | 1.0.0 |✔️| 1 | [🔗](https://verdicts.listen.dev/npm/farrukh/1.0.0) |
+| mulla | 1.0.0 |✔️| 1 | [🔗](https://verdicts.listen.dev/npm/mulla/1.0.0) |
 
 </details>
+    
+</li>
 
+<li>
 <details>
 <summary>
-:large_blue_diamond: <b>1</b> low activities detected
+<code>Zero version</code> ∙ 2 total occurrences
 </summary>
+<br>
 
-
-## <b><a href="https://verdicts.listen.dev/npm/foobar/1.0.0">foobar@1.0.0</a></b><br>
-
-
-
-
-
-	
-
-### :large_blue_diamond: outbound network connection
-<dl>
-<dt>Dependency type</dt>
-<dd>
-
-Direct dependency
-
-</dd>
-
-
-<dt>Metadata</dt>
-<dd>
-<table>
-
-
-
-<tr>
-<td>commandline:</td><td>sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0</td>
-</tr>
-
-
-
-<tr>
-<td>executable_path:</td><td>/bin/sh</td>
-</tr>
-
-
-
-
-
-
-
-<tr>
-<td>parent_name:</td><td>node</td>
-</tr>
-
-
-
-	
-</table>
-</dd>
-</dl>
-
-
+| Name | Version | Transitive Dependency | Occurrences | More |
+|---|---|---|---|---|
+| transitive | 1.0.0 |✔️| 2 | [🔗](https://verdicts.listen.dev/npm/transitive/1.0.0) |
 
 </details>
+    
+</li>
 
-***
+</ul>
+</details>
+</li>
+
+</ul>
+</details>    
+</li>
+
+</ul>
+</details>
+<hr>
+
+<details>
+<summary>⚠️ <b>Medium severity</b>
+<table align="right">
+<tr>
+<td>📡🔎</td>
+<td>2 categories</td>
+</tr>
+</table>
+</summary>
+<br>
+
+<ul>
+  
+<li>
+<details>
+<summary>
+📡 <b>Dynamic instrumentation</b> ∙ 1 package
+</summary>
+<br>
+
+<ul>
+
+<li>
+<details>
+<summary>📦 <i>react@18.0.0</i>
+<table align="right">
+<tr>
+<td>2 occurrences</td>
+<td>1 kind of issue</td>
+<td><a href="https://verdicts.listen.dev/npm/react/18.0.0">🔗</a></td>
+</tr>
+</table>
+</summary>
+<br>    
+
+<ul>
+
+<li>
+<details>
+<summary>
+<code>outbound network connection</code> ∙ 2 total occurrences
+</summary>
+<br>
+
+| Name | Version | Transitive Dependency | Occurrences | More |
+|---|---|---|---|---|
+| react | 17.0.0 || 1 | [🔗](https://verdicts.listen.dev/npm/react/17.0.0) |
+| react | 18.0.0 || 1 | [🔗](https://verdicts.listen.dev/npm/react/18.0.0) |
+
+</details>
+    
+</li>
+
+</ul>
+</details>
+</li>
+
+</ul>
+</details>    
+</li>
+  
+<li>
+<details>
+<summary>
+🔎 <b>Static analysis</b> ∙ 1 package
+</summary>
+<br>
+
+<ul>
+
+<li>
+<details>
+<summary>📦 <i>react@18.0.0</i>
+<table align="right">
+<tr>
+<td>2 occurrences</td>
+<td>2 kind of issues</td>
+<td><a href="https://verdicts.listen.dev/npm/react/18.0.0">🔗</a></td>
+</tr>
+</table>
+</summary>
+<br>    
+
+<ul>
+
+<li>
+<details>
+<summary>
+<code>outbound network connection</code> ∙ 1 total occurrence
+</summary>
+<br>
+
+| Name | Version | Transitive Dependency | Occurrences | More |
+|---|---|---|---|---|
+| react | 17.0.0 || 1 | [🔗](https://verdicts.listen.dev/npm/react/17.0.0) |
+
+</details>
+    
+</li>
+
+<li>
+<details>
+<summary>
+<code>outbound network connection</code> ∙ 1 total occurrence
+</summary>
+<br>
+
+| Name | Version | Transitive Dependency | Occurrences | More |
+|---|---|---|---|---|
+| react | 17.0.0 || 1 | [🔗](https://verdicts.listen.dev/npm/react/17.0.0) |
+
+</details>
+    
+</li>
+
+</ul>
+</details>
+</li>
+
+</ul>
+</details>    
+</li>
+
+</ul>
+</details>
+<hr>
+
 <i>Powered by</i> <b><a href="https://listen.dev">listen.dev</a> <img height=14 src="https://listen.dev/assets/images/dolphin-noborder.png"></b>
