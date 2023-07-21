@@ -1,0 +1,14 @@
+{{ range $title, $list := .Problems }}
+{{- $pkg := index $list 0 -}}
+{{- $problem := index $pkg.Problems 0 -}}
+<details>
+<summary><a href="{{- $problem.Type -}}">🔗</a> <b>{{ $title }}</b> ∙ {{ len $list }} occurrence{{- pluralize (len $list) "" "s" }} ∙ <i>{{ $problem.Detail }}</i></summary>
+
+{{ range $list -}}
+- [{{ .Name -}}@{{- .Version }}](https://verdicts.listen.dev/npm/{{- .Name -}}/{{- .Version -}})
+{{ end }}
+
+[See docs 🔗]({{- $problem.Type -}})
+</details>
+{{ end }}
+<hr>

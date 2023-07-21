@@ -12,22 +12,25 @@
   </tr>
 </table>
 
-{{ if (eq .Amounts.Total 0) -}}
+{{ if and (eq .Amounts.Total 0) (eq .Amounts.Problems 0) }}
 
 - 🌟 No signs of suspicious behavior were found in the dependency tree during installation
 - 🔒 Your meticulous approach ensures a secure codebase
 - 🚀 Keep up the excellent work!
 <hr>
-{{- else -}}
-🔍 The following behaviors have been detected in the dependency tree during installation
+{{- else if gt .Amounts.Total 0 -}}
+### 🔍 The following behaviors have been detected in the dependency tree during installation
+{{ .RenderHigh }}
 
-<hr>
-{{ .High }}
+{{ .RenderMedium }}
 
-{{ .Medium }}
-
-{{ .Low }}
+{{ .RenderLow }}
 
 {{- end -}}
+
+{{ if gt .Amounts.Problems 0 }}
+### 🚩 Some problems have been encountered
+{{ .RenderProblems }}
+{{ end }}
 
 <i>Powered by</i> <b><a href="https://listen.dev">listen.dev</a> <img height=14 src="https://listen.dev/assets/images/dolphin-noborder.png"></b>
