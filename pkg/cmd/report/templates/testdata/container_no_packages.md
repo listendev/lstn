@@ -8,7 +8,11 @@
   </tr>
 </table>
 
+
+
 - 🌟 No signs of suspicious behavior were found in the dependency tree during installation
 - 🔒 Your meticulous approach ensures a secure codebase
 - 🚀 Keep up the excellent work!
-<hr><i>Powered by</i> <b><a href="https://listen.dev">listen.dev</a> <img height=14 src="https://listen.dev/assets/images/dolphin-noborder.png"></b>
+<hr>
+
+<i>Powered by</i> <b><a href="https://listen.dev">listen.dev</a> <img height=14 src="https://listen.dev/assets/images/dolphin-noborder.png"></b>

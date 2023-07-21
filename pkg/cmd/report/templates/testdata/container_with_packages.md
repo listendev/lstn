@@ -8,9 +8,7 @@
   </tr>
 </table>
 
-🔍 The following behaviors have been detected in the dependency tree during installation
-
-<hr>
+### 🔍 The following behaviors have been detected in the dependency tree during installation
 <details>
 <summary>🚨 <b>Critical severity</b>
 <table align="right">
@@ -35,14 +33,7 @@
 
 <li>
 <details>
-<summary>📦 <i>bufferutil@4.0.7</i>
-<table align="right">
-<tr>
-<td>7 occurrences</td>
-<td>2 kind of issues</td>
-<td><a href="https://verdicts.listen.dev/npm/bufferutil/4.0.7">🔗</a></td>
-</tr>
-</table>
+<summary>📦 <i>bufferutil@4.0.7</i> ∙ 7 occurrences ∙ 2 kind of issues ∙ <a href="https://verdicts.listen.dev/npm/bufferutil/4.0.7">open 🔗</a>
 </summary>
 <br>    
 
@@ -116,14 +107,7 @@
 
 <li>
 <details>
-<summary>📦 <i>react@18.0.0</i>
-<table align="right">
-<tr>
-<td>2 occurrences</td>
-<td>1 kind of issue</td>
-<td><a href="https://verdicts.listen.dev/npm/react/18.0.0">🔗</a></td>
-</tr>
-</table>
+<summary>📦 <i>react@18.0.0</i> ∙ 2 occurrences ∙ 1 kind of issue ∙ <a href="https://verdicts.listen.dev/npm/react/18.0.0">open 🔗</a>
 </summary>
 <br>    
 
@@ -164,14 +148,7 @@
 
 <li>
 <details>
-<summary>📦 <i>react@18.0.0</i>
-<table align="right">
-<tr>
-<td>2 occurrences</td>
-<td>2 kind of issues</td>
-<td><a href="https://verdicts.listen.dev/npm/react/18.0.0">🔗</a></td>
-</tr>
-</table>
+<summary>📦 <i>react@18.0.0</i> ∙ 2 occurrences ∙ 2 kind of issues ∙ <a href="https://verdicts.listen.dev/npm/react/18.0.0">open 🔗</a>
 </summary>
 <br>    
 
@@ -218,5 +195,7 @@
 </ul>
 </details>
 <hr>
+
+
 
 <i>Powered by</i> <b><a href="https://listen.dev">listen.dev</a> <img height=14 src="https://listen.dev/assets/images/dolphin-noborder.png"></b>

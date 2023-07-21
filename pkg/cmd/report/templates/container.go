@@ -16,8 +16,6 @@
 package templates
 
 import (
-	"embed"
-	"fmt"
 	"io"
 	"strings"
 	"text/template"
@@ -25,93 +23,32 @@ import (
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/listendev/pkg/models"
 	"github.com/listendev/pkg/models/severity"
-	"github.com/listendev/pkg/verdictcode"
 )
-
-//go:embed container.html
-var tmplContainer embed.FS
-
-//go:embed severity.html
-var tmpSeverity embed.FS
-
-//go:embed codegroup.html
-var tmpCodegroup embed.FS
-
-//go:embed package.html
-var tmpPackage embed.FS
-
-//go:embed code.html
-var tmpCode embed.FS
 
 // TODO No signs of suspicious behavior - should we first ensure there are no problems?!
 
 type amounts struct {
-	Map   map[string]uint
-	Total uint
+	Map      map[string]uint
+	Total    uint
+	Problems uint
 }
 
 func newAmounts(packages []listen.Package) amounts {
 	m := make(map[string]uint)
+	var p uint
 	var t uint
-	for _, p := range packages {
-		for _, v := range p.Verdicts {
+	for _, pkg := range packages {
+		if len(pkg.Problems) > 0 {
+			p++
+			continue
+		}
+
+		for _, v := range pkg.Verdicts {
 			m[v.Severity.String()]++
 			t++
 		}
 	}
-	return amounts{m, t}
-}
-
-// severity -> codeGroup -> name/version -> code -> verdicts
-type nestedSeverityCodeGroupCode map[severity.Severity]map[string]map[string]map[verdictcode.Code][]models.Verdict
-
-func nestSeverityCodeGroupCode(packages []listen.Package) nestedSeverityCodeGroupCode {
-	m := make(nestedSeverityCodeGroupCode)
-
-	for _, pkg := range packages {
-		for _, v := range pkg.Verdicts {
-			codeGroups, e := m[v.Severity]
-			if !e {
-				codeGroups = make(map[string]map[string]map[verdictcode.Code][]models.Verdict)
-				m[v.Severity] = codeGroups
-			}
-
-			var foundCodeGroup string
-			for codeGroup := range codeDataLabel {
-				if strings.HasPrefix(v.Code.String(), codeGroup) {
-					foundCodeGroup = codeGroup
-					break
-				}
-			}
-			if foundCodeGroup == "" {
-				// codeGroup not found.
-				continue
-			}
-
-			nameVersions, e := codeGroups[foundCodeGroup]
-			if !e {
-				nameVersions = make(map[string]map[verdictcode.Code][]models.Verdict)
-				codeGroups[foundCodeGroup] = nameVersions
-			}
-
-			nameVersion := fmt.Sprintf("%s/%s", v.Pkg, v.Version)
-			codes, e := nameVersions[nameVersion]
-			if !e {
-				codes = make(map[verdictcode.Code][]models.Verdict)
-				nameVersions[nameVersion] = codes
-			}
-
-			verdicts, e := codes[v.Code]
-			if !e {
-				verdicts = []models.Verdict{}
-			}
-
-			verdicts = append(verdicts, v)
-			codes[v.Code] = verdicts
-		}
-	}
-
-	return m
+	return amounts{m, t, p}
 }
 
 var icons = map[string]string{
@@ -192,6 +129,11 @@ func RenderContainer(
 		return err
 	}
 
+	rProblems, err := r.Problems()
+	if err != nil {
+		return err
+	}
+
 	tmplData, err := tmplContainer.ReadFile("container.html")
 	if err != nil {
 		return err
@@ -203,18 +145,18 @@ func RenderContainer(
 	}
 
 	return tmpl.Execute(w, struct {
-		Icons   map[string]string
-		High    string
-		Medium  string
-		Low     string
-		Amounts amounts
-		Debug   interface{}
+		Icons          map[string]string
+		Amounts        amounts
+		RenderHigh     string
+		RenderMedium   string
+		RenderLow      string
+		RenderProblems string
 	}{
-		Icons:   icons,
-		High:    rHigh,
-		Medium:  rMedium,
-		Low:     rLow,
-		Amounts: newAmounts(packages),
-		Debug:   packages,
+		Icons:          icons,
+		Amounts:        newAmounts(packages),
+		RenderHigh:     rHigh,
+		RenderMedium:   rMedium,
+		RenderLow:      rLow,
+		RenderProblems: rProblems,
 	})
 }

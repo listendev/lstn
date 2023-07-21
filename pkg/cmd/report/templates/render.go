@@ -2,6 +2,7 @@ package templates
 
 import (
 	"bytes"
+	"embed"
 	"fmt"
 	"strings"
 	"text/template"
@@ -12,15 +13,86 @@ import (
 	"github.com/listendev/pkg/verdictcode"
 )
 
+//go:embed container.html
+var tmplContainer embed.FS
+
+//go:embed severity.html
+var tmpSeverity embed.FS
+
+//go:embed codegroup.html
+var tmpCodegroup embed.FS
+
+//go:embed package.html
+var tmpPackage embed.FS
+
+//go:embed code.html
+var tmpCode embed.FS
+
+//go:embed problems.html
+var tmpProblems embed.FS
+
 type render struct {
-	data  nestedSeverityCodeGroupCode
-	icons map[string]string
-	funcs template.FuncMap
+	packages []listen.Package
+	data     nestedSeverityCodeGroupCode
+	icons    map[string]string
+	funcs    template.FuncMap
+}
+
+// severity -> codeGroup -> name/version -> code -> verdicts
+type nestedSeverityCodeGroupCode map[severity.Severity]map[string]map[string]map[verdictcode.Code][]models.Verdict
+
+func nestSeverityCodeGroupCode(packages []listen.Package) nestedSeverityCodeGroupCode {
+	m := make(nestedSeverityCodeGroupCode)
+
+	for _, pkg := range packages {
+		for _, v := range pkg.Verdicts {
+			codeGroups, e := m[v.Severity]
+			if !e {
+				codeGroups = make(map[string]map[string]map[verdictcode.Code][]models.Verdict)
+				m[v.Severity] = codeGroups
+			}
+
+			var foundCodeGroup string
+			for codeGroup := range codeDataLabel {
+				if strings.HasPrefix(v.Code.String(), codeGroup) {
+					foundCodeGroup = codeGroup
+					break
+				}
+			}
+			if foundCodeGroup == "" {
+				// codeGroup not found.
+				continue
+			}
+
+			nameVersions, e := codeGroups[foundCodeGroup]
+			if !e {
+				nameVersions = make(map[string]map[verdictcode.Code][]models.Verdict)
+				codeGroups[foundCodeGroup] = nameVersions
+			}
+
+			nameVersion := fmt.Sprintf("%s/%s", v.Pkg, v.Version)
+			codes, e := nameVersions[nameVersion]
+			if !e {
+				codes = make(map[verdictcode.Code][]models.Verdict)
+				nameVersions[nameVersion] = codes
+			}
+
+			verdicts, e := codes[v.Code]
+			if !e {
+				verdicts = []models.Verdict{}
+			}
+
+			verdicts = append(verdicts, v)
+			codes[v.Code] = verdicts
+		}
+	}
+
+	return m
 }
 
 func NewFromPackages(packages []listen.Package, icons map[string]string, funcs template.FuncMap) *render {
 	data := nestSeverityCodeGroupCode(packages)
-	return &render{data, icons, funcs}
+	return &render{packages, data, icons, funcs}
 }
 
 func (r *render) Severity(s severity.Severity) (string, error) {
@@ -211,6 +283,49 @@ func (r *render) Code(code verdictcode.Code, verdicts []models.Verdict) (string,
 		Code:              code,
 		Verdicts:          verdicts,
 		CumulatedVerdicts: cumulated,
+	}); err != nil {
+		return "", err
+	}
+
+	return render.String(), nil
+}
+
+func (r *render) Problems() (string, error) {
+	var render bytes.Buffer
+
+	tmplData, err := tmpProblems.ReadFile("problems.html")
+	if err != nil {
+		return "", err
+	}
+
+	tmpl, err := template.New("problems").Funcs(r.funcs).Parse(string(tmplData))
+	if err != nil {
+		return "", err
+	}
+
+	problems := make(map[string][]listen.Package)
+	for _, pkg := range r.packages {
+		if len(pkg.Problems) == 0 {
+			continue
+		}
+
+		for _, p := range pkg.Problems {
+			a, e := problems[p.Title]
+			if !e {
+				a = []listen.Package{}
+			}
+
+			a = append(a, pkg)
+			problems[p.Title] = a
+		}
+	}
+
+	if err := tmpl.Execute(&render, struct {
+		Icons    map[string]string
+		Problems map[string][]listen.Package
+	}{
+		Icons:    r.icons,
+		Problems: problems,
 	}); err != nil {
 		return "", err
 	}

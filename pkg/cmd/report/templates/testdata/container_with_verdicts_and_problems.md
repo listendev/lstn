@@ -1,162 +1,178 @@
 
-The following behavior was detected in the dependency tree during installation
-
-<details>
-<summary>
-:stop_sign: <b>2</b> critical activities detected
-</summary>
-
-## <b><a href="https://verdicts.listen.dev/npm/foo/1.0.0">foo@1.0.0</a></b><br>
-
-
-
-
-
-	
-
-### :stop_sign: outbound network connection
-<dl>
-<dt>Dependency type</dt>
-<dd>
-
-Direct dependency
-
-</dd>
-
-
-<dt>Metadata</dt>
-<dd>
-<table>
-
-
-
-<tr>
-<td>commandline:</td><td>sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0</td>
-</tr>
-
-
-
-<tr>
-<td>executable_path:</td><td>/bin/sh</td>
-</tr>
-
-
-
-
-
-
-
-<tr>
-<td>parent_name:</td><td>node</td>
-</tr>
-
-
-
-	
+# <img height=20 src="https://listen.dev/assets/images/dolphin-noborder.png"> listen.dev ∙ Security Report
+<table align=center>
+  <tr>
+    <td><b>critical</b> 🚨 6</td>
+    <td><b>medium</b> ⚠️ 0</td>
+    <td><b>low</b> 🔷 0</td>
+  </tr>
 </table>
-</dd>
-</dl>
 
-
-
-
-## <b><a href="https://verdicts.listen.dev/npm/baz/1.0.0">baz@1.0.0</a></b><br>
-
-
-
-
-
-	
-
-### :stop_sign: outbound network connection
-<dl>
-<dt>Dependency type</dt>
-<dd>
-
-Direct dependency
-
-</dd>
-
-
-<dt>Metadata</dt>
-<dd>
-<table>
-
-
-
+### 🔍 The following behaviors have been detected in the dependency tree during installation
+<details>
+<summary>🚨 <b>Critical severity</b>
+<table align="right">
 <tr>
-<td>commandline:</td><td>sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0</td>
+<td>📡📑</td>
+<td>2 categories</td>
 </tr>
-
-
-
-<tr>
-<td>executable_path:</td><td>/bin/sh</td>
-</tr>
-
-
-
-
-
-
-
-<tr>
-<td>parent_name:</td><td>node</td>
-</tr>
-
-
-
-	
 </table>
-</dd>
-</dl>
+</summary>
+<br>
 
-
-
-</details>
-
+<ul>
+  
+<li>
 <details>
 <summary>
-:warning: <b>0</b> medium activities detected
+📡 <b>Dynamic instrumentation</b> ∙ 2 packages
 </summary>
-</details>
+<br>
 
+<ul>
+
+<li>
+<details>
+<summary>📦 <i>foo@1.0.0</i> ∙ 5 occurrences ∙ 2 kind of issues ∙ <a href="https://verdicts.listen.dev/npm/foo/1.0.0">open 🔗</a>
+</summary>
+<br>    
+
+<ul>
+
+<li>
 <details>
 <summary>
-:large_blue_diamond: <b>0</b> low activities detected
+<code>outbound network connection</code> ∙ 3 total occurrences
 </summary>
+<br>
+
+| Name | Version | Transitive Dependency | Occurrences | More |
+|---|---|---|---|---|
+| foo | 1.0.0 || 3 | [🔗](https://verdicts.listen.dev/npm/foo/1.0.0) |
 
 </details>
+    
+</li>
 
-#### :triangular_flag_on_post: The analysis could not complete because of the following problems:
+<li>
+<details>
+<summary>
+<code>write to filesystem</code> ∙ 2 total occurrences
+</summary>
+<br>
+
+| Name | Version | Transitive Dependency | Occurrences | More |
+|---|---|---|---|---|
+| bar | 1.0.0 || 1 | [🔗](https://verdicts.listen.dev/npm/bar/1.0.0) |
+| foo | 1.0.0 || 1 | [🔗](https://verdicts.listen.dev/npm/foo/1.0.0) |
+
+</details>
+    
+</li>
+
+</ul>
+</details>
+</li>
+
+<li>
+<details>
+<summary>📦 <i>baz@1.0.0</i> ∙ 1 occurrence ∙ 1 kind of issue ∙ <a href="https://verdicts.listen.dev/npm/baz/1.0.0">open 🔗</a>
+</summary>
+<br>    
+
+<ul>
+
+<li>
+<details>
+<summary>
+<code>outbound network connection</code> ∙ 1 total occurrence
+</summary>
+<br>
+
+| Name | Version | Transitive Dependency | Occurrences | More |
+|---|---|---|---|---|
+| baz | 1.0.0 || 1 | [🔗](https://verdicts.listen.dev/npm/baz/1.0.0) |
+
+</details>
+    
+</li>
+
+</ul>
+</details>
+</li>
+
+</ul>
+</details>    
+</li>
+  
+<li>
+<details>
+<summary>
+📑 <b>Metadata</b> ∙ 1 package
+</summary>
+<br>
+
+<ul>
+
+<li>
+<details>
+<summary>📦 <i>foo@1.0.0</i> ∙ 1 occurrence ∙ 1 kind of issue ∙ <a href="https://verdicts.listen.dev/npm/foo/1.0.0">open 🔗</a>
+</summary>
+<br>    
+
+<ul>
+
+<li>
+<details>
+<summary>
+<code>missing description</code> ∙ 1 total occurrence
+</summary>
+<br>
+
+| Name | Version | Transitive Dependency | Occurrences | More |
+|---|---|---|---|---|
+| bar | 1.0.0 || 1 | [🔗](https://verdicts.listen.dev/npm/bar/1.0.0) |
+
+</details>
+    
+</li>
+
+</ul>
+</details>
+</li>
+
+</ul>
+</details>    
+</li>
+
+</ul>
+</details>
+<hr>
 
 
-### <b><a href="https://verdicts.listen.dev/npm/foobar/1.0.0">foobar@1.0.0</a></b><br>
 
 
+### 🚩 Some problems have been encountered
+<details>
+<summary><a href="https://listen.dev/probs/invalid-name">🔗</a> <b>A problem that does not exist, just for testing</b> ∙ 2 occurrences ∙ <i>Package name not valid</i></summary>
+
+- [foobar@1.0.0](https://verdicts.listen.dev/npm/foobar/1.0.0)
+- [baz@1.0.0](https://verdicts.listen.dev/npm/baz/1.0.0)
 
 
-- Package name not valid (<a href="https://listen.dev/probs/invalid-name">learn more :link:</a>)
+[See docs 🔗](https://listen.dev/probs/invalid-name)
+</details>
+<details>
+<summary><a href="https://listen.dev/probs/invalid-name">🔗</a> <b>Package name not valid</b> ∙ 2 occurrences ∙ <i>Package name not valid</i></summary>
+
+- [foobar@1.0.0](https://verdicts.listen.dev/npm/foobar/1.0.0)
+- [baz@1.0.0](https://verdicts.listen.dev/npm/baz/1.0.0)
 
 
+[See docs 🔗](https://listen.dev/probs/invalid-name)
+</details>
 
-- A problem that does not exist, just for testing (<a href="https://listen.dev/probs/does-not-exist">learn more :link:</a>)
-
-
-
-
-### <b><a href="https://verdicts.listen.dev/npm/baz/1.0.0">baz@1.0.0</a></b><br>
-
-
-
-
-- Package name not valid (<a href="https://listen.dev/probs/invalid-name">learn more :link:</a>)
-
-
-
-- A problem that does not exist, just for testing (<a href="https://listen.dev/probs/does-not-exist">learn more :link:</a>)
-
-
+<hr>
 
 
 <i>Powered by</i> <b><a href="https://listen.dev">listen.dev</a> <img height=14 src="https://listen.dev/assets/images/dolphin-noborder.png"></b>
