@@ -1,0 +1,15 @@
+<details>
+<summary>
+{{- (printf "%s" .Severity) | icon }} <b>{{ .Severity | severityLabel }}</b> ∙ 3 packages across 2 typologies
+</summary>
+<br />
+
+<ul>
+{{ range .RenderCodeGroups }}  
+<li>
+{{ . }}    
+</li>
+{{ end }}
+</ul>
+</details>
+<hr>

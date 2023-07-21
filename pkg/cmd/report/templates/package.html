@@ -1,0 +1,11 @@
+<details>
+<summary>{{ index .Icons "package" }} <i>{{ .Name }}@{{ .Version }}</i></summary>
+
+<ul>
+{{ range .RenderCodes }}
+<li>
+{{ . }}    
+</li>
+{{ end }}
+</ul>
+</details>

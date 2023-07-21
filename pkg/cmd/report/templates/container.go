@@ -18,6 +18,7 @@ package templates
 import (
 	"bytes"
 	"embed"
+	"fmt"
 	"io"
 	"strings"
 	"text/template"
@@ -31,6 +32,18 @@ import (
 //go:embed container.html
 var tmplContainer embed.FS
 
+//go:embed severity.html
+var tmpSeverity embed.FS
+
+//go:embed codegroup.html
+var tmpCodegroup embed.FS
+
+//go:embed package.html
+var tmpPackage embed.FS
+
+//go:embed code.html
+var tmpCode embed.FS
+
 // TODO No signs of suspicious behavior - should we first ensure there are no problems?!
 type severityData struct {
 	Packages      []listen.Package
@@ -43,12 +56,13 @@ type problemsData struct {
 	DetailsRender string
 }
 
-type groupedByCodesSeverity map[string]map[severity.Severity][]models.Verdict
-
 type containerData struct {
 	Icons          map[string]string
 	GroupedRender  string
 	Amounts        amounts
+	High           string
+	Medium         string
+	Low            string
 	LowSeverity    severityData
 	MediumSeverity severityData
 	HighSeverity   severityData
@@ -168,6 +182,8 @@ func renderProblems(packages []listen.Package) (string, error) {
 	return detailsRender.String(), nil
 }
 
+type groupedByCodesSeverity map[string]map[severity.Severity][]models.Verdict
+
 func nestGroupCodeSeverity(packages []listen.Package) groupedByCodesSeverity {
 	// Ignore UNK
 	codesMap := groupedByCodesSeverity{
@@ -196,18 +212,337 @@ func nestGroupCodeSeverity(packages []listen.Package) groupedByCodesSeverity {
 	return codesMap
 }
 
+// severity -> codeGroup -> name/version -> code -> verdicts
+type nestedSeverityCodeGroupCode map[severity.Severity]map[string]map[string]map[verdictcode.Code][]models.Verdict
+
+func nestSeverityCodeGroupCode(packages []listen.Package) nestedSeverityCodeGroupCode {
+	m := make(nestedSeverityCodeGroupCode)
+
+	for _, pkg := range packages {
+		for _, v := range pkg.Verdicts {
+			codeGroups, e := m[v.Severity]
+			if !e {
+				codeGroups = make(map[string]map[string]map[verdictcode.Code][]models.Verdict)
+				m[v.Severity] = codeGroups
+			}
+
+			var foundCodeGroup string
+			for codeGroup := range codeDataMap {
+				if strings.HasPrefix(v.Code.String(), codeGroup) {
+					foundCodeGroup = codeGroup
+					break
+				}
+			}
+			if foundCodeGroup == "" {
+				// codeGroup not found.
+				continue
+			}
+
+			nameVersions, e := codeGroups[foundCodeGroup]
+			if !e {
+				nameVersions = make(map[string]map[verdictcode.Code][]models.Verdict)
+				codeGroups[foundCodeGroup] = nameVersions
+			}
+
+			nameVersion := fmt.Sprintf("%s/%s", v.Pkg, v.Version)
+			codes, e := nameVersions[nameVersion]
+			if !e {
+				codes = make(map[verdictcode.Code][]models.Verdict)
+				nameVersions[nameVersion] = codes
+			}
+
+			verdicts, e := codes[v.Code]
+			if !e {
+				verdicts = []models.Verdict{}
+			}
+
+			verdicts = append(verdicts, v)
+			codes[v.Code] = verdicts
+		}
+	}
+
+	return m
+}
+
+type render struct {
+	data  nestedSeverityCodeGroupCode
+	icons map[string]string
+	funcs template.FuncMap
+}
+
+func NewFromPackages(packages []listen.Package, icons map[string]string, funcs template.FuncMap) *render {
+	data := nestSeverityCodeGroupCode(packages)
+	return &render{data, icons, funcs}
+}
+
+func (r *render) Severity(s severity.Severity) (string, error) {
+	var render bytes.Buffer
+
+	tmplData, err := tmpSeverity.ReadFile("severity.html")
+	if err != nil {
+		return "", err
+	}
+
+	tmpl, err := template.New("severity").Funcs(r.funcs).Parse(string(tmplData))
+	if err != nil {
+		return "", err
+	}
+
+	codeGroups, e := r.data[s]
+	if !e {
+		return "", nil
+	}
+
+	rCodeGroups := []string{}
+	for codeGroup, nameVersions := range codeGroups {
+		rCodeGroup, err := r.CodeGroup(codeGroup, nameVersions)
+		if err != nil {
+			return "", err
+		}
+
+		rCodeGroups = append(rCodeGroups, rCodeGroup)
+	}
+
+	if err := tmpl.Execute(&render, struct {
+		Severity         severity.Severity
+		Icons            map[string]string
+		RenderCodeGroups []string
+	}{
+		Icons:            r.icons,
+		Severity:         s,
+		RenderCodeGroups: rCodeGroups,
+	}); err != nil {
+		return "", err
+	}
+
+	return render.String(), nil
+}
+
+func (r *render) CodeGroup(codeGroup string, nameVersions map[string]map[verdictcode.Code][]models.Verdict) (string, error) {
+	var render bytes.Buffer
+
+	tmplData, err := tmpCodegroup.ReadFile("codegroup.html")
+	if err != nil {
+		return "", err
+	}
+
+	tmpl, err := template.New("codegroup").Funcs(r.funcs).Parse(string(tmplData))
+	if err != nil {
+		return "", err
+	}
+
+	rNameVersions := []string{}
+	for nameVersion, codes := range nameVersions {
+		rNameVersion, err := r.Package(nameVersion, codes)
+		if err != nil {
+			return "", err
+		}
+		rNameVersions = append(rNameVersions, rNameVersion)
+	}
+
+	if err := tmpl.Execute(&render, struct {
+		Icons          map[string]string
+		CodeGroup      string
+		RenderPackages []string
+	}{
+		Icons:          r.icons,
+		CodeGroup:      codeGroup,
+		RenderPackages: rNameVersions,
+	}); err != nil {
+		return "", err
+	}
+
+	return render.String(), nil
+}
+
+func (r *render) Package(nameVersion string, codes map[verdictcode.Code][]models.Verdict) (string, error) {
+	var render bytes.Buffer
+
+	tmplData, err := tmpPackage.ReadFile("package.html")
+	if err != nil {
+		return "", err
+	}
+
+	tmpl, err := template.New("package").Funcs(r.funcs).Parse(string(tmplData))
+	if err != nil {
+		return "", err
+	}
+
+	li := strings.LastIndex(nameVersion, "/")
+
+	rCodes := []string{}
+	for code, verdicts := range codes {
+		rCode, err := r.Code(code, verdicts)
+		if err != nil {
+			return "", err
+		}
+		rCodes = append(rCodes, rCode)
+	}
+
+	if err := tmpl.Execute(&render, struct {
+		Icons       map[string]string
+		Name        string
+		Version     string
+		RenderCodes []string
+	}{
+		Icons:       r.icons,
+		Name:        nameVersion[:li],
+		Version:     nameVersion[li+1:],
+		RenderCodes: rCodes,
+	}); err != nil {
+		return "", err
+	}
+
+	return render.String(), nil
+}
+
+func (r *render) Code(code verdictcode.Code, verdicts []models.Verdict) (string, error) {
+	// The verdicts provided are all guaranteed to have the same code.
+
+	var render bytes.Buffer
+
+	tmplData, err := tmpCode.ReadFile("code.html")
+	if err != nil {
+		return "", err
+	}
+
+	tmpl, err := template.New("code").Funcs(r.funcs).Parse(string(tmplData))
+	if err != nil {
+		return "", err
+	}
+
+	type grouped struct {
+		Transitive bool
+		Refs       []models.Verdict
+	}
+	cumulated := make(map[string]grouped)
+
+	for _, v := range verdicts {
+		var ok bool
+		var name string
+		var version string
+
+		name, ok = v.Metadata["npm_package_name"].(string)
+		if !ok {
+			return "", fmt.Errorf("'npm_package_name' of %s %s is not of type string", v.Pkg, v.Version)
+		}
+		version, ok = v.Metadata["npm_package_version"].(string)
+		if !ok {
+			return "", fmt.Errorf("'npm_package_version' of %s %s is not of type string", v.Pkg, v.Version)
+		}
+
+		transitive := name != v.Pkg && version != v.Version
+
+		key := fmt.Sprintf("%s/%s", name, version)
+
+		g, e := cumulated[key]
+		if !e {
+			g = grouped{transitive, []models.Verdict{}}
+		}
+		g.Refs = append(g.Refs, v)
+		cumulated[key] = g
+	}
+
+	if err := tmpl.Execute(&render, struct {
+		Icons             map[string]string
+		Code              verdictcode.Code
+		Verdicts          []models.Verdict
+		CumulatedVerdicts map[string]grouped
+	}{
+		Icons:             r.icons,
+		Code:              code,
+		Verdicts:          verdicts,
+		CumulatedVerdicts: cumulated,
+	}); err != nil {
+		return "", err
+	}
+
+	return render.String(), nil
+}
+
+var icons = map[string]string{
+	"high":    "🚨",
+	"medium":  "⚠️",
+	"low":     "🔷",
+	"package": "📦",
+}
+
+type codeData struct {
+	Label string
+	Icon  string
+}
+
+var codeDataMap = map[string]codeData{
+	// Ignore UNK
+	"FNI": {"Dynamic instrumentation", "📡"},
+	"TSN": {"Typosquatting", "🔀"},
+	"MDN": {"Metadata", "📑"},
+	"STN": {"Static analysis", "🔎"},
+	"DDN": {"Advisories", "🛡️"},
+}
+
+type nameVersion struct {
+	Name    string
+	Version string
+}
+
+var funcs = template.FuncMap{
+	"pluralize": pluralize,
+	"icon": func(key string) string {
+		return icons[key]
+	},
+	"severityLabel": func(s severity.Severity) string {
+		if s == severity.Low {
+			return "Low severity"
+		}
+		if s == severity.Medium {
+			return "Medium severity"
+		}
+		return "Critical severity"
+	},
+	"codeGroupData": func(codeGroup string) codeData {
+		return codeDataMap[codeGroup]
+	},
+	"getCodeMessage": func(verdict []models.Verdict) string {
+		return verdict[0].Message
+	},
+	"extractMessage": func(grouped TransitivesAndNon) string {
+		if len(grouped.Transitive) > 0 {
+			return grouped.Transitive[0].Message
+		}
+		return grouped.NonTransitive[0].Message
+	},
+	"getNameVersion": func(nameSlashVersion string) nameVersion {
+		i := nameSlashVersion
+
+		li := strings.LastIndex(i, "/")
+		return nameVersion{i[:li], i[li+1:]}
+	},
+	"transitiveAndNonAmount": func(grouped TransitivesAndNon) int {
+		return len(grouped.NonTransitive) + len(grouped.Transitive)
+	},
+}
+
 func RenderContainer(
 	w io.Writer,
 	packages []listen.Package,
 ) error {
-	nestedGroups := nestGroupCodeSeverity(packages)
+	r := NewFromPackages(packages, icons, funcs)
 
-	icons := map[string]string{
-		"high":    "🚨",
-		"medium":  "⚠️",
-		"low":     "🔷",
-		"package": "📦",
+	rHigh, err := r.Severity(severity.High)
+	if err != nil {
+		return err
 	}
+	rMedium, err := r.Severity(severity.Medium)
+	if err != nil {
+		return err
+	}
+	rLow, err := r.Severity(severity.Low)
+	if err != nil {
+		return err
+	}
+
+	nestedGroups := nestGroupCodeSeverity(packages)
 	groupedRender, err := renderGrouped(nestedGroups, icons)
 	if err != nil {
 		return err
@@ -260,6 +595,9 @@ func RenderContainer(
 	cdata := containerData{
 		Icons:          icons,
 		GroupedRender:  groupedRender,
+		High:           rHigh,
+		Medium:         rMedium,
+		Low:            rLow,
 		Amounts:        newAmounts(packages),
 		LowSeverity:    lowSeverityData,
 		MediumSeverity: mediumSeverityData,

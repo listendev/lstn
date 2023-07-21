@@ -1,0 +1,13 @@
+<details>
+<summary>
+<code>{{ .Verdicts | getCodeMessage }}</code> ∙ {{ len .Verdicts }} total occurence{{ len .Verdicts | pluralize }}
+</summary>
+<br>
+
+| Name | Version | Transitive Dependency | Occurrences | More |
+|---|---|---|---|---|
+{{ range $nameSlashVersion, $grouped := .CumulatedVerdicts -}}
+{{- $nv := $nameSlashVersion | getNameVersion -}}
+| {{ $nv.Name }} | {{ $nv.Version }} | {{- if $grouped.Transitive -}}✔️{{- end -}} | {{ len $grouped.Refs }} | [🔗](https://verdicts.listen.dev/npm/{{- $nameSlashVersion -}}) |
+{{ end }}
+</details>

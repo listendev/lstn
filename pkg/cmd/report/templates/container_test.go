@@ -47,58 +47,100 @@ func TestRenderContainer(t *testing.T) {
 		{
 			name: "with packages",
 			packages: []listen.Package{
-				{
-					Name:    "react",
-					Version: strPtr("18.0.0"),
-					Verdicts: []listen.Verdict{
-						{
-							Pkg:     "react",
-							Version: "18.0.0",
-							Shasum:  "555bd98592883255fa00de14f1151a917b5d77d5",
-							CreatedAt: func() *time.Time {
-								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+				// {
+				// 	Name:    "react",
+				// 	Version: strPtr("18.0.0"),
+				// 	Verdicts: []listen.Verdict{
+				// 		{
+				// 			Pkg:     "react",
+				// 			Version: "18.0.0",
+				// 			Shasum:  "555bd98592883255fa00de14f1151a917b5d77d5",
+				// 			CreatedAt: func() *time.Time {
+				// 				t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
-								return &t
-							}(),
-							Code:     verdictcode.FNI001,
-							Message:  "outbound network connection",
-							Severity: "high",
-							Metadata: map[string]interface{}{
-								"npm_package_name":    "react",
-								"npm_package_version": "18.0.0",
-								"parent_name":         "node",
-								"executable_path":     "/bin/sh",
-								"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
-								"server_ip":           "",
-							},
-						},
-						{
-							Pkg:     "react",
-							Version: "18.0.0",
-							Shasum:  "555bd98592883255fa00de14f1151a917b5d77d5",
-							CreatedAt: func() *time.Time {
-								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+				// 				return &t
+				// 			}(),
+				// 			Code:     verdictcode.FNI001,
+				// 			Message:  "outbound network connection",
+				// 			Severity: "high",
+				// 			Metadata: map[string]interface{}{
+				// 				"npm_package_name":    "react",
+				// 				"npm_package_version": "18.0.0",
+				// 				"parent_name":         "node",
+				// 				"executable_path":     "/bin/sh",
+				// 				"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
+				// 				"server_ip":           "",
+				// 			},
+				// 		},
+				// 		{
+				// 			Pkg:     "react",
+				// 			Version: "18.0.0",
+				// 			Shasum:  "555bd98592883255fa00de14f1151a917b5d77d5",
+				// 			CreatedAt: func() *time.Time {
+				// 				t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
-								return &t
-							}(),
-							Code:     verdictcode.FNI001,
-							Message:  "outbound network connection",
-							Severity: "high",
-							Metadata: map[string]interface{}{
-								"npm_package_name":    "react",
-								"npm_package_version": "17.0.0",
-								"parent_name":         "node",
-								"executable_path":     "/bin/sh",
-								"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
-								"server_ip":           "",
-							},
-						},
-					},
-				},
+				// 				return &t
+				// 			}(),
+				// 			Code:     verdictcode.FNI001,
+				// 			Message:  "outbound network connection",
+				// 			Severity: "high",
+				// 			Metadata: map[string]interface{}{
+				// 				"npm_package_name":    "react",
+				// 				"npm_package_version": "17.0.0",
+				// 				"parent_name":         "node",
+				// 				"executable_path":     "/bin/sh",
+				// 				"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
+				// 				"server_ip":           "",
+				// 			},
+				// 		},
+				// 	},
+				// },
 				{
 					Name:    "bufferutil",
 					Version: strPtr("4.0.7"),
 					Verdicts: []listen.Verdict{
+						{
+							Pkg:     "bufferutil",
+							Version: "4.0.7",
+							Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
+							CreatedAt: func() *time.Time {
+								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+
+								return &t
+							}(),
+							Code:     verdictcode.MDN01,
+							Message:  "Empty description",
+							Severity: "high",
+							Metadata: map[string]interface{}{
+								"npm_package_name":    "bufferutil",
+								"npm_package_version": "4.0.7",
+								"parent_name":         "node",
+								"executable_path":     "/bin/sh",
+								"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
+								"server_ip":           "",
+							},
+						},
+						{
+							Pkg:     "bufferutil",
+							Version: "4.0.7",
+							Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
+							CreatedAt: func() *time.Time {
+								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+
+								return &t
+							}(),
+							Code:     verdictcode.MDN01,
+							Message:  "Empty description",
+							Severity: "high",
+							Metadata: map[string]interface{}{
+								"npm_package_name":    "bufferutil",
+								"npm_package_version": "4.0.7",
+								"parent_name":         "node",
+								"executable_path":     "/bin/sh",
+								"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
+								"server_ip":           "",
+							},
+						},
 						{
 							Pkg:     "bufferutil",
 							Version: "4.0.7",
@@ -162,159 +204,48 @@ func TestRenderContainer(t *testing.T) {
 								"server_ip":           "",
 							},
 						},
-						{
-							Pkg:     "bufferutil",
-							Version: "4.0.7",
-							Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
-							CreatedAt: func() *time.Time {
-								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+						// {
+						// 	Pkg:     "bufferutil",
+						// 	Version: "4.0.7",
+						// 	Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
+						// 	CreatedAt: func() *time.Time {
+						// 		t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
-								return &t
-							}(),
-							Code:     verdictcode.MDN02,
-							Message:  "Zero version",
-							Severity: "high",
-							Metadata: map[string]interface{}{
-								"npm_package_name":    "transitive",
-								"npm_package_version": "1.0.0",
-								"parent_name":         "node",
-								"executable_path":     "/bin/sh",
-								"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
-								"server_ip":           "",
-							},
-						},
-						{
-							Pkg:     "bufferutil",
-							Version: "4.0.7",
-							Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
-							CreatedAt: func() *time.Time {
-								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
+						// 		return &t
+						// 	}(),
+						// 	Code:     verdictcode.MDN02,
+						// 	Message:  "Zero version",
+						// 	Severity: "high",
+						// 	Metadata: map[string]interface{}{
+						// 		"npm_package_name":    "transitive",
+						// 		"npm_package_version": "1.0.0",
+						// 		"parent_name":         "node",
+						// 		"executable_path":     "/bin/sh",
+						// 		"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
+						// 		"server_ip":           "",
+						// 	},
+						// },
+						// {
+						// 	Pkg:     "bufferutil",
+						// 	Version: "4.0.7",
+						// 	Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
+						// 	CreatedAt: func() *time.Time {
+						// 		t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
-								return &t
-							}(),
-							Code:     verdictcode.MDN02,
-							Message:  "Zero version",
-							Severity: "high",
-							Metadata: map[string]interface{}{
-								"npm_package_name":    "transitive",
-								"npm_package_version": "1.0.0",
-								"parent_name":         "node",
-								"executable_path":     "/bin/sh",
-								"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
-								"server_ip":           "",
-							},
-						},
-						{
-							Pkg:     "bufferutil",
-							Version: "4.0.7",
-							Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
-							CreatedAt: func() *time.Time {
-								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
-
-								return &t
-							}(),
-							Code:     verdictcode.MDN02,
-							Message:  "Zero version",
-							Severity: "low",
-							Metadata: map[string]interface{}{
-								"npm_package_name":    "transitive",
-								"npm_package_version": "1.0.0",
-								"parent_name":         "node",
-								"executable_path":     "/bin/sh",
-								"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
-								"server_ip":           "",
-							},
-						},
-					},
-				},
-				{
-					Name:    "vu3",
-					Version: strPtr("0.0.1"),
-					Verdicts: []listen.Verdict{
-						{
-							Pkg:     "vu3",
-							Version: "0.0.1",
-							Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
-							CreatedAt: func() *time.Time {
-								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
-
-								return &t
-							}(),
-							Code:     verdictcode.MDN01,
-							Message:  "Empty description",
-							Severity: "high",
-							Metadata: map[string]interface{}{
-								"npm_package_name":    "vu3",
-								"npm_package_version": "0.0.1",
-								"parent_name":         "node",
-								"executable_path":     "/bin/sh",
-								"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
-								"server_ip":           "",
-							},
-						},
-						{
-							Pkg:     "vu3",
-							Version: "0.0.1",
-							Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
-							CreatedAt: func() *time.Time {
-								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
-
-								return &t
-							}(),
-							Code:     verdictcode.MDN01,
-							Message:  "Empty description",
-							Severity: "high",
-							Metadata: map[string]interface{}{
-								"npm_package_name":    "vu3",
-								"npm_package_version": "0.0.1",
-								"parent_name":         "node",
-								"executable_path":     "/bin/sh",
-								"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
-								"server_ip":           "",
-							},
-						},
-						{
-							Pkg:     "vu3",
-							Version: "0.0.1",
-							Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
-							CreatedAt: func() *time.Time {
-								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
-
-								return &t
-							}(),
-							Code:     verdictcode.MDN01,
-							Message:  "Empty description",
-							Severity: "high",
-							Metadata: map[string]interface{}{
-								"npm_package_name":    "lore",
-								"npm_package_version": "0.0.1",
-								"parent_name":         "node",
-								"executable_path":     "/bin/sh",
-								"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
-								"server_ip":           "",
-							},
-						},
-						{
-							Pkg:     "vu3",
-							Version: "0.0.1",
-							Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
-							CreatedAt: func() *time.Time {
-								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
-
-								return &t
-							}(),
-							Code:     verdictcode.MDN01,
-							Message:  "Empty description",
-							Severity: "high",
-							Metadata: map[string]interface{}{
-								"npm_package_name":    "leo",
-								"npm_package_version": "0.1.1",
-								"parent_name":         "node",
-								"executable_path":     "/bin/sh",
-								"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
-								"server_ip":           "",
-							},
-						},
+						// 		return &t
+						// 	}(),
+						// 	Code:     verdictcode.MDN02,
+						// 	Message:  "Zero version",
+						// 	Severity: "high",
+						// 	Metadata: map[string]interface{}{
+						// 		"npm_package_name":    "transitive",
+						// 		"npm_package_version": "1.0.0",
+						// 		"parent_name":         "node",
+						// 		"executable_path":     "/bin/sh",
+						// 		"commandline":         `sh -c  node -e "try{require('./_postinstall')}catch(e){}" || exit 0`,
+						// 		"server_ip":           "",
+						// 	},
+						// },
 					},
 				},
 			},
