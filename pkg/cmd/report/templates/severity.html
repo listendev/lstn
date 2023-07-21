@@ -1,8 +1,18 @@
 <details>
 <summary>
-{{- (printf "%s" .Severity) | icon }} <b>{{ .Severity | severityLabel }}</b> ∙ 3 packages across 2 typologies
+{{- (printf "%s" .Severity) | icon }} <b>{{ .Severity | severityLabel }}</b>
+<table align="right">
+<tr>
+<td>
+{{- range .CodeGroupIcons -}}
+{{ . }}
+{{- end -}}
+</td>
+<td>{{ len .RenderCodeGroups }} categor{{ pluralize (len .RenderCodeGroups) "y" "ies" }}</td>
+</tr>
+</table>
 </summary>
-<br />
+<br>
 
 <ul>
 {{ range .RenderCodeGroups }}  
