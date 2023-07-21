@@ -1,0 +1,14 @@
+{{- $data := .CodeGroup | codeGroupData -}}
+<details>
+<summary>
+{{ $data.Icon }} <b>{{ $data.Label }}</b>
+</summary>
+
+<ul>
+{{ range .RenderPackages }}
+<li>
+{{ . }}
+</li>
+{{ end }}
+</ul>
+</details>

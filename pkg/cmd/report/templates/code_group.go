@@ -130,20 +130,6 @@ func newCumulatedSeverities(severityGroups map[severity.Severity][]models.Verdic
 	return cs
 }
 
-type codeData struct {
-	Label string
-	Icon  string
-}
-
-var codeDataMap = map[string]codeData{
-	"UNK": {"Unknown", "👽"},
-	"FNI": {"Dynamic instrumentation", "📡"},
-	"TSN": {"Typosquatting", "🔀"},
-	"MDN": {"Metadata", "📑"},
-	"STN": {"Static analysis", "🔎"},
-	"DDN": {"Advisories", "🛡️"},
-}
-
 func pluralize(count int) string {
 	if count == 1 {
 		return ""
