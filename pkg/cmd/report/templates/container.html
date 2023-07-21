@@ -1,60 +1,33 @@
 
-# <img height=14 src="https://listen.dev/assets/images/dolphin-noborder.png"> listen.dev ∙ Security Report
+# <img height=20 src="https://listen.dev/assets/images/dolphin-noborder.png"> listen.dev ∙ Security Report
+{{ $high := index .Amounts.Map "high" -}}
+{{- $medium := index .Amounts.Map "medium" -}}
+{{- $low := index .Amounts.Map "low" -}}
 
-{{ $high := .HighSeverity -}}
-{{- $medium := .MediumSeverity -}}
-{{- $low := .LowSeverity -}}
-{{- $problems := .Problems -}}
 <table align=center>
   <tr>
-    <td><b>critical</b> {{ index .Icons "high" }} {{ index .Amounts.Map "high" -}}</td>
-    <td><b>medium</b> {{ index .Icons "medium" }} {{ index .Amounts.Map "medium" -}}</td>
-    <td><b>low</b> {{ index .Icons "low" }} {{ index .Amounts.Map "low" -}}</td>
+    <td><b>critical</b> {{ index .Icons "high" }} {{ $high -}}</td>
+    <td><b>medium</b> {{ index .Icons "medium" }} {{ $medium -}}</td>
+    <td><b>low</b> {{ index .Icons "low" }} {{ $low -}}</td>
   </tr>
 </table>
-{{- if and (eq $high.TotalVerdicts 0) (eq $medium.TotalVerdicts 0) (eq $low.TotalVerdicts 0) }}
+
+{{ if (eq .Amounts.Total 0) -}}
 
 - 🌟 No signs of suspicious behavior were found in the dependency tree during installation
 - 🔒 Your meticulous approach ensures a secure codebase
 - 🚀 Keep up the excellent work!
-{{- else }}
+<hr>
+{{- else -}}
 🔍 The following behaviors have been detected in the dependency tree during installation
 
 <hr>
-<!-- {{ .GroupedRender }} -->
-
 {{ .High }}
 
 {{ .Medium }}
 
 {{ .Low }}
 
-<!-- <details>
-<summary>
-:stop_sign: <b>{{ $high.TotalVerdicts }}</b> critical activities detected
-</summary>
-{{- $high.DetailsRender }}
-</details>
-
-<details>
-<summary>
-:warning: <b>{{ $medium.TotalVerdicts }}</b> medium activities detected
-</summary>
-{{- $medium.DetailsRender }}
-</details>
-
-<details>
-<summary>
-:large_blue_diamond: <b>{{ $low.TotalVerdicts }}</b> low activities detected
-</summary>
-{{ $low.DetailsRender }}
-</details>
-{{- end }}
-
-{{- if gt $problems.TotalProblems 0 }}
-
-#### :triangular_flag_on_post: The analysis could not complete because of the following problems:
-{{ $problems.DetailsRender }}
-{{- end }} -->
+{{- end -}}
 
 <i>Powered by</i> <b><a href="https://listen.dev">listen.dev</a> <img height=14 src="https://listen.dev/assets/images/dolphin-noborder.png"></b>
