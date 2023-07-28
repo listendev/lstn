@@ -1,3 +1,18 @@
+// SPDX-License-Identifier: Apache-2.0
+//
+// Copyright © 2023 The listen.dev team <engineering@garnet.ai>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//	http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 package templates
 
 import (
@@ -38,7 +53,7 @@ type render struct {
 	funcs    template.FuncMap
 }
 
-// severity -> codeGroup -> name/version -> code -> verdicts
+// Mapping severity -> codeGroup -> name/version -> code -> verdicts.
 type nestedSeverityCodeGroupCode map[severity.Severity]map[string]map[string]map[verdictcode.Code][]models.Verdict
 
 func nestSeverityCodeGroupCode(packages []listen.Package) nestedSeverityCodeGroupCode {
@@ -56,6 +71,7 @@ func nestSeverityCodeGroupCode(packages []listen.Package) nestedSeverityCodeGrou
 			for codeGroup := range codeDataLabel {
 				if strings.HasPrefix(v.Code.String(), codeGroup) {
 					foundCodeGroup = codeGroup
+
 					break
 				}
 			}
@@ -92,6 +108,7 @@ func nestSeverityCodeGroupCode(packages []listen.Package) nestedSeverityCodeGrou
 
 func NewFromPackages(packages []listen.Package, icons map[string]string, funcs template.FuncMap) *render {
 	data := nestSeverityCodeGroupCode(packages)
+
 	return &render{packages, data, icons, funcs}
 }
 
@@ -249,17 +266,17 @@ func (r *render) Code(code verdictcode.Code, verdicts []models.Verdict) (string,
 		var name string
 		var version string
 
-		if mn, ok := v.Metadata["npm_package_name"]; !ok {
+		mn, ok := v.Metadata["npm_package_name"]
+		if !ok {
 			return "", fmt.Errorf("'npm_package_name' of %s %s is not of type string", v.Pkg, v.Version)
-		} else {
-			name = mn.(string)
 		}
+		name = mn.(string)
 
-		if mv, ok := v.Metadata["npm_package_version"]; !ok {
+		mv, ok := v.Metadata["npm_package_version"]
+		if !ok {
 			return "", fmt.Errorf("'npm_package_version' of %s %s is not of type string", v.Pkg, v.Version)
-		} else {
-			version = mv.(string)
 		}
+		version = mv.(string)
 
 		transitive := name != v.Pkg && version != v.Version
 
