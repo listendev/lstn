@@ -128,6 +128,7 @@ func (r *rep) Run(res listen.Response) error {
 
 // CanRun tells whether this reporter is being executed on a GitHub pull request
 // (in which case it returns a true value) or not.
+// FIXME: this is now unused (see pkg/reporter/factory/factory.go): move that code here or remove this function.
 func (r *rep) CanRun() bool {
 	ghOpts := r.opts.Reporting.GitHub
 
