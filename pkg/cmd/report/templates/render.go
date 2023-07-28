@@ -19,6 +19,7 @@ import (
 	"bytes"
 	"embed"
 	"fmt"
+	"sort"
 	"strings"
 	"text/template"
 
@@ -131,16 +132,28 @@ func (r *render) Severity(s severity.Severity) (string, error) {
 		return "", nil
 	}
 
+	type holder struct {
+		codeGroup    string
+		nameVersions map[string]map[verdictcode.Code][]models.Verdict
+	}
+	cg := make([]holder, 0, len(codeGroups))
+	for codeGroup, nameVersions := range codeGroups {
+		cg = append(cg, holder{codeGroup, nameVersions})
+	}
+	sort.SliceStable(cg, func(i, j int) bool {
+		return cg[i].codeGroup < cg[j].codeGroup
+	})
+
 	codeGroupsIcons := []string{}
 	rCodeGroups := []string{}
-	for codeGroup, nameVersions := range codeGroups {
-		rCodeGroup, err := r.CodeGroup(codeGroup, nameVersions)
+	for _, element := range cg {
+		rCodeGroup, err := r.CodeGroup(element.codeGroup, element.nameVersions)
 		if err != nil {
 			return "", err
 		}
 
 		rCodeGroups = append(rCodeGroups, rCodeGroup)
-		codeGroupsIcons = append(codeGroupsIcons, r.icons[codeGroup])
+		codeGroupsIcons = append(codeGroupsIcons, r.icons[element.codeGroup])
 	}
 
 	if err := tmpl.Execute(&render, struct {
@@ -173,9 +186,21 @@ func (r *render) CodeGroup(codeGroup string, nameVersions map[string]map[verdict
 		return "", err
 	}
 
-	rNameVersions := []string{}
+	type holder struct {
+		nameVersion string
+		codes       map[verdictcode.Code][]models.Verdict
+	}
+	n := make([]holder, 0, len(nameVersions))
 	for nameVersion, codes := range nameVersions {
-		rNameVersion, err := r.Package(nameVersion, codes)
+		n = append(n, holder{nameVersion, codes})
+	}
+	sort.SliceStable(n, func(i, j int) bool {
+		return n[i].nameVersion > n[j].nameVersion
+	})
+
+	rNameVersions := []string{}
+	for _, element := range n {
+		rNameVersion, err := r.Package(element.nameVersion, element.codes)
 		if err != nil {
 			return "", err
 		}
@@ -213,14 +238,26 @@ func (r *render) Package(nameVersion string, codes map[verdictcode.Code][]models
 	li := strings.LastIndex(nameVersion, "/")
 
 	occurrences := 0
-	rCodes := []string{}
+	type holder struct {
+		code     verdictcode.Code
+		verdicts []models.Verdict
+	}
+	c := make([]holder, 0, len(codes))
 	for code, verdicts := range codes {
-		rCode, err := r.Code(code, verdicts)
+		c = append(c, holder{code, verdicts})
+		occurrences += len(verdicts)
+	}
+	sort.SliceStable(c, func(i, j int) bool {
+		return c[i].code < c[j].code
+	})
+
+	rCodes := []string{}
+	for _, element := range c {
+		rCode, err := r.Code(element.code, element.verdicts)
 		if err != nil {
 			return "", err
 		}
 		rCodes = append(rCodes, rCode)
-		occurrences += len(verdicts)
 	}
 
 	if err := tmpl.Execute(&render, struct {
