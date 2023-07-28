@@ -106,6 +106,7 @@ func nestSeverityCodeGroupCode(packages []listen.Package) nestedSeverityCodeGrou
 	return m
 }
 
+//nolint:revive // this is a constructor returning a pointer to a struct not meant for external usage at the moment
 func NewFromPackages(packages []listen.Package, icons map[string]string, funcs template.FuncMap) *render {
 	data := nestSeverityCodeGroupCode(packages)
 
