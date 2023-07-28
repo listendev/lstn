@@ -79,7 +79,7 @@ func PackageTriple(c *cobra.Command, args []string) error {
 }
 
 // PackageTripleActiveHelp generates the active help for a triple package, version (or version constraint), and shasumxs.
-func PackageTripleActiveHelp(c *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func PackageTripleActiveHelp(_ *cobra.Command, args []string, _ /*toComplete*/ string) ([]string, cobra.ShellCompDirective) {
 	// TODO:  Double-check it's working.
 	var comps []string
 

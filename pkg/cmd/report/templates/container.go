@@ -38,6 +38,7 @@ func newAmounts(packages []listen.Package) amounts {
 	for _, pkg := range packages {
 		if len(pkg.Problems) > 0 {
 			p++
+
 			continue
 		}
 
@@ -46,6 +47,7 @@ func newAmounts(packages []listen.Package) amounts {
 			t++
 		}
 	}
+
 	return amounts{m, t, p}
 }
 
@@ -80,6 +82,7 @@ var funcs = template.FuncMap{
 		if count == 1 {
 			return singular
 		}
+
 		return plural
 	},
 	"icon": func(key string) string {
@@ -92,6 +95,7 @@ var funcs = template.FuncMap{
 		if s == severity.Medium {
 			return "Medium severity"
 		}
+
 		return "Critical severity"
 	},
 	"codeGroupLabel": func(codeGroup string) string {
@@ -102,8 +106,8 @@ var funcs = template.FuncMap{
 	},
 	"getNameVersion": func(nameSlashVersion string) nameVersion {
 		i := nameSlashVersion
-
 		li := strings.LastIndex(i, "/")
+
 		return nameVersion{i[:li], i[li+1:]}
 	},
 }

@@ -66,7 +66,7 @@ func GetDirectory(args []string) (string, error) {
 }
 
 // SingleDirectoryActiveHelp generates the active help for a single directory.
-func SingleDirectoryActiveHelp(c *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func SingleDirectoryActiveHelp(_ *cobra.Command, args []string, _ /*toComplete*/ string) ([]string, cobra.ShellCompDirective) {
 	// TODO:  Double-check it's working.
 	var comps []string
 	switch len(args) {

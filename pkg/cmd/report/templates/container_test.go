@@ -18,13 +18,13 @@ package templates
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"testing"
 	"time"
 
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/listendev/pkg/verdictcode"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -559,7 +559,7 @@ func TestRenderContainer(t *testing.T) {
 			}
 
 			if tt.snapshot {
-				ioutil.WriteFile(fmt.Sprintf("./testdata/snapshots/%s.md", tt.name), outBuf.Bytes(), 0644)
+				assert.Nil(t, os.WriteFile(fmt.Sprintf("./testdata/snapshots/%s.md", tt.name), outBuf.Bytes(), 0644))
 			}
 
 			require.Equal(t, tt.expectedOutput, outBuf.Bytes())
