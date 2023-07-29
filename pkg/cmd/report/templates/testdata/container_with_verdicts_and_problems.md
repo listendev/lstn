@@ -63,7 +63,7 @@
 
 | Name | Version | Transitive Dependency | Occurrences | More |
 |---|---|---|---|---|
-| bar | 1.0.0 || 1 | [🔗](https://verdicts.listen.dev/npm/bar/1.0.0) |
+| bar | 1.0.0 |✔️| 1 | [🔗](https://verdicts.listen.dev/npm/bar/1.0.0) |
 | foo | 1.0.0 || 1 | [🔗](https://verdicts.listen.dev/npm/foo/1.0.0) |
 
 </details>
@@ -131,7 +131,7 @@
 
 | Name | Version | Transitive Dependency | Occurrences | More |
 |---|---|---|---|---|
-| bar | 1.0.0 || 1 | [🔗](https://verdicts.listen.dev/npm/bar/1.0.0) |
+| bar | 1.0.0 |✔️| 1 | [🔗](https://verdicts.listen.dev/npm/bar/1.0.0) |
 
 </details>
     
