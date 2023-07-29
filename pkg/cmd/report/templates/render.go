@@ -87,7 +87,7 @@ func nestSeverityCodeGroupCode(packages []listen.Package) nestedSeverityCodeGrou
 				codeGroups[foundCodeGroup] = nameVersions
 			}
 
-			nameVersion := fmt.Sprintf("%s/%s", v.Pkg, v.Version)
+			nameVersion := strings.TrimPrefix(fmt.Sprintf("%s/%s@%s", v.Org, v.Pkg, v.Version), "/")
 			codes, e := nameVersions[nameVersion]
 			if !e {
 				codes = make(map[verdictcode.Code][]models.Verdict)
@@ -235,7 +235,7 @@ func (r *render) Package(nameVersion string, codes map[verdictcode.Code][]models
 		return "", err
 	}
 
-	li := strings.LastIndex(nameVersion, "/")
+	li := strings.LastIndex(nameVersion, "@")
 
 	occurrences := 0
 	type holder struct {
@@ -301,22 +301,21 @@ func (r *render) Code(code verdictcode.Code, verdicts []models.Verdict) (string,
 	cumulated := make(map[string]grouped)
 
 	for _, v := range verdicts {
-		var name string
-		var version string
+		nameInVerdict := strings.TrimPrefix(fmt.Sprintf("%s/%s", v.Org, v.Pkg), "/")
+		name := nameInVerdict
+		version := v.Version
+		transitive := false
 
 		mn, ok := v.Metadata["npm_package_name"]
-		if !ok {
-			return "", fmt.Errorf("'npm_package_name' of %s %s is not of type string", v.Pkg, v.Version)
+		if ok {
+			name = mn.(string)
 		}
-		name = mn.(string)
+		transitive = name != nameInVerdict
 
 		mv, ok := v.Metadata["npm_package_version"]
-		if !ok {
-			return "", fmt.Errorf("'npm_package_version' of %s %s is not of type string", v.Pkg, v.Version)
+		if ok {
+			version = mv.(string)
 		}
-		version = mv.(string)
-
-		transitive := name != v.Pkg && version != v.Version
 
 		key := fmt.Sprintf("%s/%s", name, version)
 
