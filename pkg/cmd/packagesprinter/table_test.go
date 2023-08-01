@@ -356,7 +356,7 @@ func TestTablePrinter_printPackages(t *testing.T) {
 		{
 			name: "packages with problems and verdicts prints the verdicts and problems",
 			packages: &listen.Response{
-				{
+				listen.Package{
 					Name:     "my-package",
 					Version:  strPtr("1.0.0"),
 					Verdicts: []listen.Verdict{},
@@ -373,7 +373,7 @@ func TestTablePrinter_printPackages(t *testing.T) {
 						},
 					},
 				},
-				{
+				listen.Package{
 					Name:     "my-package",
 					Version:  strPtr("1.0.0"),
 					Verdicts: []listen.Verdict{},
@@ -391,7 +391,7 @@ func TestTablePrinter_printPackages(t *testing.T) {
 		{
 			name: "empty packages prints nothing",
 			packages: &listen.Response{
-				{
+				listen.Package{
 					Name:     "my-package",
 					Version:  strPtr("1.0.0"),
 					Verdicts: []listen.Verdict{},
@@ -430,7 +430,7 @@ func TestTablePrinter_printTable(t *testing.T) {
 		{
 			name: "inform that there are problems and verdicts in table format",
 			packages: &listen.Response{
-				{
+				listen.Package{
 					Name:    "react",
 					Version: strPtr("1.0.0"),
 					Verdicts: []listen.Verdict{
@@ -448,7 +448,7 @@ func TestTablePrinter_printTable(t *testing.T) {
 					},
 					Problems: []listen.Problem{},
 				},
-				{
+				listen.Package{
 					Name:    "my-package",
 					Version: strPtr("1.0.0"),
 					Verdicts: []listen.Verdict{
@@ -490,7 +490,7 @@ func TestTablePrinter_printTable(t *testing.T) {
 						},
 					},
 				},
-				{
+				listen.Package{
 					Name:     "my-package",
 					Version:  strPtr("1.0.0"),
 					Verdicts: []listen.Verdict{},
