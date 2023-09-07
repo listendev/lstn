@@ -60,14 +60,15 @@ type Reporting struct {
 }
 
 type Ignore struct {
-	Packages []string          `name:"ignore packages" flag:"ignore-packages" desc:"list of packages to not process" transform:"unique" default:"[]" json:"ignore-packages"`
-	Deptypes []npmdeptype.Enum `name:"ignore dependency types" flag:"ignore-deptypes" desc:"list of dependencies types to not process" transform:"unique" json:"ignore-deptypes"`
+	Packages []string          `name:"ignore packages" flag:"ignore-packages" desc:"the list of packages to not process" transform:"unique" default:"[]" json:"ignore-packages"`
+	Deptypes []npmdeptype.Enum `name:"ignore dependency types" flag:"ignore-deptypes" desc:"the list of dependencies types to not process" transform:"unique" json:"ignore-deptypes"`
 
 	types *enumflag.EnumFlagValue[npmdeptype.Enum]
 }
 
 type Filtering struct {
-	Ignore `flagset:"Filtering"`
+	Ignore     `flagset:"Filtering"`
+	Expression string `flagset:"Filtering" name:"filter verdicts" flag:"select" shorthand:"s" desc:"filter the output verdicts using a jsonpath script expression (server-side)"`
 }
 
 type ConfigFlags struct {
