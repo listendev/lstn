@@ -214,7 +214,7 @@ func TestNewBulkVerdictsRequestsFromMap(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.desc, func(t *testing.T) {
-			res, err := NewBulkVerdictsRequestsFromMap(tc.args)
+			res, err := NewBulkVerdictsRequestsFromMap(tc.args, "")
 			if err != nil {
 				assert.Nil(t, res)
 				if assert.Error(t, err) {
