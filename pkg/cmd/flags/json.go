@@ -25,7 +25,7 @@ import (
 
 type JSONFlags struct {
 	JSON bool   `name:"json" flag:"json" desc:"output the verdicts (if any) in JSON form" json:"json"`
-	JQ   string `name:"jq" flag:"jq" shorthand:"q" desc:"filter the output using a jq expression" validate:"excluded_without=JSON,jq" json:"jq"`
+	JQ   string `flagset:"Filtering" name:"jq" flag:"jq" shorthand:"q" desc:"filter the output verdicts using a jq expression (requires --json)" validate:"excluded_without=JSON,jq" json:"jq"`
 }
 
 func (o *JSONFlags) IsJSON() bool {
