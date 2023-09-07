@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"github.com/Masterminds/semver/v3"
+	"github.com/listendev/lstn/pkg/jsonpath"
 	"github.com/listendev/lstn/pkg/npm"
 	"github.com/listendev/lstn/pkg/validate"
 )
@@ -34,6 +35,7 @@ type VerdictsRequest struct {
 	Name    string   `json:"name" name:"name" validate:"mandatory"`
 	Version string   `json:"version,omitempty" validate:"omitempty,semver"`
 	Shasum  string   `json:"shasum,omitempty" validate:"omitempty,shasum"`
+	Select  string   `json:"select,omitempty"`
 	Context *Context `json:"context,omitempty"`
 }
 
@@ -76,7 +78,7 @@ func NewVerdictsRequest(args []string) (*VerdictsRequest, error) {
 	return fillVerdictsRequest(ret, args)
 }
 
-func NewBulkVerdictsRequestsFromMap(deps map[string]*semver.Version) ([]*VerdictsRequest, error) {
+func NewBulkVerdictsRequestsFromMap(deps map[string]*semver.Version, selection string) ([]*VerdictsRequest, error) {
 	if len(deps) == 0 {
 		return nil, fmt.Errorf("couldn't create a request set from empty dependencies map")
 	}
@@ -95,13 +97,15 @@ func NewBulkVerdictsRequestsFromMap(deps map[string]*semver.Version) ([]*Verdict
 		if reqErr != nil {
 			return nil, reqErr
 		}
+		reqs[i].Select = jsonpath.Make(selection)
+
 		i++
 	}
 
 	return reqs, nil
 }
 
-func NewBulkVerdictsRequests(names []string, versions semver.Collection) ([]*VerdictsRequest, error) {
+func NewBulkVerdictsRequests(names []string, versions semver.Collection, selection string) ([]*VerdictsRequest, error) {
 	if len(names) != len(versions) {
 		return nil, fmt.Errorf("couldn't create a request set because of mismatching lenghts")
 	}
@@ -116,6 +120,7 @@ func NewBulkVerdictsRequests(names []string, versions semver.Collection) ([]*Ver
 		if reqErr != nil {
 			return nil, reqErr
 		}
+		reqs[i].Select = jsonpath.Make(selection)
 	}
 
 	return reqs, nil
