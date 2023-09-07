@@ -28,6 +28,7 @@ import (
 	"github.com/listendev/lstn/pkg/cmd/options"
 	"github.com/listendev/lstn/pkg/cmd/packagesprinter"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
+	"github.com/listendev/lstn/pkg/jsonpath"
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/listendev/lstn/pkg/npm"
 	"github.com/spf13/cobra"
@@ -136,7 +137,7 @@ It lists out the verdicts of all the versions of the input package name.`,
 				}
 
 				// Create list of verdicts requests
-				reqs, multipleErr := listen.NewBulkVerdictsRequests(names, versions)
+				reqs, multipleErr := listen.NewBulkVerdictsRequests(names, versions, toOpts.ConfigFlags.Filtering.Expression)
 				if multipleErr != nil {
 					return multipleErr
 				}
@@ -155,6 +156,7 @@ It lists out the verdicts of all the versions of the input package name.`,
 				if reqErr != nil {
 					return reqErr
 				}
+				req.Select = jsonpath.Make(toOpts.ConfigFlags.Filtering.Expression)
 
 				res, resJSON, resErr = listen.Packages(
 					req,
