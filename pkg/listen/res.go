@@ -15,7 +15,9 @@
 // limitations under the License.
 package listen
 
-import "github.com/listendev/pkg/models"
+import (
+	"github.com/listendev/pkg/models"
+)
 
 type Verdict = models.Verdict
 type Problem = models.Problem

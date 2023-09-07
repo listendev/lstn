@@ -95,15 +95,18 @@ func response(dec *json.Decoder, o *options) (*Response, []byte, error) {
 	return target, nil, nil
 }
 
-func request[T Request](r T, o *options, endpointURL, userAgent string) (*json.Decoder, *http.Response, error) {
+// request performs the HTTP request to the API
+//
+// It assumes that the input Request is already well-formed.
+func request[T Request](ctx context.Context, r T, endpointURL, userAgent string) (*json.Decoder, *http.Response, error) {
 	// Prepare the request
 	pl, err := json.Marshal(r)
 	if err != nil {
-		return nil, nil, pkgcontext.OutputError(o.ctx, err)
+		return nil, nil, pkgcontext.OutputError(ctx, err)
 	}
-	req, err := http.NewRequestWithContext(o.ctx, http.MethodPost, endpointURL, bytes.NewBuffer(pl))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpointURL, bytes.NewBuffer(pl))
 	if err != nil {
-		return nil, nil, pkgcontext.OutputError(o.ctx, err)
+		return nil, nil, pkgcontext.OutputError(ctx, err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
@@ -117,7 +120,7 @@ func request[T Request](r T, o *options, endpointURL, userAgent string) (*json.D
 	client := http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		return nil, nil, pkgcontext.OutputError(o.ctx, err)
+		return nil, nil, pkgcontext.OutputError(ctx, err)
 	}
 
 	dec := json.NewDecoder(res.Body)
@@ -126,10 +129,10 @@ func request[T Request](r T, o *options, endpointURL, userAgent string) (*json.D
 	if res.StatusCode != http.StatusOK {
 		target := &responseError{}
 		if err = dec.Decode(target); err != nil {
-			return nil, nil, pkgcontext.OutputError(o.ctx, err)
+			return nil, nil, pkgcontext.OutputError(ctx, err)
 		}
 
-		return nil, nil, pkgcontext.OutputErrorf(o.ctx, err, target.Message)
+		return nil, nil, pkgcontext.OutputErrorf(ctx, err, target.Message)
 	}
 
 	return dec, res, nil
@@ -146,7 +149,7 @@ func Packages[T Request](r T, opts ...func(*options)) (*Response, []byte, error)
 		return nil, nil, pkgcontext.OutputError(o.ctx, err)
 	}
 
-	dec, res, err := request(r, o, endpointURL, "")
+	dec, res, err := request(o.ctx, r, endpointURL, "")
 	if err != nil {
 		return nil, nil, err
 	}
@@ -181,7 +184,7 @@ func BulkPackages(requests []*VerdictsRequest, opts ...func(*options)) (*Respons
 	}
 
 	cb := func(req *VerdictsRequest) returnWrap {
-		dec, res, reqErr := request(req, o, endpointURL, userAgent)
+		dec, res, reqErr := request(o.ctx, req, endpointURL, userAgent)
 		if reqErr != nil {
 			return returnWrap{nil, reqErr}
 		}
