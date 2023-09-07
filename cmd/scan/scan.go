@@ -113,13 +113,17 @@ The verdicts it returns are listed by the name of each package and its specified
 			combinedResponse := []listen.Package{}
 			for _, deps := range deps {
 				// Create list of verdicts requests
-				reqs, bulkErr := listen.NewBulkVerdictsRequestsFromMap(deps)
+				reqs, bulkErr := listen.NewBulkVerdictsRequestsFromMap(deps, scanOpts.ConfigFlags.Filtering.Expression)
 				if bulkErr != nil {
 					return err
 				}
 
 				// Query for verdicts about the current dependencies set in parallel...
-				res, resJSON, resErr := listen.BulkPackages(reqs, listen.WithContext(ctx), listen.WithJSONOptions(scanOpts.JSONFlags))
+				res, resJSON, resErr := listen.BulkPackages(
+					reqs,
+					listen.WithContext(ctx),
+					listen.WithJSONOptions(scanOpts.JSONFlags),
+				)
 
 				if resErr != nil {
 					return err
