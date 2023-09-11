@@ -68,7 +68,7 @@ type Ignore struct {
 
 type Filtering struct {
 	Ignore     `flagset:"Filtering"`
-	Expression string `flagset:"Filtering" name:"filter verdicts" flag:"select" shorthand:"s" desc:"filter the output verdicts using a jsonpath script expression (server-side)"`
+	Expression string `flagset:"Filtering" name:"filter verdicts" flag:"select" shorthand:"s" desc:"filter the output verdicts using a jsonpath script expression (server-side)" json:"select"`
 }
 
 type ConfigFlags struct {
