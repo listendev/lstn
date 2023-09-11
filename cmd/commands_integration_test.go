@@ -1424,7 +1424,7 @@ Global Flags:
 			envvar: map[string]string{
 				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
 				"GITHUB_ACTIONS": "",
-				"LSTN_SELECT": `"network" in @.categories`,
+				"LSTN_SELECT":    `"network" in @.categories`,
 			},
 			cmdline: []string{"scan", "--debug-options"},
 			stdout: heredoc.Doc(`{
@@ -1444,6 +1444,38 @@ Global Flags:
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
 	"select": "\"network\" in @.categories",
+	"timeout": 60
+}
+`),
+			stderr: "Running without a configuration file\n",
+			errstr: "",
+		},
+		// lstn to --debug-options -s '(@.file !~ "^advisory" && @.message != "")'
+		// TODO: double-check why the debug options JSON is returning unicode chars in place of the `&` ones
+		{
+			name: `lstn to --debug-options -s '(@.file !~ "^advisory" && @.message != "")'`,
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
+			cmdline: []string{"to", "--debug-options", "-s", `(@.file !~ "^advisory" && @.message != "")`},
+			stdout: heredoc.Doc(`{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "",
+	"ignore-deptypes": [
+		110
+	],
+	"ignore-packages": null,
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://registry.npmjs.org",
+	"reporter": [],
+	"select": "(@.file !~ \"^advisory\" \u0026\u0026 @.message != \"\")",
 	"timeout": 60
 }
 `),
