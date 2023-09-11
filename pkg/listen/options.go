@@ -23,9 +23,9 @@ import (
 )
 
 type options struct {
-	baseURL  string
-	ctx      context.Context
-	json     flags.JSONFlags
+	baseURL string
+	ctx     context.Context
+	json    flags.JSONFlags
 }
 
 func newOptions(opts ...func(*options)) (*options, error) {
