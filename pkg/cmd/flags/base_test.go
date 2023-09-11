@@ -43,7 +43,7 @@ func (suite *FlagsBaseSuite) TestGetNames() {
 	res := GetNames(&ScanOpts{})
 
 	// Expecting all the (sub)fields
-	assert.Len(suite.T(), res, 13)
+	assert.Len(suite.T(), res, 14)
 }
 
 func (suite *FlagsBaseSuite) TestGetDefaults() {
@@ -254,7 +254,7 @@ func (suite *FlagsBaseSuite) TestDefine() {
 			assert.NotNil(t, f.Lookup("jq"))
 			assert.NotNil(t, f.ShorthandLookup("q"))
 			assert.Equal(t, "output the verdicts (if any) in JSON form", f.Lookup("json").Usage)
-			assert.Equal(t, "filter the output using a jq expression", f.Lookup("jq").Usage)
+			assert.Equal(t, "filter the output verdicts using a jq expression (requires --json)", f.Lookup("jq").Usage)
 		})
 	}
 }

@@ -59,7 +59,7 @@ func (suite *FlagsConfigSuite) TestNewConfigFlagsDefaults() {
 
 func (suite *FlagsConfigSuite) TestGetConfigFlagsNames() {
 	m := GetNames(&ConfigFlags{})
-	assert.Equal(suite.T(), 11, len(m))
+	assert.Equal(suite.T(), 12, len(m))
 
 	expected := make(map[string]string)
 	expected["loglevel"] = "LogLevel"
@@ -73,6 +73,7 @@ func (suite *FlagsConfigSuite) TestGetConfigFlagsNames() {
 	expected["npm-registry"] = "Registry.NPM"
 	expected["ignore-packages"] = "Filtering.Ignore.Packages"
 	expected["ignore-deptypes"] = "Filtering.Ignore.Deptypes"
+	expected["select"] = "Filtering.Expression"
 
 	for k, v := range m {
 		e, ok := expected[k]
