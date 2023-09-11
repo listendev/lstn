@@ -37,6 +37,9 @@ type testCase struct {
 	errstr  string
 }
 
+// TODO: lstn scan -s '@.severity == "high"'
+// TODO: LSTN_SELECT='"network" in @.categories' lstn scan
+
 func TestChildCommands(t *testing.T) {
 	cwd, _ := os.Getwd()
 
@@ -92,8 +95,7 @@ Examples:
   lstn to prettier ">=2.7.0 <=3.0.0"
 
 Flags:
-  -q, --jq string   filter the output using a jq expression
-      --json        output the verdicts (if any) in JSON form
+      --json   output the verdicts (if any) in JSON form
 
 Config Flags:
       --endpoint string   the listen.dev endpoint emitting the verdicts (default "https://npm.listen.dev")
@@ -102,6 +104,10 @@ Config Flags:
 
 Debug Flags:
       --debug-options   output the options, then exit
+
+Filtering Flags:
+  -q, --jq string       filter the output verdicts using a jq expression (requires --json)
+  -s, --select string   filter the output verdicts using a jsonpath script expression (server-side)
 
 Registry Flags:
       --npm-registry string   set a custom NPM registry (default "https://registry.npmjs.org")
@@ -142,8 +148,7 @@ Examples:
   lstn scan /we/snitch --ignore-packages react --ignore-packages glob,@vue/devtools
 
 Flags:
-  -q, --jq string   filter the output using a jq expression
-      --json        output the verdicts (if any) in JSON form
+      --json   output the verdicts (if any) in JSON form
 
 Config Flags:
       --endpoint string   the listen.dev endpoint emitting the verdicts (default "https://npm.listen.dev")
@@ -154,8 +159,10 @@ Debug Flags:
       --debug-options   output the options, then exit
 
 Filtering Flags:
-      --ignore-deptypes (dep,dev,optional,peer)   list of dependencies types to not process (default [bundle])
-      --ignore-packages strings                   list of packages to not process
+      --ignore-deptypes (dep,dev,optional,peer)   the list of dependencies types to not process (default [bundle])
+      --ignore-packages strings                   the list of packages to not process
+  -q, --jq string                                 filter the output verdicts using a jq expression (requires --json)
+  -s, --select string                             filter the output verdicts using a jsonpath script expression (server-side)
 
 Registry Flags:
       --npm-registry string   set a custom NPM registry (default "https://registry.npmjs.org")
@@ -199,6 +206,7 @@ Global Flags:
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
+	"select": "",
 	"timeout": 60
 }
 `),
@@ -229,6 +237,7 @@ Global Flags:
 	"loglevel": "info",
 	"npm-registry": "https://some.io",
 	"reporter": [],
+	"select": "",
 	"timeout": 2222
 }
 `),
@@ -260,8 +269,7 @@ Examples:
   lstn in sub/dir
 
 Flags:
-  -q, --jq string   filter the output using a jq expression
-      --json        output the verdicts (if any) in JSON form
+      --json   output the verdicts (if any) in JSON form
 
 Config Flags:
       --endpoint string   the listen.dev endpoint emitting the verdicts (default "https://npm.listen.dev")
@@ -270,6 +278,9 @@ Config Flags:
 
 Debug Flags:
       --debug-options   output the options, then exit
+
+Filtering Flags:
+  -q, --jq string   filter the output verdicts using a jq expression (requires --json)
 
 Registry Flags:
       --npm-registry string   set a custom NPM registry (default "https://registry.npmjs.org")
@@ -304,6 +315,7 @@ Global Flags:
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
+	"select": "",
 	"timeout": 60
 }
 `),
@@ -335,6 +347,7 @@ Global Flags:
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
+	"select": "",
 	"timeout": 8888
 }
 `),
@@ -366,6 +379,7 @@ Global Flags:
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
+	"select": "",
 	"timeout": 60
 }
 `),
@@ -399,6 +413,7 @@ Global Flags:
 	"reporter": [
 		44
 	],
+	"select": "",
 	"timeout": 60
 }
 `),
@@ -441,6 +456,7 @@ Global Flags:
 		33,
 		22
 	],
+	"select": "",
 	"timeout": 60
 }
 `),
@@ -489,6 +505,7 @@ Global Flags:
 		33,
 		44
 	],
+	"select": "",
 	"timeout": 60
 }
 `),
@@ -523,6 +540,7 @@ Global Flags:
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.com",
 	"reporter": [],
+	"select": "",
 	"timeout": 60
 }
 `),
@@ -556,6 +574,7 @@ Global Flags:
 	"reporter": [
 		33
 	],
+	"select": "",
 	"timeout": 2222
 }
 `),
@@ -593,6 +612,7 @@ Global Flags:
 	"reporter": [
 		33
 	],
+	"select": "",
 	"timeout": 33331
 }
 `),
@@ -631,6 +651,7 @@ Global Flags:
 	"reporter": [
 		44
 	],
+	"select": "",
 	"timeout": 33331
 }
 `),
@@ -664,6 +685,7 @@ Global Flags:
 		22,
 		44
 	],
+	"select": "",
 	"timeout": 60
 }
 `),
@@ -697,6 +719,7 @@ Global Flags:
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
+	"select": "",
 	"timeout": 60
 }
 `),
@@ -779,6 +802,7 @@ Global Flags:
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
+	"select": "",
 	"timeout": 60
 }
 `),
@@ -813,6 +837,7 @@ Global Flags:
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
+	"select": "",
 	"timeout": 60
 }
 `),
@@ -847,6 +872,7 @@ Global Flags:
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
+	"select": "",
 	"timeout": 60
 }
 `),
@@ -880,6 +906,7 @@ Global Flags:
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
+	"select": "",
 	"timeout": 60
 }
 `),
@@ -913,6 +940,7 @@ Global Flags:
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
+	"select": "",
 	"timeout": 60
 }
 `),
@@ -946,6 +974,7 @@ Global Flags:
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
+	"select": "",
 	"timeout": 60
 }
 `),
@@ -980,6 +1009,7 @@ Global Flags:
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
+	"select": "",
 	"timeout": 60
 }
 `),
@@ -1014,6 +1044,7 @@ Global Flags:
 	"loglevel": "info",
 	"npm-registry": "https://smtg.io",
 	"reporter": [],
+	"select": "",
 	"timeout": 1111
 }
 `),
@@ -1049,6 +1080,7 @@ Global Flags:
 	"loglevel": "info",
 	"npm-registry": "https://smtg.io",
 	"reporter": [],
+	"select": "",
 	"timeout": 1111
 }
 `),
@@ -1084,6 +1116,7 @@ Global Flags:
 	"loglevel": "info",
 	"npm-registry": "https://smtg.io",
 	"reporter": [],
+	"select": "",
 	"timeout": 1111
 }
 `),
@@ -1129,6 +1162,7 @@ Global Flags:
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
+	"select": "",
 	"timeout": 60
 }
 `),
@@ -1162,6 +1196,7 @@ Global Flags:
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
+	"select": "",
 	"timeout": 60
 }
 `),
@@ -1198,6 +1233,7 @@ Global Flags:
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
+	"select": "",
 	"timeout": 60
 }
 `),
@@ -1233,6 +1269,7 @@ Global Flags:
 	"loglevel": "info",
 	"npm-registry": "https://smtg.io",
 	"reporter": [],
+	"select": "",
 	"timeout": 1111
 }
 `),
@@ -1269,6 +1306,7 @@ Global Flags:
 	"loglevel": "info",
 	"npm-registry": "https://smtg.io",
 	"reporter": [],
+	"select": "",
 	"timeout": 1111
 }
 `),
@@ -1305,6 +1343,7 @@ Global Flags:
 	"loglevel": "info",
 	"npm-registry": "https://smtg.io",
 	"reporter": [],
+	"select": "",
 	"timeout": 1111
 }
 `),
@@ -1344,6 +1383,7 @@ Global Flags:
 	"loglevel": "info",
 	"npm-registry": "https://smtg.io",
 	"reporter": [],
+	"select": "",
 	"timeout": 1111
 }
 `),
