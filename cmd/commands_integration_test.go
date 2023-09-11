@@ -37,9 +37,6 @@ type testCase struct {
 	errstr  string
 }
 
-// TODO: lstn scan -s '@.severity == "high"'
-// TODO: LSTN_SELECT='"network" in @.categories' lstn scan
-
 func TestChildCommands(t *testing.T) {
 	cwd, _ := os.Getwd()
 
@@ -1388,6 +1385,69 @@ Global Flags:
 }
 `),
 			stderr: "",
+			errstr: "",
+		},
+		// lstn scan --debug-options --select '@.severity == "high"'
+		{
+			name: `lstn scan --debug-options --select '@.severity == "high"'`,
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
+			cmdline: []string{"scan", "--debug-options", "--select", `@.severity == "high"`},
+			stdout: heredoc.Doc(`{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "",
+	"ignore-deptypes": [
+		110
+	],
+	"ignore-packages": null,
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://registry.npmjs.org",
+	"reporter": [],
+	"select": "@.severity == \"high\"",
+	"timeout": 60
+}
+`),
+			stderr: "Running without a configuration file\n",
+			errstr: "",
+		},
+		// LSTN_SELECT='"network" in @.categories' lstn scan --debug-options
+		{
+			name: `LSTN_SELECT='"network" in @.categories' lstn scan --debug-options`,
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+				"LSTN_SELECT": `"network" in @.categories`,
+			},
+			cmdline: []string{"scan", "--debug-options"},
+			stdout: heredoc.Doc(`{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "",
+	"ignore-deptypes": [
+		110
+	],
+	"ignore-packages": null,
+	"jq": "",
+	"json": false,
+	"loglevel": "info",
+	"npm-registry": "https://registry.npmjs.org",
+	"reporter": [],
+	"select": "\"network\" in @.categories",
+	"timeout": 60
+}
+`),
+			stderr: "Running without a configuration file\n",
 			errstr: "",
 		},
 	}
