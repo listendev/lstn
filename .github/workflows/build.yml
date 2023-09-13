@@ -45,12 +45,6 @@ jobs:
       - name: Force fetch upstream tags
         run: git fetch --force --tags
 
-      - name: Extract the branch name
-        if: ${{ github.event_name == 'pull_request' }}
-        shell: bash
-        run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
-        id: extract_branch
-
       - name: Set up Go ${{ matrix.go }}
         uses: actions/setup-go@v4
         with:
