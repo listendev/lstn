@@ -14,15 +14,17 @@ But flags override them.
 
 `LSTN_GH_TOKEN`: set the GitHub token
 
-`LSTN_IGNORE_DEPTYPES`: list of dependencies types to not process
+`LSTN_IGNORE_DEPTYPES`: the list of dependencies types to not process
 
-`LSTN_IGNORE_PACKAGES`: list of packages to not process
+`LSTN_IGNORE_PACKAGES`: the list of packages to not process
 
 `LSTN_LOGLEVEL`: set the logging level
 
 `LSTN_NPM_REGISTRY`: set a custom NPM registry
 
 `LSTN_REPORTER`: set one or more reporters to use
+
+`LSTN_SELECT`: filter the output verdicts using a jsonpath script expression (server-side)
 
 `LSTN_TIMEOUT`: set the timeout, in seconds
 

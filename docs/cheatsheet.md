@@ -75,8 +75,7 @@ Inspect the verdicts for your dependencies tree.
 ### Flags
 
 ```
--q, --jq string   filter the output using a jq expression
-    --json        output the verdicts (if any) in JSON form
+--json   output the verdicts (if any) in JSON form
 ```
 
 ### Config Flags
@@ -91,6 +90,12 @@ Inspect the verdicts for your dependencies tree.
 
 ```
 --debug-options   output the options, then exit
+```
+
+### Filtering Flags
+
+```
+-q, --jq string   filter the output verdicts using a jq expression (requires --json)
 ```
 
 ### Registry Flags
@@ -123,8 +128,7 @@ Inspect the verdicts for your direct dependencies.
 ### Flags
 
 ```
--q, --jq string   filter the output using a jq expression
-    --json        output the verdicts (if any) in JSON form
+--json   output the verdicts (if any) in JSON form
 ```
 
 ### Config Flags
@@ -144,8 +148,10 @@ Inspect the verdicts for your direct dependencies.
 ### Filtering Flags
 
 ```
---ignore-deptypes (dep,dev,optional,peer)   list of dependencies types to not process (default [bundle])
---ignore-packages strings                   list of packages to not process
+    --ignore-deptypes (dep,dev,optional,peer)   the list of dependencies types to not process (default [bundle])
+    --ignore-packages strings                   the list of packages to not process
+-q, --jq string                                 filter the output verdicts using a jq expression (requires --json)
+-s, --select string                             filter the output verdicts using a jsonpath script expression (server-side)
 ```
 
 ### Registry Flags
@@ -190,8 +196,7 @@ Get the verdicts of a package.
 ### Flags
 
 ```
--q, --jq string   filter the output using a jq expression
-    --json        output the verdicts (if any) in JSON form
+--json   output the verdicts (if any) in JSON form
 ```
 
 ### Config Flags
@@ -206,6 +211,13 @@ Get the verdicts of a package.
 
 ```
 --debug-options   output the options, then exit
+```
+
+### Filtering Flags
+
+```
+-q, --jq string       filter the output verdicts using a jq expression (requires --json)
+-s, --select string   filter the output verdicts using a jsonpath script expression (server-side)
 ```
 
 ### Registry Flags

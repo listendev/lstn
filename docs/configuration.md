@@ -10,6 +10,7 @@ Here's an example of a configuration file (with the default values):
 ```yaml
 endpoint: "https://npm.listen.dev"
 filtering: 
+  expression: "..."
   ignore: 
     deptypes: 
       - "..."
