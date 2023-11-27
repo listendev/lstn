@@ -335,7 +335,14 @@ func TestNewAnalysisRequest(t *testing.T) {
 }
 
 func TestAnalysisRequestMarshal(t *testing.T) {
-	validPackageLockJSON, _ := npm.NewPackageLockJSONFromBytes([]byte(heredoc.Doc(`{
+	validPackageLockJSON1, _ := npm.NewPackageLockJSONFromBytes([]byte(`{"name": "github-gist","version": "1.0.0","lockfileVersion": 1,"requires": true,"dependencies": {"@babel/runtime-corejs3": {"version": "7.12.1","resolved": "https://registry.npmjs.org/@babel/runtime-corejs3/-/runtime-corejs3-7.12.1.tgz","integrity": "sha512-umhPIcMrlBZ2aTWlWjUseW9LjQKxi1dpFlQS8DzsxB//5K+u6GLTC/JliPKHsd5kJVPIU6X/Hy0YvWOYPcMxBw==","dev": true,"requires": {"core-js-pure": "^3.0.0","regenerator-runtime": "^0.13.4"}}}}`))
+
+	validAnalysisRequest1, err := NewAnalysisRequest(validPackageLockJSON1)
+	assert.Nil(t, err)
+
+	validPackageLockBody1 := []byte(`"eyJuYW1lIjogImdpdGh1Yi1naXN0IiwidmVyc2lvbiI6ICIxLjAuMCIsImxvY2tmaWxlVmVyc2lvbiI6IDEsInJlcXVpcmVzIjogdHJ1ZSwiZGVwZW5kZW5jaWVzIjogeyJAYmFiZWwvcnVudGltZS1jb3JlanMzIjogeyJ2ZXJzaW9uIjogIjcuMTIuMSIsInJlc29sdmVkIjogImh0dHBzOi8vcmVnaXN0cnkubnBtanMub3JnL0BiYWJlbC9ydW50aW1lLWNvcmVqczMvLS9ydW50aW1lLWNvcmVqczMtNy4xMi4xLnRneiIsImludGVncml0eSI6ICJzaGE1MTItdW1oUEljTXJsQloyYVRXbFdqVXNlVzlMalFLeGkxZHBGbFFTOER6c3hCLy81Syt1NkdMVEMvSmxpUEtIc2Q1a0pWUElVNlgvSHkwWXZXT1lQY014Qnc9PSIsImRldiI6IHRydWUsInJlcXVpcmVzIjogeyJjb3JlLWpzLXB1cmUiOiAiXjMuMC4wIiwicmVnZW5lcmF0b3ItcnVudGltZSI6ICJeMC4xMy40In19fX0="`)
+
+	validPackageLockJSON3, _ := npm.NewPackageLockJSONFromBytes([]byte(heredoc.Doc(`{
 		"name": "sample",
 		"version": "1.0.0",
 		"lockfileVersion": 3,
@@ -363,10 +370,10 @@ func TestAnalysisRequestMarshal(t *testing.T) {
 		}
 	}`)))
 
-	validAnalysisRequest, err := NewAnalysisRequest(validPackageLockJSON)
+	validAnalysisRequest3, err := NewAnalysisRequest(validPackageLockJSON3)
 	assert.Nil(t, err)
 
-	validPackageLockBody := []byte(`"ewoJIm5hbWUiOiAic2FtcGxlIiwKCSJ2ZXJzaW9uIjogIjEuMC4wIiwKCSJsb2NrZmlsZVZlcnNpb24iOiAzLAoJInJlcXVpcmVzIjogdHJ1ZSwKCSJwYWNrYWdlcyI6IHsKCQkiIjogewoJCQkibmFtZSI6ICJzYW1wbGUiLAoJCQkidmVyc2lvbiI6ICIxLjAuMCIsCgkJCSJsaWNlbnNlIjogIklTQyIsCgkJCSJkZXBlbmRlbmNpZXMiOiB7CgkJCQkicmVhY3QiOiAiMTguMC4wIgoJCQl9CgkJfSwKCQkibm9kZV9tb2R1bGVzL0BiYWJlbC9ydW50aW1lIjogewoJCQkidmVyc2lvbiI6ICI3LjIwLjEzIiwKCQkJInJlc29sdmVkIjogImh0dHBzOi8vcmVnaXN0cnkubnBtanMub3JnL0BiYWJlbC9ydW50aW1lLy0vcnVudGltZS03LjIwLjEzLnRneiIsCgkJCSJpbnRlZ3JpdHkiOiAic2hhNTEyLWd0M1BLWHMwREJvTDl4Q3ZPSUlaMk5FcUFHWnFIakFubVZiZlF0QjYyMFYwdVJlSVF1dHBlbDE0S2NuZVp1ZXI3VWlvWThBTEtaN2lvY2F2dnpUTkZBPT0iLAoJCQkiZGVwZW5kZW5jaWVzIjogewoJCQkJInJlZ2VuZXJhdG9yLXJ1bnRpbWUiOiAiXjAuMTMuMTEiCgkJCX0sCgkJCSJlbmdpbmVzIjogewoJCQkJIm5vZGUiOiAiPj02LjkuMCIKCQkJfQoJCX0KCX0KfQ=="`)
+	validPackageLockBody3 := []byte(`"ewoJIm5hbWUiOiAic2FtcGxlIiwKCSJ2ZXJzaW9uIjogIjEuMC4wIiwKCSJsb2NrZmlsZVZlcnNpb24iOiAzLAoJInJlcXVpcmVzIjogdHJ1ZSwKCSJwYWNrYWdlcyI6IHsKCQkiIjogewoJCQkibmFtZSI6ICJzYW1wbGUiLAoJCQkidmVyc2lvbiI6ICIxLjAuMCIsCgkJCSJsaWNlbnNlIjogIklTQyIsCgkJCSJkZXBlbmRlbmNpZXMiOiB7CgkJCQkicmVhY3QiOiAiMTguMC4wIgoJCQl9CgkJfSwKCQkibm9kZV9tb2R1bGVzL0BiYWJlbC9ydW50aW1lIjogewoJCQkidmVyc2lvbiI6ICI3LjIwLjEzIiwKCQkJInJlc29sdmVkIjogImh0dHBzOi8vcmVnaXN0cnkubnBtanMub3JnL0BiYWJlbC9ydW50aW1lLy0vcnVudGltZS03LjIwLjEzLnRneiIsCgkJCSJpbnRlZ3JpdHkiOiAic2hhNTEyLWd0M1BLWHMwREJvTDl4Q3ZPSUlaMk5FcUFHWnFIakFubVZiZlF0QjYyMFYwdVJlSVF1dHBlbDE0S2NuZVp1ZXI3VWlvWThBTEtaN2lvY2F2dnpUTkZBPT0iLAoJCQkiZGVwZW5kZW5jaWVzIjogewoJCQkJInJlZ2VuZXJhdG9yLXJ1bnRpbWUiOiAiXjAuMTMuMTEiCgkJCX0sCgkJCSJlbmdpbmVzIjogewoJCQkJIm5vZGUiOiAiPj02LjkuMCIKCQkJfQoJCX0KCX0KfQ=="`)
 
 	tests := []struct {
 		desc    string
@@ -376,9 +383,15 @@ func TestAnalysisRequestMarshal(t *testing.T) {
 		wantErr string
 	}{
 		{
-			desc:    "valid",
-			areq:    validAnalysisRequest,
-			lock:    validPackageLockBody,
+			desc:    "valid version 1",
+			areq:    validAnalysisRequest1,
+			lock:    validPackageLockBody1,
+			wantErr: "",
+		},
+		{
+			desc:    "valid version 3",
+			areq:    validAnalysisRequest3,
+			lock:    validPackageLockBody3,
 			wantErr: "",
 		},
 		{
@@ -397,8 +410,6 @@ func TestAnalysisRequestMarshal(t *testing.T) {
 					assert.Equal(t, tc.wantErr, err.Error())
 				}
 			} else {
-				assert.Nil(t, err)
-
 				var o map[string]json.RawMessage
 				e := json.Unmarshal(res, &o)
 				assert.Nil(t, e)
