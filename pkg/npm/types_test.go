@@ -16,11 +16,15 @@
 package npm
 
 import (
+	"bytes"
+	"io"
+	"os"
 	"strings"
 	"testing"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestPackageStruct(t *testing.T) {
@@ -344,4 +348,19 @@ func TestNewPackageJSONFromReader(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestNewPackageLockJSONFromReader(t *testing.T) {
+	fixture, errFixture := os.Open("testdata/package-lock.json")
+	assert.Nil(t, errFixture)
+	defer fixture.Close()
+
+	var b bytes.Buffer
+	r := io.TeeReader(fixture, &b)
+
+	lockFromDir, errFromDir := NewPackageLockJSONFromReader(r)
+	assert.Nil(t, errFromDir)
+	require.IsType(t, &packageLockJSON{}, lockFromDir)
+
+	assert.Equal(t, b.Bytes(), lockFromDir.(*packageLockJSON).bytes)
 }
