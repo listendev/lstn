@@ -16,6 +16,7 @@
 package npm
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -181,10 +182,12 @@ func NewPackageLockJSONFromDir(ctx context.Context, dir string) (PackageLockJSON
 // NewPackageLockJSONFromReader creates a PackageLockJSON instance from by reading the contents of a package-lock.json file.
 func NewPackageLockJSONFromReader(reader io.Reader) (PackageLockJSON, error) {
 	ret := &packageLockJSON{}
-	if err := json.NewDecoder(reader).Decode(ret); err != nil {
+	var b bytes.Buffer
+	r := io.TeeReader(reader, &b)
+	if err := json.NewDecoder(r).Decode(ret); err != nil {
 		return nil, fmt.Errorf("couldn't instantiate from the input package-lock.json contents")
 	}
-	// TODO > set ret.bytes (TeeReader)
+	ret.bytes = b.Bytes()
 
 	return ret, nil
 }
