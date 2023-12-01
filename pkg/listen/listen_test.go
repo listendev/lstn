@@ -248,7 +248,7 @@ func (suite *RequestsSuite) TestAnalysisRequest() {
 		}
 	}`)))
 
-	req, err1 := NewAnalysisRequest(plj)
+	req, err1 := NewAnalysisRequest(plj, WithRequestContext())
 	suite.Assert().Nil(err1)
 
 	res1, _, err1 := Packages(req, WithBaseURL(suite.server.URL))

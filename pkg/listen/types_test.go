@@ -319,7 +319,7 @@ func TestNewAnalysisRequest(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.desc, func(t *testing.T) {
-			res, err := NewAnalysisRequest(tc.lock)
+			res, err := NewAnalysisRequest(tc.lock, WithRequestContext())
 			if err != nil {
 				assert.Nil(t, res)
 				if assert.Error(t, err) {
@@ -337,7 +337,7 @@ func TestNewAnalysisRequest(t *testing.T) {
 func TestAnalysisRequestMarshal(t *testing.T) {
 	validPackageLockJSON1, _ := npm.NewPackageLockJSONFromBytes([]byte(`{"name": "github-gist","version": "1.0.0","lockfileVersion": 1,"requires": true,"dependencies": {"@babel/runtime-corejs3": {"version": "7.12.1","resolved": "https://registry.npmjs.org/@babel/runtime-corejs3/-/runtime-corejs3-7.12.1.tgz","integrity": "sha512-umhPIcMrlBZ2aTWlWjUseW9LjQKxi1dpFlQS8DzsxB//5K+u6GLTC/JliPKHsd5kJVPIU6X/Hy0YvWOYPcMxBw==","dev": true,"requires": {"core-js-pure": "^3.0.0","regenerator-runtime": "^0.13.4"}}}}`))
 
-	validAnalysisRequest1, err := NewAnalysisRequest(validPackageLockJSON1)
+	validAnalysisRequest1, err := NewAnalysisRequest(validPackageLockJSON1, WithRequestContext())
 	assert.Nil(t, err)
 
 	validPackageLockBody1 := []byte(`"eyJuYW1lIjogImdpdGh1Yi1naXN0IiwidmVyc2lvbiI6ICIxLjAuMCIsImxvY2tmaWxlVmVyc2lvbiI6IDEsInJlcXVpcmVzIjogdHJ1ZSwiZGVwZW5kZW5jaWVzIjogeyJAYmFiZWwvcnVudGltZS1jb3JlanMzIjogeyJ2ZXJzaW9uIjogIjcuMTIuMSIsInJlc29sdmVkIjogImh0dHBzOi8vcmVnaXN0cnkubnBtanMub3JnL0BiYWJlbC9ydW50aW1lLWNvcmVqczMvLS9ydW50aW1lLWNvcmVqczMtNy4xMi4xLnRneiIsImludGVncml0eSI6ICJzaGE1MTItdW1oUEljTXJsQloyYVRXbFdqVXNlVzlMalFLeGkxZHBGbFFTOER6c3hCLy81Syt1NkdMVEMvSmxpUEtIc2Q1a0pWUElVNlgvSHkwWXZXT1lQY014Qnc9PSIsImRldiI6IHRydWUsInJlcXVpcmVzIjogeyJjb3JlLWpzLXB1cmUiOiAiXjMuMC4wIiwicmVnZW5lcmF0b3ItcnVudGltZSI6ICJeMC4xMy40In19fX0="`)
@@ -370,7 +370,7 @@ func TestAnalysisRequestMarshal(t *testing.T) {
 		}
 	}`)))
 
-	validAnalysisRequest3, err := NewAnalysisRequest(validPackageLockJSON3)
+	validAnalysisRequest3, err := NewAnalysisRequest(validPackageLockJSON3, WithRequestContext())
 	assert.Nil(t, err)
 
 	validPackageLockBody3 := []byte(`"ewoJIm5hbWUiOiAic2FtcGxlIiwKCSJ2ZXJzaW9uIjogIjEuMC4wIiwKCSJsb2NrZmlsZVZlcnNpb24iOiAzLAoJInJlcXVpcmVzIjogdHJ1ZSwKCSJwYWNrYWdlcyI6IHsKCQkiIjogewoJCQkibmFtZSI6ICJzYW1wbGUiLAoJCQkidmVyc2lvbiI6ICIxLjAuMCIsCgkJCSJsaWNlbnNlIjogIklTQyIsCgkJCSJkZXBlbmRlbmNpZXMiOiB7CgkJCQkicmVhY3QiOiAiMTguMC4wIgoJCQl9CgkJfSwKCQkibm9kZV9tb2R1bGVzL0BiYWJlbC9ydW50aW1lIjogewoJCQkidmVyc2lvbiI6ICI3LjIwLjEzIiwKCQkJInJlc29sdmVkIjogImh0dHBzOi8vcmVnaXN0cnkubnBtanMub3JnL0BiYWJlbC9ydW50aW1lLy0vcnVudGltZS03LjIwLjEzLnRneiIsCgkJCSJpbnRlZ3JpdHkiOiAic2hhNTEyLWd0M1BLWHMwREJvTDl4Q3ZPSUlaMk5FcUFHWnFIakFubVZiZlF0QjYyMFYwdVJlSVF1dHBlbDE0S2NuZVp1ZXI3VWlvWThBTEtaN2lvY2F2dnpUTkZBPT0iLAoJCQkiZGVwZW5kZW5jaWVzIjogewoJCQkJInJlZ2VuZXJhdG9yLXJ1bnRpbWUiOiAiXjAuMTMuMTEiCgkJCX0sCgkJCSJlbmdpbmVzIjogewoJCQkJIm5vZGUiOiAiPj02LjkuMCIKCQkJfQoJCX0KCX0KfQ=="`)

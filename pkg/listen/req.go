@@ -193,7 +193,15 @@ func (req AnalysisRequest) MarshalJSON() ([]byte, error) {
 	})
 }
 
-func NewAnalysisRequest(packageLockJSON npm.PackageLockJSON) (*AnalysisRequest, error) {
+type RequestOption func(*AnalysisRequest)
+
+func WithRequestContext() RequestOption {
+	return func(req *AnalysisRequest) {
+		req.Context = NewContext()
+	}
+}
+
+func NewAnalysisRequest(packageLockJSON npm.PackageLockJSON, opts ...RequestOption) (*AnalysisRequest, error) {
 	if packageLockJSON == nil {
 		return nil, fmt.Errorf("couldn't create the analysis request")
 	}
@@ -201,10 +209,13 @@ func NewAnalysisRequest(packageLockJSON npm.PackageLockJSON) (*AnalysisRequest, 
 		return nil, fmt.Errorf("couldn't create the analysis request because of invalid package-lock.json")
 	}
 
-	return &AnalysisRequest{
-		packageLockJSON,
-		NewContext(),
-	}, nil
+	req := &AnalysisRequest{packageLockJSON, nil}
+
+	for _, opt := range opts {
+		opt(req)
+	}
+
+	return req, nil
 }
 
 func (req AnalysisRequest) IsRequest() bool {

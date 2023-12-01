@@ -93,7 +93,7 @@ The verdicts it returns are listed by the name of each package and its specified
 			}
 
 			// Ask listen.dev for an analysis
-			req, err := listen.NewAnalysisRequest(packageLockJSON)
+			req, err := listen.NewAnalysisRequest(packageLockJSON, listen.WithRequestContext())
 			if err != nil {
 				return err
 			}
