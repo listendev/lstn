@@ -23,9 +23,10 @@ import (
 )
 
 type options struct {
-	baseURL string
-	ctx     context.Context
-	json    flags.JSONFlags
+	baseURL   string
+	userAgent string
+	ctx       context.Context
+	json      flags.JSONFlags
 }
 
 func newOptions(opts ...func(*options)) (*options, error) {
@@ -63,5 +64,11 @@ func WithBaseURL(input string) func(*options) {
 func WithContext(input context.Context) func(*options) {
 	return func(o *options) {
 		o.ctx = input
+	}
+}
+
+func WithUserAgent(userAgent string) func(*options) {
+	return func(o *options) {
+		o.userAgent = userAgent
 	}
 }

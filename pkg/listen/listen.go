@@ -149,7 +149,7 @@ func Packages[T Request](r T, opts ...func(*options)) (*Response, []byte, error)
 		return nil, nil, pkgcontext.OutputError(o.ctx, err)
 	}
 
-	dec, res, err := request(o.ctx, r, endpointURL, "")
+	dec, res, err := request(o.ctx, r, endpointURL, o.userAgent)
 	if err != nil {
 		return nil, nil, err
 	}
