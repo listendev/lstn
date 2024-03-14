@@ -134,7 +134,7 @@ func (req *VerdictsRequest) Ok() (bool, error) {
 	err := validate.Singleton.Struct(req)
 	if err != nil {
 		if all, isValidationErrors := err.(validate.ValidationErrors); isValidationErrors {
-			return false, fmt.Errorf(all[0].Translate(validate.Translator))
+			return false, fmt.Errorf(all[0].Translate(validate.Translator)) // Only the first one
 		}
 
 		return false, err

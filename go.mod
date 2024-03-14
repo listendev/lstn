@@ -10,7 +10,6 @@ require (
 	github.com/creasty/defaults v1.7.0
 	github.com/go-git/go-billy/v5 v5.5.0
 	github.com/go-git/go-git/v5 v5.11.0
-	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/mold/v4 v4.5.0
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/go-playground/validator/v10 v10.19.0
@@ -20,7 +19,6 @@ require (
 	github.com/imdario/mergo v0.3.13
 	github.com/itchyny/gojq v0.12.14
 	github.com/jarcoal/httpmock v1.3.1
-	github.com/leodido/go-npmpackagename v0.2.0
 	github.com/listendev/pkg v0.0.0-20240223160031-c1a6a71da942
 	github.com/matishsiao/goInfo v0.0.0-00010101000000-000000000000
 	github.com/mitchellh/mapstructure v1.5.0
@@ -57,6 +55,7 @@ require (
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-logr/logr v1.4.1 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
@@ -76,6 +75,7 @@ require (
 	github.com/juliangruber/go-intersect v1.1.0 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/leodido/go-encodeuricomponent v0.1.0 // indirect
+	github.com/leodido/go-npmpackagename v0.2.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/magiconair/properties v1.8.6 // indirect

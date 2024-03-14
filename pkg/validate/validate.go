@@ -60,6 +60,8 @@ func init() {
 		panic(err)
 	}
 
+	Singleton.RegisterAlias("digest", "len=40|len=64") // It seems cannot alias aliases (shasum and blake2b_256)
+
 	if err := Singleton.RegisterTranslation(
 		"excluded_without",
 		Translator,
