@@ -64,7 +64,7 @@ func TestNewVerdictsRequest(t *testing.T) {
 		{
 			"name+version+shasum",
 			[]string{"react", "18.2.0", "555bd98592883255fa00de14f1151a917b5d77d5"},
-			&VerdictsRequest{Name: "react", Version: "18.2.0", Shasum: "555bd98592883255fa00de14f1151a917b5d77d5"},
+			&VerdictsRequest{Name: "react", Version: "18.2.0", Digest: "555bd98592883255fa00de14f1151a917b5d77d5"},
 			"",
 		},
 	}
@@ -82,7 +82,7 @@ func TestNewVerdictsRequest(t *testing.T) {
 				assert.IsType(t, &VerdictsRequest{}, res)
 				assert.Equal(t, tc.req.Name, res.Name)
 				assert.Equal(t, tc.req.Version, res.Version)
-				assert.Equal(t, tc.req.Shasum, res.Shasum)
+				assert.Equal(t, tc.req.Digest, res.Digest)
 			}
 		})
 	}
@@ -118,7 +118,7 @@ func TestNewVerdictsRequestWithContext(t *testing.T) {
 		{
 			"name+version+shasum",
 			[]string{"react", "18.2.0", "555bd98592883255fa00de14f1151a917b5d77d5"},
-			&VerdictsRequest{Name: "react", Version: "18.2.0", Shasum: "555bd98592883255fa00de14f1151a917b5d77d5", Context: c},
+			&VerdictsRequest{Name: "react", Version: "18.2.0", Digest: "555bd98592883255fa00de14f1151a917b5d77d5", Context: c},
 			"",
 		},
 	}
@@ -136,7 +136,7 @@ func TestNewVerdictsRequestWithContext(t *testing.T) {
 				assert.IsType(t, &VerdictsRequest{}, res)
 				assert.Equal(t, tc.req.Name, res.Name)
 				assert.Equal(t, tc.req.Version, res.Version)
-				assert.Equal(t, tc.req.Shasum, res.Shasum)
+				assert.Equal(t, tc.req.Digest, res.Digest)
 				assert.Equal(t, tc.req.Context, res.Context)
 			}
 		})
