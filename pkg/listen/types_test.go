@@ -458,7 +458,7 @@ func (suite *TypesSuite) TestResponseMarshalJSON() {
 		},
 		{
 			desc:   "with verdicts",
-			reader: strings.NewReader(`[{"name":"name","version":"1.0.0","digest":"036bfebd9748309772b79753d2e9924af7707d00","verdicts":[{"pkg": "name", "version": "1.0.0", "digest": "036bfebd9748309772b79753d2e9924af7707d00", "created_at": "2023-06-22T20:12:58.911537+00:00", "categories": ["process"], "code": "STN001", "file": "static(exfiltrate_env).json", "ecosystem": "npm", "message":"message","severity":"medium","metadata":{}}]}]`),
+			reader: strings.NewReader(`[{"name":"name","version":"1.0.0","digest":"036bfebd9748309772b79753d2e9924af7707d00","verdicts":[{"pkg": "name", "version": "1.0.0", "digest": "036bfebd9748309772b79753d2e9924af7707d00", "created_at": "2023-06-22T20:12:58.911537+00:00", "categories": ["process"], "code": "STN001", "fingerprint": "fp0001", "file": "static(exfiltrate_env).json", "ecosystem": "npm", "message":"message","severity":"medium","metadata":{}}]}]`),
 			expected: Response{
 				Package{
 					Name:    "name",
@@ -466,15 +466,16 @@ func (suite *TypesSuite) TestResponseMarshalJSON() {
 					Digest:  strPtr("036bfebd9748309772b79753d2e9924af7707d00"),
 					Verdicts: []Verdict{
 						{
-							File:       "static(exfiltrate_env).json",
-							Pkg:        "name",
-							Digest:     "036bfebd9748309772b79753d2e9924af7707d00",
-							Version:    "1.0.0",
-							Categories: []category.Category{category.Process},
-							Code:       verdictcode.STN001,
-							Ecosystem:  ecosystem.Npm,
-							Message:    "message",
-							Severity:   "medium",
+							File:        "static(exfiltrate_env).json",
+							Pkg:         "name",
+							Digest:      "036bfebd9748309772b79753d2e9924af7707d00",
+							Version:     "1.0.0",
+							Categories:  []category.Category{category.Process},
+							Code:        verdictcode.STN001,
+							Fingerprint: "fp0001",
+							Ecosystem:   ecosystem.Npm,
+							Message:     "message",
+							Severity:    "medium",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
@@ -488,7 +489,7 @@ func (suite *TypesSuite) TestResponseMarshalJSON() {
 		},
 		{
 			desc:   "metadata accept any type",
-			reader: strings.NewReader(`[{"name":"name","version":"1.0.0","digest":"036bfebd9748309772b79753d2e9924af7707d00","verdicts":[{"pkg": "name", "version": "1.0.0", "digest": "036bfebd9748309772b79753d2e9924af7707d00", "created_at": "2023-06-22T20:12:58.911537+00:00", "categories": ["process"], "code": "STN001", "file": "static(exfiltrate_env).json", "ecosystem": "npm", "message":"message","severity":"medium","metadata":{"number":42,"string":"foo"}}]}]`),
+			reader: strings.NewReader(`[{"name":"name","version":"1.0.0","digest":"036bfebd9748309772b79753d2e9924af7707d00","verdicts":[{"pkg": "name", "version": "1.0.0", "digest": "036bfebd9748309772b79753d2e9924af7707d00", "created_at": "2023-06-22T20:12:58.911537+00:00", "categories": ["process"], "fingerprint": "fp0001", "code": "STN001", "file": "static(exfiltrate_env).json", "ecosystem": "npm", "message":"message","severity":"medium","metadata":{"number":42,"string":"foo"}}]}]`),
 			expected: Response{
 				Package{
 					Name:    "name",
@@ -496,15 +497,16 @@ func (suite *TypesSuite) TestResponseMarshalJSON() {
 					Digest:  strPtr("036bfebd9748309772b79753d2e9924af7707d00"),
 					Verdicts: []Verdict{
 						{
-							File:       "static(exfiltrate_env).json",
-							Pkg:        "name",
-							Digest:     "036bfebd9748309772b79753d2e9924af7707d00",
-							Version:    "1.0.0",
-							Categories: []category.Category{category.Process},
-							Code:       verdictcode.STN001,
-							Ecosystem:  ecosystem.Npm,
-							Message:    "message",
-							Severity:   "medium",
+							File:        "static(exfiltrate_env).json",
+							Pkg:         "name",
+							Digest:      "036bfebd9748309772b79753d2e9924af7707d00",
+							Version:     "1.0.0",
+							Categories:  []category.Category{category.Process},
+							Fingerprint: "fp0001",
+							Code:        verdictcode.STN001,
+							Ecosystem:   ecosystem.Npm,
+							Message:     "message",
+							Severity:    "medium",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
