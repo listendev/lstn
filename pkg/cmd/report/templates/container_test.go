@@ -67,7 +67,7 @@ func TestRenderContainer(t *testing.T) {
 						{
 							Pkg:     "react",
 							Version: "18.0.0",
-							Shasum:  "555bd98592883255fa00de14f1151a917b5d77d5",
+							Digest:  "555bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
@@ -88,7 +88,7 @@ func TestRenderContainer(t *testing.T) {
 						{
 							Pkg:     "react",
 							Version: "18.0.0",
-							Shasum:  "555bd98592883255fa00de14f1151a917b5d77d5",
+							Digest:  "555bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
@@ -109,7 +109,7 @@ func TestRenderContainer(t *testing.T) {
 						{
 							Pkg:     "react",
 							Version: "18.0.0",
-							Shasum:  "555bd98592883255fa00de14f1151a917b5d77d5",
+							Digest:  "555bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
@@ -130,7 +130,7 @@ func TestRenderContainer(t *testing.T) {
 						{
 							Pkg:     "react",
 							Version: "18.0.0",
-							Shasum:  "555bd98592883255fa00de14f1151a917b5d77d5",
+							Digest:  "555bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
@@ -157,7 +157,7 @@ func TestRenderContainer(t *testing.T) {
 						{
 							Pkg:     "bufferutil",
 							Version: "4.0.7",
-							Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
+							Digest:  "777bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
@@ -178,7 +178,7 @@ func TestRenderContainer(t *testing.T) {
 						{
 							Pkg:     "bufferutil",
 							Version: "4.0.7",
-							Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
+							Digest:  "777bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
@@ -199,7 +199,7 @@ func TestRenderContainer(t *testing.T) {
 						{
 							Pkg:     "bufferutil",
 							Version: "4.0.7",
-							Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
+							Digest:  "777bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
@@ -220,7 +220,7 @@ func TestRenderContainer(t *testing.T) {
 						{
 							Pkg:     "bufferutil",
 							Version: "4.0.7",
-							Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
+							Digest:  "777bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
@@ -241,7 +241,7 @@ func TestRenderContainer(t *testing.T) {
 						{
 							Pkg:     "bufferutil",
 							Version: "4.0.7",
-							Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
+							Digest:  "777bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
@@ -262,7 +262,7 @@ func TestRenderContainer(t *testing.T) {
 						{
 							Pkg:     "bufferutil",
 							Version: "4.0.7",
-							Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
+							Digest:  "777bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
@@ -283,7 +283,7 @@ func TestRenderContainer(t *testing.T) {
 						{
 							Pkg:     "bufferutil",
 							Version: "4.0.7",
-							Shasum:  "777bd98592883255fa00de14f1151a917b5d77d5",
+							Digest:  "777bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
@@ -363,7 +363,7 @@ func TestRenderContainer(t *testing.T) {
 						{
 							Pkg:     "foo",
 							Version: "1.0.0",
-							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
+							Digest:  "333bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
@@ -384,7 +384,7 @@ func TestRenderContainer(t *testing.T) {
 						{
 							Pkg:     "foo",
 							Version: "1.0.0",
-							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
+							Digest:  "333bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
@@ -405,7 +405,7 @@ func TestRenderContainer(t *testing.T) {
 						{
 							Pkg:     "foo",
 							Version: "1.0.0",
-							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
+							Digest:  "333bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
@@ -426,7 +426,7 @@ func TestRenderContainer(t *testing.T) {
 						{
 							Pkg:     "foo",
 							Version: "1.0.0",
-							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
+							Digest:  "333bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
@@ -447,7 +447,7 @@ func TestRenderContainer(t *testing.T) {
 						{
 							Pkg:     "foo",
 							Version: "1.0.0",
-							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
+							Digest:  "333bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
@@ -468,7 +468,7 @@ func TestRenderContainer(t *testing.T) {
 						{
 							Pkg:     "foo",
 							Version: "1.0.0",
-							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
+							Digest:  "333bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 
@@ -511,7 +511,7 @@ func TestRenderContainer(t *testing.T) {
 						{
 							Pkg:     "baz",
 							Version: "1.0.0",
-							Shasum:  "333bd98592883255fa00de14f1151a917b5d77d5",
+							Digest:  "333bd98592883255fa00de14f1151a917b5d77d5",
 							CreatedAt: func() *time.Time {
 								t, _ := time.Parse(time.RFC3339Nano, "2023-06-22T20:12:58.911537+00:00")
 

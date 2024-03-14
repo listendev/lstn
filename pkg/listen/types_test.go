@@ -468,7 +468,7 @@ func (suite *TypesSuite) TestResponseMarshalJSON() {
 						{
 							File:       "static(exfiltrate_env).json",
 							Pkg:        "name",
-							Shasum:     "036bfebd9748309772b79753d2e9924af7707d00",
+							Digest:     "036bfebd9748309772b79753d2e9924af7707d00",
 							Version:    "1.0.0",
 							Categories: []category.Category{category.Process},
 							Code:       verdictcode.STN001,
@@ -498,7 +498,7 @@ func (suite *TypesSuite) TestResponseMarshalJSON() {
 						{
 							File:       "static(exfiltrate_env).json",
 							Pkg:        "name",
-							Shasum:     "036bfebd9748309772b79753d2e9924af7707d00",
+							Digest:     "036bfebd9748309772b79753d2e9924af7707d00",
 							Version:    "1.0.0",
 							Categories: []category.Category{category.Process},
 							Code:       verdictcode.STN001,
