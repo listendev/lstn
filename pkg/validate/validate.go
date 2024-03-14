@@ -19,10 +19,10 @@ import (
 	"reflect"
 	"strings"
 
-	en "github.com/go-playground/locales/en"
+	"github.com/listendev/pkg/validate"
+
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
-	en_translations "github.com/go-playground/validator/v10/translations/en"
 )
 
 type ValidationErrors = validator.ValidationErrors
@@ -36,9 +36,11 @@ var Singleton *validator.Validate
 var Translator ut.Translator
 
 func init() {
-	Singleton = validator.New()
+	Singleton = validate.Singleton
+	Translator = validate.Translator
 
 	// Register a function to get the field name from "name" tags.
+	// This overrides the one coming with validate.Singleton.
 	Singleton.RegisterTagNameFunc(func(fld reflect.StructField) string {
 		name := strings.SplitN(fld.Tag.Get("name"), ",", 2)[0]
 		if name == "-" {
@@ -54,34 +56,7 @@ func init() {
 	if err := Singleton.RegisterValidation("jq", jqQueryCompiles); err != nil {
 		panic(err)
 	}
-	if err := Singleton.RegisterValidation("npm_package_name", isNpmPackageName); err != nil {
-		panic(err)
-	}
 	if err := Singleton.RegisterValidation("version_constraint", isVersionConstraint); err != nil {
-		panic(err)
-	}
-
-	Singleton.RegisterAlias("shasum", "len=40")
-	Singleton.RegisterAlias("mandatory", "required")
-
-	eng := en.New()
-	Translator, _ = (ut.New(eng, eng)).GetTranslator("en")
-	if err := en_translations.RegisterDefaultTranslations(Singleton, Translator); err != nil {
-		panic(err)
-	}
-
-	if err := Singleton.RegisterTranslation(
-		"mandatory",
-		Translator,
-		func(ut ut.Translator) error {
-			return ut.Add("mandatory", "{0} is mandatory", true)
-		},
-		func(ut ut.Translator, fe validator.FieldError) string {
-			t, _ := ut.T("mandatory", fe.Field())
-
-			return t
-		},
-	); err != nil {
 		panic(err)
 	}
 
