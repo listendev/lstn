@@ -255,8 +255,8 @@ func (suite *RequestsSuite) TestAnalysisRequest() {
 	suite.Assert().Nil(err1)
 
 	exp1 := &Response{
-		Package{Name: "js-tokens", Version: strPtr("4.0.0"), Shasum: strPtr("19203fb59991df98e3a287050d4647cdeaf32499"), Verdicts: []Verdict{}},
-		Package{Name: "loose-envify", Version: strPtr("1.4.0"), Shasum: strPtr("71ee51fa7be4caec1a63839f7e682d8132d30caf"), Verdicts: []Verdict{}},
+		Package{Name: "js-tokens", Version: strPtr("4.0.0"), Digest: strPtr("19203fb59991df98e3a287050d4647cdeaf32499"), Verdicts: []Verdict{}},
+		Package{Name: "loose-envify", Version: strPtr("1.4.0"), Digest: strPtr("71ee51fa7be4caec1a63839f7e682d8132d30caf"), Verdicts: []Verdict{}},
 	}
 	suite.Assert().Equal(exp1, res1)
 
@@ -276,7 +276,7 @@ func (suite *RequestsSuite) TestVerdictsRequest() {
 	suite.Assert().Nil(err1)
 
 	exp1 := &Response{
-		Package{Name: "js-tokens", Version: strPtr("4.0.0"), Shasum: strPtr("19203fb59991df98e3a287050d4647cdeaf32499"), Verdicts: []Verdict{}},
+		Package{Name: "js-tokens", Version: strPtr("4.0.0"), Digest: strPtr("19203fb59991df98e3a287050d4647cdeaf32499"), Verdicts: []Verdict{}},
 	}
 	suite.Assert().Equal(exp1, res1)
 
