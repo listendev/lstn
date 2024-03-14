@@ -446,24 +446,24 @@ func (suite *TypesSuite) TestResponseMarshalJSON() {
 		},
 		{
 			desc:   "without verdicts",
-			reader: strings.NewReader(`[{"name":"name","version":"version","shasum":"shasum","verdicts":[]}]`),
+			reader: strings.NewReader(`[{"name":"name","version":"version","digest":"shasum","verdicts":[]}]`),
 			expected: Response{
 				Package{
 					Name:     "name",
 					Version:  strPtr("version"),
-					Shasum:   strPtr("shasum"),
+					Digest:   strPtr("shasum"),
 					Verdicts: []Verdict{},
 				},
 			},
 		},
 		{
 			desc:   "with verdicts",
-			reader: strings.NewReader(`[{"name":"name","version":"1.0.0","shasum":"036bfebd9748309772b79753d2e9924af7707d00","verdicts":[{"pkg": "name", "version": "1.0.0", "shasum": "036bfebd9748309772b79753d2e9924af7707d00", "created_at": "2023-06-22T20:12:58.911537+00:00", "categories": ["process"], "code": "STN001", "file": "static(exfiltrate_env).json", "ecosystem": "npm", "message":"message","severity":"medium","metadata":{}}]}]`),
+			reader: strings.NewReader(`[{"name":"name","version":"1.0.0","digest":"036bfebd9748309772b79753d2e9924af7707d00","verdicts":[{"pkg": "name", "version": "1.0.0", "digest": "036bfebd9748309772b79753d2e9924af7707d00", "created_at": "2023-06-22T20:12:58.911537+00:00", "categories": ["process"], "code": "STN001", "file": "static(exfiltrate_env).json", "ecosystem": "npm", "message":"message","severity":"medium","metadata":{}}]}]`),
 			expected: Response{
 				Package{
 					Name:    "name",
 					Version: strPtr("1.0.0"),
-					Shasum:  strPtr("036bfebd9748309772b79753d2e9924af7707d00"),
+					Digest:  strPtr("036bfebd9748309772b79753d2e9924af7707d00"),
 					Verdicts: []Verdict{
 						{
 							File:       "static(exfiltrate_env).json",
@@ -488,12 +488,12 @@ func (suite *TypesSuite) TestResponseMarshalJSON() {
 		},
 		{
 			desc:   "metadata accept any type",
-			reader: strings.NewReader(`[{"name":"name","version":"1.0.0","shasum":"036bfebd9748309772b79753d2e9924af7707d00","verdicts":[{"pkg": "name", "version": "1.0.0", "shasum": "036bfebd9748309772b79753d2e9924af7707d00", "created_at": "2023-06-22T20:12:58.911537+00:00", "categories": ["process"], "code": "STN001", "file": "static(exfiltrate_env).json", "ecosystem": "npm", "message":"message","severity":"medium","metadata":{"number":42,"string":"foo"}}]}]`),
+			reader: strings.NewReader(`[{"name":"name","version":"1.0.0","digest":"036bfebd9748309772b79753d2e9924af7707d00","verdicts":[{"pkg": "name", "version": "1.0.0", "digest": "036bfebd9748309772b79753d2e9924af7707d00", "created_at": "2023-06-22T20:12:58.911537+00:00", "categories": ["process"], "code": "STN001", "file": "static(exfiltrate_env).json", "ecosystem": "npm", "message":"message","severity":"medium","metadata":{"number":42,"string":"foo"}}]}]`),
 			expected: Response{
 				Package{
 					Name:    "name",
 					Version: strPtr("1.0.0"),
-					Shasum:  strPtr("036bfebd9748309772b79753d2e9924af7707d00"),
+					Digest:  strPtr("036bfebd9748309772b79753d2e9924af7707d00"),
 					Verdicts: []Verdict{
 						{
 							File:       "static(exfiltrate_env).json",
@@ -518,12 +518,12 @@ func (suite *TypesSuite) TestResponseMarshalJSON() {
 		},
 		{
 			desc:   "with problems",
-			reader: strings.NewReader(`[{"name":"name","version":"version","shasum":"shasum","problems":[{"type":"type","title":"title","detail":"detail"}]}]`),
+			reader: strings.NewReader(`[{"name":"name","version":"version","digest":"shasum","problems":[{"type":"type","title":"title","detail":"detail"}]}]`),
 			expected: Response{
 				Package{
 					Name:    "name",
 					Version: strPtr("version"),
-					Shasum:  strPtr("shasum"),
+					Digest:  strPtr("shasum"),
 					Problems: []Problem{
 						{
 							Type:   "type",
