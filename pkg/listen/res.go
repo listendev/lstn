@@ -30,7 +30,7 @@ type Package struct {
 	Problems []Problem `json:"problems,omitempty"`
 
 	// Shasum shasum of the package
-	Shasum *string `json:"shasum,omitempty"`
+	Digest *string `json:"digest,omitempty"`
 
 	// Verdicts A list of verdicts
 	Verdicts []Verdict `json:"verdicts"`
@@ -38,6 +38,7 @@ type Package struct {
 	// Version version of the package
 	Version *string `json:"version,omitempty"`
 }
+
 type Response []Package
 
 type responseError struct {
