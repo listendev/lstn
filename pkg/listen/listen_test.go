@@ -16,8 +16,8 @@
 package listen
 
 import (
-	"bytes"
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -173,10 +173,10 @@ func (suite *RequestsSuite) BeforeTest(suiteName, testName string) {
 
 	switch testName {
 	case "TestAnalysisRequest":
-		resp := []byte(`[{"name":"js-tokens","shasum":"19203fb59991df98e3a287050d4647cdeaf32499","verdicts":[],"version":"4.0.0"},{"name":"loose-envify","shasum":"71ee51fa7be4caec1a63839f7e682d8132d30caf","verdicts":[],"version":"1.4.0"}]`)
+		resp := []byte(`[{"name":"js-tokens","digest":"19203fb59991df98e3a287050d4647cdeaf32499","verdicts":[],"version":"4.0.0"},{"name":"loose-envify","digest":"71ee51fa7be4caec1a63839f7e682d8132d30caf","verdicts":[],"version":"1.4.0"}]`)
 		suite.server = internaltesting.MockHTTPServer(suite.Assert(), "analysis", resp, http.StatusOK, "POST")
 	case "TestVerdictsRequest":
-		resp := []byte(`[{"name":"js-tokens","shasum":"19203fb59991df98e3a287050d4647cdeaf32499","verdicts":[],"version":"4.0.0"}]`)
+		resp := []byte(`[{"name":"js-tokens","digest":"19203fb59991df98e3a287050d4647cdeaf32499","verdicts":[],"version":"4.0.0"}]`)
 		suite.server = internaltesting.MockHTTPServer(suite.Assert(), "verdicts", resp, http.StatusOK, "POST")
 	}
 }
@@ -263,9 +263,9 @@ func (suite *RequestsSuite) TestAnalysisRequest() {
 	_, res2, err2 := Packages(req, WithBaseURL(suite.server.URL), WithJSONOptions(flags.JSONFlags{JSON: true}))
 	suite.Assert().Nil(err2)
 
-	exp2 := []byte(`[{"name":"js-tokens","shasum":"19203fb59991df98e3a287050d4647cdeaf32499","verdicts":[],"version":"4.0.0"},{"name":"loose-envify","shasum":"71ee51fa7be4caec1a63839f7e682d8132d30caf","verdicts":[],"version":"1.4.0"}]`)
-
-	suite.Assert().Equal(exp2, bytes.TrimSuffix(res2, []byte("\n")))
+	exp2 := &Response{}
+	suite.Assert().Nil(json.Unmarshal(res2, exp2))
+	suite.Assert().Equal(exp2, exp1)
 }
 
 func (suite *RequestsSuite) TestVerdictsRequest() {
@@ -283,9 +283,9 @@ func (suite *RequestsSuite) TestVerdictsRequest() {
 	_, res2, err2 := Packages(req, WithBaseURL(suite.server.URL), WithJSONOptions(flags.JSONFlags{JSON: true}))
 	suite.Assert().Nil(err2)
 
-	exp2 := []byte(`[{"name":"js-tokens","shasum":"19203fb59991df98e3a287050d4647cdeaf32499","verdicts":[],"version":"4.0.0"}]`)
-
-	suite.Assert().Equal(exp2, bytes.TrimSuffix(res2, []byte("\n")))
+	exp2 := &Response{}
+	suite.Assert().Nil(json.Unmarshal(res2, exp2))
+	suite.Assert().Equal(exp1, exp2)
 }
 
 func TestRequestsSuite(t *testing.T) {
