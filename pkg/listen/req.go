@@ -34,7 +34,7 @@ type Request interface {
 type VerdictsRequest struct {
 	Name    string   `json:"name" name:"name" validate:"mandatory"`
 	Version string   `json:"version,omitempty" validate:"omitempty,semver"`
-	Shasum  string   `json:"shasum,omitempty" validate:"omitempty,shasum"`
+	Digest  string   `json:"digest,omitempty" validate:"omitempty,digest"`
 	Select  string   `json:"select,omitempty"`
 	Context *Context `json:"context,omitempty"`
 }
@@ -42,7 +42,7 @@ type VerdictsRequest struct {
 func fillVerdictsRequest(r *VerdictsRequest, args []string) (*VerdictsRequest, error) {
 	switch len(args) {
 	case 3:
-		r.Shasum = args[2]
+		r.Digest = args[2]
 
 		fallthrough
 	case 2:
