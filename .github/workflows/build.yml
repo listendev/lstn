@@ -16,11 +16,11 @@ jobs:
           - darwin
           - windows
         go:
-          - "1.20"
+          - "1.21"
         include:
           # Set the minimum Go patch version for the given Go minor
-          - go: "1.20"
-            GO_VERSION: "~1.20.0"
+          - go: "1.21"
+            GO_VERSION: "~1.21.0"
     runs-on: ubuntu-latest
     continue-on-error: true
 
@@ -46,7 +46,7 @@ jobs:
         run: git fetch --force --tags
 
       - name: Set up Go ${{ matrix.go }}
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: ${{ matrix.GO_VERSION }}
           check-latest: true
@@ -72,7 +72,7 @@ jobs:
           make/make GOOS=$GOOS lstn
 
       - name: Generate docs
-        if: ${{ github.event_name == 'pull_request' && matrix.goos == 'linux' && matrix.go == '1.20' }}
+        if: ${{ github.event_name == 'pull_request' && matrix.goos == 'linux' && matrix.go == '1.21' }}
         run: |
           GITHUB_ACTIONS= GITHUB_EVENT_PATH= ./lstn manual 2> docs/cheatsheet.md
           ./lstn config 2> docs/configuration.md
@@ -81,7 +81,7 @@ jobs:
           ./lstn reporters 2> docs/reporters.md
 
       - name: Update docs
-        if: ${{ github.event_name == 'pull_request' && matrix.goos == 'linux' && matrix.go == '1.20' }}
+        if: ${{ github.event_name == 'pull_request' && matrix.goos == 'linux' && matrix.go == '1.21' }}
         uses: EndBug/add-and-commit@v9
         with:
           default_author: github_actor
@@ -91,33 +91,33 @@ jobs:
           push: true
 
       - name: Archive the artifact(s)
-        if: ${{ matrix.go == '1.20' && matrix.goos != 'windows' }}
-        uses: actions/upload-artifact@v3
+        if: ${{ matrix.go == '1.21' && matrix.goos != 'windows' }}
+        uses: actions/upload-artifact@v4
         with:
           name: artifact-${{ matrix.goos }}
           path: ./lstn
           retention-days: 1
 
       - name: Archive the artifact(s)
-        if: ${{ matrix.go == '1.20' && matrix.goos == 'windows' }}
-        uses: actions/upload-artifact@v3
+        if: ${{ matrix.go == '1.21' && matrix.goos == 'windows' }}
+        uses: actions/upload-artifact@v4
         with:
           name: artifact-${{ matrix.goos }}
           path: ./lstn.exe
           retention-days: 1
 
   version-darwin:
-    name: "check version (darwin, 1.20)"
+    name: "check version (darwin, 1.21)"
     needs: build
     runs-on: macos-latest
     steps:
       - name: Check out the source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Avoid running against a shallow clone
 
       - name: Get binaries
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: artifact-darwin
           path: .
@@ -132,18 +132,18 @@ jobs:
           [[ "lstn ${latest_tag}" == $(./lstn version 2>&1) ]]
 
   version-linux:
-    name: "check version (linux, 1.20)"
+    name: "check version (linux, 1.21)"
     needs: build
     runs-on: ubuntu-latest
 
     steps:
       - name: Check out the source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Avoid running against a shallow clone
 
       - name: Get binaries
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: artifact-linux
           path: .
@@ -158,18 +158,18 @@ jobs:
           [[ "lstn ${latest_tag}" == $(./lstn version 2>&1) ]]
 
   version-windows:
-    name: "check version (windows, 1.20)"
+    name: "check version (windows, 1.21)"
     needs: build
     runs-on: windows-latest
 
     steps:
       - name: Check out the source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Avoid running against a shallow clone
 
       - name: Get binaries
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: artifact-windows
           path: .
