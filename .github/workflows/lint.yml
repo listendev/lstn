@@ -16,6 +16,8 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
+  checks: write
 
 jobs:
   lint:
@@ -24,12 +26,13 @@ jobs:
 
     steps:
       - name: Check out the source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Set up Go 1.20
-        uses: actions/setup-go@v4
+      - name: Set up Go 1.21
+        uses: actions/setup-go@v5
         with:
-          go-version: "1.20"
+          go-version: "1.21"
+          cache: false
 
       - name: Verify the dependencies
         run: |
@@ -37,7 +40,8 @@ jobs:
           go mod download
 
       - name: Lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v4
         with:
-          version: v1.51.0
-          args: --timeout 15m0s --verbose --out-${IGNORE_FUTURE_WARNINGS}format tab
+          version: v1.54
+          args: --timeout 20m0s --verbose --out-${IGNORE_FUTURE_WARNINGS}format tab
+          only-new-issues: true # Show only new issues on pull requests
