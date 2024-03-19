@@ -202,8 +202,19 @@ func NewPackageLockJSONFromBytes(b []byte) (PackageLockJSON, error) {
 	return ret, nil
 }
 
+// GetPackageLockJsonFromDir creates a PackageLockJSON instance from the existing package-lock.json in dir, if any.
+func GetPackageLockJsonFromDir(dir string) (PackageLockJSON, error) {
+	reader, err := read(dir, "package-lock.json")
+	if err != nil {
+		return nil, err
+	}
+
+	return NewPackageLockJSONFromReader(reader)
+}
+
+// GetPackageJSONFromDir creates a PackageJSON instance from the existing package.json in dir, if any.
 func GetPackageJSONFromDir(dir string) (PackageJSON, error) {
-	reader, err := readPackageJSON(dir)
+	reader, err := read(dir, "package.json")
 	if err != nil {
 		return nil, err
 	}
