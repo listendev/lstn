@@ -75,7 +75,6 @@ archives:
         {{- with .Mips }}_{{ . }}{{ end }}
         {{- if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}
     wrap_in_directory: true
-    rlcp: true
     format: tar.gz
     files:
       - LICENSE
