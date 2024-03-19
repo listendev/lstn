@@ -86,10 +86,19 @@ The verdicts it returns are listed by the name of each package and its specified
 				return fmt.Errorf("couldn't get to know on which directory you want me to listen in")
 			}
 
-			// Unmarshal the package-lock.json file contents to a struct
-			packageLockJSON, err := npm.NewPackageLockJSONFromDir(ctx, targetDir)
-			if err != nil {
-				return err
+			var packageLockJSON npm.PackageLockJSON
+			var packageLockJSONErr error
+
+			if inOpts.GenerateLock {
+				// Try to generate a package-lock.json file on the fly
+				packageLockJSON, packageLockJSONErr = npm.NewPackageLockJSONFromDir(ctx, targetDir)
+			}
+			// Fallback to reading the package-lock.json in the target directory
+			if packageLockJSONErr != nil || !inOpts.GenerateLock {
+				packageLockJSON, packageLockJSONErr = npm.GetPackageLockJsonFromDir(targetDir)
+			}
+			if packageLockJSONErr != nil {
+				return packageLockJSONErr
 			}
 
 			// Ask listen.dev for an analysis
