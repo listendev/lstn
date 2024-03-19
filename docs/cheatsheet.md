@@ -75,7 +75,8 @@ Inspect the verdicts for your dependencies tree.
 ### Flags
 
 ```
---json   output the verdicts (if any) in JSON form
+--genlock   whether to generate the lock file on the fly or not
+--json      output the verdicts (if any) in JSON form
 ```
 
 ### Config Flags
