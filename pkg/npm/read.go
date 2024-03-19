@@ -22,16 +22,18 @@ import (
 	"path/filepath"
 )
 
-func readPackageJSON(dir string) (io.Reader, error) {
-	name := filepath.Join(dir, "package.json")
+func read(dir, filename string) (io.Reader, error) {
+	name := filepath.Join(dir, filename)
 
 	f, err := activeFS.Open(name)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, fmt.Errorf("directory %s does not contain a package.json file", dir)
+			return nil, fmt.Errorf("directory %s does not contain the %s file", dir, filename)
+		} else if os.IsPermission(err) {
+			return nil, fmt.Errorf("insufficient permission to open %s", name)
 		}
 
-		return nil, fmt.Errorf("couldn't read the package.json file")
+		return nil, fmt.Errorf("couldn't read the %s file", filename)
 	}
 
 	return f, nil
