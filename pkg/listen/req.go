@@ -159,7 +159,7 @@ func (req VerdictsRequest) MarshalJSON() ([]byte, error) {
 
 // AnalysisRequest represents the payload for the analysis listen.dev API endpoint.
 type AnalysisRequest struct {
-	PackageLockJSON npm.PackageLockJSON `json:"package-lock" name:"package lock" validate:"mandatory"`
+	PackageLockJSON npm.PackageLockJSON `json:"manifest" name:"package lock" validate:"mandatory"`
 	Context         *Context            `json:"context,omitempty"`
 }
 
@@ -186,7 +186,7 @@ func (req AnalysisRequest) MarshalJSON() ([]byte, error) {
 	type AnalysisRequestAlias AnalysisRequest
 
 	return json.Marshal(&struct {
-		PackageLockJSON string `json:"package-lock"`
+		PackageLockJSON string `json:"manifest"`
 		*AnalysisRequestAlias
 	}{
 		PackageLockJSON:      req.PackageLockJSON.Encode(),
