@@ -414,7 +414,7 @@ func TestAnalysisRequestMarshal(t *testing.T) {
 				e := json.Unmarshal(res, &o)
 				assert.Nil(t, e)
 
-				assert.Equal(t, tc.lock, []byte(o["package-lock"]))
+				assert.Equal(t, tc.lock, []byte(o["manifest"]))
 			}
 		})
 	}
