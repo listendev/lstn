@@ -19,7 +19,7 @@ require (
 	github.com/imdario/mergo v0.3.13
 	github.com/itchyny/gojq v0.12.14
 	github.com/jarcoal/httpmock v1.3.1
-	github.com/listendev/pkg v0.0.0-20240223160031-c1a6a71da942
+	github.com/listendev/pkg v0.0.0-20240319104911-2671ef1f1207
 	github.com/matishsiao/goInfo v0.0.0-00010101000000-000000000000
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/muja/goconfig v0.0.0-20180417074348-0a635507dddc
@@ -85,7 +85,7 @@ require (
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect
 	github.com/muesli/termenv v0.13.0 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
-	github.com/pelletier/go-toml/v2 v2.0.5 // indirect
+	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rabbitmq/amqp091-go v1.9.0 // indirect
