@@ -107,7 +107,7 @@ func (o *ConfigFlags) SetDefaults() {
 	}
 	if defaults.CanUpdate(o.Reporting.Types) {
 		// Create the enum flag value for --reporter
-		enumValues := goneric.MapToSlice(func(t cmd.ReportType, v []string) string {
+		enumValues := goneric.MapToSlice(func(_ cmd.ReportType, v []string) string {
 			return v[0]
 		}, cmd.ReporterTypeIDs)
 		sort.Strings(enumValues)

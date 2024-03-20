@@ -39,7 +39,7 @@ func New(ctx context.Context) (*cobra.Command, error) {
 		Annotations: map[string]string{
 			"source": project.GetSourceURL(filename),
 		},
-		RunE: func(c *cobra.Command, args []string) error {
+		RunE: func(c *cobra.Command, _ []string) error {
 			ctx = c.Context()
 
 			// Obtain the local options from the context

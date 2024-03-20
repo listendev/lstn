@@ -91,7 +91,7 @@ func cReference(w io.Writer, c *cobra.Command, depth int) {
 }
 
 func manualHelpTopicFunc() TopicFunc {
-	return func(c *cobra.Command, args []string) {
+	return func(c *cobra.Command, _ []string) {
 		b := bytes.NewBufferString("# lstn cheatsheet\n\n")
 
 		// NOTE > Assuming c.Parent() is the root one

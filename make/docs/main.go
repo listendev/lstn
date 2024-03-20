@@ -46,7 +46,7 @@ func getManpages(ctx context.Context) *cobra.Command {
 		SilenceUsage:          true,
 		DisableFlagsInUseLine: true,
 		Short:                 "Generate lstn manpages.",
-		RunE: func(c *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			rootFlagValues, ok := ctx.Value(rootFlagsKey).(*rootFlags)
 			if !ok {
 				return fmt.Errorf("couldn't obtain the flag values from the context")
@@ -68,7 +68,7 @@ func newRoot(ctx context.Context) error {
 		SilenceUsage: true,
 		Short:        "Generate lstn documentation.",
 		Args:         cobra.ExactArgs(1),
-		PersistentPreRunE: func(c *cobra.Command, args []string) error {
+		PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
 			// Eventually validate rootF struct
 
 			return nil

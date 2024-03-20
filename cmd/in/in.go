@@ -95,7 +95,7 @@ The verdicts it returns are listed by the name of each package and its specified
 			}
 			// Fallback to reading the package-lock.json in the target directory
 			if packageLockJSONErr != nil || !inOpts.GenerateLock {
-				packageLockJSON, packageLockJSONErr = npm.GetPackageLockJsonFromDir(targetDir)
+				packageLockJSON, packageLockJSONErr = npm.GetPackageLockJSONFromDir(targetDir)
 			}
 			if packageLockJSONErr != nil {
 				return packageLockJSONErr

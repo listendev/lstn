@@ -103,7 +103,7 @@ func (suite *FlagsBaseSuite) TestValidate() {
 	}
 
 	for _, tc := range cases {
-		suite.T().Run(tc.desc, func(t *testing.T) {
+		suite.T().Run(tc.desc, func(_ *testing.T) {
 			actual := Validate(tc.o)
 			assert.Equal(suite.T(), len(tc.expectedStr), len(actual))
 			for _, a := range actual {
