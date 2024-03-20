@@ -46,8 +46,8 @@ func TestChildCommands(t *testing.T) {
 			name:    "lstn in",
 			cmdline: []string{"in"},
 			stdout:  "",
-			stderr:  "Running without a configuration file\nError: directory _CWD_ does not contain a package.json file\n",
-			errstr:  "directory _CWD_ does not contain a package.json file",
+			stderr:  "Running without a configuration file\nError: directory _CWD_ does not contain the package-lock.json file\n",
+			errstr:  "directory _CWD_ does not contain the package-lock.json file",
 		},
 		// lstn to
 		{
@@ -266,7 +266,8 @@ Examples:
   lstn in sub/dir
 
 Flags:
-      --json   output the verdicts (if any) in JSON form
+      --genlock   whether to generate the lock file on the fly or not
+      --json      output the verdicts (if any) in JSON form
 
 Config Flags:
       --endpoint string   the listen.dev endpoint emitting the verdicts (default "https://npm.listen.dev")
@@ -299,6 +300,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
+	"genlock": false,
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -331,6 +333,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": "https://npm.listen.dev",
+	"genlock": false,
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -363,6 +366,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": "https://npm-staging.listen.dev",
+	"genlock": false,
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
