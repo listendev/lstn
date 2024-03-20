@@ -33,7 +33,7 @@ func init() {
 	Singleton = modifiers.New()
 	Singleton.SetTagName("transform")
 
-	Singleton.Register("unique", func(ctx context.Context, fl mold.FieldLevel) error {
+	Singleton.Register("unique", func(_ context.Context, fl mold.FieldLevel) error {
 		if fl.Field().Kind() == reflect.Slice {
 			unique := fl.Field().Interface()
 			switch fl.Field().Type().Elem().String() {

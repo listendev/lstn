@@ -540,7 +540,7 @@ func (suite *TypesSuite) TestResponseMarshalJSON() {
 
 	for _, tc := range cases {
 		r := new(Response)
-		t.Run(tc.desc, func(t *testing.T) {
+		t.Run(tc.desc, func(_ *testing.T) {
 			dec := json.NewDecoder(tc.reader)
 			suite.NoError(dec.Decode(r))
 			suite.Equal(*r, tc.expected)

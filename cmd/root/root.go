@@ -75,7 +75,7 @@ func New(ctx context.Context) (*Command, error) {
 		Annotations: map[string]string{
 			"source": project.GetSourceURL(filename),
 		},
-		PersistentPreRunE: func(c *cobra.Command, args []string) error {
+		PersistentPreRunE: func(c *cobra.Command, _ []string) error {
 			// Do not check for the config file if the command is not available (eg., help) or not core (eg., version)
 			withConfigFile := false
 			c, _, err := c.Find(os.Args[1:])
@@ -240,7 +240,7 @@ func New(ctx context.Context) (*Command, error) {
 
 			return nil
 		},
-		PersistentPostRunE: func(c *cobra.Command, args []string) error {
+		PersistentPostRunE: func(c *cobra.Command, _ []string) error {
 			contextCancel, ok := c.Context().Value(pkgcontext.ContextCancelFuncKey).(context.CancelFunc)
 			if !ok {
 				return fmt.Errorf("couldn't obtain configuration options")

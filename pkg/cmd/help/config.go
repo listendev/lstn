@@ -27,7 +27,7 @@ import (
 )
 
 func configHelpTopicFunc() TopicFunc {
-	return func(c *cobra.Command, args []string) {
+	return func(c *cobra.Command, _ []string) {
 		b := bytes.NewBufferString("# lstn configuration file\n\n")
 		fmt.Fprintf(b, "%s\n\n", "The `lstn` CLI looks for a configuration file .lstn.yaml in your `$HOME` directory when it starts.")
 		fmt.Fprintf(b, "%s\n", "In this file you can set the values for the global `lstn` configurations.")

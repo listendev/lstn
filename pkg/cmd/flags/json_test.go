@@ -45,21 +45,21 @@ func (suite *FlagsJSONSuite) TestQuery() {
 }
 
 func (suite *FlagsJSONSuite) TestOutput() {
-	suite.T().Run("Failure", func(t *testing.T) {
+	suite.T().Run("Failure", func(_ *testing.T) {
 		i := &JSONFlags{JSON: false, JQ: "."}
 		input := bytes.NewReader([]byte("{\"key\":\"value\"}"))
 		var output bytes.Buffer
 		assert.EqualError(suite.T(), i.GetOutput(context.Background(), input, &output), "cannot output JSON")
 	})
 	suite.T().Run("Success", func(t *testing.T) {
-		t.Run("QueryGetAll", func(t *testing.T) {
+		t.Run("QueryGetAll", func(_ *testing.T) {
 			i := &JSONFlags{JSON: true, JQ: "."}
 			input := bytes.NewReader([]byte("{\"key\":\"value\"}"))
 			var output bytes.Buffer
 			assert.NoError(suite.T(), i.GetOutput(context.Background(), input, &output))
 			assert.Equal(suite.T(), "{\"key\":\"value\"}\n", output.String())
 		})
-		t.Run("QueryGetValue", func(t *testing.T) {
+		t.Run("QueryGetValue", func(_ *testing.T) {
 			i := &JSONFlags{JSON: true, JQ: ".key"}
 			input := bytes.NewReader([]byte("{\"key\":\"value\"}"))
 			var output bytes.Buffer

@@ -26,7 +26,7 @@ import (
 )
 
 func envHelpTopicFunc() TopicFunc {
-	return func(c *cobra.Command, args []string) {
+	return func(c *cobra.Command, _ []string) {
 		b := bytes.NewBufferString("# lstn environment variables\n\n")
 		fmt.Fprintf(b, "%s\n\n", "The environment variables override any corresponding configuration setting.")
 		fmt.Fprintf(b, "%s\n\n", "But flags override them.")

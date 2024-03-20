@@ -24,7 +24,7 @@ import (
 )
 
 func reportersHelpTopicFunc() TopicFunc {
-	return func(c *cobra.Command, args []string) {
+	return func(c *cobra.Command, _ []string) {
 		b := bytes.NewBufferString("# lstn reporters\n\n")
 
 		for _, reportType := range cmd.AllReportTypes {
