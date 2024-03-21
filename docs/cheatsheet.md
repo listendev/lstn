@@ -180,8 +180,7 @@ Inspect the verdicts for your direct dependencies.
 ### Token Flags
 
 ```
---gh-token string    set the GitHub token
---jwt-token string   set the listen.dev auth token
+--gh-token string   set the GitHub token
 ```
 
 For example:
