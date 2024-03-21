@@ -562,6 +562,73 @@ Global Flags:
 			stderr: "Running without a configuration file\n",
 			errstr: "",
 		},
+		// LSTN_JWT_TOKEN=some123jwt.aaa.zzz lstn scan --debug-options
+		{
+			name: "LSTN_JWT_TOKEN=some123jwt.aaa.zzz lstn scan --debug-options",
+			envvar: map[string]string{
+				"LSTN_JWT_TOKEN":     "some123jwt.aaa.zzz",
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
+			cmdline: []string{"scan", "--debug-options"},
+			stdout: heredoc.Doc(`{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "",
+	"ignore-deptypes": [
+		110
+	],
+	"ignore-packages": null,
+	"jq": "",
+	"json": false,
+	"jwt-token": "some123jwt.aaa.zzz",
+	"loglevel": "info",
+	"npm-registry": "https://registry.npmjs.org",
+	"reporter": [],
+	"select": "",
+	"timeout": 60
+}
+`),
+			stderr: "Running without a configuration file\n",
+			errstr: "",
+		},
+		// LSTN_JWT_TOKEN=some123jwt.aaa.xxx lstn in --debug-options
+		{
+			name: "LSTN_JWT_TOKEN=some123jwt.aaa.xxx lstn in --debug-options",
+			envvar: map[string]string{
+				"LSTN_JWT_TOKEN":     "some123jwt.aaa.xxx",
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
+			cmdline: []string{"in", "--debug-options"},
+			stdout: heredoc.Doc(`{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"genlock": false,
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "",
+	"ignore-deptypes": [
+		110
+	],
+	"ignore-packages": null,
+	"jq": "",
+	"json": false,
+	"jwt-token": "some123jwt.aaa.xxx",
+	"loglevel": "info",
+	"npm-registry": "https://registry.npmjs.org",
+	"reporter": [],
+	"select": "",
+	"timeout": 60
+}
+`),
+			stderr: "Running without a configuration file\n",
+			errstr: "",
+		},
 		// lstn scan --debug-options --config testdata/config_reporting.yaml
 		{
 			name: "lstn scan --debug-options --config testdata/config_reporting.yaml",
