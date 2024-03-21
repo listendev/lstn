@@ -41,18 +41,21 @@ const (
 	GitHubPullCommentReport
 	GitHubPullReviewReport
 	GitHubPullCheckReport
+	ListenPro
 )
 
 var AllReportTypes = []ReportType{
 	GitHubPullCommentReport,
 	GitHubPullReviewReport,
 	GitHubPullCheckReport,
+	ListenPro,
 }
 
 var ReporterTypeIDs = map[ReportType][]string{
 	GitHubPullCommentReport: {GitHubPullCommentReport.String()},
 	GitHubPullCheckReport:   {GitHubPullCheckReport.String()},
 	GitHubPullReviewReport:  {GitHubPullReviewReport.String()},
+	ListenPro:               {ListenPro.String()},
 }
 
 func (t ReportType) String() string {
@@ -63,6 +66,8 @@ func (t ReportType) String() string {
 		return "gh-pull-review"
 	case GitHubPullCheckReport:
 		return "gh-pull-check"
+	case ListenPro:
+		return "pro"
 	default:
 		return "all"
 	}
@@ -73,6 +78,21 @@ func (t ReportType) Doc() string {
 	ghFlags := "`--gh-repo`, `--gh-owner`, `--gh-pull-id`"
 
 	switch t {
+	case ListenPro:
+		ret := heredoc.Docf(`
+It reports results to the listen.dev product.
+
+It works only when specifying the API token (JWT) for your product subscription.
+The target GitHub pull request comes from the values of the GitHub reporter flags (ie., %s).
+Same for other GitHub values. Notice those values are automatically set when %s detects it is running in a GitHub Action.
+
+### Status
+
+Working.
+`,
+			ghFlags, lstn)
+
+		return ret
 	case GitHubPullCommentReport:
 		ret := heredoc.Docf(`
 It reports results as a sticky comment on the target GitHub pull request.
