@@ -566,7 +566,7 @@ Global Flags:
 		{
 			name: "LSTN_JWT_TOKEN=some123jwt.aaa.zzz lstn scan --debug-options",
 			envvar: map[string]string{
-				"LSTN_JWT_TOKEN":     "some123jwt.aaa.zzz",
+				"LSTN_JWT_TOKEN": "some123jwt.aaa.zzz",
 				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
 				"GITHUB_ACTIONS": "",
 			},
@@ -599,7 +599,7 @@ Global Flags:
 		{
 			name: "LSTN_JWT_TOKEN=some123jwt.aaa.xxx lstn in --debug-options",
 			envvar: map[string]string{
-				"LSTN_JWT_TOKEN":     "some123jwt.aaa.xxx",
+				"LSTN_JWT_TOKEN": "some123jwt.aaa.xxx",
 				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
 				"GITHUB_ACTIONS": "",
 			},
