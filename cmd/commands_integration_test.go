@@ -171,7 +171,8 @@ Reporting Flags:
   -r, --reporter (gh-pull-check,gh-pull-comment,gh-pull-review)   set one or more reporters to use (default [])
 
 Token Flags:
-      --gh-token string   set the GitHub token
+      --gh-token string    set the GitHub token
+      --jwt-token string   set the listen.dev auth token
 
 Global Flags:
       --config string   config file (default is $HOME/.lstn.yaml)
@@ -200,6 +201,7 @@ Global Flags:
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -231,6 +233,7 @@ Global Flags:
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://some.io",
 	"reporter": [],
@@ -283,6 +286,10 @@ Filtering Flags:
 Registry Flags:
       --npm-registry string   set a custom NPM registry (default "https://registry.npmjs.org")
 
+Token Flags:
+      --gh-token string    set the GitHub token
+      --jwt-token string   set the listen.dev auth token
+
 Global Flags:
       --config string   config file (default is $HOME/.lstn.yaml)
 `),
@@ -311,6 +318,7 @@ Global Flags:
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -344,6 +352,7 @@ Global Flags:
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -377,6 +386,7 @@ Global Flags:
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -409,6 +419,7 @@ Global Flags:
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [
@@ -451,6 +462,7 @@ Global Flags:
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [
@@ -500,6 +512,7 @@ Global Flags:
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [
@@ -538,6 +551,7 @@ Global Flags:
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.com",
 	"reporter": [],
@@ -570,6 +584,7 @@ Global Flags:
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://some.io",
 	"reporter": [
@@ -608,6 +623,7 @@ Global Flags:
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://some.io",
 	"reporter": [
@@ -647,6 +663,7 @@ Global Flags:
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://some.io",
 	"reporter": [
@@ -680,6 +697,7 @@ Global Flags:
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [
@@ -717,6 +735,7 @@ Global Flags:
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -800,6 +819,7 @@ Global Flags:
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -835,6 +855,7 @@ Global Flags:
 	],
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -870,6 +891,7 @@ Global Flags:
 	],
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -904,6 +926,7 @@ Global Flags:
 	],
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -938,6 +961,7 @@ Global Flags:
 	],
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -972,6 +996,7 @@ Global Flags:
 	],
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -1007,6 +1032,7 @@ Global Flags:
 	],
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -1042,6 +1068,7 @@ Global Flags:
 	],
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://smtg.io",
 	"reporter": [],
@@ -1078,6 +1105,7 @@ Global Flags:
 	],
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://smtg.io",
 	"reporter": [],
@@ -1114,6 +1142,7 @@ Global Flags:
 	],
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://smtg.io",
 	"reporter": [],
@@ -1160,6 +1189,7 @@ Global Flags:
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -1194,6 +1224,7 @@ Global Flags:
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -1231,6 +1262,7 @@ Global Flags:
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -1267,6 +1299,7 @@ Global Flags:
 	],
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://smtg.io",
 	"reporter": [],
@@ -1304,6 +1337,7 @@ Global Flags:
 	],
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://smtg.io",
 	"reporter": [],
@@ -1341,6 +1375,7 @@ Global Flags:
 	],
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://smtg.io",
 	"reporter": [],
@@ -1381,6 +1416,7 @@ Global Flags:
 	],
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://smtg.io",
 	"reporter": [],
@@ -1412,6 +1448,7 @@ Global Flags:
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -1444,6 +1481,7 @@ Global Flags:
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -1476,6 +1514,7 @@ Global Flags:
 	"ignore-packages": null,
 	"jq": "",
 	"json": false,
+	"jwt-token": "",
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
