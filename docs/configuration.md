@@ -33,4 +33,5 @@ reporting:
 timeout: 60
 token: 
   github: "..."
+  jwt: "..."
 ```

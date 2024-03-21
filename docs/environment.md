@@ -18,6 +18,8 @@ But flags override them.
 
 `LSTN_IGNORE_PACKAGES`: the list of packages to not process
 
+`LSTN_JWT_TOKEN`: set the listen.dev auth token
+
 `LSTN_LOGLEVEL`: set the logging level
 
 `LSTN_NPM_REGISTRY`: set a custom NPM registry

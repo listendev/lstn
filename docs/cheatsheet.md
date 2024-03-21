@@ -105,6 +105,13 @@ Inspect the verdicts for your dependencies tree.
 --npm-registry string   set a custom NPM registry (default "https://registry.npmjs.org")
 ```
 
+### Token Flags
+
+```
+--gh-token string    set the GitHub token
+--jwt-token string   set the listen.dev auth token
+```
+
 For example:
 
 ```bash
@@ -173,7 +180,8 @@ Inspect the verdicts for your direct dependencies.
 ### Token Flags
 
 ```
---gh-token string   set the GitHub token
+--gh-token string    set the GitHub token
+--jwt-token string   set the listen.dev auth token
 ```
 
 For example:
