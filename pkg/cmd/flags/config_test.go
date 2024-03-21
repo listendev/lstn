@@ -59,13 +59,14 @@ func (suite *FlagsConfigSuite) TestNewConfigFlagsDefaults() {
 
 func (suite *FlagsConfigSuite) TestGetConfigFlagsNames() {
 	m := GetNames(&ConfigFlags{})
-	assert.Equal(suite.T(), 12, len(m))
+	assert.Equal(suite.T(), 13, len(m))
 
 	expected := make(map[string]string)
 	expected["loglevel"] = "LogLevel"
 	expected["endpoint"] = "Endpoint"
 	expected["timeout"] = "Timeout"
 	expected["gh-token"] = "Token.GitHub"
+	expected["jwt-token"] = "Token.JWT"
 	expected["gh-pull-id"] = "Reporting.GitHub.Pull.ID"
 	expected["gh-repo"] = "Reporting.GitHub.Repo"
 	expected["gh-owner"] = "Reporting.GitHub.Owner"
