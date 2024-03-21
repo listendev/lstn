@@ -35,6 +35,7 @@ var _ cmd.Options = (*ConfigFlags)(nil)
 
 type Token struct {
 	GitHub string `name:"GitHub token" flag:"gh-token" desc:"set the GitHub token" flagset:"Token" json:"gh-token"`
+	JWT    string `name:"JWT token" flag:"jwt-token" desc:"set the listen.dev auth token" flagset:"Token" json:"jwt-token"`
 }
 
 type Registry struct {
