@@ -23,7 +23,6 @@ import (
 
 	"github.com/cli/cli/pkg/iostreams"
 	"github.com/listendev/lstn/internal/project"
-	"github.com/listendev/lstn/pkg/cmd"
 	"github.com/listendev/lstn/pkg/cmd/arguments"
 	"github.com/listendev/lstn/pkg/cmd/groups"
 	"github.com/listendev/lstn/pkg/cmd/options"
@@ -110,7 +109,7 @@ The verdicts it returns are listed by the name of each package and its specified
 
 			// Process one dependency set at once
 			tablePrinter := packagesprinter.NewTablePrinter(io)
-			combinedResponse := []listen.Package{}
+			combinedResponse := listen.Response{}
 			for _, deps := range deps {
 				// Create list of verdicts requests
 				reqs, bulkErr := listen.NewBulkVerdictsRequestsFromMap(deps, scanOpts.ConfigFlags.Filtering.Expression)
@@ -143,42 +142,12 @@ The verdicts it returns are listed by the name of each package and its specified
 				return nil
 			}
 
-			err = tablePrinter.RenderPackages((*listen.Response)(&combinedResponse))
+			err = tablePrinter.RenderPackages(&combinedResponse)
 			if err != nil {
 				return err
 			}
 
-			cs := io.ColorScheme()
-			for _, r := range scanOpts.Reporting.Types {
-				rString := cs.Gray(fmt.Sprintf("%q", r.String()))
-				c.Printf("Reporting using the %s reporter...\n", rString)
-
-				switch r {
-				case cmd.GitHubPullCommentReport:
-					rep, runnable, err := reporterfactory.Make(ctx, r)
-					if runnable && err != nil {
-						return err
-					}
-					// Move on when the current reporter cannot run in the current context
-					if !runnable {
-						c.PrintErrf("Exiting: %s.\n", err)
-
-						continue
-					}
-
-					err = rep.Run(combinedResponse)
-					if err != nil {
-						return fmt.Errorf("error while executing the %q reporter: %w", r.String(), err)
-					}
-					c.Printf("The report has been successfully sent using the %s reporter... %s\n", rString, cs.SuccessIcon())
-				case cmd.GitHubPullCheckReport:
-					c.PrintErrf("The %s reporter is coming soon...\n", rString)
-				case cmd.GitHubPullReviewReport:
-					c.PrintErrf("The %s reporter is coming soon...\n", rString)
-				}
-			}
-
-			return nil
+			return reporterfactory.Exec(c, scanOpts.Reporting, combinedResponse)
 		},
 	}
 
