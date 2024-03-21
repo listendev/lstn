@@ -18,11 +18,17 @@ package factory
 import (
 	"context"
 	"errors"
+	"fmt"
 
+	"github.com/cli/cli/pkg/iostreams"
 	"github.com/listendev/lstn/pkg/ci"
 	"github.com/listendev/lstn/pkg/cmd"
+	"github.com/listendev/lstn/pkg/cmd/flags"
+	pkgcontext "github.com/listendev/lstn/pkg/context"
+	"github.com/listendev/lstn/pkg/listen"
 	"github.com/listendev/lstn/pkg/reporter"
 	ghcomment "github.com/listendev/lstn/pkg/reporter/gh/comment"
+	"github.com/spf13/cobra"
 )
 
 var (
@@ -72,4 +78,47 @@ func Make(ctx context.Context, reportType cmd.ReportType) (r reporter.Reporter, 
 	default:
 		return nil, true, ErrReporterNotFound
 	}
+}
+
+func Exec(c *cobra.Command, reportingOpts flags.Reporting, resp listen.Response) error {
+	ctx := c.Context()
+	var cs *iostreams.ColorScheme
+	io, ok := ctx.Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
+	if ok {
+		cs = io.ColorScheme()
+	}
+
+	for _, r := range reportingOpts.Types {
+		rString := fmt.Sprintf("%q", r.String())
+		if cs != nil {
+			rString = cs.Gray(rString)
+		}
+		c.Printf("Reporting using the %s reporter...\n", rString)
+
+		switch r {
+		case cmd.GitHubPullCommentReport:
+			rep, runnable, err := Make(c.Context(), r)
+			if runnable && err != nil {
+				return err
+			}
+			// Move on when the current reporter cannot run in the current context
+			if !runnable {
+				c.PrintErrf("Exiting: %s.\n", err)
+
+				continue
+			}
+
+			err = rep.Run(resp)
+			if err != nil {
+				return fmt.Errorf("error while executing the %q reporter: %w", r.String(), err)
+			}
+			c.Printf("The report has been successfully sent using the %s reporter... %s\n", rString, cs.SuccessIcon())
+		case cmd.GitHubPullCheckReport:
+			c.PrintErrf("The %s reporter is coming soon...\n", rString)
+		case cmd.GitHubPullReviewReport:
+			c.PrintErrf("The %s reporter is coming soon...\n", rString)
+		}
+	}
+
+	return nil
 }
