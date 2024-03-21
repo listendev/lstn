@@ -31,3 +31,15 @@ When `lstn` detect it is running from a fork repository, due to [GitHub Actions 
 
 TBD.
 
+## pro
+
+It reports results to the listen.dev product.
+
+It works only when specifying the API token (JWT) for your product subscription.
+The target GitHub pull request comes from the values of the GitHub reporter flags (ie., `--gh-repo`, `--gh-owner`, `--gh-pull-id`).
+Same for other GitHub values. Notice those values are automatically set when `lstn` detects it is running in a GitHub Action.
+
+### Status
+
+Working.
+
