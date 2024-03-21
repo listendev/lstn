@@ -165,10 +165,10 @@ Registry Flags:
       --npm-registry string   set a custom NPM registry (default "https://registry.npmjs.org")
 
 Reporting Flags:
-      --gh-owner string                                           set the GitHub owner name (org|user)
-      --gh-pull-id int                                            set the GitHub pull request ID
-      --gh-repo string                                            set the GitHub repository name
-  -r, --reporter (gh-pull-check,gh-pull-comment,gh-pull-review)   set one or more reporters to use (default [])
+      --gh-owner string                                               set the GitHub owner name (org|user)
+      --gh-pull-id int                                                set the GitHub pull request ID
+      --gh-repo string                                                set the GitHub repository name
+  -r, --reporter (gh-pull-check,gh-pull-comment,gh-pull-review,pro)   set one or more reporters to use (default [])
 
 Token Flags:
       --gh-token string   set the GitHub token
@@ -284,6 +284,12 @@ Filtering Flags:
 
 Registry Flags:
       --npm-registry string   set a custom NPM registry (default "https://registry.npmjs.org")
+
+Reporting Flags:
+      --gh-owner string                                               set the GitHub owner name (org|user)
+      --gh-pull-id int                                                set the GitHub pull request ID
+      --gh-repo string                                                set the GitHub repository name
+  -r, --reporter (gh-pull-check,gh-pull-comment,gh-pull-review,pro)   set one or more reporters to use (default [])
 
 Token Flags:
       --gh-token string    set the GitHub token
@@ -778,6 +784,40 @@ Global Flags:
 			stderr: "Running without a configuration file\n",
 			errstr: "",
 		},
+		// lstn scan --debug-options --reporter pro
+		{
+			name: "lstn scan --debug-options --reporter pro",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
+			cmdline: []string{"scan", "--debug-options", "--reporter", "pro"},
+			stdout: heredoc.Doc(`{
+	"debug-options": true,
+	"endpoint": "https://npm.listen.dev",
+	"gh-owner": "",
+	"gh-pull-id": 0,
+	"gh-repo": "",
+	"gh-token": "",
+	"ignore-deptypes": [
+		110
+	],
+	"ignore-packages": null,
+	"jq": "",
+	"json": false,
+	"jwt-token": "",
+	"loglevel": "info",
+	"npm-registry": "https://registry.npmjs.org",
+	"reporter": [
+		55
+	],
+	"select": "",
+	"timeout": 60
+}
+`),
+			stderr: "Running without a configuration file\n",
+			errstr: "",
+		},
 		// FIXME: COMPLETE ME
 		// lstn scan --debug-options --ignore-deptypes dev,dev --ignore-deptypes optional,dev
 		{
@@ -1230,8 +1270,8 @@ Global Flags:
 			},
 			cmdline: []string{"scan", "--debug-options"},
 			stdout:  "",
-			stderr:  "Running without a configuration file\nError: reporter must be 'gh-pull-check', 'gh-pull-comment', 'gh-pull-review'; got wrong\n",
-			errstr:  "reporter must be 'gh-pull-check', 'gh-pull-comment', 'gh-pull-review'; got wrong",
+			stderr:  "Running without a configuration file\nError: reporter must be 'gh-pull-check', 'gh-pull-comment', 'gh-pull-review', 'pro'; got wrong\n",
+			errstr:  "reporter must be 'gh-pull-check', 'gh-pull-comment', 'gh-pull-review', 'pro'; got wrong",
 		},
 		// lstn scan --ignore-deptypes dev,peer,dev --debug-options
 		{
