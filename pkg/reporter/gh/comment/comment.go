@@ -68,7 +68,7 @@ func (r *rep) WithConfigOptions(opts *flags.ConfigFlags) {
 	r.opts = opts
 }
 
-func (r *rep) WithContinuousIntegrationInfo(info *ci.Info) {
+func (r *rep) WithContinuousIntegrationInfo(_ *ci.Info) {
 	// Do Nothing
 }
 
@@ -133,7 +133,7 @@ func (r *rep) Run(res listen.Response) error {
 
 // CanRun tells whether this reporter is being executed on a GitHub pull request
 // (in which case it returns a true value) or not.
-// FIXME: this is now unused (see pkg/reporter/factory/factory.go): it exists only for tests
+// FIXME: this is now unused (see pkg/reporter/factory/factory.go): it exists only for tests.
 func (r *rep) CanRun() bool {
 	ghOpts := r.opts.Reporting.GitHub
 
