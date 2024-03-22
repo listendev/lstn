@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/cli/cli/pkg/iostreams"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/listendev/lstn/pkg/ci"
 	"github.com/listendev/lstn/pkg/cmd"
 	"github.com/listendev/lstn/pkg/cmd/flags"
@@ -28,6 +29,7 @@ import (
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/listendev/lstn/pkg/reporter"
 	ghcomment "github.com/listendev/lstn/pkg/reporter/gh/comment"
+	"github.com/listendev/lstn/pkg/reporter/pro"
 	"github.com/spf13/cobra"
 )
 
@@ -36,6 +38,7 @@ var (
 	ErrReporterUnsupportedEnvironment = errors.New("the reporter is not running in a supported environment")
 	ErrReporterNotOnPullRequest       = errors.New("the reporter is not running against a GitHub pull request")
 	ErrReporterCantWrite              = errors.New("the GitHub token the reporter is running with is read-only")
+	ErrReporterOnFork                 = errors.New("the GitHub action is running on a pull request of a fork")
 )
 
 // Make creates a new reporter.Reporter.
@@ -51,6 +54,27 @@ var (
 // everything the reporter being instantiated needs.
 func Make(ctx context.Context, reportType cmd.ReportType) (r reporter.Reporter, canRun bool, err error) {
 	switch reportType {
+	case cmd.ListenPro:
+		info, infoErr := ci.NewInfo()
+		if infoErr != nil {
+			spew.Dump(infoErr)
+			return nil, false, ErrReporterUnsupportedEnvironment
+		}
+
+		// This reporter doesn't run on forks at the moment
+		if info.IsGitHubPullRequest() {
+			if info.HasReadOnlyGitHubToken() {
+				return nil, false, ErrReporterOnFork
+			}
+		}
+
+		r, err := pro.New(ctx, reporter.WithContinuousIntegrationInfo(info))
+		if err != nil {
+			return nil, true, err
+		}
+
+		return r, true, nil
+
 	case cmd.GitHubPullCommentReport:
 		r, err := ghcomment.New(ctx)
 		if err != nil {
@@ -71,6 +95,7 @@ func Make(ctx context.Context, reportType cmd.ReportType) (r reporter.Reporter, 
 			// NOTE: see links below
 			// https://docs.github.com/en/actions/reference/events-that-trigger-workflows#pull_request_target
 			// https://help.github.com/en/actions/automating-your-workflow-with-github-actions/development-tools-for-github-actions#logging-commands.
+
 			return nil, false, ErrReporterCantWrite
 		}
 
@@ -96,6 +121,9 @@ func Exec(c *cobra.Command, reportingOpts flags.Reporting, resp listen.Response)
 		c.Printf("Reporting using the %s reporter...\n", rString)
 
 		switch r {
+		case cmd.ListenPro:
+			fallthrough
+
 		case cmd.GitHubPullCommentReport:
 			rep, runnable, err := Make(c.Context(), r)
 			if runnable && err != nil {
@@ -113,8 +141,10 @@ func Exec(c *cobra.Command, reportingOpts flags.Reporting, resp listen.Response)
 				return fmt.Errorf("error while executing the %q reporter: %w", r.String(), err)
 			}
 			c.Printf("The report has been successfully sent using the %s reporter... %s\n", rString, cs.SuccessIcon())
+
 		case cmd.GitHubPullCheckReport:
 			c.PrintErrf("The %s reporter is coming soon...\n", rString)
+
 		case cmd.GitHubPullReviewReport:
 			c.PrintErrf("The %s reporter is coming soon...\n", rString)
 		}
