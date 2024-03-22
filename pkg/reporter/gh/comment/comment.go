@@ -23,6 +23,7 @@ import (
 	"strings"
 
 	"github.com/google/go-github/v53/github"
+	"github.com/listendev/lstn/pkg/ci"
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	"github.com/listendev/lstn/pkg/cmd/report"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
@@ -43,7 +44,7 @@ func New(ctx context.Context, opts ...reporter.Option) (reporter.Reporter, error
 	// Those are mandatory because they contain the GitHub reporting options
 	cfgOpts, ok := ctx.Value(pkgcontext.ConfigKey).(*flags.ConfigFlags)
 	if cfgOpts == nil || !ok {
-		return nil, fmt.Errorf("couldn't retrieve the reporter options")
+		return nil, fmt.Errorf("couldn't retrieve the config options")
 	}
 
 	ret := &rep{
@@ -65,6 +66,10 @@ func (r *rep) WithGitHubClient(client *github.Client) {
 
 func (r *rep) WithConfigOptions(opts *flags.ConfigFlags) {
 	r.opts = opts
+}
+
+func (r *rep) WithContinuousIntegrationInfo(info *ci.Info) {
+	// Do Nothing
 }
 
 func (r *rep) stickyComment(owner string, repo string, id int, comment io.Reader) error {
@@ -128,7 +133,7 @@ func (r *rep) Run(res listen.Response) error {
 
 // CanRun tells whether this reporter is being executed on a GitHub pull request
 // (in which case it returns a true value) or not.
-// FIXME: this is now unused (see pkg/reporter/factory/factory.go): move that code here or remove this function.
+// FIXME: this is now unused (see pkg/reporter/factory/factory.go): it exists only for tests
 func (r *rep) CanRun() bool {
 	ghOpts := r.opts.Reporting.GitHub
 
