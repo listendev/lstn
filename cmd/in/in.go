@@ -29,6 +29,7 @@ import (
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/listendev/lstn/pkg/npm"
+	reporterfactory "github.com/listendev/lstn/pkg/reporter/factory"
 	"github.com/spf13/cobra"
 )
 
@@ -126,7 +127,12 @@ The verdicts it returns are listed by the name of each package and its specified
 
 			tablePrinter := packagesprinter.NewTablePrinter(io)
 
-			return tablePrinter.RenderPackages(res)
+			err = tablePrinter.RenderPackages(res)
+			if err != nil {
+				return err
+			}
+
+			return reporterfactory.Exec(c, inOpts.Reporting, *res)
 		},
 	}
 
