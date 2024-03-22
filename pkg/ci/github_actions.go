@@ -20,8 +20,27 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/caarlos0/env/v10"
 	"github.com/google/go-github/v53/github"
 )
+
+func NewInfoFromGitHub() (*Info, error) {
+	// Fetch from event JSON
+	info, err := NewInfoFromGitHubEvent()
+	if err != nil {
+		return nil, err
+	}
+
+	// Fetch from environment
+	if err := env.ParseWithOptions(
+		info,
+		env.Options{UseFieldNameByDefault: false},
+	); err != nil {
+		return nil, err
+	}
+
+	return info, nil
+}
 
 // NewInfoFromGitHubEvent creates an Info instance using the the file on the GitHub action runner
 // that contains the full event webhook payload.
