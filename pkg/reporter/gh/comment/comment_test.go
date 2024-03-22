@@ -22,6 +22,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ghetzel/testify/require"
 	"github.com/google/go-github/v53/github"
 	"github.com/jarcoal/httpmock"
 	"github.com/listendev/lstn/pkg/cmd/flags"
@@ -89,7 +90,9 @@ func TestReporterCanRun(t *testing.T) {
 				assert.Error(t, err)
 			} else {
 				assert.Nil(t, err)
-				assert.Equal(t, tc.want, r.CanRun())
+				rep, isRep := r.(*rep)
+				require.True(t, isRep)
+				assert.Equal(t, tc.want, rep.CanRun())
 			}
 		})
 	}
