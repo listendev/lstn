@@ -23,6 +23,7 @@ import (
 
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
+	"github.com/go-playground/validator/v10/non-standard/validators"
 )
 
 type ValidationErrors = validator.ValidationErrors
@@ -57,6 +58,9 @@ func init() {
 		panic(err)
 	}
 	if err := Singleton.RegisterValidation("version_constraint", isVersionConstraint); err != nil {
+		panic(err)
+	}
+	if err := Singleton.RegisterValidation("notblank", validators.NotBlank); err != nil {
 		panic(err)
 	}
 
@@ -110,13 +114,13 @@ func init() {
 	}
 
 	if err := Singleton.RegisterTranslation(
-		"npm_package_name",
+		"version_constraint",
 		Translator,
 		func(ut ut.Translator) error {
-			return ut.Add("npm_package_name", "{0} is not a valid npm package name", true)
+			return ut.Add("version_constraint", "{0} is not a valid version constraint", true)
 		},
 		func(ut ut.Translator, fe validator.FieldError) string {
-			t, _ := ut.T("npm_package_name", fe.Field())
+			t, _ := ut.T("version_constraint", fe.Field())
 
 			return t
 		},
@@ -125,13 +129,13 @@ func init() {
 	}
 
 	if err := Singleton.RegisterTranslation(
-		"version_constraint",
+		"notblank",
 		Translator,
 		func(ut ut.Translator) error {
-			return ut.Add("version_constraint", "{0} is not a valid version constraint", true)
+			return ut.Add("notblank", "{0} cannot be blank", true)
 		},
 		func(ut ut.Translator, fe validator.FieldError) string {
-			t, _ := ut.T("version_constraint", fe.Field())
+			t, _ := ut.T("notblank", fe.Field())
 
 			return t
 		},
