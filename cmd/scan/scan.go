@@ -165,7 +165,6 @@ The verdicts it returns are listed by the name of each package and its specified
 
 	// Pass the options through the context
 	ctx = context.WithValue(ctx, pkgcontext.ScanKey, scanOpts)
-
 	scanCmd.SetContext(ctx)
 
 	return scanCmd, nil

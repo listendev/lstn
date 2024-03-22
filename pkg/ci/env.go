@@ -20,13 +20,38 @@ import (
 )
 
 type Info struct {
-	Owner     string
-	Repo      string
-	SHA       string
-	Num       int // Pull (merge) request number
-	Branch    string
-	Fork      bool
-	EventName string
+	Owner            string
+	Repo             string
+	SHA              string
+	Num              int    // Pull (merge) request number
+	Branch           string // Pull (merge) request branch
+	Fork             bool
+	Action           string `env:"GITHUB_ACTION"`
+	ActionPath       string `env:"GITHUB_ACTION_PATH"`
+	ActionRepository string `env:"GITHUB_ACTION_REPOSITORY"`
+	Actor            string `env:"GITHUB_ACTOR"`
+	ActorID          int    `env:"GITHUB_ACTOR_ID"`
+	EventName        string
+	Job              string `env:"GITHUB_JOB"`
+	Ref              string `env:"GITHUB_REF"`
+	RefName          string `env:"GITHUB_REF_NAME"`
+	RefProtected     string `env:"GITHUB_REF_PROTECTED"`
+	RefType          string `env:"GITHUB_REF_TYPE"`
+	RepoFullName     string `env:"GITHUB_REPOSITORY"`
+	RepoID           int64  `env:"GITHUB_REPOSITORY_ID"`
+	RepoOwner        string `env:"GITHUB_REPOSITORY_OWNER"`
+	RepoOwnerID      int64  `env:"GITHUB_REPOSITORY_OWNER_ID"`
+	RunAttempt       int64  `env:"GITHUB_RUN_ATTEMPT"`
+	RunID            int64  `env:"GITHUB_RUN_ID"`
+	RunNumber        int64  `env:"GITHUB_RUN_NUMBER"`
+	RunnerArch       string `env:"RUNNER_ARCH"`
+	RunnerDebug      bool   `env:"RUNNER_DEBUG"`
+	RunnerOs         string `env:"RUNNER_OS"`
+	SeverURL         string `env:"GITHUB_SERVER_URL"`
+	TriggeringActor  string `env:"GITHUB_TRIGGERING_ACTOR"`
+	Workflow         string `env:"GITHUB_WORKFLOW"`
+	WorkflowRef      string `env:"GITHUB_WORKFLOW_REF"`
+	Workspace        string `env:"GITHUB_WORKSPACE"`
 }
 
 func (i *Info) IsGitHubPullRequest() bool {
@@ -44,7 +69,7 @@ func (i *Info) HasReadOnlyGitHubToken() bool {
 // NewInfo creates a Info from environment variables.
 func NewInfo() (*Info, error) {
 	if IsRunningInGitHubAction() {
-		return NewInfoFromGitHubEvent()
+		return NewInfoFromGitHub()
 	}
 
 	// TODO: implement logic for other CI systems
