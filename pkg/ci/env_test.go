@@ -57,7 +57,7 @@ func TestNewInfo_GitHubActionsPushEvent(t *testing.T) {
 		Repo:  "reviewdog",
 		SHA:   "febdd4bf26c6e8856c792303cfc66fa5e7bc975b",
 	}
-	if diff := cmp.Diff(exp, got, cmpopts.IgnoreFields(Info{}, "EventName")); diff != "" {
+	if diff := cmp.Diff(exp, got, cmpopts.IgnoreFields(Info{}, "EventName", "Action", "ActionPath", "ActionRepository", "Actor", "ActorID", "Job", "Ref", "RefName", "RefProtected", "RefType", "RepoFullName", "RepoID", "RepoOwner", "RepoOwnerID", "RunAttempt", "RunID", "RunNumber", "RunnerArch", "RunnerOs", "SeverURL", "TriggeringActor", "Workflow", "WorkflowRef", "Workspace")); diff != "" {
 		t.Errorf("info mismatch (-want +got):\n%s", diff)
 	}
 
@@ -83,7 +83,7 @@ func TestNewInfo_GitHubActionsPullRequestEvent(t *testing.T) {
 		Num:    285,
 		Branch: "go1.13",
 	}
-	if diff := cmp.Diff(exp, got, cmpopts.IgnoreFields(Info{}, "EventName")); diff != "" {
+	if diff := cmp.Diff(exp, got, cmpopts.IgnoreFields(Info{}, "EventName", "Action", "ActionPath", "ActionRepository", "Actor", "ActorID", "Job", "Ref", "RefName", "RefProtected", "RefType", "RepoFullName", "RepoID", "RepoOwner", "RepoOwnerID", "RunAttempt", "RunID", "RunNumber", "RunnerArch", "RunnerOs", "SeverURL", "TriggeringActor", "Workflow", "WorkflowRef", "Workspace")); diff != "" {
 		t.Errorf("info mismatch (-want +got):\n%s", diff)
 	}
 
@@ -110,7 +110,7 @@ func TestNewInfo_GitHubActionsPullRequestForkEvent(t *testing.T) {
 		Branch: "build/pkg",
 		Fork:   true,
 	}
-	if diff := cmp.Diff(exp, got, cmpopts.IgnoreFields(Info{}, "EventName")); diff != "" {
+	if diff := cmp.Diff(exp, got, cmpopts.IgnoreFields(Info{}, "EventName", "Action", "ActionPath", "ActionRepository", "Actor", "ActorID", "Job", "Ref", "RefName", "RefProtected", "RefType", "RepoFullName", "RepoID", "RepoOwner", "RepoOwnerID", "RunAttempt", "RunID", "RunNumber", "RunnerArch", "RunnerOs", "SeverURL", "TriggeringActor", "Workflow", "WorkflowRef", "Workspace")); diff != "" {
 		t.Errorf("info mismatch (-want +got):\n%s", diff)
 	}
 
@@ -136,7 +136,7 @@ func TestNewInfo_GitHubActionsReRunEvent(t *testing.T) {
 		Num:    286,
 		Branch: "github-actions-env",
 	}
-	if diff := cmp.Diff(exp, got, cmpopts.IgnoreFields(Info{}, "EventName")); diff != "" {
+	if diff := cmp.Diff(exp, got, cmpopts.IgnoreFields(Info{}, "EventName", "Action", "ActionPath", "ActionRepository", "Actor", "ActorID", "Job", "Ref", "RefName", "RefProtected", "RefType", "RepoFullName", "RepoID", "RepoOwner", "RepoOwnerID", "RunAttempt", "RunID", "RunNumber", "RunnerArch", "RunnerOs", "SeverURL", "TriggeringActor", "Workflow", "WorkflowRef", "Workspace")); diff != "" {
 		t.Errorf("info mismatch (-want +got):\n%s", diff)
 	}
 
