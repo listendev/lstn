@@ -21,7 +21,6 @@ import (
 	"fmt"
 
 	"github.com/cli/cli/pkg/iostreams"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/listendev/lstn/pkg/ci"
 	"github.com/listendev/lstn/pkg/cmd"
 	"github.com/listendev/lstn/pkg/cmd/flags"
@@ -57,7 +56,6 @@ func Make(ctx context.Context, reportType cmd.ReportType) (r reporter.Reporter, 
 	case cmd.ListenPro:
 		info, infoErr := ci.NewInfo()
 		if infoErr != nil {
-			spew.Dump(infoErr)
 			return nil, false, ErrReporterUnsupportedEnvironment
 		}
 
