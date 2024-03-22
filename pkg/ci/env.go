@@ -35,7 +35,7 @@ type Info struct {
 	Job              string `env:"GITHUB_JOB"`
 	Ref              string `env:"GITHUB_REF"`
 	RefName          string `env:"GITHUB_REF_NAME"`
-	RefProtected     string `env:"GITHUB_REF_PROTECTED"`
+	RefProtected     bool   `env:"GITHUB_REF_PROTECTED"`
 	RefType          string `env:"GITHUB_REF_TYPE"`
 	RepoFullName     string `env:"GITHUB_REPOSITORY"`
 	RepoID           int64  `env:"GITHUB_REPOSITORY_ID"`
