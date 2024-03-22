@@ -41,6 +41,17 @@ type Package struct {
 
 type Response []Package
 
+func (r Response) Verdicts() models.Verdicts {
+	res := models.Verdicts{}
+	for _, p := range r {
+		for _, v := range p.Verdicts {
+			res = append(res, v)
+		}
+	}
+
+	return res
+}
+
 type responseError struct {
 	Message string `json:"message"`
 }
