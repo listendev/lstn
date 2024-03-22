@@ -8,6 +8,7 @@ require (
 	github.com/XANi/goneric v1.1.0
 	github.com/cli/cli v1.14.0
 	github.com/creasty/defaults v1.7.0
+	github.com/ghetzel/testify v1.4.1
 	github.com/go-git/go-billy/v5 v5.5.0
 	github.com/go-git/go-git/v5 v5.11.0
 	github.com/go-playground/mold/v4 v4.5.0
@@ -39,6 +40,7 @@ require (
 	github.com/ProtonMail/go-crypto v0.0.0-20230828082145-3c4c8a2d2371 // indirect
 	github.com/aymanbagabas/go-osc52 v1.0.3 // indirect
 	github.com/briandowns/spinner v1.11.1 // indirect
+	github.com/caarlos0/env/v10 v10.0.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/cli/safeexec v1.0.0 // indirect
 	github.com/cloudflare/circl v1.3.7 // indirect
