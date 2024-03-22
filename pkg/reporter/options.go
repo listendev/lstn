@@ -17,6 +17,7 @@ package reporter
 
 import (
 	"github.com/google/go-github/v53/github"
+	"github.com/listendev/lstn/pkg/ci"
 	"github.com/listendev/lstn/pkg/cmd/flags"
 )
 
@@ -33,6 +34,14 @@ func WithConfigOptions(opts *flags.ConfigFlags) Option {
 func WithGitHubClient(c *github.Client) Option {
 	return func(r Reporter) Reporter {
 		r.WithGitHubClient(c)
+
+		return r
+	}
+}
+
+func WithContinuousIntegrationInfo(info *ci.Info) Option {
+	return func(r Reporter) Reporter {
+		r.WithContinuousIntegrationInfo(info)
 
 		return r
 	}
