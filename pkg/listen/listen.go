@@ -213,7 +213,7 @@ func BulkPackages(requests []*VerdictsRequest, opts ...func(*options)) (*Respons
 		if ret.err == nil {
 			res = append(res, *ret.res)
 		} else {
-			return nil, nil, pkgcontext.OutputError(o.ctx, err)
+			return nil, nil, pkgcontext.OutputError(o.ctx, ret.err)
 		}
 	}
 	if o.json.IsJSON() {
