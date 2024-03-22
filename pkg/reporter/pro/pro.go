@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/google/go-github/v53/github"
 	"github.com/listendev/lstn/pkg/ci"
 	"github.com/listendev/lstn/pkg/cmd/flags"
@@ -41,7 +40,6 @@ func New(ctx context.Context, opts ...reporter.Option) (reporter.Reporter, error
 
 func (r *rep) Run(res listen.Response) error {
 	fmt.Println("TODO: for every listen.Package call the Dependency API")
-	spew.Dump(res)
 
 	return nil
 }
