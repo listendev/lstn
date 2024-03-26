@@ -30,7 +30,7 @@ type Info struct {
 	ActionPath       string `env:"GITHUB_ACTION_PATH"`
 	ActionRepository string `env:"GITHUB_ACTION_REPOSITORY"`
 	Actor            string `env:"GITHUB_ACTOR"`
-	ActorID          int    `env:"GITHUB_ACTOR_ID"`
+	ActorID          int64  `env:"GITHUB_ACTOR_ID"`
 	EventName        string
 	Job              string `env:"GITHUB_JOB"`
 	Ref              string `env:"GITHUB_REF"`
