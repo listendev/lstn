@@ -424,8 +424,8 @@ github.com/leodido/go-npmpackagename v0.2.0 h1:PWtLWmGwffpCMdVY1twLqVw9IyQJVU3Tf
 github.com/leodido/go-npmpackagename v0.2.0/go.mod h1:dFl2KBJaW8cAAnWZXtrNnXdpDEfg5hmBtg808SrblpM=
 github.com/leodido/go-urn v1.4.0 h1:WT9HwE9SGECu3lg4d/dIA+jxlljEa1/ffXKmRjqdmIQ=
 github.com/leodido/go-urn v1.4.0/go.mod h1:bvxc+MVxLKB4z00jd1z+Dvzr47oO32F/QSNjSBOlFxI=
-github.com/listendev/pkg v0.0.0-20240319104911-2671ef1f1207 h1:LxbI0h5xM6DKpFgz8bvvZ1cHgvGMM/X6h43/+7Q6LpA=
-github.com/listendev/pkg v0.0.0-20240319104911-2671ef1f1207/go.mod h1:MDVYyvM9SG2EV+Up2bcGyPQ0GF9HXNXbmp8dCtvrcsg=
+github.com/listendev/pkg v0.0.0-20240322212730-709f6f1dc05d h1:MSfDoTxSQz1f0UDhKLAVzoCO1DVjx8idbh4FhcTMJ4Y=
+github.com/listendev/pkg v0.0.0-20240322212730-709f6f1dc05d/go.mod h1:5arbKKs4nBpXLTDR7/H7AMCfk57OOnKvMYkBGNWcXCg=
 github.com/lucasb-eyer/go-colorful v1.2.0 h1:1nnpGOrhyZZuNyfu1QjKiUICQ74+3FNCN69Aj6K7nkY=
 github.com/lucasb-eyer/go-colorful v1.2.0/go.mod h1:R4dSotOR9KMtayYi1e77YzuveK+i7ruzyGqttikkLy0=
 github.com/magiconair/properties v1.8.5/go.mod h1:y3VJvCyxH9uVvJTWEGAELF3aiYNyPKd5NZ3oSwXrF60=
@@ -622,6 +622,8 @@ github.com/yuin/goldmark-emoji v1.0.1/go.mod h1:2w1E6FEWLcDQkoTE+7HU6QF1F6SLlNGj
 go.etcd.io/etcd/api/v3 v3.5.0/go.mod h1:cbVKeC6lCfl7j/8jBhAK6aIYO9XOjdptoxU/nLQcPvs=
 go.etcd.io/etcd/client/pkg/v3 v3.5.0/go.mod h1:IJHfcCEKxYu1Os13ZdwCwIUTUVGYTSAM3YSwc9/Ac1g=
 go.etcd.io/etcd/client/v2 v2.305.0/go.mod h1:h9puh54ZTgAKtEbut2oe9P4L/oqKCVB6xsXlzd7alYQ=
+go.mongodb.org/mongo-driver v1.14.0 h1:P98w8egYRjYe3XDjxhYJagTokP/H6HzlsnojRgZRd80=
+go.mongodb.org/mongo-driver v1.14.0/go.mod h1:Vzb0Mk/pa7e6cWw85R4F/endUC3u0U9jGcNU603k65c=
 go.opencensus.io v0.21.0/go.mod h1:mSImk1erAIZhrmZN+AvHh14ztQfjbGwt4TtuofqLduU=
 go.opencensus.io v0.22.0/go.mod h1:+kGneAE2xo2IficOXnaByMWTGM9T73dGwxeWcUqIpI8=
 go.opencensus.io v0.22.2/go.mod h1:yxeiOL68Rb0Xd1ddK5vPZ/oVn4vY4Ynel7k9FzqtOIw=
