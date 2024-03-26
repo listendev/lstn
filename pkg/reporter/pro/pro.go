@@ -73,10 +73,9 @@ func New(ctx context.Context, opts ...reporter.Option) (reporter.Reporter, error
 
 func (r *rep) Run(res listen.Response) error {
 	verdicts := res.Verdicts()
-	// if len(verdicts) == 0 {
-	// Assuming we have problems...
-	// FIXME: signal if a package has a problem (yet to analyse) ?
-	// }
+	if len(verdicts) == 0 {
+		return nil
+	}
 
 	// Spawn API calls in parallel
 	type wrap struct {
@@ -122,12 +121,8 @@ func (r *rep) WithContinuousIntegrationInfo(info *ci.Info) {
 	r.info = info
 }
 
-// TODO: impl (only for tests/mocks?)
-func (r *rep) WithProClientBaseURL() {
-}
-
 func attachAuthBearer(r *rep) apispec.RequestEditorFn {
-	return func(ctx context.Context, req *http.Request) error {
+	return func(_ context.Context, req *http.Request) error {
 		if req == nil {
 			return fmt.Errorf("request is nil")
 		}
