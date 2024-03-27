@@ -28,7 +28,9 @@ jobs:
           check-latest: true
 
       - name: Install cosign
-        uses: sigstore/cosign-installer@v3.0.1
+        uses: sigstore/cosign-installer@v3.4.0
+        with:
+          cosign-release: 'v2.2.3'
 
       - name: Install syft
         uses: anchore/sbom-action/download-syft@v0.13.3
