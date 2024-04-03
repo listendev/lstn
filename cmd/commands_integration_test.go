@@ -268,8 +268,9 @@ Examples:
   lstn in sub/dir
 
 Flags:
-      --genlock   whether to generate the lock file on the fly or not
-      --json      output the verdicts (if any) in JSON form
+      --genlock             whether to generate the lock file on the fly or not
+      --json                output the verdicts (if any) in JSON form
+  -l, --lockfiles strings   set one or more lock file paths (relative to the working dir) to lookup for (default [package-lock.json,poetry.lock])
 
 Config Flags:
       --endpoint string   the listen.dev endpoint emitting the verdicts (default "https://npm.listen.dev")
@@ -324,6 +325,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -358,6 +363,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -392,6 +401,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -625,6 +638,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "some123jwt.aaa.xxx",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
