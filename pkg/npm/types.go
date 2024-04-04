@@ -24,9 +24,12 @@ import (
 	"strings"
 
 	"github.com/Masterminds/semver/v3"
+	listentype "github.com/listendev/lstn/pkg/listen/type"
 	npmdeptype "github.com/listendev/lstn/pkg/npm/deptype"
 	"github.com/listendev/lstn/pkg/validate"
 )
+
+var _ PackageLockJSON = (*packageLockJSON)(nil)
 
 type packageJSON struct {
 	Dependencies         map[string]string `json:"dependencies"`
@@ -113,9 +116,8 @@ func (p *packageLockJSON) UnmarshalJSON(data []byte) error {
 }
 
 type PackageLockJSON interface {
+	listentype.AnalysisRequester
 	Deps() map[string]PackageLockDependency
-	Encode() string
-	Ok() bool
 	Version() int
 }
 
