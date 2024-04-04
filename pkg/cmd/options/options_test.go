@@ -36,7 +36,8 @@ func TestOptionsGotConfigDefaultsFromEnv(t *testing.T) {
 	assert.Equal(t, "reviewdog", rootOpts.ConfigFlags.Reporting.GitHub.Repo)
 	assert.Equal(t, "https://registry.npmjs.org", rootOpts.Registry.NPM)
 	assert.Equal(t, "info", rootOpts.LogLevel)
-	assert.Equal(t, "https://npm.listen.dev", rootOpts.Endpoint)
+	assert.Equal(t, "https://npm.listen.dev", rootOpts.Endpoint.Npm)
+	assert.Equal(t, "https://pypi.listen.dev", rootOpts.Endpoint.PyPi)
 	assert.Equal(t, 60, rootOpts.Timeout)
 
 	inOpts, err := NewIn()
@@ -46,7 +47,8 @@ func TestOptionsGotConfigDefaultsFromEnv(t *testing.T) {
 	assert.Equal(t, "reviewdog", inOpts.ConfigFlags.Reporting.GitHub.Repo)
 	assert.Equal(t, "https://registry.npmjs.org", inOpts.Registry.NPM)
 	assert.Equal(t, "info", inOpts.LogLevel)
-	assert.Equal(t, "https://npm.listen.dev", inOpts.Endpoint)
+	assert.Equal(t, "https://npm.listen.dev", inOpts.Endpoint.Npm)
+	assert.Equal(t, "https://pypi.listen.dev", inOpts.Endpoint.PyPi)
 	assert.Equal(t, 60, inOpts.Timeout)
 
 	scanOpts, err := NewScan()
@@ -56,7 +58,8 @@ func TestOptionsGotConfigDefaultsFromEnv(t *testing.T) {
 	assert.Equal(t, "reviewdog", scanOpts.ConfigFlags.Reporting.GitHub.Repo)
 	assert.Equal(t, "https://registry.npmjs.org", scanOpts.Registry.NPM)
 	assert.Equal(t, "info", scanOpts.LogLevel)
-	assert.Equal(t, "https://npm.listen.dev", scanOpts.Endpoint)
+	assert.Equal(t, "https://npm.listen.dev", scanOpts.Endpoint.Npm)
+	assert.Equal(t, "https://pypi.listen.dev", scanOpts.Endpoint.PyPi)
 	assert.Equal(t, 60, scanOpts.Timeout)
 
 	toOpts, err := NewTo()
@@ -66,6 +69,7 @@ func TestOptionsGotConfigDefaultsFromEnv(t *testing.T) {
 	assert.Equal(t, "reviewdog", toOpts.ConfigFlags.Reporting.GitHub.Repo)
 	assert.Equal(t, "https://registry.npmjs.org", toOpts.Registry.NPM)
 	assert.Equal(t, "info", toOpts.LogLevel)
-	assert.Equal(t, "https://npm.listen.dev", toOpts.Endpoint)
+	assert.Equal(t, "https://npm.listen.dev", toOpts.Endpoint.Npm)
+	assert.Equal(t, "https://pypi.listen.dev", toOpts.Endpoint.PyPi)
 	assert.Equal(t, 60, toOpts.Timeout)
 }

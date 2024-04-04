@@ -43,7 +43,7 @@ func (suite *FlagsBaseSuite) TestGetNames() {
 	res := GetNames(&ScanOpts{})
 
 	// Expecting all the (sub)fields
-	assert.Len(suite.T(), res, 15)
+	assert.Len(suite.T(), res, 16)
 }
 
 func (suite *FlagsBaseSuite) TestGetDefaults() {
@@ -53,8 +53,7 @@ func (suite *FlagsBaseSuite) TestGetDefaults() {
 	}
 	res := GetDefaults(&ScanOpts{})
 
-	// Only 4 (sub)fields have default values
-	assert.Len(suite.T(), res, 5)
+	assert.Len(suite.T(), res, 6)
 }
 
 func (suite *FlagsBaseSuite) TestGetField() {
@@ -83,21 +82,26 @@ func (suite *FlagsBaseSuite) TestValidate() {
 		{
 			"empty config flags",
 			&ConfigFlags{},
-			[]string{"timeout must be 30 or greater", "endpoint must be a valid URL"},
+			[]string{"timeout must be 30 or greater", "NPM endpoint must be a valid URL", "PyPi endpoint must be a valid URL"},
 		},
 		{
 			"invalid timeout",
-			&ConfigFlags{Timeout: 29, Endpoint: Endpoint{Npm: "http://127.0.0.1:3000"}},
+			&ConfigFlags{Timeout: 29, Endpoint: Endpoint{Npm: "http://127.0.0.1:3000", PyPi: "http://127.0.0.1:3001"}},
 			[]string{"timeout must be 30 or greater"},
 		},
 		{
-			"invalid endpoint",
-			&ConfigFlags{Timeout: 31, Endpoint: Endpoint{Npm: "http://invalid.endpoint"}},
-			[]string{"endpoint must be a valid listen.dev endpoint"},
+			"invalid NPM endpoint",
+			&ConfigFlags{Timeout: 31, Endpoint: Endpoint{Npm: "http://invalid.endpoint", PyPi: "http://127.0.0.1:3001"}},
+			[]string{"NPM endpoint must be a valid listen.dev endpoint"},
+		},
+		{
+			"invalid PyPi endpoint",
+			&ConfigFlags{Timeout: 31, Endpoint: Endpoint{PyPi: "http://invalid.endpoint", Npm: "http://127.0.0.1:3001"}},
+			[]string{"PyPi endpoint must be a valid listen.dev endpoint"},
 		},
 		{
 			"valid config flags",
-			&ConfigFlags{Timeout: 31, Endpoint: Endpoint{PyPi: "http://127.0.0.1:3000"}},
+			&ConfigFlags{Timeout: 31, Endpoint: Endpoint{Npm: "http://127.0.0.1:3000", PyPi: "http://127.0.0.1:3000"}},
 			[]string{},
 		},
 	}
@@ -277,13 +281,13 @@ func (suite *FlagsBaseSuite) TestDefine() {
 			f := c.Flags()
 
 			assert.NotNil(t, f.Lookup("loglevel"))
-			assert.NotNil(t, f.Lookup("endpoint"))
+			assert.NotNil(t, f.Lookup("npm-endpoint"))
 			assert.NotNil(t, f.Lookup("timeout"))
 			assert.Equal(t, expectedAnnotations, f.Lookup("loglevel").Annotations)
-			assert.Equal(t, expectedAnnotations, f.Lookup("endpoint").Annotations)
+			assert.Equal(t, expectedAnnotations, f.Lookup("npm-endpoint").Annotations)
 			assert.Equal(t, expectedAnnotations, f.Lookup("timeout").Annotations)
 			assert.Equal(t, "set the logging level", f.Lookup("loglevel").Usage)
-			assert.Equal(t, "the listen.dev endpoint emitting the verdicts", f.Lookup("endpoint").Usage)
+			assert.Equal(t, "the listen.dev endpoint emitting the NPM verdicts", f.Lookup("npm-endpoint").Usage)
 			assert.Equal(t, "set the timeout, in seconds", f.Lookup("timeout").Usage)
 
 			assert.NotNil(t, f.Lookup("json"))
