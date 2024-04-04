@@ -147,16 +147,16 @@ func TestGetDepsMapFromDepList(t *testing.T) {
 	assert.Empty(t, ret)
 
 	depList := []*dep{
-		&dep{
+		{
 			name:    "core-js",
 			version: semver.MustParse("3.29.1"),
 		},
-		&dep{
+		{
 			name:    "vue",
 			version: semver.MustParse("3.2.47"),
 		},
 		nil,
-		&dep{
+		{
 			name:    "react",
 			version: semver.MustParse("18.2.0"),
 		},
@@ -165,7 +165,7 @@ func TestGetDepsMapFromDepList(t *testing.T) {
 	assert.Len(t, ret, 1)
 	assert.Len(t, ret[npmdeptype.Dependencies], 3)
 	assert.Equal(t, map[npmdeptype.Enum]map[string]*semver.Version{
-		npmdeptype.Dependencies: map[string]*semver.Version{
+		npmdeptype.Dependencies: {
 			"react":   semver.MustParse("18.2.0"),
 			"vue":     semver.MustParse("3.2.47"),
 			"core-js": semver.MustParse("3.29.1"),
