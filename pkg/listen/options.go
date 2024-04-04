@@ -20,11 +20,13 @@ import (
 
 	"github.com/creasty/defaults"
 	"github.com/listendev/lstn/pkg/cmd/flags"
+	"github.com/listendev/pkg/ecosystem"
 )
 
 type options struct {
 	baseURL   string
 	userAgent string
+	ecosystem ecosystem.Ecosystem
 	ctx       context.Context
 	json      flags.JSONFlags
 }
@@ -70,5 +72,11 @@ func WithContext(input context.Context) func(*options) {
 func WithUserAgent(userAgent string) func(*options) {
 	return func(o *options) {
 		o.userAgent = userAgent
+	}
+}
+
+func WithEcosystem(eco ecosystem.Ecosystem) func(*options) {
+	return func(o *options) {
+		o.ecosystem = eco
 	}
 }
