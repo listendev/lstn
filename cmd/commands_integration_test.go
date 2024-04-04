@@ -95,9 +95,10 @@ Flags:
       --json   output the verdicts (if any) in JSON form
 
 Config Flags:
-      --endpoint string   the listen.dev endpoint emitting the verdicts (default "https://npm.listen.dev")
-      --loglevel string   set the logging level (default "info")
-      --timeout int       set the timeout, in seconds (default 60)
+      --loglevel string        set the logging level (default "info")
+      --npm-endpoint string    the listen.dev endpoint emitting the NPM verdicts (default "https://npm.listen.dev")
+      --pypi-endpoint string   the listen.dev endpoint emitting the PyPi verdicts (default "https://pypi.listen.dev")
+      --timeout int            set the timeout, in seconds (default 60)
 
 Debug Flags:
       --debug-options   output the options, then exit
@@ -148,9 +149,10 @@ Flags:
       --json   output the verdicts (if any) in JSON form
 
 Config Flags:
-      --endpoint string   the listen.dev endpoint emitting the verdicts (default "https://npm.listen.dev")
-      --loglevel string   set the logging level (default "info")
-      --timeout int       set the timeout, in seconds (default 60)
+      --loglevel string        set the logging level (default "info")
+      --npm-endpoint string    the listen.dev endpoint emitting the NPM verdicts (default "https://npm.listen.dev")
+      --pypi-endpoint string   the listen.dev endpoint emitting the PyPi verdicts (default "https://pypi.listen.dev")
+      --timeout int            set the timeout, in seconds (default 60)
 
 Debug Flags:
       --debug-options   output the options, then exit
@@ -189,7 +191,10 @@ Global Flags:
 			cmdline: []string{"to", "--debug-options"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -221,7 +226,10 @@ Global Flags:
 			cmdline: []string{"to", "--debug-options", "--npm-registry", "https://some.io", "--timeout", "2222"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -273,9 +281,10 @@ Flags:
   -l, --lockfiles strings   set one or more lock file paths (relative to the working dir) to lookup for (default [package-lock.json,poetry.lock])
 
 Config Flags:
-      --endpoint string   the listen.dev endpoint emitting the verdicts (default "https://npm.listen.dev")
-      --loglevel string   set the logging level (default "info")
-      --timeout int       set the timeout, in seconds (default 60)
+      --loglevel string        set the logging level (default "info")
+      --npm-endpoint string    the listen.dev endpoint emitting the NPM verdicts (default "https://npm.listen.dev")
+      --pypi-endpoint string   the listen.dev endpoint emitting the PyPi verdicts (default "https://pypi.listen.dev")
+      --timeout int            set the timeout, in seconds (default 60)
 
 Debug Flags:
       --debug-options   output the options, then exit
@@ -312,7 +321,10 @@ Global Flags:
 			cmdline: []string{"in", "--debug-options"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"genlock": false,
 	"gh-owner": "",
 	"gh-pull-id": 0,
@@ -350,7 +362,10 @@ Global Flags:
 			cmdline: []string{"in", "--debug-options", "--timeout", "8888"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"genlock": false,
 	"gh-owner": "",
 	"gh-pull-id": 0,
@@ -377,18 +392,21 @@ Global Flags:
 			stderr: "Running without a configuration file\n",
 			errstr: "",
 		},
-		// LSTN_ENDPOINT=https://npm-staging.listen.dev lstn in --debug-options
+		// LSTN_NPM_ENDPOINT=https://npm-staging.listen.dev lstn in --debug-options
 		{
-			name: "LSTN_ENDPOINT=https://npm-staging.listen.dev lstn in --debug-options",
+			name: "LSTN_NPM_ENDPOINT=https://npm-staging.listen.dev lstn in --debug-options",
 			envvar: map[string]string{
-				"LSTN_ENDPOINT": "https://npm-staging.listen.dev/",
+				"LSTN_NPM_ENDPOINT": "https://npm-staging.listen.dev/",
 				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
 				"GITHUB_ACTIONS": "",
 			},
 			cmdline: []string{"in", "--debug-options"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm-staging.listen.dev",
+	"endpoint": {
+		"npm": "https://npm-staging.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"genlock": false,
 	"gh-owner": "",
 	"gh-pull-id": 0,
@@ -426,7 +444,10 @@ Global Flags:
 			cmdline: []string{"scan", "--debug-options"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -469,7 +490,10 @@ Global Flags:
 			},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "leodido",
 	"gh-pull-id": 111,
 	"gh-repo": "go-urn",
@@ -519,7 +543,10 @@ Global Flags:
 			},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "leodido",
 	"gh-pull-id": 111,
 	"gh-repo": "go-urn",
@@ -558,7 +585,10 @@ Global Flags:
 			cmdline: []string{"scan", "--debug-options"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "fntlnz",
 	"gh-pull-id": 654,
 	"gh-repo": "",
@@ -592,7 +622,10 @@ Global Flags:
 		// 			cmdline: []string{"scan", "--debug-options"},
 		// 			stdout: heredoc.Doc(`{
 		// 	"debug-options": true,
-		// 	"endpoint": "https://npm.listen.dev",
+		// 	"endpoint": {
+		// 		"npm": "https://npm.listen.dev",
+		// 		"pypi": "https://pypi.listen.dev"
+		// },
 		// 	"gh-owner": "",
 		// 	"gh-pull-id": 0,
 		// 	"gh-repo": "",
@@ -625,7 +658,10 @@ Global Flags:
 			cmdline: []string{"in", "--debug-options"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"genlock": false,
 	"gh-owner": "",
 	"gh-pull-id": 0,
@@ -663,7 +699,10 @@ Global Flags:
 			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_reporting.yaml
 {
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "leodido",
 	"gh-pull-id": 78999,
 	"gh-repo": "go-urn",
@@ -687,14 +726,14 @@ Global Flags:
 			stderr: "",
 			errstr: "",
 		},
-		// LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/config_reporting.yaml
+		// LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_NPM_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/config_reporting.yaml
 		{
-			name: "LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/config_reporting.yaml",
+			name: "LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_NPM_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/config_reporting.yaml",
 			envvar: map[string]string{
-				"LSTN_GH_PULL_ID": "887755",
-				"LSTN_GH_REPO":    "go-conventionalcommits",
-				"LSTN_ENDPOINT":   "https://npm-stage.listen.dev",
-				"LSTN_TIMEOUT":    "33331",
+				"LSTN_GH_PULL_ID":   "887755",
+				"LSTN_GH_REPO":      "go-conventionalcommits",
+				"LSTN_NPM_ENDPOINT": "https://npm-stage.listen.dev",
+				"LSTN_TIMEOUT":      "33331",
 				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
 				"GITHUB_ACTIONS": "",
 			},
@@ -702,7 +741,10 @@ Global Flags:
 			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_reporting.yaml
 {
 	"debug-options": true,
-	"endpoint": "https://npm-stage.listen.dev",
+	"endpoint": {
+		"npm": "https://npm-stage.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "leodido",
 	"gh-pull-id": 887755,
 	"gh-repo": "go-conventionalcommits",
@@ -726,15 +768,15 @@ Global Flags:
 			stderr: "",
 			errstr: "",
 		},
-		// LSTN_REPORTER=gh-pull-check LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/config_reporting.yaml
+		// LSTN_REPORTER=gh-pull-check LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_NPM_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/config_reporting.yaml
 		{
-			name: "LSTN_REPORTER=gh-pull-check LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/config_reporting.yaml",
+			name: "LSTN_REPORTER=gh-pull-check LSTN_GH_PULL_ID=887755 LSTN_GH_REPO=go-conventionalcommits LSTN_NPM_ENDPOINT=https://npm-stage.listen.dev LSTN_TIMEOUT=33331 lstn scan --debug-options --config testdata/config_reporting.yaml",
 			envvar: map[string]string{
-				"LSTN_GH_PULL_ID": "887755",
-				"LSTN_GH_REPO":    "go-conventionalcommits",
-				"LSTN_ENDPOINT":   "https://npm-stage.listen.dev",
-				"LSTN_TIMEOUT":    "33331",
-				"LSTN_REPORTER":   "gh-pull-check",
+				"LSTN_GH_PULL_ID":   "887755",
+				"LSTN_GH_REPO":      "go-conventionalcommits",
+				"LSTN_NPM_ENDPOINT": "https://npm-stage.listen.dev",
+				"LSTN_TIMEOUT":      "33331",
+				"LSTN_REPORTER":     "gh-pull-check",
 				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
 				"GITHUB_ACTIONS": "",
 			},
@@ -742,7 +784,10 @@ Global Flags:
 			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_reporting.yaml
 {
 	"debug-options": true,
-	"endpoint": "https://npm-stage.listen.dev",
+	"endpoint": {
+		"npm": "https://npm-stage.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "leodido",
 	"gh-pull-id": 887755,
 	"gh-repo": "go-conventionalcommits",
@@ -776,7 +821,10 @@ Global Flags:
 			cmdline: []string{"scan", "--debug-options", "--reporter", "gh-pull-comment,gh-pull-comment", "-r", "gh-pull-check,gh-pull-comment"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -811,7 +859,10 @@ Global Flags:
 			cmdline: []string{"scan", "--debug-options", "--reporter", "pro"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -846,7 +897,10 @@ Global Flags:
 			cmdline: []string{"scan", "--debug-options", "--ignore-deptypes", "dev,dev", "--ignore-deptypes", "optional,dev"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -932,7 +986,10 @@ Global Flags:
 			cmdline: []string{"scan", "--debug-options"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "reviewdog",
 	"gh-pull-id": 285,
 	"gh-repo": "reviewdog",
@@ -965,7 +1022,10 @@ Global Flags:
 			cmdline: []string{"scan", "--debug-options", "--ignore-packages", "@vue/devtools,anotherpackage"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -1001,7 +1061,10 @@ Global Flags:
 			cmdline: []string{"scan", "--debug-options", "--ignore-packages", "@vue/devtools", "--ignore-packages", "anotherpackage"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -1037,7 +1100,10 @@ Global Flags:
 			cmdline: []string{"scan", "--debug-options", "--ignore-packages", "@vue/devtools"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -1072,7 +1138,10 @@ Global Flags:
 			cmdline: []string{"scan", "--debug-options"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -1107,7 +1176,10 @@ Global Flags:
 			cmdline: []string{"scan", "--debug-options"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -1142,7 +1214,10 @@ Global Flags:
 			cmdline: []string{"scan", "--debug-options"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -1178,7 +1253,10 @@ Global Flags:
 			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_filtering.yaml
 {
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -1214,7 +1292,10 @@ Global Flags:
 			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_filtering.yaml
 {
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -1252,7 +1333,10 @@ Global Flags:
 			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_filtering.yaml
 {
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -1300,7 +1384,10 @@ Global Flags:
 			cmdline: []string{"scan", "--ignore-deptypes", "dev,peer,dev", "--debug-options"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -1335,7 +1422,10 @@ Global Flags:
 			cmdline: []string{"scan", "--debug-options"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -1372,7 +1462,10 @@ Global Flags:
 			cmdline: []string{"scan", "--debug-options", "--ignore-deptypes", "optional"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -1408,7 +1501,10 @@ Global Flags:
 			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_filtering.yaml
 {
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -1446,7 +1542,10 @@ Global Flags:
 			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_filtering.yaml
 {
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -1485,7 +1584,10 @@ Global Flags:
 			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_filtering.yaml
 {
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -1523,7 +1625,10 @@ Global Flags:
 			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_filtering.yaml
 {
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -1561,7 +1666,10 @@ Global Flags:
 			cmdline: []string{"scan", "--debug-options", "--select", `@.severity == "high"`},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -1594,7 +1702,10 @@ Global Flags:
 			cmdline: []string{"scan", "--debug-options"},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -1627,7 +1738,10 @@ Global Flags:
 			cmdline: []string{"to", "--debug-options", "-s", `(@.file !~ "^advisory" && @.message != "")`},
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
-	"endpoint": "https://npm.listen.dev",
+	"endpoint": {
+		"npm": "https://npm.listen.dev",
+		"pypi": "https://pypi.listen.dev"
+	},
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",

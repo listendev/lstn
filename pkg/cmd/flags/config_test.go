@@ -53,17 +53,19 @@ func (suite *FlagsConfigSuite) TestNewConfigFlagsDefaults() {
 	assert.Equal(suite.T(), "reviewdog", i.Reporting.GitHub.Repo)
 	assert.Equal(suite.T(), "https://registry.npmjs.org", i.Registry.NPM)
 	assert.Equal(suite.T(), "info", i.LogLevel)
-	assert.Equal(suite.T(), "https://npm.listen.dev", i.Endpoint)
+	assert.Equal(suite.T(), "https://npm.listen.dev", i.Endpoint.Npm)
+	assert.Equal(suite.T(), "https://pypi.listen.dev", i.Endpoint.PyPi)
 	assert.Equal(suite.T(), 60, i.Timeout)
 }
 
 func (suite *FlagsConfigSuite) TestGetConfigFlagsNames() {
 	m := GetNames(&ConfigFlags{})
-	assert.Equal(suite.T(), 13, len(m))
+	assert.Equal(suite.T(), 14, len(m))
 
 	expected := make(map[string]string)
 	expected["loglevel"] = "LogLevel"
-	expected["endpoint"] = "Endpoint"
+	expected["npm-endpoint"] = "Endpoint.Npm"
+	expected["pypi-endpoint"] = "Endpoint.PyPi"
 	expected["timeout"] = "Timeout"
 	expected["gh-token"] = "Token.GitHub"
 	expected["jwt-token"] = "Token.JWT"
@@ -85,10 +87,11 @@ func (suite *FlagsConfigSuite) TestGetConfigFlagsNames() {
 
 func (suite *FlagsConfigSuite) TestGetConfigFlagsDefaults() {
 	m := GetDefaults(&ConfigFlags{})
-	assert.Equal(suite.T(), 5, len(m))
+	assert.Equal(suite.T(), 6, len(m))
 
 	expected := make(map[string]string)
-	expected["endpoint"] = "https://npm.listen.dev"
+	expected["npm-endpoint"] = "https://npm.listen.dev"
+	expected["pypi-endpoint"] = "https://pypi.listen.dev"
 	expected["loglevel"] = "info"
 	expected["timeout"] = "60"
 	expected["npm-registry"] = "https://registry.npmjs.org"
