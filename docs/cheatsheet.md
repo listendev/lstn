@@ -83,9 +83,10 @@ Inspect the verdicts for your dependencies tree.
 ### Config Flags
 
 ```
---endpoint string   the listen.dev endpoint emitting the verdicts (default "https://npm.listen.dev")
---loglevel string   set the logging level (default "info")
---timeout int       set the timeout, in seconds (default 60)
+--loglevel string        set the logging level (default "info")
+--npm-endpoint string    the listen.dev endpoint emitting the NPM verdicts (default "https://npm.listen.dev")
+--pypi-endpoint string   the listen.dev endpoint emitting the PyPi verdicts (default "https://pypi.listen.dev")
+--timeout int            set the timeout, in seconds (default 60)
 ```
 
 ### Debug Flags
@@ -152,9 +153,10 @@ Inspect the verdicts for your direct dependencies.
 ### Config Flags
 
 ```
---endpoint string   the listen.dev endpoint emitting the verdicts (default "https://npm.listen.dev")
---loglevel string   set the logging level (default "info")
---timeout int       set the timeout, in seconds (default 60)
+--loglevel string        set the logging level (default "info")
+--npm-endpoint string    the listen.dev endpoint emitting the NPM verdicts (default "https://npm.listen.dev")
+--pypi-endpoint string   the listen.dev endpoint emitting the PyPi verdicts (default "https://pypi.listen.dev")
+--timeout int            set the timeout, in seconds (default 60)
 ```
 
 ### Debug Flags
@@ -220,9 +222,10 @@ Get the verdicts of a package.
 ### Config Flags
 
 ```
---endpoint string   the listen.dev endpoint emitting the verdicts (default "https://npm.listen.dev")
---loglevel string   set the logging level (default "info")
---timeout int       set the timeout, in seconds (default 60)
+--loglevel string        set the logging level (default "info")
+--npm-endpoint string    the listen.dev endpoint emitting the NPM verdicts (default "https://npm.listen.dev")
+--pypi-endpoint string   the listen.dev endpoint emitting the PyPi verdicts (default "https://pypi.listen.dev")
+--timeout int            set the timeout, in seconds (default 60)
 ```
 
 ### Debug Flags
