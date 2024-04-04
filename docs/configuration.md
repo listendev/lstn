@@ -8,7 +8,9 @@ Anyways, notice that environment variables, and flags (if any) override the valu
 Here's an example of a configuration file (with the default values):
 
 ```yaml
-endpoint: "https://npm.listen.dev"
+endpoint: 
+  npm: "https://npm.listen.dev"
+  pypi: "https://pypi.listen.dev"
 filtering: 
   expression: "..."
   ignore: 
