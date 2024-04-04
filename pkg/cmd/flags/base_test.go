@@ -87,17 +87,17 @@ func (suite *FlagsBaseSuite) TestValidate() {
 		},
 		{
 			"invalid timeout",
-			&ConfigFlags{Timeout: 29, Endpoint: "http://127.0.0.1:3000"},
+			&ConfigFlags{Timeout: 29, Endpoint: Endpoint{Npm: "http://127.0.0.1:3000"}},
 			[]string{"timeout must be 30 or greater"},
 		},
 		{
 			"invalid endpoint",
-			&ConfigFlags{Timeout: 31, Endpoint: "http://invalid.endpoint"},
+			&ConfigFlags{Timeout: 31, Endpoint: Endpoint{Npm: "http://invalid.endpoint"}},
 			[]string{"endpoint must be a valid listen.dev endpoint"},
 		},
 		{
 			"valid config flags",
-			&ConfigFlags{Timeout: 31, Endpoint: "http://127.0.0.1:3000"},
+			&ConfigFlags{Timeout: 31, Endpoint: Endpoint{PyPi: "http://127.0.0.1:3000"}},
 			[]string{},
 		},
 	}
@@ -136,12 +136,48 @@ func (suite *FlagsBaseSuite) TestTransform() {
 			nil,
 		},
 		{
-			"endpoint config with leading slash",
+			"npm endpoint config with leading slash",
 			&ConfigFlags{
-				Endpoint: "https://npm.listen.dev/",
+				Endpoint: Endpoint{Npm: "https://npm.listen.dev/"},
 			},
 			&ConfigFlags{
-				Endpoint: "https://npm.listen.dev",
+				Endpoint: Endpoint{Npm: "https://npm.listen.dev"},
+				Reporting: Reporting{
+					Types: []cmd.ReportType{},
+				},
+				Filtering: Filtering{
+					Ignore: Ignore{
+						Deptypes: []npmdeptype.Enum{},
+					},
+				},
+			},
+			nil,
+		},
+		{
+			"pypi endpoint config with leading slash",
+			&ConfigFlags{
+				Endpoint: Endpoint{PyPi: "https://pypi.listen.dev/"},
+			},
+			&ConfigFlags{
+				Endpoint: Endpoint{PyPi: "https://pypi.listen.dev"},
+				Reporting: Reporting{
+					Types: []cmd.ReportType{},
+				},
+				Filtering: Filtering{
+					Ignore: Ignore{
+						Deptypes: []npmdeptype.Enum{},
+					},
+				},
+			},
+			nil,
+		},
+		{
+			"endpoints config with leading slash",
+			&ConfigFlags{
+				Endpoint: Endpoint{PyPi: "https://pypi.listen.dev/", Npm: "https://npm.listen.dev/"},
+			},
+			&ConfigFlags{
+				Endpoint: Endpoint{PyPi: "https://pypi.listen.dev", Npm: "https://npm.listen.dev"},
 				Reporting: Reporting{
 					Types: []cmd.ReportType{},
 				},
