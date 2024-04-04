@@ -212,7 +212,7 @@ func (suite *RequestsSuite) TestAnalysisRequestEmpty() {
 	suite.Assert().Nil(resp)
 	suite.Assert().Nil(data)
 	if suite.Assert().Error(erro) {
-		suite.Assert().Contains(erro.Error(), "package lock is mandatory")
+		suite.Assert().Contains(erro.Error(), "manifest is mandatory")
 	}
 }
 
