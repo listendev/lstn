@@ -30,6 +30,16 @@ type PoetryLock interface {
 	listentype.AnalysisRequester
 }
 
+func NewPoetryLockFromBytes(b []byte) (PoetryLock, error) {
+	ret := &poetryLock{}
+	if err := toml.Unmarshal(b, ret); err != nil {
+		return nil, fmt.Errorf("couldn't decode from the input %s contents", lockfile.PoetryLock.String())
+	}
+	ret.bytes = b
+
+	return ret, nil
+}
+
 // NewPoetryLockFromReader creates a PoetryLock instance from by reading the contents of a poetry.lock file.
 func NewPoetryLockFromReader(reader io.Reader) (PoetryLock, error) {
 	ret := &poetryLock{}
