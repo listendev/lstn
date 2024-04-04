@@ -28,6 +28,7 @@ import (
 	"github.com/Masterminds/semver/v3"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+	listentype "github.com/listendev/lstn/pkg/listen/type"
 	"github.com/listendev/lstn/pkg/npm"
 	"github.com/listendev/pkg/ecosystem"
 	"github.com/listendev/pkg/models/category"
@@ -293,7 +294,7 @@ func TestNewAnalysisRequest(t *testing.T) {
 
 	tests := []struct {
 		desc    string
-		lock    npm.PackageLockJSON
+		lock    listentype.AnalysisRequester
 		wantErr string
 		version int
 	}{
@@ -306,7 +307,7 @@ func TestNewAnalysisRequest(t *testing.T) {
 		{
 			"lock-empty",
 			npm.NewPackageLockJSON(),
-			"couldn't create the analysis request because of invalid package-lock.json",
+			"couldn't create the analysis request because of invalid lockfile",
 			0,
 		},
 		{
@@ -328,7 +329,11 @@ func TestNewAnalysisRequest(t *testing.T) {
 			} else {
 				assert.Nil(t, err)
 				assert.IsType(t, &AnalysisRequest{}, res)
-				assert.Equal(t, res.PackageLockJSON.Version(), tc.version)
+				assert.NotNil(t, res.Manifest)
+				if assert.Implements(t, (*npm.PackageLockJSON)(nil), res.Manifest) {
+					packageLockJSON := res.Manifest.(npm.PackageLockJSON)
+					assert.Equal(t, packageLockJSON.Version(), tc.version)
+				}
 			}
 		})
 	}
@@ -397,7 +402,7 @@ func TestAnalysisRequestMarshal(t *testing.T) {
 		{
 			desc:    "missing-packagelock",
 			areq:    &AnalysisRequest{},
-			wantErr: "json: error calling MarshalJSON for type *listen.AnalysisRequest: package lock is mandatory",
+			wantErr: "json: error calling MarshalJSON for type *listen.AnalysisRequest: manifest is mandatory",
 		},
 	}
 
