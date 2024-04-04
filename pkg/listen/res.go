@@ -53,5 +53,10 @@ func (r Response) Verdicts() models.Verdicts {
 }
 
 type responseError struct {
+	Field   string `json:"field"`
 	Message string `json:"message"`
+}
+
+type responseErrors struct {
+	Errors []responseError `json:"errors"`
 }
