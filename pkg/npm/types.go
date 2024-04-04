@@ -24,9 +24,12 @@ import (
 	"strings"
 
 	"github.com/Masterminds/semver/v3"
+	"github.com/listendev/lstn/pkg/fs"
 	listentype "github.com/listendev/lstn/pkg/listen/type"
 	npmdeptype "github.com/listendev/lstn/pkg/npm/deptype"
 	"github.com/listendev/lstn/pkg/validate"
+	"github.com/listendev/pkg/lockfile"
+	"github.com/listendev/pkg/manifest"
 )
 
 var _ PackageLockJSON = (*packageLockJSON)(nil)
@@ -111,7 +114,7 @@ func (p *packageLockJSON) UnmarshalJSON(data []byte) error {
 
 		return nil
 	default:
-		return fmt.Errorf("unsupported package-lock.json version")
+		return fmt.Errorf("unsupported %s version", lockfile.PackageLockJSON.String())
 	}
 }
 
@@ -187,7 +190,7 @@ func NewPackageLockJSONFromReader(reader io.Reader) (PackageLockJSON, error) {
 	var b bytes.Buffer
 	r := io.TeeReader(reader, &b)
 	if err := json.NewDecoder(r).Decode(ret); err != nil {
-		return nil, fmt.Errorf("couldn't instantiate from the input package-lock.json contents")
+		return nil, fmt.Errorf("couldn't decode from the input %s contents", lockfile.PackageLockJSON.String())
 	}
 	ret.bytes = b.Bytes()
 
@@ -197,7 +200,7 @@ func NewPackageLockJSONFromReader(reader io.Reader) (PackageLockJSON, error) {
 func NewPackageLockJSONFromBytes(b []byte) (PackageLockJSON, error) {
 	ret := &packageLockJSON{}
 	if err := json.Unmarshal(b, ret); err != nil {
-		return nil, fmt.Errorf("couldn't instantiate from the input package-lock.json contents")
+		return nil, fmt.Errorf("couldn't decode from the input %s contents", lockfile.PackageLockJSON.String())
 	}
 	ret.bytes = b
 
@@ -206,7 +209,7 @@ func NewPackageLockJSONFromBytes(b []byte) (PackageLockJSON, error) {
 
 // GetPackageLockJSONFromDir creates a PackageLockJSON instance from the existing package-lock.json in dir, if any.
 func GetPackageLockJSONFromDir(dir string) (PackageLockJSON, error) {
-	reader, err := read(dir, "package-lock.json")
+	reader, err := fs.Read(dir, lockfile.PackageLockJSON.String())
 	if err != nil {
 		return nil, err
 	}
@@ -216,7 +219,7 @@ func GetPackageLockJSONFromDir(dir string) (PackageLockJSON, error) {
 
 // GetPackageJSONFromDir creates a PackageJSON instance from the existing package.json in dir, if any.
 func GetPackageJSONFromDir(dir string) (PackageJSON, error) {
-	reader, err := read(dir, "package.json")
+	reader, err := fs.Read(dir, manifest.PackageJSON.String())
 	if err != nil {
 		return nil, err
 	}
@@ -227,7 +230,7 @@ func GetPackageJSONFromDir(dir string) (PackageJSON, error) {
 func NewPackageJSONFromReader(reader io.Reader) (PackageJSON, error) {
 	ret := &packageJSON{}
 	if err := json.NewDecoder(reader).Decode(ret); err != nil {
-		return nil, fmt.Errorf("couldn't instantiate from the input package.json contents")
+		return nil, fmt.Errorf("couldn't instantiate from the input %s contents", manifest.PackageJSON.String())
 	}
 
 	return ret, nil

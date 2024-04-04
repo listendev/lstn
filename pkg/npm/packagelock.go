@@ -24,6 +24,7 @@ import (
 
 	"github.com/go-git/go-billy/v5/util"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
+	"github.com/listendev/lstn/pkg/fs"
 )
 
 // generatePackageLock generates a package-lock.json by executing npm
@@ -53,16 +54,16 @@ func generatePackageLock(ctx context.Context, dir string) ([]byte, error) {
 	}
 
 	// Create temporary directory
-	tmp, err := util.TempDir(activeFS, "", "lstn-*")
+	tmp, err := util.TempDir(fs.Current, "", "lstn-*")
 	if err != nil {
 		return []byte{}, fmt.Errorf("couldn't create a temporary directory where to do the dirty work")
 	}
 	//nolint:errcheck // no need to check the error
-	defer util.RemoveAll(activeFS, tmp)
+	defer util.RemoveAll(fs.Current, tmp)
 
 	// Copy the package.json in the temporary directory
 	packageJSONPath := filepath.Join(dir, "package.json")
-	packageJSON, err := util.ReadFile(activeFS, packageJSONPath)
+	packageJSON, err := util.ReadFile(fs.Current, packageJSONPath)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return []byte{}, fmt.Errorf("directory %s does not contain a package.json file", dir)
@@ -70,7 +71,7 @@ func generatePackageLock(ctx context.Context, dir string) ([]byte, error) {
 
 		return []byte{}, fmt.Errorf("couldn't read the package.json file")
 	}
-	if err := util.WriteFile(activeFS, filepath.Join(tmp, "package.json"), packageJSON, 0644); err != nil {
+	if err := util.WriteFile(fs.Current, filepath.Join(tmp, "package.json"), packageJSON, 0644); err != nil {
 		return []byte{}, fmt.Errorf("couldn't copy the package.json file")
 	}
 
@@ -80,7 +81,7 @@ func generatePackageLock(ctx context.Context, dir string) ([]byte, error) {
 	if err := npmPackageLockOnly.Run(); err != nil {
 		return []byte{}, pkgcontext.OutputErrorf(ctx, err, "couldn't generate the package-lock.json file")
 	}
-	packageLockJSON, _ := util.ReadFile(activeFS, filepath.Join(tmp, "package-lock.json"))
+	packageLockJSON, _ := util.ReadFile(fs.Current, filepath.Join(tmp, "package-lock.json"))
 
 	return packageLockJSON, nil
 }

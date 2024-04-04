@@ -159,7 +159,7 @@ func TestPackageLockJSONInstantiation(t *testing.T) {
 	}`)))
 
 	if assert.Error(t, err) {
-		assert.Equal(t, "couldn't instantiate from the input package-lock.json contents", err.Error())
+		assert.Equal(t, "couldn't decode from the input package-lock.json contents", err.Error())
 		assert.Nil(t, lockfileVersionFuture)
 	}
 
@@ -352,7 +352,7 @@ func TestNewPackageJSONFromReader(t *testing.T) {
 
 func TestNewPackageLockJSONFromReader(t *testing.T) {
 	fixture, errFixture := os.Open("testdata/package-lock.json")
-	assert.Nil(t, errFixture)
+	require.Nil(t, errFixture)
 	defer fixture.Close()
 
 	var b bytes.Buffer
