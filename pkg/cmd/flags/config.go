@@ -72,10 +72,15 @@ type Filtering struct {
 	Expression string `flagset:"Filtering" name:"filter verdicts" flag:"select" shorthand:"s" desc:"filter the output verdicts using a jsonpath script expression (server-side)" json:"select"`
 }
 
+type Endpoint struct {
+	Npm  string `default:"https://npm.listen.dev" flag:"npm-endpoint" name:"NPM endpoint" desc:"the listen.dev endpoint emitting the NPM verdicts" validate:"url,endpoint" transform:"tsuffix=/" flagset:"Config" json:"npm"`
+	PyPi string `default:"https://pypi.listen.dev" flag:"pypi-endpoint" name:"PyPi endpoint" desc:"the listen.dev endpoint emitting the PyPi verdicts" validate:"url,endpoint" transform:"tsuffix=/" flagset:"Config" json:"pypi"`
+}
+
 type ConfigFlags struct {
-	LogLevel string `default:"info" name:"log level" flag:"loglevel" desc:"set the logging level" flagset:"Config" json:"loglevel"`                          // TODO > validator
-	Timeout  int    `default:"60" name:"timeout" flag:"timeout" desc:"set the timeout, in seconds" validate:"number,min=30" flagset:"Config" json:"timeout"` // FIXME: change to time.Duration type
-	Endpoint string `default:"https://npm.listen.dev" flag:"endpoint" name:"endpoint" desc:"the listen.dev endpoint emitting the verdicts" validate:"url,endpoint" transform:"tsuffix=/" flagset:"Config" json:"endpoint"`
+	LogLevel string   `default:"info" name:"log level" flag:"loglevel" desc:"set the logging level" flagset:"Config" json:"loglevel"`                          // TODO > validator
+	Timeout  int      `default:"60" name:"timeout" flag:"timeout" desc:"set the timeout, in seconds" validate:"number,min=30" flagset:"Config" json:"timeout"` // FIXME: change to time.Duration type
+	Endpoint Endpoint `json:"endpoint"`
 	Token
 	Registry
 	Reporting
