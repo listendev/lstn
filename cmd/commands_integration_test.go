@@ -433,6 +433,47 @@ Global Flags:
 			stderr: "Running without a configuration file\n",
 			errstr: "",
 		},
+		// LSTN_PYPI_ENDPOINT=https://pypi-stage.listen.dev lstn in --debug-options
+		{
+			name: "LSTN_PYPI_ENDPOINT=https://pypi-stage.listen.dev lstn in --debug-options",
+			envvar: map[string]string{
+				"LSTN_PYPI_ENDPOINT": "https://pypi-stage.listen.dev/",
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
+			cmdline: []string{"in", "--debug-options"},
+			stdout: heredoc.Doc(`{
+			"debug-options": true,
+			"endpoint": {
+				"npm": "https://npm.listen.dev",
+				"pypi": "https://pypi-stage.listen.dev"
+			},
+			"genlock": false,
+			"gh-owner": "",
+			"gh-pull-id": 0,
+			"gh-repo": "",
+			"gh-token": "",
+			"ignore-deptypes": [
+				110
+			],
+			"ignore-packages": null,
+			"jq": "",
+			"json": false,
+			"jwt-token": "",
+			"lockfiles": [
+				"package-lock.json",
+				"poetry.lock"
+			],
+			"loglevel": "info",
+			"npm-registry": "https://registry.npmjs.org",
+			"reporter": [],
+			"select": "",
+			"timeout": 60
+		}
+		`),
+			stderr: "Running without a configuration file\n",
+			errstr: "",
+		},
 		// LSTN_REPORTER=gh-pull-check lstn scan --debug-options
 		{
 			name: "LSTN_REPORTER=gh-pull-check lstn scan --debug-options",
