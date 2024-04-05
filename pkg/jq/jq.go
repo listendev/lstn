@@ -118,19 +118,10 @@ func jsonScalarToString(input interface{}) (string, error) {
 	}
 }
 
-// NOTE > gojq has a few (private) errors
-// For more details see:
-// - https://github.com/itchyny/gojq/blob/main/error.go
-// - https://github.com/itchyny/gojq/blob/70c1144e9658f8688e8028da2b51f34b3e4fc699/cli/cli.go#L422
-//
-// The following function maps gojq errors to ours.
+// convertError maps gojq errors to ours.
 func convertError(err error) error {
 	if er, ok := err.(interface{ IsEmptyError() bool }); !ok || !er.IsEmptyError() {
-		if er, ok := err.(interface {
-			IsHaltError() bool
-			ExitCode() int
-			Value() interface{}
-		}); ok && er.IsHaltError() {
+		if er, ok := err.(*gojq.HaltError); ok {
 			v := er.Value()
 			if str, ok := v.(string); ok {
 				return &HaltError{
