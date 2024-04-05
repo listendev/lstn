@@ -60,8 +60,8 @@ The verdicts it returns are listed by the name of each package and its specified
   lstn in .
   lstn in /we/snitch
   lstn in sub/dir
-  lstn in --manifests poetry.lock,package-lock.json
-  lstn in /pyproj --manifests poetry.lock`,
+  lstn in --lockfiles poetry.lock,package-lock.json
+  lstn in /pyproj --lockfiles poetry.lock`,
 		Args:              arguments.SingleDirectory, // Executes before RunE
 		ValidArgsFunction: arguments.SingleDirectoryActiveHelp,
 		Annotations: map[string]string{
