@@ -60,7 +60,7 @@ func (suite *FlagsConfigSuite) TestNewConfigFlagsDefaults() {
 
 func (suite *FlagsConfigSuite) TestGetConfigFlagsNames() {
 	m := GetNames(&ConfigFlags{})
-	assert.Equal(suite.T(), 14, len(m))
+	assert.Equal(suite.T(), 15, len(m))
 
 	expected := make(map[string]string)
 	expected["loglevel"] = "LogLevel"
@@ -77,6 +77,7 @@ func (suite *FlagsConfigSuite) TestGetConfigFlagsNames() {
 	expected["ignore-packages"] = "Filtering.Ignore.Packages"
 	expected["ignore-deptypes"] = "Filtering.Ignore.Deptypes"
 	expected["select"] = "Filtering.Expression"
+	expected["lockfiles"] = "Lockfiles"
 
 	for k, v := range m {
 		e, ok := expected[k]
@@ -87,7 +88,7 @@ func (suite *FlagsConfigSuite) TestGetConfigFlagsNames() {
 
 func (suite *FlagsConfigSuite) TestGetConfigFlagsDefaults() {
 	m := GetDefaults(&ConfigFlags{})
-	assert.Equal(suite.T(), 6, len(m))
+	assert.Equal(suite.T(), 7, len(m))
 
 	expected := make(map[string]string)
 	expected["npm-endpoint"] = "https://npm.listen.dev"
@@ -96,6 +97,7 @@ func (suite *FlagsConfigSuite) TestGetConfigFlagsDefaults() {
 	expected["timeout"] = "60"
 	expected["npm-registry"] = "https://registry.npmjs.org"
 	expected["ignore-packages"] = "[]"
+	expected["lockfiles"] = "[\"package-lock.json\",\"poetry.lock\"]"
 
 	for k, v := range m {
 		e, ok := expected[k]
