@@ -18,6 +18,7 @@ package in
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 	"runtime"
 
 	"github.com/cli/cli/pkg/iostreams"
@@ -28,8 +29,12 @@ import (
 	"github.com/listendev/lstn/pkg/cmd/packagesprinter"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/listen"
+	listentype "github.com/listendev/lstn/pkg/listen/type"
 	"github.com/listendev/lstn/pkg/npm"
+	"github.com/listendev/lstn/pkg/pypi"
 	reporterfactory "github.com/listendev/lstn/pkg/reporter/factory"
+	"github.com/listendev/pkg/ecosystem"
+	"github.com/listendev/pkg/lockfile"
 	"github.com/spf13/cobra"
 )
 
@@ -45,14 +50,17 @@ func New(ctx context.Context) (*cobra.Command, error) {
 		Short:                 "Inspect the verdicts for your dependencies tree",
 		Long: `Query listen.dev for the verdicts of all the dependencies in your project.
 
-Using this command, you can audit all the dependencies configured for a project and obtain their verdicts.
-This requires a package.json file to fetch the package name and version of the project dependencies.
+Using this command, you can audit all the dependencies of a project and obtain their verdicts.
+Given a project directory containing manifest files (package-lock.json, poetry.lock, etc),
+it fetches the package names and versions of the project dependencies.
 
 The verdicts it returns are listed by the name of each package and its specified version.`,
 		Example: `  lstn in
   lstn in .
   lstn in /we/snitch
-  lstn in sub/dir`,
+  lstn in sub/dir
+  lstn in --manifests poetry.lock,package-lock.json
+  lstn in /pyproj --manifests poetry.lock`,
 		Args:              arguments.SingleDirectory, // Executes before RunE
 		ValidArgsFunction: arguments.SingleDirectoryActiveHelp,
 		Annotations: map[string]string{
@@ -71,15 +79,15 @@ The verdicts it returns are listed by the name of each package and its specified
 				return fmt.Errorf("couldn't obtain options for the current child command")
 			}
 
+			io := c.Context().Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
+			cs := io.ColorScheme()
+
+			// For debugging/testing reasons...
 			if inOpts.DebugOptions {
 				c.Println(inOpts.AsJSON())
 
 				return nil
 			}
-
-			io := c.Context().Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
-			io.StartProgressIndicator()
-			defer io.StopProgressIndicator()
 
 			// Obtain the target directory that we want to listen in
 			targetDir, err := arguments.GetDirectory(args)
@@ -87,52 +95,148 @@ The verdicts it returns are listed by the name of each package and its specified
 				return fmt.Errorf("couldn't get to know on which directory you want me to listen in")
 			}
 
-			var packageLockJSON npm.PackageLockJSON
-			var packageLockJSONErr error
-
-			if inOpts.GenerateLock {
-				// Try to generate a package-lock.json file on the fly
-				packageLockJSON, packageLockJSONErr = npm.NewPackageLockJSONFromDir(ctx, targetDir)
+			// Lookup the lock files (relative to the working directory)
+			foundLockfiles, notFoundLockfiles := arguments.GetLockfiles(targetDir, inOpts.Lockfiles)
+			if len(notFoundLockfiles) > 0 {
+				for _, errs := range notFoundLockfiles {
+					for _, e := range errs {
+						c.PrintErrln(cs.WarningIcon(), e.Error())
+					}
+				}
 			}
-			// Fallback to reading the package-lock.json in the target directory
-			if packageLockJSONErr != nil || !inOpts.GenerateLock {
-				packageLockJSON, packageLockJSONErr = npm.GetPackageLockJSONFromDir(targetDir)
-			}
-			if packageLockJSONErr != nil {
-				return packageLockJSONErr
+			if len(foundLockfiles) == 0 {
+				return fmt.Errorf("directory %s does not contain any lock file", targetDir)
 			}
 
-			// Ask listen.dev for an analysis
-			req, err := listen.NewAnalysisRequest(packageLockJSON, listen.WithRequestContext())
-			if err != nil {
-				return err
+			numIterations := len(foundLockfiles)
+			for lp, lf := range foundLockfiles {
+				// TODO: check that targetDir == filepath.Dir(lp) for extra safety?
+				dir := filepath.Dir(lp)
+				eco := lockfile.Ecosystem(lf)
+
+				var toAnalyse listentype.AnalysisRequester
+				var lockfileErr error
+				switch eco {
+				case ecosystem.Npm:
+					switch lf {
+					case lockfile.PackageLockJSON:
+						toAnalyse, lockfileErr = npm.GetPackageLockJSONFromDir(dir)
+
+					default:
+						err := fmt.Errorf("could not process %s yet", lp)
+						if numIterations == 1 {
+							return err
+						}
+						c.PrintErrln(cs.FailureIcon(), cs.Blue(fmt.Sprintf("[%s ecosystem]", eco.Case())), err.Error())
+
+						continue
+					}
+
+				case ecosystem.Pypi:
+					switch lf {
+					case lockfile.PoetryLock:
+						toAnalyse, lockfileErr = pypi.GetPoetryLockFromDir(dir)
+
+					default:
+						err := fmt.Errorf("could not process %s yet", lp)
+						if numIterations == 1 {
+							return err
+						}
+						c.PrintErrln(cs.FailureIcon(), cs.Blue(fmt.Sprintf("[%s ecosystem]", eco.Case())), err.Error())
+
+						continue
+					}
+
+				case ecosystem.None:
+					err := fmt.Errorf("couldn't retrieve the ecosystem relative to the %s lock file", lp)
+					if numIterations == 1 {
+						return err
+					}
+					c.PrintErrln(cs.FailureIcon(), cs.Blue(fmt.Sprintf("[%s ecosystem]", eco.Case())), err.Error())
+
+					continue
+				}
+
+				if lockfileErr != nil {
+					err := fmt.Errorf("could not process %s yet: %s", lp, cs.Red(lockfileErr.Error()))
+					if numIterations == 1 {
+						return err
+					}
+					c.PrintErrln(cs.FailureIcon(), cs.Blue(fmt.Sprintf("[%s ecosystem]", eco.Case())), err.Error())
+
+					continue
+				}
+
+				io.StartProgressIndicator()
+
+				// Prepare analysis request for <eco>.listen.dev/api/analysis
+				req, err := listen.NewAnalysisRequest(toAnalyse, listen.WithRequestContext())
+				if err != nil {
+					io.StopProgressIndicator()
+					if numIterations == 1 {
+						return err
+					}
+					c.PrintErrln(cs.FailureIcon(), cs.Blue(fmt.Sprintf("[%s ecosystem]", eco.Case())), fmt.Sprintf("got an error requesting the analysis: %s", cs.Red(err.Error())))
+
+					continue
+				}
+
+				// Ask listen.dev to analyze the lockfile
+				res, resJSON, err := listen.Packages(
+					req,
+					listen.WithContext(ctx),
+					listen.WithEcosystem(eco),
+					listen.WithJSONOptions(inOpts.JSONFlags),
+				)
+				if err != nil {
+					io.StopProgressIndicator()
+					if numIterations == 1 {
+						return err
+					}
+					c.PrintErrln(cs.FailureIcon(), cs.Blue(fmt.Sprintf("[%s ecosystem]", eco.Case())), fmt.Sprintf("got an error from the analysis endpoint: %s", cs.Red(err.Error())))
+
+					continue
+				}
+				if resJSON != nil {
+					fmt.Fprintf(io.Out, "%s", resJSON)
+				}
+				if res == nil {
+					io.StopProgressIndicator()
+					c.PrintErrln(cs.WarningIcon(), cs.Blue(fmt.Sprintf("[%s ecosystem]", eco.Case())), "couldn't obtain the verdicts but got no error")
+
+					if numIterations == 1 {
+						return nil
+					} else {
+						continue
+					}
+				}
+				io.StopProgressIndicator()
+
+				c.Println(cs.SuccessIcon(), cs.Blue(fmt.Sprintf("[%s ecosystem]", eco.Case())), fmt.Sprintf("showing verdicts for %s...\n", lp))
+
+				tablePrinter := packagesprinter.NewTablePrinter(io)
+				err = tablePrinter.RenderPackages(res)
+				if err != nil {
+					if numIterations == 1 {
+						return err
+					}
+					c.PrintErrln(cs.FailureIcon(), cs.Blue(fmt.Sprintf("[%s ecosystem]", eco.Case())), fmt.Sprintf("got an error printing the verdicts: %s", cs.Red(err.Error())))
+
+					continue
+				}
+
+				errExec := reporterfactory.Exec(c, inOpts.Reporting, *res)
+				if errExec != nil {
+					if numIterations == 1 {
+						return errExec
+					}
+					c.PrintErrln(cs.FailureIcon(), cs.Blue(fmt.Sprintf("[%s ecosystem]", eco.Case())), fmt.Sprintf("got an error executing the reporter: %s", cs.Red(errExec.Error())))
+
+					continue
+				}
 			}
 
-			res, resJSON, err := listen.Packages(
-				req,
-				listen.WithContext(ctx),
-				listen.WithJSONOptions(inOpts.JSONFlags),
-			)
-			if err != nil {
-				return err
-			}
-
-			if resJSON != nil {
-				fmt.Fprintf(io.Out, "%s", resJSON)
-			}
-
-			if res == nil {
-				return nil
-			}
-
-			tablePrinter := packagesprinter.NewTablePrinter(io)
-
-			err = tablePrinter.RenderPackages(res)
-			if err != nil {
-				return err
-			}
-
-			return reporterfactory.Exec(c, inOpts.Reporting, *res)
+			return nil
 		},
 	}
 
