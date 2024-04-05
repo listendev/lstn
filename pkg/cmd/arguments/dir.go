@@ -20,7 +20,9 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/XANi/goneric"
 	"github.com/listendev/lstn/pkg/validate"
+	"github.com/listendev/pkg/lockfile"
 	"github.com/spf13/cobra"
 )
 
@@ -38,12 +40,6 @@ func SingleDirectory(c *cobra.Command, args []string) error {
 	}
 	if errs := validate.Singleton.Var(args[0], "dir"); errs != nil {
 		return fmt.Errorf("requires the argument to be an existing directory")
-	}
-	// Check that the target directory contains a package.json file
-	packageJSONErrors := validate.Singleton.Var(filepath.Join(args[0], "package.json"), "file")
-	// NOTE > In the future, we can try to detect other package managers here rather than erroring out
-	if packageJSONErrors != nil {
-		return fmt.Errorf("couldn't find a package.json in %s", args[0])
 	}
 
 	return nil
@@ -63,6 +59,23 @@ func GetDirectory(args []string) (string, error) {
 	}
 
 	return filepath.Abs(dir)
+}
+
+func GetLockfiles(cwd string, lockfiles []string) (map[string]lockfile.Lockfile, map[lockfile.Lockfile][]error) {
+	paths := goneric.MapSlice(func(f string) string {
+		return filepath.Join(cwd, f)
+	}, lockfiles)
+
+	existingMap, errorsMap := lockfile.Existing(paths)
+
+	existing := map[string]lockfile.Lockfile{}
+	for l, paths := range existingMap {
+		for _, p := range paths {
+			existing[p] = l
+		}
+	}
+
+	return existing, errorsMap
 }
 
 // SingleDirectoryActiveHelp generates the active help for a single directory.
