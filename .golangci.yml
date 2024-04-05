@@ -36,8 +36,6 @@ linters:
 linters-settings:
   gofmt:
     simplify: false
-  govet:
-    check-shadowing: true
   goconst:
     ignore-tests: true
   nolintlint:

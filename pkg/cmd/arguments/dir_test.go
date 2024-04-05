@@ -99,5 +99,4 @@ func TestGetLockfiles(t *testing.T) {
 		require.Equal(t, tc.wantLockfiles, gotLockfiles)
 		require.Equal(t, tc.wantErrors, gotErrors)
 	}
-
 }

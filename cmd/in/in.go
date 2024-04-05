@@ -42,6 +42,7 @@ var (
 	_, filename, _, _ = runtime.Caller(0)
 )
 
+//nolint:gocyclo // ignore
 func New(ctx context.Context) (*cobra.Command, error) {
 	var inCmd = &cobra.Command{
 		Use:                   "in [path]",
@@ -206,9 +207,9 @@ The verdicts it returns are listed by the name of each package and its specified
 
 					if numIterations == 1 {
 						return nil
-					} else {
-						continue
 					}
+
+					continue
 				}
 				io.StopProgressIndicator()
 
