@@ -206,6 +206,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -241,6 +245,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://some.io",
 	"reporter": [],
@@ -477,6 +485,50 @@ Global Flags:
 			stderr: "Running without a configuration file\n",
 			errstr: "",
 		},
+		// lstn in --debug-options --config testdata/config_lockfiles.yaml
+		{
+			name: "lstn in --debug-options --config testdata/config_lockfiles.yaml",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
+			cmdline: []string{"in", "--debug-options", "--config", path.Join(cwd, "testdata", "config_lockfiles.yaml")},
+			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/config_lockfiles.yaml
+		{
+			"debug-options": true,
+			"endpoint": {
+				"npm": "https://npm.listen.dev",
+				"pypi": "https://pypi.listen.dev"
+			},
+			"genlock": false,
+			"gh-owner": "leodido",
+			"gh-pull-id": 78991,
+			"gh-repo": "go-urn",
+			"gh-token": "zzz123",
+			"ignore-deptypes": [
+				110
+			],
+			"ignore-packages": null,
+			"jq": "",
+			"json": false,
+			"jwt-token": "xxx.yyy.zzz",
+			"lockfiles": [
+				"monorepo/package-lock.json",
+				"monorepo/poetry.lock",
+				"monorepo/sub/poetry.lock"
+			],
+			"loglevel": "info",
+			"npm-registry": "https://registry.npmjs.org",
+			"reporter": [
+				33
+			],
+			"select": "",
+			"timeout": 2223
+		}
+		`),
+			stderr: "",
+			errstr: "",
+		},
 		// LSTN_REPORTER=gh-pull-check lstn scan --debug-options
 		{
 			name: "LSTN_REPORTER=gh-pull-check lstn scan --debug-options",
@@ -503,6 +555,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [
@@ -549,6 +605,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [
@@ -602,6 +662,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [
@@ -644,6 +708,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.com",
 	"reporter": [],
@@ -681,6 +749,10 @@ Global Flags:
 		// 	"jq": "",
 		// 	"json": false,
 		// 	"jwt-token": "some123jwt.aaa.zzz",
+		// "lockfiles": [
+		// 	"package-lock.json",
+		// 	"poetry.lock"
+		// ],
 		// 	"loglevel": "info",
 		// 	"npm-registry": "https://registry.npmjs.org",
 		// 	"reporter": [],
@@ -758,6 +830,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://some.io",
 	"reporter": [
@@ -800,6 +876,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://some.io",
 	"reporter": [
@@ -843,6 +923,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://some.io",
 	"reporter": [
@@ -880,6 +964,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [
@@ -918,6 +1006,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [
@@ -958,6 +1050,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -1045,6 +1141,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -1084,6 +1184,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -1123,6 +1227,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -1161,6 +1269,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -1199,6 +1311,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -1237,6 +1353,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -1276,6 +1396,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -1315,6 +1439,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://smtg.io",
 	"reporter": [],
@@ -1355,6 +1483,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://smtg.io",
 	"reporter": [],
@@ -1395,6 +1527,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://smtg.io",
 	"reporter": [],
@@ -1445,6 +1581,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -1483,6 +1623,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -1524,6 +1668,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -1564,6 +1712,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://smtg.io",
 	"reporter": [],
@@ -1605,6 +1757,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://smtg.io",
 	"reporter": [],
@@ -1646,6 +1802,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://smtg.io",
 	"reporter": [],
@@ -1690,6 +1850,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://smtg.io",
 	"reporter": [],
@@ -1725,6 +1889,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -1761,6 +1929,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
@@ -1797,6 +1969,10 @@ Global Flags:
 	"jq": "",
 	"json": false,
 	"jwt-token": "",
+	"lockfiles": [
+		"package-lock.json",
+		"poetry.lock"
+	],
 	"loglevel": "info",
 	"npm-registry": "https://registry.npmjs.org",
 	"reporter": [],
