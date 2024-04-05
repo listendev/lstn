@@ -149,7 +149,8 @@ Inspect the verdicts for your direct dependencies.
 ### Flags
 
 ```
---json   output the verdicts (if any) in JSON form
+    --json                output the verdicts (if any) in JSON form
+-l, --lockfiles strings   set one or more lock file paths (relative to the working dir) to lookup for (default [package-lock.json,poetry.lock])
 ```
 
 ### Config Flags
@@ -218,7 +219,8 @@ Get the verdicts of a package.
 ### Flags
 
 ```
---json   output the verdicts (if any) in JSON form
+    --json                output the verdicts (if any) in JSON form
+-l, --lockfiles strings   set one or more lock file paths (relative to the working dir) to lookup for (default [package-lock.json,poetry.lock])
 ```
 
 ### Config Flags

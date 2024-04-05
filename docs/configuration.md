@@ -20,6 +20,9 @@ filtering:
     packages: 
       - "..."
       - "..."
+lockfiles: 
+  - "..."
+  - "..."
 loglevel: "info"
 registry: 
   npm: "https://registry.npmjs.org"

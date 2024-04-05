@@ -18,6 +18,8 @@ But flags override them.
 
 `LSTN_JWT_TOKEN`: set the listen.dev auth token
 
+`LSTN_LOCKFILES`: set one or more lock file paths (relative to the working dir) to lookup for
+
 `LSTN_LOGLEVEL`: set the logging level
 
 `LSTN_NPM_ENDPOINT`: the listen.dev endpoint emitting the NPM verdicts
