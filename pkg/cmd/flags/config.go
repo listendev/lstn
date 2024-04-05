@@ -85,6 +85,7 @@ type ConfigFlags struct {
 	Registry
 	Reporting
 	Filtering
+	Lockfiles []string `json:"lockfiles" flag:"lockfiles" shorthand:"l" transform:"unique" desc:"set one or more lock file paths (relative to the working dir) to lookup for" default:"[\"package-lock.json\",\"poetry.lock\"]"`
 }
 
 func NewConfigFlags() (*ConfigFlags, error) {

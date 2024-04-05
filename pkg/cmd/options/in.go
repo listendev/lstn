@@ -32,7 +32,6 @@ type In struct {
 	flags.JSONFlags
 	flags.ConfigFlags
 	flags.DebugFlags `flagset:"Debug"`
-	Lockfiles        []string `json:"lockfiles" flag:"lockfiles" shorthand:"l" transform:"unique" desc:"set one or more lock file paths (relative to the working dir) to lookup for" default:"[\"package-lock.json\",\"poetry.lock\"]"`
 	GenerateLock     bool     `name:"generate lock" flag:"genlock" desc:"whether to generate the lock file on the fly or not" json:"genlock"`
 }
 
