@@ -33,6 +33,7 @@ import (
 	"github.com/listendev/lstn/cmd/version"
 	"github.com/listendev/lstn/internal/project"
 	"github.com/listendev/lstn/pkg/cmd"
+	"github.com/listendev/lstn/pkg/cmd/arguments"
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	"github.com/listendev/lstn/pkg/cmd/flagusages"
 	"github.com/listendev/lstn/pkg/cmd/groups"
@@ -400,7 +401,11 @@ func initConfig() {
 
 		// Search config in home directory with name ".lstn" (without extension)
 		viper.AddConfigPath(home)
-		// TODO > Add current working directory as config path too?
+		// Add current working directory as config path too?
+		cwd, cwdErr := arguments.GetDirectory([]string{})
+		cobra.CheckErr(cwdErr)
+		viper.AddConfigPath(cwd)
+
 		viper.SetConfigType("yaml")
 		viper.SetConfigName(".lstn")
 	}
