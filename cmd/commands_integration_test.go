@@ -46,8 +46,8 @@ func TestChildCommands(t *testing.T) {
 			name:    "lstn in",
 			cmdline: []string{"in"},
 			stdout:  "",
-			stderr:  "Running without a configuration file\nError: directory _CWD_ does not contain the package-lock.json file\n",
-			errstr:  "directory _CWD_ does not contain the package-lock.json file",
+			stderr:  "Running without a configuration file\nError: directory _CWD_ does not contain any lock file\n",
+			errstr:  "directory _CWD_ does not contain any lock file",
 		},
 		// lstn to
 		{
