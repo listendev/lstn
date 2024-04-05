@@ -20,7 +20,10 @@ import (
 	"fmt"
 	"path/filepath"
 	"runtime"
+	"sort"
+	"strings"
 
+	"github.com/XANi/goneric"
 	"github.com/cli/cli/pkg/iostreams"
 	"github.com/listendev/lstn/internal/project"
 	"github.com/listendev/lstn/pkg/cmd/arguments"
@@ -99,11 +102,16 @@ The verdicts it returns are listed by the name of each package and its specified
 			// Lookup the lock files (relative to the working directory)
 			foundLockfiles, notFoundLockfiles := arguments.GetLockfiles(targetDir, inOpts.Lockfiles)
 			if len(notFoundLockfiles) > 0 {
+				notFoundErrors := []string{}
 				for _, errs := range notFoundLockfiles {
-					for _, e := range errs {
-						c.PrintErrln(cs.WarningIcon(), e.Error())
-					}
+					notFoundErrors = append(notFoundErrors, goneric.MapSlice(func(e error) string {
+						return e.Error()
+					}, errs)...)
 				}
+				sort.SliceStable(notFoundErrors, func(i, j int) bool {
+					return notFoundErrors[i] < notFoundErrors[j]
+				})
+				c.PrintErrln(cs.WarningIcon(), strings.Join(notFoundErrors, fmt.Sprintf("\n%s ", cs.WarningIcon())))
 			}
 			if len(foundLockfiles) == 0 {
 				return fmt.Errorf("directory %s does not contain any lock file", targetDir)
