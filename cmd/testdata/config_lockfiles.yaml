@@ -1,0 +1,16 @@
+timeout: 2223
+token:
+  github: zzz123
+  jwt: "xxx.yyy.zzz"
+lockfiles:
+  - monorepo/package-lock.json
+  - monorepo/poetry.lock
+  - monorepo/sub/poetry.lock
+reporting:
+  types:
+    - gh-pull-review
+  github:
+    owner: leodido
+    pull:
+      id: 78991
+    repo: go-urn
