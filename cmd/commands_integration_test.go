@@ -46,7 +46,7 @@ func TestChildCommands(t *testing.T) {
 			name:    "lstn in",
 			cmdline: []string{"in"},
 			stdout:  "",
-			stderr:  "Running without a configuration file\nError: directory _CWD_ does not contain any lock file\n",
+			stderr:  "Running without a configuration file\n! _CWD_/package-lock.json not found\n! _CWD_/poetry.lock not found\nError: directory _CWD_ does not contain any lock file\n",
 			errstr:  "directory _CWD_ does not contain any lock file",
 		},
 		// lstn to
@@ -261,8 +261,9 @@ Global Flags:
 			cmdline: []string{"in", "--help"},
 			stdout: heredoc.Doc(`Query listen.dev for the verdicts of all the dependencies in your project.
 
-Using this command, you can audit all the dependencies configured for a project and obtain their verdicts.
-This requires a package.json file to fetch the package name and version of the project dependencies.
+Using this command, you can audit all the dependencies of a project and obtain their verdicts.
+Given a project directory containing manifest files (package-lock.json, poetry.lock, etc),
+it fetches the package names and versions of the project dependencies.
 
 The verdicts it returns are listed by the name of each package and its specified version.
 
@@ -274,6 +275,8 @@ Examples:
   lstn in .
   lstn in /we/snitch
   lstn in sub/dir
+  lstn in --lockfiles poetry.lock,package-lock.json
+  lstn in /pyproj --lockfiles poetry.lock
 
 Flags:
       --genlock             whether to generate the lock file on the fly or not
