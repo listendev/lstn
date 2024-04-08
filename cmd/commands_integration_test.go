@@ -287,7 +287,6 @@ Examples:
   lstn in /pyproj --lockfiles poetry.lock
 
 Flags:
-      --genlock             whether to generate the lock file on the fly or not
       --json                output the verdicts (if any) in JSON form
   -l, --lockfiles strings   set one or more lock file paths (relative to the working dir) to lookup for (default [package-lock.json,poetry.lock])
 
@@ -336,7 +335,6 @@ Global Flags:
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
-	"genlock": false,
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -377,7 +375,6 @@ Global Flags:
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
-	"genlock": false,
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -418,7 +415,6 @@ Global Flags:
 		"npm": "https://npm-staging.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
-	"genlock": false,
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
@@ -459,7 +455,6 @@ Global Flags:
 				"npm": "https://npm.listen.dev",
 				"pypi": "https://pypi-stage.listen.dev"
 			},
-			"genlock": false,
 			"gh-owner": "",
 			"gh-pull-id": 0,
 			"gh-repo": "",
@@ -500,7 +495,6 @@ Global Flags:
 				"npm": "https://npm.listen.dev",
 				"pypi": "https://pypi.listen.dev"
 			},
-			"genlock": false,
 			"gh-owner": "leodido",
 			"gh-pull-id": 78991,
 			"gh-repo": "go-urn",
@@ -778,7 +772,6 @@ Global Flags:
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
-	"genlock": false,
 	"gh-owner": "",
 	"gh-pull-id": 0,
 	"gh-repo": "",
