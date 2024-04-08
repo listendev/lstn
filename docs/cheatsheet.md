@@ -75,7 +75,6 @@ Inspect the verdicts for your dependencies tree.
 ### Flags
 
 ```
-    --genlock             whether to generate the lock file on the fly or not
     --json                output the verdicts (if any) in JSON form
 -l, --lockfiles strings   set one or more lock file paths (relative to the working dir) to lookup for (default [package-lock.json,poetry.lock])
 ```
