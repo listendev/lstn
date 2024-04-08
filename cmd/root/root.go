@@ -401,7 +401,7 @@ func initConfig() {
 
 		// Search config in home directory with name ".lstn" (without extension)
 		viper.AddConfigPath(home)
-		// Add current working directory as config path too?
+		// Add current working directory as config path too
 		cwd, cwdErr := arguments.GetDirectory([]string{})
 		cobra.CheckErr(cwdErr)
 		viper.AddConfigPath(cwd)

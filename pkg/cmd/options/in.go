@@ -32,7 +32,6 @@ type In struct {
 	flags.JSONFlags
 	flags.ConfigFlags
 	flags.DebugFlags `flagset:"Debug"`
-	GenerateLock     bool `name:"generate lock" flag:"genlock" desc:"whether to generate the lock file on the fly or not" json:"genlock"`
 }
 
 func NewIn() (*In, error) {
