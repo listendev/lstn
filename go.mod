@@ -21,7 +21,7 @@ require (
 	github.com/imdario/mergo v0.3.13
 	github.com/itchyny/gojq v0.12.15
 	github.com/jarcoal/httpmock v1.3.1
-	github.com/listendev/pkg v0.0.0-20240404215942-ca211b5b993d
+	github.com/listendev/pkg v0.0.0-20240408095356-8b8482c6d65b
 	github.com/matishsiao/goInfo v0.0.0-00010101000000-000000000000
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/muja/goconfig v0.0.0-20180417074348-0a635507dddc
