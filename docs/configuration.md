@@ -1,6 +1,6 @@
 # lstn configuration file
 
-The `lstn` CLI looks for a configuration file .lstn.yaml in your `$HOME` directory when it starts.
+The `lstn` CLI looks for a configuration file .lstn.yaml in your `$HOME` or current working directory when it starts.
 
 In this file you can set the values for the global `lstn` configurations.
 Anyways, notice that environment variables, and flags (if any) override the values in your configuration file.
