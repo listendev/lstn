@@ -68,7 +68,8 @@ The verdicts it returns are listed by the name of each package and its specified
 		Args:              arguments.SingleDirectory, // Executes before RunE
 		ValidArgsFunction: arguments.SingleDirectoryActiveHelp,
 		Annotations: map[string]string{
-			"source": project.GetSourceURL(filename),
+			"source":   project.GetSourceURL(filename),
+			"subgroup": groups.WithDirectory.String(),
 		},
 		RunE: func(c *cobra.Command, args []string) error {
 			ctx = c.Context()
