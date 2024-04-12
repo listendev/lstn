@@ -77,9 +77,13 @@ func New(ctx context.Context) (*Command, error) {
 			"source": project.GetSourceURL(filename),
 		},
 		PersistentPreRunE: func(c *cobra.Command, _ []string) error {
-			// Do not check for the config file if the command is not available (eg., help) or not core (eg., version)
 			withConfigFile := false
 			c, _, err := c.Find(os.Args[1:])
+			// If the child command is one of those taking in a directory as first argument, look for the config file in there too
+			if subgroup, hasSubgroup := c.Annotations["subgroup"]; hasSubgroup && subgroup == groups.WithDirectory.String() && len(os.Args) > 1 {
+				viper.AddConfigPath(os.Args[2])
+			}
+			// Do not check for the config file if the command is not available (eg., help) or not core (eg., version)
 			if err == nil && (c.IsAvailableCommand() && c.GroupID == groups.Core.ID) {
 				// If a config file is found, read it in
 				if err := viper.ReadInConfig(); err == nil {
