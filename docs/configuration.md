@@ -10,35 +10,35 @@ Anyways, notice that environment variables, and flags (if any) override the valu
 Here's an example of a configuration file (with the default values):
 
 ```yaml
-endpoint:
+endpoint: 
   npm: "https://npm.listen.dev"
   pypi: "https://pypi.listen.dev"
-filtering:
+filtering: 
   expression: "..."
-  ignore:
-    deptypes:
+  ignore: 
+    deptypes: 
       - "..."
       - "..."
-    packages:
+    packages: 
       - "..."
       - "..."
-lockfiles:
+lockfiles: 
   - "..."
   - "..."
 loglevel: "info"
-registry:
+registry: 
   npm: "https://registry.npmjs.org"
-reporting:
-  github:
+reporting: 
+  github: 
     owner: "..."
-    pull:
+    pull: 
       id: 0
     repo: "..."
-  types:
+  types: 
     - "..."
     - "..."
 timeout: 60
-token:
+token: 
   github: "..."
   jwt: "..."
 ```
