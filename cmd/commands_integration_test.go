@@ -523,6 +523,45 @@ Global Flags:
 			stderr: "",
 			errstr: "",
 		},
+		// lstn in testdata/monorepo --debug-options
+		{
+			name: "lstn in testdata/monorepo --debug-options",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
+			cmdline: []string{"in", path.Join(cwd, "testdata", "monorepo"), "--debug-options"},
+			stdout: heredoc.Doc(`Using config file: _CWD_/testdata/monorepo/.lstn.yaml
+		{
+			"debug-options": true,
+			"endpoint": {
+				"npm": "https://npm.listen.dev",
+				"pypi": "https://pypi.listen.dev"
+			},
+			"gh-owner": "",
+			"gh-pull-id": 0,
+			"gh-repo": "",
+			"gh-token": "",
+			"ignore-deptypes": [
+				110
+			],
+			"ignore-packages": null,
+			"jq": "",
+			"json": false,
+			"jwt-token": "",
+			"lockfiles": [
+				"sub/poetry.lock"
+			],
+			"loglevel": "info",
+			"npm-registry": "https://registry.npmjs.org",
+			"reporter": [],
+			"select": "",
+			"timeout": 60
+		}
+		`),
+			stderr: "",
+			errstr: "",
+		},
 		// LSTN_REPORTER=gh-pull-check lstn scan --debug-options
 		{
 			name: "LSTN_REPORTER=gh-pull-check lstn scan --debug-options",
