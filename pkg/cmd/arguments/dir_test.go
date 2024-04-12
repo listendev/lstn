@@ -17,6 +17,9 @@ package arguments
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/listendev/pkg/lockfile"
@@ -24,6 +27,9 @@ import (
 )
 
 func TestGetLockfiles(t *testing.T) {
+	absolute1, absolute1Err := filepath.Abs("testdata/package-lock.json")
+	require.NoError(t, absolute1Err)
+
 	type testCase struct {
 		inputCWD       string
 		inputLockfiles []string
@@ -37,6 +43,14 @@ func TestGetLockfiles(t *testing.T) {
 			inputLockfiles: []string{"package-lock.json"},
 			wantLockfiles: map[string]lockfile.Lockfile{
 				"testdata/package-lock.json": lockfile.PackageLockJSON,
+			},
+			wantErrors: map[lockfile.Lockfile][]error{},
+		},
+		{
+			inputCWD:       "testdata",
+			inputLockfiles: []string{absolute1},
+			wantLockfiles: map[string]lockfile.Lockfile{
+				"_CWD_/testdata/package-lock.json": lockfile.PackageLockJSON,
 			},
 			wantErrors: map[lockfile.Lockfile][]error{},
 		},
@@ -94,9 +108,22 @@ func TestGetLockfiles(t *testing.T) {
 		},
 	}
 
+	cwd, _ := os.Getwd()
+
 	for _, tc := range cases {
 		gotLockfiles, gotErrors := GetLockfiles(tc.inputCWD, tc.inputLockfiles)
-		require.Equal(t, tc.wantLockfiles, gotLockfiles)
+
+		got := map[string]lockfile.Lockfile{}
+		for k, v := range gotLockfiles {
+			got[strings.ReplaceAll(k, "_CWD_", cwd)] = v
+		}
+
+		want := map[string]lockfile.Lockfile{}
+		for k, v := range tc.wantLockfiles {
+			want[strings.ReplaceAll(k, "_CWD_", cwd)] = v
+		}
+
+		require.Equal(t, want, got)
 		require.Equal(t, tc.wantErrors, gotErrors)
 	}
 }
