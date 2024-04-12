@@ -31,6 +31,7 @@ import (
 	"github.com/listendev/lstn/pkg/jsonpath"
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/listendev/lstn/pkg/npm"
+	"github.com/listendev/pkg/ecosystem"
 	"github.com/spf13/cobra"
 )
 
@@ -161,6 +162,7 @@ It lists out the verdicts of all the versions of the input package name.`,
 				res, resJSON, resErr = listen.Packages(
 					req,
 					listen.WithContext(ctx),
+					listen.WithEcosystem(ecosystem.Npm), // FIXME: only NPM atm
 					listen.WithJSONOptions(toOpts.JSONFlags),
 				)
 			}

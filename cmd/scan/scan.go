@@ -31,6 +31,7 @@ import (
 	"github.com/listendev/lstn/pkg/listen"
 	"github.com/listendev/lstn/pkg/npm"
 	reporterfactory "github.com/listendev/lstn/pkg/reporter/factory"
+	"github.com/listendev/pkg/ecosystem"
 	"github.com/spf13/cobra"
 )
 
@@ -121,6 +122,7 @@ The verdicts it returns are listed by the name of each package and its specified
 				res, resJSON, resErr := listen.BulkPackages(
 					reqs,
 					listen.WithContext(ctx),
+					listen.WithEcosystem(ecosystem.Npm), // FIXME: only NPM at the moment
 					listen.WithJSONOptions(scanOpts.JSONFlags),
 				)
 
