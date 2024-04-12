@@ -63,6 +63,10 @@ func GetDirectory(args []string) (string, error) {
 
 func GetLockfiles(cwd string, lockfiles []string) (map[string]lockfile.Lockfile, map[lockfile.Lockfile][]error) {
 	paths := goneric.MapSlice(func(f string) string {
+		if filepath.IsAbs(f) {
+			return f
+		}
+
 		return filepath.Join(cwd, f)
 	}, lockfiles)
 
