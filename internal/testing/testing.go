@@ -202,3 +202,12 @@ func EnvSetter(envs map[string]string) (closer func()) {
 		}
 	}
 }
+
+func StringsReplaceAll(slice []string, with string) []string {
+	ret := []string{}
+	for _, s := range slice {
+		ret = append(ret, strings.ReplaceAll(s, "_CWD_", with))
+	}
+
+	return ret
+}
