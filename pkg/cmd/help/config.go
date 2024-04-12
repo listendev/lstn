@@ -29,7 +29,9 @@ import (
 func configHelpTopicFunc() TopicFunc {
 	return func(c *cobra.Command, _ []string) {
 		b := bytes.NewBufferString("# lstn configuration file\n\n")
-		fmt.Fprintf(b, "%s\n\n", "The `lstn` CLI looks for a configuration file .lstn.yaml in your `$HOME` or current working directory when it starts.")
+		fmt.Fprintf(b, "%s\n\n", "The `lstn` CLI looks for a configuration file `.lstn.yaml` in your `$HOME` or into the current working directory from which `lstn` is getting called.")
+		fmt.Fprintf(b, "%s\n\n", "When invoking `lstn in <dir>` it also looks for `.lstn.yaml` into `<dir>`.")
+
 		fmt.Fprintf(b, "%s\n", "In this file you can set the values for the global `lstn` configurations.")
 		fmt.Fprintf(b, "%s\n\n", "Anyways, notice that environment variables, and flags (if any) override the values in your configuration file.")
 		fmt.Fprintf(b, "%s\n\n", "Here's an example of a configuration file (with the default values):")
