@@ -44,7 +44,7 @@ This command requires a listen.dev pro account.`,
 		Annotations: map[string]string{
 			"source": project.GetSourceURL(filename),
 		},
-		RunE: func(c *cobra.Command, args []string) error {
+		RunE: func(c *cobra.Command, _ []string) error {
 			ctx = c.Context()
 			// Obtain the local options from the context
 			opts, err := pkgcontext.GetOptionsFromContext(ctx, pkgcontext.CiKey)
