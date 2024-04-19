@@ -235,7 +235,7 @@ The verdicts it returns are listed by the name of each package and its specified
 					continue
 				}
 
-				errExec := reporterfactory.Exec(c, inOpts.Reporting, *res)
+				errExec := reporterfactory.Exec(c, inOpts.Reporting, *res, &lp)
 				if errExec != nil {
 					if numIterations == 1 {
 						return errExec

@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 
 	"github.com/cli/cli/pkg/iostreams"
@@ -148,8 +149,9 @@ The verdicts it returns are listed by the name of each package and its specified
 			if err != nil {
 				return err
 			}
+			src := filepath.Join(targetDir, "package.json")
 
-			return reporterfactory.Exec(c, scanOpts.Reporting, combinedResponse)
+			return reporterfactory.Exec(c, scanOpts.Reporting, combinedResponse, &src)
 		},
 	}
 
