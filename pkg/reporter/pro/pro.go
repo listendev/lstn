@@ -71,7 +71,7 @@ func New(ctx context.Context, opts ...reporter.Option) (reporter.Reporter, error
 	return ret, nil
 }
 
-func (r *rep) Run(res listen.Response) error {
+func (r *rep) Run(res listen.Response, source *string) error {
 	verdicts := res.Verdicts()
 	if len(verdicts) == 0 {
 		return nil
@@ -85,7 +85,7 @@ func (r *rep) Run(res listen.Response) error {
 	cb := func(v listen.Verdict) wrap {
 		res, err := r.proClient.PostApiV1DependenciesEventWithResponse(
 			r.ctx,
-			getDependencyEvent(v, *r.info),
+			getDependencyEvent(v, *r.info, source),
 			attachAuthBearer(r),
 		)
 
@@ -133,9 +133,10 @@ func attachAuthBearer(r *rep) apispec.RequestEditorFn {
 	}
 }
 
-func getDependencyEvent(v listen.Verdict, i ci.Info) apispec.DependencyEvent {
+func getDependencyEvent(v listen.Verdict, i ci.Info, src *string) apispec.DependencyEvent {
 	return apispec.PostApiV1DependenciesEventJSONRequestBody{
-		Verdict: v,
+		Verdict:      v,
+		LockFilePath: src,
 		GithubContext: apispec.GitHubDependencyEventContext{
 			Action:            i.Action,
 			ActionPath:        &i.ActionPath,
