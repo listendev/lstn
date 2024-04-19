@@ -103,7 +103,7 @@ func Make(ctx context.Context, reportType cmd.ReportType) (r reporter.Reporter, 
 	}
 }
 
-func Exec(c *cobra.Command, reportingOpts flags.Reporting, resp listen.Response) error {
+func Exec(c *cobra.Command, reportingOpts flags.Reporting, resp listen.Response, source *string) error {
 	ctx := c.Context()
 	var cs *iostreams.ColorScheme
 	io, ok := ctx.Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
@@ -134,7 +134,7 @@ func Exec(c *cobra.Command, reportingOpts flags.Reporting, resp listen.Response)
 				continue
 			}
 
-			err = rep.Run(resp)
+			err = rep.Run(resp, source)
 			if err != nil {
 				return fmt.Errorf("error while executing the %q reporter: %w", r.String(), err)
 			}
