@@ -8,6 +8,30 @@ Every child command inherits the following flags:
 --config string   config file (default is $HOME/.lstn.yaml)
 ```
 
+## `lstn ci`
+
+Listen in on what your CI does.
+
+### Config Flags
+
+```
+--loglevel string   set the logging level (default "info")
+--timeout int       set the timeout, in seconds (default 60)
+```
+
+### Debug Flags
+
+```
+--debug-options   output the options, then exit
+```
+
+### Token Flags
+
+```
+--gh-token string    set the GitHub token
+--jwt-token string   set the listen.dev auth token
+```
+
 ## `lstn completion <bash|fish|powershell|zsh>`
 
 Generate the autocompletion script for the specified shell.
