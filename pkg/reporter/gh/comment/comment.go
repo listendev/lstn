@@ -111,7 +111,7 @@ func (r *rep) stickyComment(owner string, repo string, id int, comment io.Reader
 	return commentFn()
 }
 
-func (r *rep) Run(res listen.Response, source *string) error {
+func (r *rep) Run(res listen.Response, _ *string) error {
 	buf := bytes.Buffer{}
 	fullMarkdownReport := report.NewFullMarkdwonReport()
 	fullMarkdownReport.WithOutput(&buf)
