@@ -26,5 +26,5 @@ type Reporter interface {
 	WithGitHubClient(client *github.Client)
 	WithConfigOptions(opts *flags.ConfigFlags)
 	WithContinuousIntegrationInfo(info *ci.Info)
-	Run(res listen.Response) error
+	Run(res listen.Response, source *string) error
 }
