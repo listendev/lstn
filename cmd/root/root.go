@@ -27,6 +27,7 @@ import (
 
 	"github.com/XANi/goneric"
 	"github.com/cli/cli/pkg/iostreams"
+	"github.com/listendev/lstn/cmd/ci"
 	"github.com/listendev/lstn/cmd/in"
 	"github.com/listendev/lstn/cmd/scan"
 	"github.com/listendev/lstn/cmd/to"
@@ -280,6 +281,13 @@ func New(ctx context.Context) (*Command, error) {
 
 	// Setup the core group
 	rootCmd.AddGroup(&groups.Core)
+
+	// Setup the `ci` subcommand
+	ciCmd, err := ci.New(ctx)
+	if err != nil {
+		return nil, err
+	}
+	rootCmd.AddCommand(ciCmd)
 
 	// Setup the `in` subcommand
 	inCmd, err := in.New(ctx)
