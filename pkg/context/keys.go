@@ -23,6 +23,9 @@ var ConfigKey contextKey = "cfg"
 // ContextCancelFuncKey is the key indexing the context cancelation function in the context itself.
 var ContextCancelFuncKey contextKey = "ctxcancel"
 
+// CiKey is the key indexing the options for the `ci` child command.
+var CiKey contextKey = "ci"
+
 // InKey is the key indexing the options for the `in` child command.
 var InKey contextKey = "in"
 
