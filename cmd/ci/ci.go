@@ -20,7 +20,10 @@ import (
 	"fmt"
 	"runtime"
 
+	"github.com/cli/cli/pkg/iostreams"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/listendev/lstn/internal/project"
+	"github.com/listendev/lstn/pkg/ci"
 	"github.com/listendev/lstn/pkg/cmd/groups"
 	"github.com/listendev/lstn/pkg/cmd/options"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
@@ -61,6 +64,23 @@ This command requires a listen.dev pro account.`,
 
 				return nil
 			}
+
+			info, infoErr := ci.NewInfo()
+			if infoErr != nil {
+				return fmt.Errorf("not running in a CI environment")
+			}
+
+			io := c.Context().Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
+			cs := io.ColorScheme()
+
+			if !info.IsGitHubPullRequest() {
+				c.PrintErrln(cs.WarningIcon(), "lstn ci only runs on GitHub pull requests at the moment")
+
+				return nil
+			}
+			// FIXME: block when running on a fork pull request?
+
+
 
 			return nil
 		},
