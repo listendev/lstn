@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/caarlos0/env/v10"
+	"github.com/caarlos0/env/v11"
 	"github.com/google/go-github/v53/github"
 )
 
