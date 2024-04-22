@@ -17,6 +17,11 @@ package ci
 
 import (
 	"fmt"
+	"reflect"
+	"sort"
+	"strings"
+
+	"github.com/iancoleman/strcase"
 )
 
 type Info struct {
@@ -75,4 +80,47 @@ func NewInfo() (*Info, error) {
 	// TODO: implement logic for other CI systems
 
 	return nil, fmt.Errorf("CI systems other than GitHub Actions are not supported yet")
+}
+
+type Dumper interface {
+	Dump() string
+}
+
+func (i *Info) Dump() string {
+	ret := []string{}
+	for _, f := range reflect.VisibleFields(reflect.TypeOf(*i)) {
+		name := f.Name
+		tag := f.Tag.Get("dump")
+		if tag == "" {
+			tag = f.Tag.Get("env")
+			if tag == "" {
+				tag = strcase.ToScreamingSnake(name)
+			}
+		}
+		val := reflect.ValueOf(*i).FieldByName(name)
+		if !val.IsValid() {
+			continue
+		}
+		if isEmptyValue(val) {
+			continue
+		}
+		ret = append(ret, fmt.Sprintf("%s=%v", tag, val))
+	}
+	sort.Strings(ret)
+
+	return strings.Join(ret, "\n")
+}
+
+func isEmptyValue(v reflect.Value) bool {
+	switch v.Kind() {
+	case reflect.Array, reflect.Map, reflect.Slice, reflect.String:
+		return v.Len() == 0
+	case reflect.Bool,
+		reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
+		reflect.Float32, reflect.Float64,
+		reflect.Interface, reflect.Pointer:
+		return v.IsZero()
+	}
+	return false
 }
