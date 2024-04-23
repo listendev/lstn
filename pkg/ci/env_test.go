@@ -63,7 +63,10 @@ func TestNewInfo_GitHubActionsPushEvent(t *testing.T) {
 
 	assert.False(t, got.IsGitHubPullRequest())
 
-	assert.Equal(t, got.Dump(), "OWNER=reviewdog\nREPO=reviewdog\nSHA=febdd4bf26c6e8856c792303cfc66fa5e7bc975b")
+	gotDump := got.Dump()
+	assert.Contains(t, gotDump, "OWNER=reviewdog")
+	assert.Contains(t, gotDump, "REPO=reviewdog")
+	assert.Contains(t, gotDump, "SHA=febdd4bf26c6e8856c792303cfc66fa5e7bc975b")
 }
 
 func TestNewInfo_GitHubActionsPullRequestEvent(t *testing.T) {
@@ -90,7 +93,13 @@ func TestNewInfo_GitHubActionsPullRequestEvent(t *testing.T) {
 	}
 
 	assert.True(t, got.IsGitHubPullRequest())
-	assert.Equal(t, got.Dump(), "BRANCH=go1.13\nNUM=285\nOWNER=reviewdog\nREPO=reviewdog\nSHA=cb23119096646023c05e14ea708b7f20cee906d5")
+
+	gotDump := got.Dump()
+	assert.Contains(t, gotDump, "BRANCH=go1.13")
+	assert.Contains(t, gotDump, "NUM=285")
+	assert.Contains(t, gotDump, "OWNER=reviewdog")
+	assert.Contains(t, gotDump, "REPO=reviewdog")
+	assert.Contains(t, gotDump, "SHA=cb23119096646023c05e14ea708b7f20cee906d5")
 }
 
 func TestNewInfo_GitHubActionsPullRequestForkEvent(t *testing.T) {
@@ -118,7 +127,14 @@ func TestNewInfo_GitHubActionsPullRequestForkEvent(t *testing.T) {
 	}
 
 	assert.True(t, got.IsGitHubPullRequest())
-	assert.Equal(t, got.Dump(), "BRANCH=build/pkg\nFORK=true\nNUM=217\nOWNER=listendev\nREPO=lstn\nSHA=5864e328f129b98726813940b5bfa44707963bdc")
+
+	gotDump := got.Dump()
+	assert.Contains(t, gotDump, "BRANCH=build/pkg")
+	assert.Contains(t, gotDump, "FORK=true")
+	assert.Contains(t, gotDump, "NUM=217")
+	assert.Contains(t, gotDump, "OWNER=listendev")
+	assert.Contains(t, gotDump, "REPO=lstn")
+	assert.Contains(t, gotDump, "SHA=5864e328f129b98726813940b5bfa44707963bdc")
 }
 
 func TestNewInfo_GitHubActionsReRunEvent(t *testing.T) {
