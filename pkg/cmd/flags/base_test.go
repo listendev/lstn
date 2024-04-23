@@ -19,6 +19,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/ghetzel/testify/require"
 	"github.com/listendev/lstn/pkg/cmd"
 	"github.com/listendev/lstn/pkg/cmd/flagusages"
 	npmdeptype "github.com/listendev/lstn/pkg/npm/deptype"
@@ -71,6 +72,16 @@ func (suite *FlagsBaseSuite) TestGetField() {
 	logLevelVal := GetField(cfg, "LogLevel")
 	assert.True(suite.T(), logLevelVal.IsValid())
 	assert.Equal(suite.T(), "info", logLevelVal.Interface())
+}
+
+func (suite *FlagsBaseSuite) TestGetFieldTag() {
+	cfg := ConfigFlags{}
+
+	tokenGithubTag, tokenGithubTagFound := GetFieldTag(cfg, "Token.GitHub")
+	require.True(suite.T(), tokenGithubTagFound)
+	tokeGithubNameTag, tokeGithubNameTagFound := tokenGithubTag.Lookup("name")
+	require.True(suite.T(), tokeGithubNameTagFound)
+	require.Equal(suite.T(), "GitHub token", tokeGithubNameTag)
 }
 
 func (suite *FlagsBaseSuite) TestValidate() {
