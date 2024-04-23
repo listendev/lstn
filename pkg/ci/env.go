@@ -122,5 +122,6 @@ func isEmptyValue(v reflect.Value) bool {
 		reflect.Interface, reflect.Pointer:
 		return v.IsZero()
 	}
+
 	return false
 }
