@@ -103,7 +103,12 @@ This command requires a listen.dev pro account.`,
 
 				return nil
 			}
-			// FIXME: block when running on a fork pull request?
+			// Block when running on fork pull requests
+			if info.HasReadOnlyGitHubToken() {
+				c.PrintErrln(cs.WarningIcon(), "lstn ci doesn not run on fork pull requests at the moment")
+
+				return nil
+			}
 
 			envConfig := fmt.Sprintf("%s\n%s=%s\n%s=%s\n", info.Dump(), "LISTENDEV_TOKEN", ciOpts.Token.JWT, "GITHUB_TOKEN", ciOpts.Token.GitHub)
 
