@@ -40,14 +40,18 @@ var EnvReplacer = strings.NewReplacer("-", EnvSeparator, ".", EnvSeparator)
 // EnvPrefix is the prefix of the env variables corresponding to the global flags.
 var EnvPrefix = "lstn"
 
+func Translate(err error, prefix string) []error {
+	all := []error{}
+	for _, e := range err.(v.ValidationErrors) {
+		all = append(all, fmt.Errorf("%s%s", prefix, e.Translate(v.Translator)))
+	}
+
+	return all
+}
+
 func Validate(o interface{}) []error {
 	if err := v.Singleton.Struct(o); err != nil {
-		all := []error{}
-		for _, e := range err.(v.ValidationErrors) {
-			all = append(all, fmt.Errorf(e.Translate(v.Translator)))
-		}
-
-		return all
+		return Translate(err, "")
 	}
 
 	return nil
@@ -252,6 +256,30 @@ func GetField(o interface{}, name string) reflect.Value {
 	val := getValue(o)
 
 	return getField(val, name)
+}
+
+func getFieldTag(val reflect.Value, name string) (reflect.StructTag, bool) {
+	parts := strings.Split(name, ".")
+	for i := 0; i < val.NumField(); i++ {
+		field := val.Type().Field(i)
+		if field.Name == name {
+			return field.Tag, true
+		}
+
+		if val.Field(i).Kind() == reflect.Struct && strings.HasPrefix(field.Name, parts[0]) {
+			if t, ok := getFieldTag(val.Field(i), strings.Join(parts[1:], ".")); ok {
+				return t, ok
+			}
+		}
+	}
+
+	return "", false
+}
+
+func GetFieldTag(o interface{}, name string) (reflect.StructTag, bool) {
+	val := getValue(o)
+
+	return getFieldTag(val, name)
 }
 
 func getValue(o interface{}) reflect.Value {
