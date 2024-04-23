@@ -18,6 +18,7 @@ package ci
 import (
 	"context"
 	"fmt"
+	"os"
 	"runtime"
 
 	"github.com/cli/cli/pkg/iostreams"
@@ -104,9 +105,14 @@ This command requires a listen.dev pro account.`,
 			}
 			// FIXME: block when running on a fork pull request?
 
+			envConfig := fmt.Sprintf("%s\n%s=%s\n%s=%s\n", info.Dump(), "LISTENDEV_TOKEN", ciOpts.Token.JWT, "GITHUB_TOKEN", ciOpts.Token.GitHub)
 
+			envDirErr := os.MkdirAll("/var/run/argus", 0750)
+			if envDirErr != nil {
+				return envDirErr
+			}
 
-			return nil
+			return os.WriteFile("/var/run/argus/default", []byte(envConfig), 0640)
 		},
 	}
 
