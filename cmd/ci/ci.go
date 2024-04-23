@@ -21,12 +21,13 @@ import (
 	"runtime"
 
 	"github.com/cli/cli/pkg/iostreams"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/listendev/lstn/internal/project"
 	"github.com/listendev/lstn/pkg/ci"
+	"github.com/listendev/lstn/pkg/cmd/flags"
 	"github.com/listendev/lstn/pkg/cmd/groups"
 	"github.com/listendev/lstn/pkg/cmd/options"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
+	"github.com/listendev/lstn/pkg/validate"
 	"github.com/spf13/cobra"
 )
 
@@ -59,11 +60,34 @@ This command requires a listen.dev pro account.`,
 				return fmt.Errorf("couldn't obtain options for the current child command")
 			}
 
+			errs := []error{}
+			if err := validate.Singleton.Var(ciOpts.Token.GitHub, "mandatory"); err != nil {
+				tags, _ := flags.GetFieldTag(ciOpts, "ConfigFlags.Token.GitHub")
+				name, _ := tags.Lookup("name")
+				errs = append(errs, flags.Translate(err, name)...)
+			}
+			if err := validate.Singleton.Var(ciOpts.Token.JWT, "mandatory"); err != nil {
+				tags, _ := flags.GetFieldTag(ciOpts, "ConfigFlags.Token.JWT")
+				name, _ := tags.Lookup("name")
+				errs = append(errs, flags.Translate(err, name)...)
+			}
+			if len(errs) > 0 {
+				ret := "invalid configuration options/flags"
+				for _, e := range errs {
+					ret += "\n       "
+					ret += e.Error()
+				}
+
+				return fmt.Errorf(ret)
+			}
+
 			if ciOpts.DebugOptions {
 				c.Println(ciOpts.AsJSON())
 
 				return nil
 			}
+
+			// FIXME: exit if not on linux
 
 			info, infoErr := ci.NewInfo()
 			if infoErr != nil {
