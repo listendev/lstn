@@ -15,7 +15,7 @@ Listen in on what your CI does.
 ### Flags
 
 ```
---dir string   the directory where Argus binary is
+--dir string   the directory where the argus binary is
 ```
 
 ### Config Flags

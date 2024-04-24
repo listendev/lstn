@@ -31,7 +31,7 @@ var _ cmd.CommandOptions = (*Ci)(nil)
 type Ci struct {
 	flags.ConfigFlags
 	flags.DebugFlags `flagset:"Debug"`
-	Directory        string `flag:"dir" name:"dir" desc:"the directory where Argus binary is" validate:"omitempty,dir" json:"argusdir"`
+	Directory        string `flag:"dir" name:"dir" desc:"the directory where the argus binary is" validate:"omitempty,dir" json:"argusdir"`
 }
 
 func NewCi() (*Ci, error) {
