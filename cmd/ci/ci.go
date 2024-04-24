@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 
 	"github.com/cli/cli/pkg/iostreams"
@@ -128,17 +129,36 @@ This command requires a listen.dev pro account.`,
 				return err
 			}
 			io.StopProgressIndicator()
-			c.Println(cs.SuccessIcon(), fmt.Sprintf("Wrote config at %s", envConfigFilename))
+			c.Println(cs.SuccessIcon(), "Wrote config", cs.Magenta(envConfigFilename))
 
 			io.StartProgressIndicator()
-			exe, err := exec.LookPath("argus")
-			if err != nil {
-				io.StopProgressIndicator()
+			var argus *exec.Cmd
+			if len(ciOpts.Directory) > 0 {
+				file := filepath.Join(ciOpts.Directory, "argus")
+				info, err := os.Stat(file)
+				if os.IsNotExist(err) {
+					io.StopProgressIndicator()
 
-				return fmt.Errorf("couldn't find the argus executable in the PATH")
+					return fmt.Errorf("couldn't find the argus binary in %s", ciOpts.Directory)
+				}
+				if info.IsDir() {
+					io.StopProgressIndicator()
+
+					return fmt.Errorf("expecting %s to be an executable file", file)
+				}
+				argus = exec.CommandContext(ctx, file, "-s", "enable-now")
+			} else {
+
+				exe, err := exec.LookPath("argus")
+				if err != nil {
+					io.StopProgressIndicator()
+
+					return fmt.Errorf("couldn't find the argus executable in the PATH")
+				}
+				argus = exec.CommandContext(ctx, exe, "-s", "enable-now")
 			}
-			argus := exec.CommandContext(ctx, exe, "-s", "enable-now")
 			io.StopProgressIndicator()
+			c.Println(cs.Blue("•"), "Install and enable", cs.Magenta(argus.String()))
 
 			io.StartProgressIndicator()
 			argusOut, argusErr := argus.CombinedOutput()
