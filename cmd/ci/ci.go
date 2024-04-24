@@ -148,7 +148,6 @@ This command requires a listen.dev pro account.`,
 				}
 				argus = exec.CommandContext(ctx, file, "-s", "enable-now")
 			} else {
-
 				exe, err := exec.LookPath("argus")
 				if err != nil {
 					io.StopProgressIndicator()
