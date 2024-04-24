@@ -157,4 +157,19 @@ func init() {
 	); err != nil {
 		panic(err)
 	}
+
+	if err := Singleton.RegisterTranslation(
+		"dir",
+		Translator,
+		func(ut ut.Translator) error {
+			return ut.Add("dir", "{0} is not a valid existing directory", true)
+		},
+		func(ut ut.Translator, fe validator.FieldError) string {
+			t, _ := ut.T("dir", fe.Field())
+
+			return t
+		},
+	); err != nil {
+		panic(err)
+	}
 }
