@@ -11,6 +11,7 @@ before:
     - go build -o make/make make/main.go
     - make/make man
 
+# FIXME: use make/make lstn
 builds:
   - <<: &build_defaults
       binary: lstn

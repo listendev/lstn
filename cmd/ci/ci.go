@@ -143,6 +143,7 @@ This command requires a listen.dev pro account.`,
 			io.StartProgressIndicator()
 			argusOut, argusErr := argus.CombinedOutput()
 			if argusErr != nil {
+				io.StopProgressIndicator()
 
 				return fmt.Errorf("couldn't install and enable argus: %w", argusErr)
 			}
