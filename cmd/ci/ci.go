@@ -16,6 +16,7 @@
 package ci
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"os"
@@ -111,24 +112,44 @@ This command requires a listen.dev pro account.`,
 				return nil
 			}
 
+			io.StartProgressIndicator()
 			envConfig := fmt.Sprintf("%s\n%s=%s\n%s=%s\n", info.Dump(), "LISTENDEV_TOKEN", ciOpts.Token.JWT, "GITHUB_TOKEN", ciOpts.Token.GitHub)
-
 			envDirErr := os.MkdirAll("/var/run/argus", 0750)
 			if envDirErr != nil {
+				io.StopProgressIndicator()
+
 				return envDirErr
 			}
 
-			if err := os.WriteFile("/var/run/argus/default", []byte(envConfig), 0640); err != nil {
+			envConfigFilename := "/var/run/argus/default"
+			if err := os.WriteFile(envConfigFilename, []byte(envConfig), 0640); err != nil {
+				io.StopProgressIndicator()
+
 				return err
 			}
+			io.StopProgressIndicator()
+			c.Println(cs.SuccessIcon(), fmt.Sprintf("Wrote config at %s", envConfigFilename))
 
+			io.StartProgressIndicator()
 			exe, err := exec.LookPath("argus")
 			if err != nil {
+				io.StopProgressIndicator()
+
 				return fmt.Errorf("couldn't find the argus executable in the PATH")
 			}
 			argus := exec.CommandContext(ctx, exe, "-s", "enable-now")
+			io.StopProgressIndicator()
 
-			return argus.Run()
+			io.StartProgressIndicator()
+			argusOut, argusErr := argus.CombinedOutput()
+			if argusErr != nil {
+
+				return fmt.Errorf("couldn't install and enable argus: %w", argusErr)
+			}
+			io.StopProgressIndicator()
+			c.Println(string(bytes.Trim(argusOut, "\n")))
+
+			return nil
 		},
 	}
 
