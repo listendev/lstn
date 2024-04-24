@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"runtime"
 
 	"github.com/cli/cli/pkg/iostreams"
@@ -117,7 +118,17 @@ This command requires a listen.dev pro account.`,
 				return envDirErr
 			}
 
-			return os.WriteFile("/var/run/argus/default", []byte(envConfig), 0640)
+			if err := os.WriteFile("/var/run/argus/default", []byte(envConfig), 0640); err != nil {
+				return err
+			}
+
+			exe, err := exec.LookPath("argus")
+			if err != nil {
+				return fmt.Errorf("couldn't find the argus executable in the PATH")
+			}
+			argus := exec.CommandContext(ctx, exe, "-s", "enable-now")
+
+			return argus.Run()
 		},
 	}
 
