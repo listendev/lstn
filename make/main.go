@@ -54,7 +54,7 @@ var (
 			}
 
 			ldflags := os.Getenv("GO_LDFLAGS")
-			// Default to `-s -w` ldflags
+			// Default to `-w -s` ldflags
 			if len(ldflags) == 0 {
 				ldflags = "-w -s"
 			}
