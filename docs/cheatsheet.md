@@ -12,6 +12,12 @@ Every child command inherits the following flags:
 
 Listen in on what your CI does.
 
+### Flags
+
+```
+--dir string   the directory where Argus binary is
+```
+
 ### Config Flags
 
 ```
