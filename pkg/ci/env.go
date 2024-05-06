@@ -56,6 +56,7 @@ type Info struct {
 	TriggeringActor  string `env:"GITHUB_TRIGGERING_ACTOR"`
 	Workflow         string `env:"GITHUB_WORKFLOW"`
 	WorkflowRef      string `env:"GITHUB_WORKFLOW_REF"`
+	WorkflowSha      string `env:"GITHUB_WORKFLOW_SHA"`
 	Workspace        string `env:"GITHUB_WORKSPACE"`
 }
 
