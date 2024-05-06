@@ -27,7 +27,7 @@ import (
 type Info struct {
 	Owner            string
 	Repo             string
-	SHA              string
+	SHA              string `dump:"GITHUB_SHA"`
 	Num              int    // Pull (merge) request number
 	Branch           string // Pull (merge) request branch
 	Fork             bool
