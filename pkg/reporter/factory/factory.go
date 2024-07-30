@@ -59,11 +59,10 @@ func Make(ctx context.Context, reportType cmd.ReportType) (r reporter.Reporter, 
 			return nil, false, ErrReporterUnsupportedEnvironment
 		}
 
-		// This reporter doesn't run on forks at the moment
-		if info.IsGitHubPullRequest() {
-			if info.HasReadOnlyGitHubToken() {
-				return nil, false, ErrReporterOnFork
-			}
+		// This reporter doesn't run on fork's pull requests at the moment
+		// It can run on GitHub events other than pull_request tho since it only calls our core APIs
+		if info.HasReadOnlyGitHubToken() {
+			return nil, false, ErrReporterOnFork
 		}
 
 		r, err := pro.New(ctx, reporter.WithContinuousIntegrationInfo(info))
@@ -84,6 +83,7 @@ func Make(ctx context.Context, reportType cmd.ReportType) (r reporter.Reporter, 
 			return nil, false, ErrReporterUnsupportedEnvironment
 		}
 
+		// This reporter can only work on pull requests because it comments on them (with a sticky comment)
 		if !env.IsGitHubPullRequest() {
 			return nil, false, ErrReporterNotOnPullRequest
 		}
