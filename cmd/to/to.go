@@ -47,7 +47,7 @@ func New(ctx context.Context) (*cobra.Command, error) {
 	}
 
 	var toCmd = &cobra.Command{
-		Use:                   "to <name> [[version] [shasum] | [version constraint]]",
+		Use:                   "to <ecosystem> <name> [[version] [shasum] | [version constraint]]",
 		GroupID:               groups.Core.ID,
 		DisableFlagsInUseLine: true,
 		Short:                 "Get the verdicts of a package",
@@ -55,22 +55,25 @@ func New(ctx context.Context) (*cobra.Command, error) {
 
 Using this command, you can audit a single package version or all the versions of a package and obtain their verdicts.
 
-Specifying the package name is mandatory.
+Specifying the ecosystem and the package name is mandatory.
 
 It lists out the verdicts of all the versions of the input package name.`,
 		Example: `  # Get the verdicts for all the chalk versions that listen.dev owns
-  lstn to chalk
-  lstn to debug 4.3.4
-  lstn to react 18.0.0 b468736d1f4a5891f38585ba8e8fb29f91c3cb96
-
+  lstn to npm chalk
+  # Get the verdicts for version 4.3.4 of the debug package on NPM
+  lstn to npm debug 4.3.4
+  # Get the listen.dev verdicts for react 18.0.0 with digest b468736d1f4a5891f38585ba8e8fb29f91c3cb96
+  lstn to npm react 18.0.0 b468736d1f4a5891f38585ba8e8fb29f91c3cb96
   # Get the verdicts for all the existing chalk versions
-  lstn to chalk "*"
+  lstn to npm chalk "*"
   # Get the verdicts for nock versions >= 13.2.0 and < 13.3.0
-  lstn to nock "~13.2.x"
+  lstn to npm nock "~13.2.x"
   # Get the verdicts for tap versions >= 16.3.0 and < 16.4.0
-  lstn to tap "^16.3.0"
+  lstn to npm tap "^16.3.0"
   # Get the verdicts for prettier versions >= 2.7.0 <= 3.0.0
-  lstn to prettier ">=2.7.0 <=3.0.0"`,
+  lstn to npm prettier ">=2.7.0 <=3.0.0"
+  # Get the verdicts for all the flask versions that listen.dev analysed
+  lstn to pypi flask`,
 		// Executes before RunE
 		Args: func(c *cobra.Command, args []string) error {
 			// Do not enforce arguments validation when users uses --debug-options
@@ -78,18 +81,28 @@ It lists out the verdicts of all the versions of the input package name.`,
 				return nil
 			}
 
-			return arguments.PackageTriple(c, args)
+			return arguments.PackageTuple(c, args)
 		},
-		ValidArgsFunction: arguments.PackageTripleActiveHelp,
+		ValidArgsFunction: arguments.PackageTupleActiveHelp,
 		Annotations: map[string]string{
 			"source": project.GetSourceURL(filename),
 		},
 		PreRunE: func(c *cobra.Command, args []string) error {
-			if len(args) > 1 {
-				// Theoretically, it's impossible args[1] is not a valid semver constraint at this point
-				constraints, _ := semver.NewConstraint(args[1])
+			// Theoretically, it's impossible args[0] is not a valid ecosystem at this point (because of the Args function)
+			eco, _ := ecosystem.FromString(args[0])
 
-				versions, err := npm.GetVersionsFromRegistry(c.Context(), args[0], constraints)
+			if len(args) > 2 {
+				// Theoretically, it's impossible args[2] is not a valid semver constraint at this point (because of the Args function)
+				constraints, _ := semver.NewConstraint(args[2])
+
+				var versions semver.Collection
+				var err error
+				switch eco {
+				case ecosystem.Npm:
+					versions, err = npm.GetVersionsFromRegistry(c.Context(), args[1], constraints)
+				case ecosystem.Pypi:
+					versions, err = pypi.GetVersionsFromRegistry(c.Context(), args[1], constraints) // FIXME: implement for PyPi
+				}
 				if err != nil {
 					return err
 				}
@@ -126,7 +139,9 @@ It lists out the verdicts of all the versions of the input package name.`,
 
 			io := c.Context().Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
 			io.StartProgressIndicator()
-			defer io.StopProgressIndicator()
+
+			// Theoretically, it's impossible args[0] is not a valid ecosystem at this point (because of the Args function)
+			eco, _ := ecosystem.FromString(args[0])
 
 			versions, multiple := ctx.Value(pkgcontext.VersionsCollection).(semver.Collection)
 			if multiple {
@@ -134,7 +149,7 @@ It lists out the verdicts of all the versions of the input package name.`,
 
 				names := make([]string, nv)
 				for i := 0; i < nv; i++ {
-					names[i] = args[0]
+					names[i] = args[1]
 				}
 
 				// Create list of verdicts requests
@@ -144,7 +159,7 @@ It lists out the verdicts of all the versions of the input package name.`,
 				}
 
 				// Query for verdicts about specific package versions...
-				res, resJSON, resErr = listen.BulkPackages(reqs, listen.WithContext(ctx), listen.WithJSONOptions(toOpts.JSONFlags))
+				res, resJSON, resErr = listen.BulkPackages(reqs, listen.WithContext(ctx), listen.WithJSONOptions(toOpts.JSONFlags), listen.WithEcosystem(eco))
 
 				goto EXIT
 			}
@@ -153,7 +168,7 @@ It lists out the verdicts of all the versions of the input package name.`,
 			// Or for all the package versions listen.dev owns of the target package
 			{
 				// New block so it's safe to skip variable declarations
-				req, reqErr := listen.NewVerdictsRequest(args)
+				req, reqErr := listen.NewVerdictsRequest(args[1:])
 				if reqErr != nil {
 					return reqErr
 				}
@@ -162,12 +177,13 @@ It lists out the verdicts of all the versions of the input package name.`,
 				res, resJSON, resErr = listen.Packages(
 					req,
 					listen.WithContext(ctx),
-					listen.WithEcosystem(ecosystem.Npm), // FIXME: only NPM atm
+					listen.WithEcosystem(eco),
 					listen.WithJSONOptions(toOpts.JSONFlags),
 				)
 			}
 
 		EXIT:
+			io.StopProgressIndicator()
 			if resErr != nil {
 				return err
 			}
