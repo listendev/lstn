@@ -101,11 +101,6 @@ This command requires a listen.dev pro account.`,
 			io := c.Context().Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
 			cs := io.ColorScheme()
 
-			if !info.IsGitHubPullRequest() {
-				c.PrintErrln(cs.WarningIcon(), "lstn ci only runs on GitHub pull requests at the moment")
-
-				return nil
-			}
 			// Block when running on fork pull requests
 			if info.HasReadOnlyGitHubToken() {
 				c.PrintErrln(cs.WarningIcon(), "lstn ci doesn not run on fork pull requests at the moment")
