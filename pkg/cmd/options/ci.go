@@ -29,7 +29,7 @@ import (
 var _ cmd.CommandOptions = (*Ci)(nil)
 
 type Ci struct {
-	flags.CoreFlags  `flagset:"Config"`
+	flags.CoreFlags `flagset:"Config"`
 	flags.ConfigFlags
 	flags.DebugFlags `flagset:"Debug"`
 	Directory        string `flag:"dir" name:"dir" desc:"the directory where the argus binary is" validate:"omitempty,dir" json:"argusdir"`
