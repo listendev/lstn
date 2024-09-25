@@ -21,6 +21,7 @@ Listen in on what your CI does.
 ### Config Flags
 
 ```
+--core-api string   set a custom Core API base URL (default "https://core.listen.dev")
 --loglevel string   set the logging level (default "info")
 --timeout int       set the timeout, in seconds (default 60)
 ```
