@@ -16,14 +16,17 @@
 package ci
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"net/http"
 	"os"
+	"os/exec"
+	"path/filepath"
 	"runtime"
+	"strings"
 
 	"github.com/cli/cli/pkg/iostreams"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/listendev/lstn/internal/project"
 	"github.com/listendev/lstn/pkg/ci"
 	"github.com/listendev/lstn/pkg/cmd/flags"
@@ -148,14 +151,12 @@ This command requires a listen.dev pro account.`,
 				return fmt.Errorf("got empty settings from the Core API")
 			}
 			coreSettings := *coreResponse.JSON200
-			spew.Dump(coreSettings.Tokens) // TODO: complete
-
 			io.StopProgressIndicator()
 			c.Println(cs.SuccessIcon(), "Fetch settings")
 
 			// Create configuration for runtime eavesdropping tool
 			io.StartProgressIndicator()
-			envConfig := fmt.Sprintf("%s\n%s=%s\n%s=%s\n", info.Dump(), "LISTENDEV_TOKEN", ciOpts.Token.JWT, "GITHUB_TOKEN", ciOpts.Token.GitHub)
+			envConfig := fmt.Sprintf("%s\n%s\n%s=%s\n%s=%s\n", strings.Join(coreSettings.TokensSlice(), "\n"), info.Dump(), "LISTENDEV_TOKEN", ciOpts.Token.JWT, "GITHUB_TOKEN", ciOpts.Token.GitHub)
 			envDirErr := os.MkdirAll("/var/run/argus", 0750)
 			if envDirErr != nil {
 				io.StopProgressIndicator()
@@ -172,47 +173,45 @@ This command requires a listen.dev pro account.`,
 			io.StopProgressIndicator()
 			c.Println(cs.SuccessIcon(), "Wrote config", cs.Magenta(envConfigFilename))
 
+			io.StartProgressIndicator()
+			var argus *exec.Cmd
+			if len(ciOpts.Directory) > 0 {
+				file := filepath.Join(ciOpts.Directory, "argus")
+				info, err := os.Stat(file)
+				if os.IsNotExist(err) {
+					io.StopProgressIndicator()
+
+					return fmt.Errorf("couldn't find the argus binary in %s", ciOpts.Directory)
+				}
+				if info.IsDir() {
+					io.StopProgressIndicator()
+
+					return fmt.Errorf("expecting %s to be an executable file", file)
+				}
+				argus = exec.CommandContext(ctx, file, "-s", "enable-now")
+			} else {
+				exe, err := exec.LookPath("argus")
+				if err != nil {
+					io.StopProgressIndicator()
+
+					return fmt.Errorf("couldn't find the argus executable in the PATH")
+				}
+				argus = exec.CommandContext(ctx, exe, "-s", "enable-now")
+			}
+			io.StopProgressIndicator()
+			c.Println(cs.Blue("•"), "Install and enable", cs.Magenta(argus.String()))
+
+			io.StartProgressIndicator()
+			argusOut, argusErr := argus.CombinedOutput()
+			if argusErr != nil {
+				io.StopProgressIndicator()
+
+				return fmt.Errorf("couldn't install and enable argus: %w", argusErr)
+			}
+			io.StopProgressIndicator()
+			c.Println(string(bytes.Trim(argusOut, "\n")))
+
 			return nil
-
-			// io.StartProgressIndicator()
-			// var argus *exec.Cmd
-			// if len(ciOpts.Directory) > 0 {
-			// 	file := filepath.Join(ciOpts.Directory, "argus")
-			// 	info, err := os.Stat(file)
-			// 	if os.IsNotExist(err) {
-			// 		io.StopProgressIndicator()
-
-			// 		return fmt.Errorf("couldn't find the argus binary in %s", ciOpts.Directory)
-			// 	}
-			// 	if info.IsDir() {
-			// 		io.StopProgressIndicator()
-
-			// 		return fmt.Errorf("expecting %s to be an executable file", file)
-			// 	}
-			// 	argus = exec.CommandContext(ctx, file, "-s", "enable-now")
-			// } else {
-			// 	exe, err := exec.LookPath("argus")
-			// 	if err != nil {
-			// 		io.StopProgressIndicator()
-
-			// 		return fmt.Errorf("couldn't find the argus executable in the PATH")
-			// 	}
-			// 	argus = exec.CommandContext(ctx, exe, "-s", "enable-now")
-			// }
-			// io.StopProgressIndicator()
-			// c.Println(cs.Blue("•"), "Install and enable", cs.Magenta(argus.String()))
-
-			// io.StartProgressIndicator()
-			// argusOut, argusErr := argus.CombinedOutput()
-			// if argusErr != nil {
-			// 	io.StopProgressIndicator()
-
-			// 	return fmt.Errorf("couldn't install and enable argus: %w", argusErr)
-			// }
-			// io.StopProgressIndicator()
-			// c.Println(string(bytes.Trim(argusOut, "\n")))
-
-			// return nil
 		},
 	}
 
