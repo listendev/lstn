@@ -16,15 +16,14 @@
 package ci
 
 import (
-	"bytes"
 	"context"
 	"fmt"
+	"net/http"
 	"os"
-	"os/exec"
-	"path/filepath"
 	"runtime"
 
 	"github.com/cli/cli/pkg/iostreams"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/listendev/lstn/internal/project"
 	"github.com/listendev/lstn/pkg/ci"
 	"github.com/listendev/lstn/pkg/cmd/flags"
@@ -32,6 +31,7 @@ import (
 	"github.com/listendev/lstn/pkg/cmd/options"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/validate"
+	"github.com/listendev/pkg/apispec"
 	"github.com/spf13/cobra"
 )
 
@@ -108,6 +108,52 @@ This command requires a listen.dev pro account.`,
 				return nil
 			}
 
+			// Fetch settings from Core API
+			io.StartProgressIndicator()
+			coreClient, coreClientErr := apispec.NewClientWithResponses(
+				ciOpts.CoreFlags.BaseURL,
+				apispec.WithRequestEditorFn(func(_ context.Context, req *http.Request) error {
+					if req == nil {
+						io.StopProgressIndicator()
+						c.PrintErrln(cs.WarningIcon(), "empty settings request")
+
+						return fmt.Errorf("couldn't prepare the settings request for the Core API")
+					}
+					req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", ciOpts.Token.JWT))
+
+					return nil
+				}),
+			)
+			if coreClientErr != nil {
+				io.StopProgressIndicator()
+
+				return coreClientErr
+			}
+			coreResponse, coreResponseErr := coreClient.GetApiV1SettingsWithResponse(ctx)
+			if coreResponseErr != nil {
+				io.StopProgressIndicator()
+
+				return coreResponseErr
+			}
+			if coreResponse.StatusCode() != http.StatusOK {
+				io.StopProgressIndicator()
+				c.PrintErrln(cs.WarningIcon(), "settings request to Core API didn't work out", cs.Redf("(%d)", coreResponse.StatusCode()))
+
+				return fmt.Errorf("status code is not %d", http.StatusOK)
+			}
+			if coreResponse.JSON200 == nil {
+				io.StopProgressIndicator()
+				c.PrintErrln(cs.WarningIcon(), "empty settings response")
+
+				return fmt.Errorf("got empty settings from the Core API")
+			}
+			coreSettings := *coreResponse.JSON200
+			spew.Dump(coreSettings.Tokens) // TODO: complete
+
+			io.StopProgressIndicator()
+			c.Println(cs.SuccessIcon(), "Fetch settings")
+
+			// Create configuration for runtime eavesdropping tool
 			io.StartProgressIndicator()
 			envConfig := fmt.Sprintf("%s\n%s=%s\n%s=%s\n", info.Dump(), "LISTENDEV_TOKEN", ciOpts.Token.JWT, "GITHUB_TOKEN", ciOpts.Token.GitHub)
 			envDirErr := os.MkdirAll("/var/run/argus", 0750)
@@ -126,45 +172,47 @@ This command requires a listen.dev pro account.`,
 			io.StopProgressIndicator()
 			c.Println(cs.SuccessIcon(), "Wrote config", cs.Magenta(envConfigFilename))
 
-			io.StartProgressIndicator()
-			var argus *exec.Cmd
-			if len(ciOpts.Directory) > 0 {
-				file := filepath.Join(ciOpts.Directory, "argus")
-				info, err := os.Stat(file)
-				if os.IsNotExist(err) {
-					io.StopProgressIndicator()
-
-					return fmt.Errorf("couldn't find the argus binary in %s", ciOpts.Directory)
-				}
-				if info.IsDir() {
-					io.StopProgressIndicator()
-
-					return fmt.Errorf("expecting %s to be an executable file", file)
-				}
-				argus = exec.CommandContext(ctx, file, "-s", "enable-now")
-			} else {
-				exe, err := exec.LookPath("argus")
-				if err != nil {
-					io.StopProgressIndicator()
-
-					return fmt.Errorf("couldn't find the argus executable in the PATH")
-				}
-				argus = exec.CommandContext(ctx, exe, "-s", "enable-now")
-			}
-			io.StopProgressIndicator()
-			c.Println(cs.Blue("•"), "Install and enable", cs.Magenta(argus.String()))
-
-			io.StartProgressIndicator()
-			argusOut, argusErr := argus.CombinedOutput()
-			if argusErr != nil {
-				io.StopProgressIndicator()
-
-				return fmt.Errorf("couldn't install and enable argus: %w", argusErr)
-			}
-			io.StopProgressIndicator()
-			c.Println(string(bytes.Trim(argusOut, "\n")))
-
 			return nil
+
+			// io.StartProgressIndicator()
+			// var argus *exec.Cmd
+			// if len(ciOpts.Directory) > 0 {
+			// 	file := filepath.Join(ciOpts.Directory, "argus")
+			// 	info, err := os.Stat(file)
+			// 	if os.IsNotExist(err) {
+			// 		io.StopProgressIndicator()
+
+			// 		return fmt.Errorf("couldn't find the argus binary in %s", ciOpts.Directory)
+			// 	}
+			// 	if info.IsDir() {
+			// 		io.StopProgressIndicator()
+
+			// 		return fmt.Errorf("expecting %s to be an executable file", file)
+			// 	}
+			// 	argus = exec.CommandContext(ctx, file, "-s", "enable-now")
+			// } else {
+			// 	exe, err := exec.LookPath("argus")
+			// 	if err != nil {
+			// 		io.StopProgressIndicator()
+
+			// 		return fmt.Errorf("couldn't find the argus executable in the PATH")
+			// 	}
+			// 	argus = exec.CommandContext(ctx, exe, "-s", "enable-now")
+			// }
+			// io.StopProgressIndicator()
+			// c.Println(cs.Blue("•"), "Install and enable", cs.Magenta(argus.String()))
+
+			// io.StartProgressIndicator()
+			// argusOut, argusErr := argus.CombinedOutput()
+			// if argusErr != nil {
+			// 	io.StopProgressIndicator()
+
+			// 	return fmt.Errorf("couldn't install and enable argus: %w", argusErr)
+			// }
+			// io.StopProgressIndicator()
+			// c.Println(string(bytes.Trim(argusOut, "\n")))
+
+			// return nil
 		},
 	}
 
