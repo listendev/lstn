@@ -63,10 +63,10 @@ func (suite *FlagsConfigSuite) TestGetConfigFlagsNames() {
 	assert.Equal(suite.T(), 15, len(m))
 
 	expected := make(map[string]string)
-	expected["loglevel"] = "LogLevel"
+	expected["loglevel"] = "Verbosity.LogLevel"
 	expected["npm-endpoint"] = "Endpoint.Npm"
 	expected["pypi-endpoint"] = "Endpoint.PyPi"
-	expected["timeout"] = "Timeout"
+	expected["timeout"] = "TimeFlags.Timeout"
 	expected["gh-token"] = "Token.GitHub"
 	expected["jwt-token"] = "Token.JWT"
 	expected["gh-pull-id"] = "Reporting.GitHub.Pull.ID"

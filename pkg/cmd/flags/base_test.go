@@ -62,7 +62,9 @@ func (suite *FlagsBaseSuite) TestGetField() {
 		Token: Token{
 			GitHub: "xxxx",
 		},
-		LogLevel: "info",
+		Verbosity: Verbosity{
+			LogLevel: "info",
+		},
 	}
 
 	tokenGithubVal := GetField(cfg, "Token.GitHub")
@@ -97,22 +99,22 @@ func (suite *FlagsBaseSuite) TestValidate() {
 		},
 		{
 			"invalid timeout",
-			&ConfigFlags{Timeout: 29, Endpoint: Endpoint{Npm: "http://127.0.0.1:3000", PyPi: "http://127.0.0.1:3001"}},
+			&ConfigFlags{TimeFlags: TimeFlags{Timeout: 29}, Endpoint: Endpoint{Npm: "http://127.0.0.1:3000", PyPi: "http://127.0.0.1:3001"}},
 			[]string{"timeout must be 30 or greater"},
 		},
 		{
 			"invalid NPM endpoint",
-			&ConfigFlags{Timeout: 31, Endpoint: Endpoint{Npm: "http://invalid.endpoint", PyPi: "http://127.0.0.1:3001"}},
+			&ConfigFlags{TimeFlags: TimeFlags{Timeout: 31}, Endpoint: Endpoint{Npm: "http://invalid.endpoint", PyPi: "http://127.0.0.1:3001"}},
 			[]string{"NPM endpoint must be a valid listen.dev endpoint"},
 		},
 		{
 			"invalid PyPi endpoint",
-			&ConfigFlags{Timeout: 31, Endpoint: Endpoint{PyPi: "http://invalid.endpoint", Npm: "http://127.0.0.1:3001"}},
+			&ConfigFlags{TimeFlags: TimeFlags{Timeout: 31}, Endpoint: Endpoint{PyPi: "http://invalid.endpoint", Npm: "http://127.0.0.1:3001"}},
 			[]string{"PyPi endpoint must be a valid listen.dev endpoint"},
 		},
 		{
 			"valid config flags",
-			&ConfigFlags{Timeout: 31, Endpoint: Endpoint{Npm: "http://127.0.0.1:3000", PyPi: "http://127.0.0.1:3000"}},
+			&ConfigFlags{TimeFlags: TimeFlags{Timeout: 31}, Endpoint: Endpoint{Npm: "http://127.0.0.1:3000", PyPi: "http://127.0.0.1:3000"}},
 			[]string{},
 		},
 	}
