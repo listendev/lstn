@@ -60,13 +60,14 @@ func (suite *FlagsConfigSuite) TestNewConfigFlagsDefaults() {
 
 func (suite *FlagsConfigSuite) TestGetConfigFlagsNames() {
 	m := GetNames(&ConfigFlags{})
-	assert.Equal(suite.T(), 15, len(m))
+	assert.Equal(suite.T(), 16, len(m))
 
 	expected := make(map[string]string)
-	expected["loglevel"] = "Verbosity.LogLevel"
+	expected["loglevel"] = "LogLevel"
 	expected["npm-endpoint"] = "Endpoint.Npm"
 	expected["pypi-endpoint"] = "Endpoint.PyPi"
-	expected["timeout"] = "TimeFlags.Timeout"
+	expected["core-endpoint"] = "Endpoint.Core"
+	expected["timeout"] = "Timeout"
 	expected["gh-token"] = "Token.GitHub"
 	expected["jwt-token"] = "Token.JWT"
 	expected["gh-pull-id"] = "Reporting.GitHub.Pull.ID"
@@ -88,11 +89,12 @@ func (suite *FlagsConfigSuite) TestGetConfigFlagsNames() {
 
 func (suite *FlagsConfigSuite) TestGetConfigFlagsDefaults() {
 	m := GetDefaults(&ConfigFlags{})
-	assert.Equal(suite.T(), 7, len(m))
+	assert.Equal(suite.T(), 8, len(m))
 
 	expected := make(map[string]string)
 	expected["npm-endpoint"] = "https://npm.listen.dev"
 	expected["pypi-endpoint"] = "https://pypi.listen.dev"
+	expected["core-endpoint"] = "https://core.listen.dev"
 	expected["loglevel"] = "info"
 	expected["timeout"] = "60"
 	expected["npm-registry"] = "https://registry.npmjs.org"

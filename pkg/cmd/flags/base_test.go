@@ -44,7 +44,7 @@ func (suite *FlagsBaseSuite) TestGetNames() {
 	res := GetNames(&ScanOpts{})
 
 	// Expecting all the (sub)fields
-	assert.Len(suite.T(), res, 17)
+	assert.Len(suite.T(), res, 18)
 }
 
 func (suite *FlagsBaseSuite) TestGetDefaults() {
@@ -54,7 +54,7 @@ func (suite *FlagsBaseSuite) TestGetDefaults() {
 	}
 	res := GetDefaults(&ScanOpts{})
 
-	assert.Len(suite.T(), res, 7)
+	assert.Len(suite.T(), res, 8)
 }
 
 func (suite *FlagsBaseSuite) TestGetField() {
@@ -62,9 +62,7 @@ func (suite *FlagsBaseSuite) TestGetField() {
 		Token: Token{
 			GitHub: "xxxx",
 		},
-		Verbosity: Verbosity{
-			LogLevel: "info",
-		},
+		LogLevel: "info",
 	}
 
 	tokenGithubVal := GetField(cfg, "Token.GitHub")
@@ -95,26 +93,31 @@ func (suite *FlagsBaseSuite) TestValidate() {
 		{
 			"empty config flags",
 			&ConfigFlags{},
-			[]string{"timeout must be 30 or greater", "NPM endpoint must be a valid URL", "PyPi endpoint must be a valid URL"},
+			[]string{"timeout must be 30 or greater", "NPM endpoint must be a valid URL", "PyPi endpoint must be a valid URL", "Core API must be a valid URL"},
 		},
 		{
 			"invalid timeout",
-			&ConfigFlags{TimeFlags: TimeFlags{Timeout: 29}, Endpoint: Endpoint{Npm: "http://127.0.0.1:3000", PyPi: "http://127.0.0.1:3001"}},
+			&ConfigFlags{Timeout: 29, Endpoint: Endpoint{Npm: "http://127.0.0.1:3000", PyPi: "http://127.0.0.1:3001", Core: "http://127.0.0.1:3002"}},
 			[]string{"timeout must be 30 or greater"},
 		},
 		{
 			"invalid NPM endpoint",
-			&ConfigFlags{TimeFlags: TimeFlags{Timeout: 31}, Endpoint: Endpoint{Npm: "http://invalid.endpoint", PyPi: "http://127.0.0.1:3001"}},
+			&ConfigFlags{Timeout: 31, Endpoint: Endpoint{Npm: "http://invalid.endpoint", PyPi: "http://127.0.0.1:3001", Core: "http://127.0.0.1:3002"}},
 			[]string{"NPM endpoint must be a valid listen.dev endpoint"},
 		},
 		{
 			"invalid PyPi endpoint",
-			&ConfigFlags{TimeFlags: TimeFlags{Timeout: 31}, Endpoint: Endpoint{PyPi: "http://invalid.endpoint", Npm: "http://127.0.0.1:3001"}},
+			&ConfigFlags{Timeout: 31, Endpoint: Endpoint{PyPi: "http://invalid.endpoint", Npm: "http://127.0.0.1:3001", Core: "http://127.0.0.1:3002"}},
 			[]string{"PyPi endpoint must be a valid listen.dev endpoint"},
 		},
 		{
+			"invalid Core endpoint",
+			&ConfigFlags{Timeout: 31, Endpoint: Endpoint{PyPi: "http://127.0.0.1:3000", Npm: "http://127.0.0.1:3001", Core: "http://invalid.endpoint"}},
+			[]string{"Core API must be a valid listen.dev endpoint"},
+		},
+		{
 			"valid config flags",
-			&ConfigFlags{TimeFlags: TimeFlags{Timeout: 31}, Endpoint: Endpoint{Npm: "http://127.0.0.1:3000", PyPi: "http://127.0.0.1:3000"}},
+			&ConfigFlags{Timeout: 31, Endpoint: Endpoint{Npm: "http://127.0.0.1:3000", PyPi: "http://127.0.0.1:3000", Core: "http://127.0.0.1:3002"}},
 			[]string{},
 		},
 	}
