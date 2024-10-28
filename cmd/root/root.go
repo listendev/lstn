@@ -371,8 +371,9 @@ const (
 	exitAuth   ExitCode = 4
 )
 
-// Boot adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
+// Go is called by main.main().
+//
+// It only needs to happen once to the rootCmd.
 func (c *Command) Go() ExitCode {
 	err := c.cmd.ExecuteContext(c.ctx)
 	if err != nil {
