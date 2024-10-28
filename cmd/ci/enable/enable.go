@@ -85,7 +85,7 @@ func New(ctx context.Context) (*cobra.Command, error) {
 			// Fetch settings from Core API
 			io.StartProgressIndicator()
 			coreClient, coreClientErr := apispec.NewClientWithResponses(
-				opts.CoreFlags.BaseURL,
+				opts.Endpoint.Core,
 				apispec.WithRequestEditorFn(func(_ context.Context, req *http.Request) error {
 					if req == nil {
 						io.StopProgressIndicator()
@@ -127,7 +127,7 @@ func New(ctx context.Context) (*cobra.Command, error) {
 
 			// Create configuration for runtime eavesdropping tool
 			io.StartProgressIndicator()
-			envConfig := fmt.Sprintf("%s\n%s\n%s=%s\n%s=%s\n", strings.Join(coreSettings.TokensSlice(), "\n"), info.Dump(), "LISTENDEV_TOKEN", opts.JWT, "GITHUB_TOKEN", opts.GitHub)
+			envConfig := fmt.Sprintf("%s\n%s\n%s=%s\n%s=%s\n", strings.Join(coreSettings.TokensSlice(), "\n"), info.Dump(), "LISTENDEV_TOKEN", opts.Token.JWT, "GITHUB_TOKEN", opts.Token.GitHub)
 			envDirErr := os.MkdirAll("/var/run/jibril", 0750)
 			if envDirErr != nil {
 				io.StopProgressIndicator()
@@ -192,7 +192,7 @@ func New(ctx context.Context) (*cobra.Command, error) {
 		return nil, err
 	}
 	// Local flags will only run when this command is called directly
-	enableOpts.Attach(c, []string{})
+	enableOpts.Attach(c, []string{"--ignore-packages", "--ignore-deptypes", "--select", "lockfiles", "npm-endpoint", "pypi-endpoint", "reporter", "npm-registry", "gh-owner", "gh-pull-id", "gh-repo"})
 
 	// Pass the options through the context
 	ctx = context.WithValue(ctx, pkgcontext.CiEnableKey, enableOpts)
