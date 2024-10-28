@@ -12,13 +12,17 @@ Every child command inherits the following flags:
 
 Listen in on what your CI does.
 
-### Flags
+### `lstn ci enable`
+
+Enable the CI eavesdropping.
+
+#### Flags
 
 ```
---dir string   the directory where the argus binary is
+--dir string   the directory where the jibril binary is
 ```
 
-### Config Flags
+#### Config Flags
 
 ```
 --core-api string   set a custom Core API base URL (default "https://core.listen.dev")
@@ -26,18 +30,22 @@ Listen in on what your CI does.
 --timeout int       set the timeout, in seconds (default 60)
 ```
 
-### Debug Flags
+#### Debug Flags
 
 ```
 --debug-options   output the options, then exit
 ```
 
-### Token Flags
+#### Token Flags
 
 ```
 --gh-token string    set the GitHub token
 --jwt-token string   set the listen.dev auth token
 ```
+
+### `lstn ci report`
+
+Report the most critical findings into GitHub pull requests.
 
 ## `lstn completion <bash|fish|powershell|zsh>`
 
