@@ -157,14 +157,14 @@ This command requires a listen.dev pro account.`,
 			// Create configuration for runtime eavesdropping tool
 			io.StartProgressIndicator()
 			envConfig := fmt.Sprintf("%s\n%s\n%s=%s\n%s=%s\n", strings.Join(coreSettings.TokensSlice(), "\n"), info.Dump(), "LISTENDEV_TOKEN", ciOpts.Token.JWT, "GITHUB_TOKEN", ciOpts.Token.GitHub)
-			envDirErr := os.MkdirAll("/var/run/argus", 0750)
+			envDirErr := os.MkdirAll("/var/run/jibril", 0750)
 			if envDirErr != nil {
 				io.StopProgressIndicator()
 
 				return envDirErr
 			}
 
-			envConfigFilename := "/var/run/argus/default"
+			envConfigFilename := "/var/run/jibril/default"
 			if err := os.WriteFile(envConfigFilename, []byte(envConfig), 0640); err != nil {
 				io.StopProgressIndicator()
 
@@ -174,42 +174,42 @@ This command requires a listen.dev pro account.`,
 			c.Println(cs.SuccessIcon(), "Wrote config", cs.Magenta(envConfigFilename))
 
 			io.StartProgressIndicator()
-			var argus *exec.Cmd
+			var jibril *exec.Cmd
 			if len(ciOpts.Directory) > 0 {
-				file := filepath.Join(ciOpts.Directory, "argus")
+				file := filepath.Join(ciOpts.Directory, "jibril")
 				info, err := os.Stat(file)
 				if os.IsNotExist(err) {
 					io.StopProgressIndicator()
 
-					return fmt.Errorf("couldn't find the argus binary in %s", ciOpts.Directory)
+					return fmt.Errorf("couldn't find the jibril binary in %s", ciOpts.Directory)
 				}
 				if info.IsDir() {
 					io.StopProgressIndicator()
 
 					return fmt.Errorf("expecting %s to be an executable file", file)
 				}
-				argus = exec.CommandContext(ctx, file, "-s", "enable-now")
+				jibril = exec.CommandContext(ctx, file, "-s", "enable-now")
 			} else {
-				exe, err := exec.LookPath("argus")
+				exe, err := exec.LookPath("jibril")
 				if err != nil {
 					io.StopProgressIndicator()
 
-					return fmt.Errorf("couldn't find the argus executable in the PATH")
+					return fmt.Errorf("couldn't find the jibril executable in the PATH")
 				}
-				argus = exec.CommandContext(ctx, exe, "-s", "enable-now")
+				jibril = exec.CommandContext(ctx, exe, "-s", "enable-now")
 			}
 			io.StopProgressIndicator()
-			c.Println(cs.Blue("•"), "Install and enable", cs.Magenta(argus.String()))
+			c.Println(cs.Blue("•"), "Install and enable", cs.Magenta(jibril.String()))
 
 			io.StartProgressIndicator()
-			argusOut, argusErr := argus.CombinedOutput()
-			if argusErr != nil {
+			jibrilOut, jibrilErr := jibril.CombinedOutput()
+			if jibrilErr != nil {
 				io.StopProgressIndicator()
 
-				return fmt.Errorf("couldn't install and enable argus: %w", argusErr)
+				return fmt.Errorf("couldn't install and enable jibril: %w", jibrilErr)
 			}
 			io.StopProgressIndicator()
-			c.Println(string(bytes.Trim(argusOut, "\n")))
+			c.Println(string(bytes.Trim(jibrilOut, "\n")))
 
 			return nil
 		},
