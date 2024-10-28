@@ -17,7 +17,7 @@ package context
 
 type contextKey string
 
-var EmptyKey contextKey = ""
+var EmptyKey contextKey = "empty"
 
 // ConfigKey is the key indexing the configuration options in the contexts.
 var ConfigKey contextKey = "cfg"

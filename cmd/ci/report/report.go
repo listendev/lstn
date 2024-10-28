@@ -21,12 +21,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func New(ctx context.Context) (*cobra.Command, error) {
+func New(_ context.Context) (*cobra.Command, error) {
 	var c = &cobra.Command{
-		Use: "report",
+		Use:                   "report",
 		DisableFlagsInUseLine: true,
-		Short: "Report the most critical findings into GitHub pull requests",
-		RunE: func(c *cobra.Command, _ []string) error {
+		Short:                 "Report the most critical findings into GitHub pull requests",
+		RunE: func(_ *cobra.Command, _ []string) error {
 			return nil
 		},
 	}
