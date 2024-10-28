@@ -25,7 +25,6 @@ filtering:
 lockfiles: 
   - "..."
   - "..."
-loglevel: "info"
 registry: 
   npm: "https://registry.npmjs.org"
 reporting: 
@@ -37,8 +36,11 @@ reporting:
   types: 
     - "..."
     - "..."
-timeout: 60
+timeflags: 
+  timeout: 60
 token: 
   github: "..."
   jwt: "..."
+verbosity: 
+  loglevel: "info"
 ```
