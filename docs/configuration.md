@@ -11,6 +11,7 @@ Here's an example of a configuration file (with the default values):
 
 ```yaml
 endpoint: 
+  core: "https://core.listen.dev"
   npm: "https://npm.listen.dev"
   pypi: "https://pypi.listen.dev"
 filtering: 
@@ -25,6 +26,7 @@ filtering:
 lockfiles: 
   - "..."
   - "..."
+loglevel: "info"
 registry: 
   npm: "https://registry.npmjs.org"
 reporting: 
@@ -36,11 +38,8 @@ reporting:
   types: 
     - "..."
     - "..."
-timeflags: 
-  timeout: 60
+timeout: 60
 token: 
   github: "..."
   jwt: "..."
-verbosity: 
-  loglevel: "info"
 ```

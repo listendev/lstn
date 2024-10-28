@@ -25,9 +25,9 @@ Enable the CI eavesdropping.
 #### Config Flags
 
 ```
---core-api string   set a custom Core API base URL (default "https://core.listen.dev")
---loglevel string   set the logging level (default "info")
---timeout int       set the timeout, in seconds (default 60)
+--core-endpoint string   the listen.dev Core API endpoint (default "https://core.listen.dev")
+--loglevel string        set the logging level (default "info")
+--timeout int            set the timeout, in seconds (default 60)
 ```
 
 #### Debug Flags
@@ -121,6 +121,7 @@ Inspect the verdicts for your dependencies tree.
 ### Config Flags
 
 ```
+--core-endpoint string   the listen.dev Core API endpoint (default "https://core.listen.dev")
 --loglevel string        set the logging level (default "info")
 --npm-endpoint string    the listen.dev endpoint emitting the NPM verdicts (default "https://npm.listen.dev")
 --pypi-endpoint string   the listen.dev endpoint emitting the PyPi verdicts (default "https://pypi.listen.dev")
@@ -193,6 +194,7 @@ Inspect the verdicts for your direct dependencies.
 ### Config Flags
 
 ```
+--core-endpoint string   the listen.dev Core API endpoint (default "https://core.listen.dev")
 --loglevel string        set the logging level (default "info")
 --npm-endpoint string    the listen.dev endpoint emitting the NPM verdicts (default "https://npm.listen.dev")
 --pypi-endpoint string   the listen.dev endpoint emitting the PyPi verdicts (default "https://pypi.listen.dev")
@@ -262,6 +264,7 @@ Get the verdicts of a package.
 ### Config Flags
 
 ```
+--core-endpoint string   the listen.dev Core API endpoint (default "https://core.listen.dev")
 --loglevel string        set the logging level (default "info")
 --npm-endpoint string    the listen.dev endpoint emitting the NPM verdicts (default "https://npm.listen.dev")
 --pypi-endpoint string   the listen.dev endpoint emitting the PyPi verdicts (default "https://pypi.listen.dev")
