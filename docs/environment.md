@@ -4,6 +4,8 @@ The environment variables override any corresponding configuration setting.
 
 But flags override them.
 
+`LSTN_CORE_ENDPOINT`: the listen.dev Core API endpoint
+
 `LSTN_GH_OWNER`: set the GitHub owner name (org|user)
 
 `LSTN_GH_PULL_ID`: set the GitHub pull request ID
