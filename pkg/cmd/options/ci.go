@@ -29,11 +29,8 @@ import (
 var _ cmd.CommandOptions = (*CiEnable)(nil)
 
 type CiEnable struct {
-	flags.CoreFlags  `flagset:"Config"`
 	flags.DebugFlags `flagset:"Debug"`
-	flags.Verbosity  `flagset:"Config"`
-	flags.TimeFlags  `flagset:"Config"`
-	flags.TokenMandatory
+	flags.ConfigFlags
 	Directory string `flag:"dir" name:"dir" desc:"the directory where the jibril binary is" validate:"omitempty,dir" json:"jibrildir"`
 }
 
