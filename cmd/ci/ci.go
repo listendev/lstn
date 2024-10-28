@@ -55,8 +55,7 @@ A listen.dev pro is necessary.`,
 			return nil
 		},
 		ValidArgs: []string{"enable", "report"},
-		Run: func(c *cobra.Command, args []string) {
-		},
+		Run:       func(_ *cobra.Command, _ []string) {},
 	}
 
 	// Attach `enable` child command
