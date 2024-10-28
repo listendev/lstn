@@ -38,6 +38,11 @@ type Token struct {
 	JWT    string `name:"JWT token" flag:"jwt-token" desc:"set the listen.dev auth token" flagset:"Token" json:"jwt-token" validate:"omitempty,notblank"`
 }
 
+type TokenMandatory struct {
+	GitHub string `name:"GitHub token" flag:"gh-token" desc:"set the GitHub token" flagset:"Token" json:"gh-token" validate:"mandatory"`
+	JWT    string `name:"JWT token" flag:"jwt-token" desc:"set the listen.dev auth token" flagset:"Token" json:"jwt-token" validate:"mandatory"`
+}
+
 type Registry struct {
 	NPM string `name:"NPM registry" flag:"npm-registry" desc:"set a custom NPM registry" validate:"omitempty,url" default:"https://registry.npmjs.org" transform:"tsuffix=/" flagset:"Registry" json:"npm-registry"`
 }
@@ -77,9 +82,17 @@ type Endpoint struct {
 	PyPi string `default:"https://pypi.listen.dev" flag:"pypi-endpoint" name:"PyPi endpoint" desc:"the listen.dev endpoint emitting the PyPi verdicts" validate:"url,endpoint" transform:"tsuffix=/" flagset:"Config" json:"pypi"`
 }
 
+type Verbosity struct {
+	LogLevel string `default:"info" name:"log level" flag:"loglevel" desc:"set the logging level" flagset:"Config" json:"loglevel"` // TODO > validator
+}
+
+type TimeFlags struct {
+	Timeout int `default:"60" name:"timeout" flag:"timeout" desc:"set the timeout, in seconds" validate:"number,min=30" flagset:"Config" json:"timeout"` // FIXME: change to time.Duration type
+}
+
 type ConfigFlags struct {
-	LogLevel string   `default:"info" name:"log level" flag:"loglevel" desc:"set the logging level" flagset:"Config" json:"loglevel"`                          // TODO > validator
-	Timeout  int      `default:"60" name:"timeout" flag:"timeout" desc:"set the timeout, in seconds" validate:"number,min=30" flagset:"Config" json:"timeout"` // FIXME: change to time.Duration type
+	Verbosity
+	TimeFlags
 	Endpoint Endpoint `json:"endpoint"`
 	Token
 	Registry
