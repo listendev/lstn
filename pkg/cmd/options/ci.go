@@ -26,17 +26,19 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var _ cmd.CommandOptions = (*Ci)(nil)
+var _ cmd.CommandOptions = (*CiEnable)(nil)
 
-type Ci struct {
-	flags.CoreFlags `flagset:"Config"`
-	flags.ConfigFlags
+type CiEnable struct {
+	flags.CoreFlags  `flagset:"Config"`
 	flags.DebugFlags `flagset:"Debug"`
-	Directory        string `flag:"dir" name:"dir" desc:"the directory where the argus binary is" validate:"omitempty,dir" json:"argusdir"`
+	flags.Verbosity `flagset:"Config"`
+	flags.TimeFlags `flagset:"Config"`
+	flags.TokenMandatory
+	Directory string `flag:"dir" name:"dir" desc:"the directory where the jibril binary is" validate:"omitempty,dir" json:"jibrildir"`
 }
 
-func NewCi() (*Ci, error) {
-	o := &Ci{}
+func NewCiEnable() (*CiEnable, error) {
+	o := &CiEnable{}
 
 	if err := defaults.Set(o); err != nil {
 		return nil, fmt.Errorf("error setting configuration defaults")
@@ -45,19 +47,19 @@ func NewCi() (*Ci, error) {
 	return o, nil
 }
 
-func (o *Ci) Attach(c *cobra.Command, exclusions []string) {
+func (o *CiEnable) Attach(c *cobra.Command, exclusions []string) {
 	flags.Define(c, o, "", exclusions)
 	flagusages.Set(c)
 }
 
-func (o *Ci) Validate() []error {
+func (o *CiEnable) Validate() []error {
 	return flags.Validate(o)
 }
 
-func (o *Ci) Transform(ctx context.Context) error {
+func (o *CiEnable) Transform(ctx context.Context) error {
 	return flags.Transform(ctx, o)
 }
 
-func (o *Ci) AsJSON() string {
+func (o *CiEnable) AsJSON() string {
 	return flags.AsJSON(o)
 }
