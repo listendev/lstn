@@ -29,7 +29,7 @@ import (
 // It also validates and transforms the Options instance it obtained.
 //
 // It errors out if the context key does not refer an Options instance
-// or f the validation and trasformation process errored out.
+// or if the validation and trasformation process errored out.
 func GetOptionsFromContext(ctx context.Context, key any) (cmd.Options, error) {
 	o, ok := ctx.Value(key).(cmd.Options)
 	if !ok {
