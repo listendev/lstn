@@ -121,7 +121,6 @@ Inspect the verdicts for your dependencies tree.
 ### Config Flags
 
 ```
---core-endpoint string   the listen.dev Core API endpoint (default "https://core.listen.dev")
 --loglevel string        set the logging level (default "info")
 --npm-endpoint string    the listen.dev endpoint emitting the NPM verdicts (default "https://npm.listen.dev")
 --pypi-endpoint string   the listen.dev endpoint emitting the PyPi verdicts (default "https://pypi.listen.dev")
@@ -194,7 +193,6 @@ Inspect the verdicts for your direct dependencies.
 ### Config Flags
 
 ```
---core-endpoint string   the listen.dev Core API endpoint (default "https://core.listen.dev")
 --loglevel string        set the logging level (default "info")
 --npm-endpoint string    the listen.dev endpoint emitting the NPM verdicts (default "https://npm.listen.dev")
 --pypi-endpoint string   the listen.dev endpoint emitting the PyPi verdicts (default "https://pypi.listen.dev")
@@ -264,7 +262,6 @@ Get the verdicts of a package.
 ### Config Flags
 
 ```
---core-endpoint string   the listen.dev Core API endpoint (default "https://core.listen.dev")
 --loglevel string        set the logging level (default "info")
 --npm-endpoint string    the listen.dev endpoint emitting the NPM verdicts (default "https://npm.listen.dev")
 --pypi-endpoint string   the listen.dev endpoint emitting the PyPi verdicts (default "https://pypi.listen.dev")
