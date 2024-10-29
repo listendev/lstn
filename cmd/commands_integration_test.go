@@ -192,7 +192,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -232,7 +232,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -334,7 +334,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -375,7 +375,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -416,7 +416,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm-staging.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -457,7 +457,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 			"debug-options": true,
 			"endpoint": {
-				"core-api": "https://core.listen.dev",
+				"core": "https://core.listen.dev",
 				"npm": "https://npm.listen.dev",
 				"pypi": "https://pypi-stage.listen.dev"
 			},
@@ -498,7 +498,7 @@ Global Flags:
 		{
 			"debug-options": true,
 			"endpoint": {
-				"core-api": "https://core.listen.dev",
+				"core": "https://core.listen.dev",
 				"npm": "https://npm.listen.dev",
 				"pypi": "https://pypi.listen.dev"
 			},
@@ -542,7 +542,7 @@ Global Flags:
 		{
 			"debug-options": true,
 			"endpoint": {
-				"core-api": "https://core.listen.dev",
+				"core": "https://core.listen.dev",
 				"npm": "https://npm.listen.dev",
 				"pypi": "https://pypi.listen.dev"
 			},
@@ -582,7 +582,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -633,7 +633,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -691,7 +691,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -738,7 +738,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -780,7 +780,7 @@ Global Flags:
 		// 			stdout: heredoc.Doc(`{
 		// 	"debug-options": true,
 		// 	"endpoint": {
-		// 		"core-api": "https://core.listen.dev",
+		// 		"core": "https://core.listen.dev",
 		// 		"npm": "https://npm.listen.dev",
 		// 		"pypi": "https://pypi.listen.dev"
 		// },
@@ -821,7 +821,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -862,7 +862,7 @@ Global Flags:
 {
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -909,7 +909,7 @@ Global Flags:
 {
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm-stage.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -957,7 +957,7 @@ Global Flags:
 {
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm-stage.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -999,7 +999,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -1042,7 +1042,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -1085,7 +1085,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -1179,7 +1179,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -1220,7 +1220,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -1264,7 +1264,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -1308,7 +1308,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -1351,7 +1351,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -1394,7 +1394,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -1437,7 +1437,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -1481,7 +1481,7 @@ Global Flags:
 {
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -1525,7 +1525,7 @@ Global Flags:
 {
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -1571,7 +1571,7 @@ Global Flags:
 {
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -1627,7 +1627,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -1670,7 +1670,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -1715,7 +1715,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -1759,7 +1759,7 @@ Global Flags:
 {
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -1805,7 +1805,7 @@ Global Flags:
 {
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -1852,7 +1852,7 @@ Global Flags:
 {
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -1898,7 +1898,7 @@ Global Flags:
 {
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -1944,7 +1944,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -1985,7 +1985,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},
@@ -2026,7 +2026,7 @@ Global Flags:
 			stdout: heredoc.Doc(`{
 	"debug-options": true,
 	"endpoint": {
-		"core-api": "https://core.listen.dev",
+		"core": "https://core.listen.dev",
 		"npm": "https://npm.listen.dev",
 		"pypi": "https://pypi.listen.dev"
 	},

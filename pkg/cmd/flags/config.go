@@ -80,7 +80,7 @@ type Filtering struct {
 type Endpoint struct {
 	Npm  string `default:"https://npm.listen.dev" flag:"npm-endpoint" name:"NPM endpoint" desc:"the listen.dev endpoint emitting the NPM verdicts" validate:"url,endpoint" transform:"tsuffix=/" flagset:"Config" json:"npm"`
 	PyPi string `default:"https://pypi.listen.dev" flag:"pypi-endpoint" name:"PyPi endpoint" desc:"the listen.dev endpoint emitting the PyPi verdicts" validate:"url,endpoint" transform:"tsuffix=/" flagset:"Config" json:"pypi"`
-	Core string `default:"https://core.listen.dev" flag:"core-endpoint" name:"Core API" desc:"the listen.dev Core API endpoint" validate:"url,endpoint" transform:"tsuffix=/" flagset:"Config" json:"core-api"`
+	Core string `default:"https://core.listen.dev" flag:"core-endpoint" name:"Core API" desc:"the listen.dev Core API endpoint" validate:"url,endpoint" transform:"tsuffix=/" flagset:"Config" json:"core"`
 }
 
 // ConfigFlags are the options that the CLI also reads from the YAML configuration file.
