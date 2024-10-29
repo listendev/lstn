@@ -29,8 +29,10 @@ import (
 	"github.com/cli/cli/pkg/iostreams"
 	"github.com/listendev/lstn/internal/project"
 	"github.com/listendev/lstn/pkg/ci"
+	"github.com/listendev/lstn/pkg/cmd/flags"
 	"github.com/listendev/lstn/pkg/cmd/options"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
+	"github.com/listendev/lstn/pkg/validate"
 	"github.com/listendev/pkg/apispec"
 	"github.com/spf13/cobra"
 )
@@ -57,6 +59,28 @@ func New(ctx context.Context) (*cobra.Command, error) {
 			opts, ok := optsFromContext.(*options.CiEnable)
 			if !ok {
 				return fmt.Errorf("couldn't obtain options for the current child command")
+			}
+
+			// Token options are mandatory in this case
+			errs := []error{}
+			if err := validate.Singleton.Var(opts.Token.GitHub, "mandatory"); err != nil {
+				tags, _ := flags.GetFieldTag(opts, "ConfigFlags.Token.GitHub")
+				name, _ := tags.Lookup("name")
+				errs = append(errs, flags.Translate(err, name)...)
+			}
+			if err := validate.Singleton.Var(opts.Token.JWT, "mandatory"); err != nil {
+				tags, _ := flags.GetFieldTag(opts, "ConfigFlags.Token.JWT")
+				name, _ := tags.Lookup("name")
+				errs = append(errs, flags.Translate(err, name)...)
+			}
+			if len(errs) > 0 {
+				ret := "invalid configuration options/flags"
+				for _, e := range errs {
+					ret += "\n       "
+					ret += e.Error()
+				}
+
+				return fmt.Errorf(ret)
 			}
 
 			if opts.DebugOptions {
