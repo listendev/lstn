@@ -17,19 +17,60 @@ package report
 
 import (
 	"context"
+	"fmt"
+	"runtime"
 
+	"github.com/listendev/lstn/internal/project"
+	"github.com/listendev/lstn/pkg/cmd/options"
+	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/spf13/cobra"
 )
 
-func New(_ context.Context) (*cobra.Command, error) {
+var (
+	_, filename, _, _ = runtime.Caller(0)
+)
+
+func New(ctx context.Context) (*cobra.Command, error) {
 	var c = &cobra.Command{
 		Use:                   "report",
 		DisableFlagsInUseLine: true,
 		Short:                 "Report the most critical findings into GitHub pull requests",
-		RunE: func(_ *cobra.Command, _ []string) error {
+		Annotations: map[string]string{
+			"source": project.GetSourceURL(filename),
+		},
+		RunE: func(c *cobra.Command, _ []string) error {
+			ctx = c.Context()
+			// Obtain the local options from the context
+			optsFromContext, err := pkgcontext.GetOptionsFromContext(ctx, pkgcontext.CiReportKey)
+			if err != nil {
+				return err
+			}
+			opts, ok := optsFromContext.(*options.CiReport)
+			if !ok {
+				return fmt.Errorf("couldn't obtain options for the current child command")
+			}
+
+			if opts.DebugOptions {
+				c.Println(opts.AsJSON())
+
+				return nil
+			}
+
 			return nil
 		},
 	}
+
+	// Create the local options
+	reportOpts, err := options.NewCiReport()
+	if err != nil {
+		return nil, err
+	}
+	// Local flags will only run when this command is called directly
+	reportOpts.Attach(c, []string{"npm-registry", "select", "ignore-deptypes", "ignore-packages", "pypi-endpoint", "npm-endpoint", "lockfiles", "reporter"})
+
+	// Pass the options through the context
+	ctx = context.WithValue(ctx, pkgcontext.CiReportKey, reportOpts)
+	c.SetContext(ctx)
 
 	return c, nil
 }

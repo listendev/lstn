@@ -28,6 +28,9 @@ var ContextCancelFuncKey contextKey = "ctxcancel"
 // CiEnableKey is the key indexing the options for the `ci enable` child command.
 var CiEnableKey contextKey = "cienable"
 
+// CiReportKey is the key indexing the options for the `ci report` child command.
+var CiReportKey contextKey = "cireport"
+
 // InKey is the key indexing the options for the `in` child command.
 var InKey contextKey = "in"
 
