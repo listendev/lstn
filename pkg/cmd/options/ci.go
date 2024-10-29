@@ -60,3 +60,37 @@ func (o *CiEnable) Transform(ctx context.Context) error {
 func (o *CiEnable) AsJSON() string {
 	return flags.AsJSON(o)
 }
+
+var _ cmd.CommandOptions = (*CiReport)(nil)
+
+type CiReport struct {
+	flags.DebugFlags `flagset:"Debug"`
+	flags.ConfigFlags
+}
+
+func NewCiReport() (*CiReport, error) {
+	o := &CiReport{}
+
+	if err := defaults.Set(o); err != nil {
+		return nil, fmt.Errorf("error setting configuration defaults")
+	}
+
+	return o, nil
+}
+
+func (o *CiReport) Attach(c *cobra.Command, exclusions []string) {
+	flags.Define(c, o, "", exclusions)
+	flagusages.Set(c)
+}
+
+func (o *CiReport) Validate() []error {
+	return flags.Validate(o)
+}
+
+func (o *CiReport) Transform(ctx context.Context) error {
+	return flags.Transform(ctx, o)
+}
+
+func (o *CiReport) AsJSON() string {
+	return flags.AsJSON(o)
+}
