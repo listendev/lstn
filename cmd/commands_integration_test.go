@@ -41,6 +41,34 @@ func TestChildCommands(t *testing.T) {
 	cwd, _ := os.Getwd()
 
 	cases := []testCase{
+		// lstn ci
+		{
+			name:    "lstn ci",
+			cmdline: []string{"ci"},
+			stdout:  "",
+			stderr:  "Error: accepts 1 arg(s), received 0\n",
+			errstr:  "accepts 1 arg(s), received 0",
+		},
+		// lstn ci enable
+		{
+			name:    "lstn ci enable",
+			cmdline: []string{"ci", "enable"},
+			stdout:  "",
+			stderr:  "Error: invalid configuration options/flags\n       GitHub token is mandatory\n       JWT token is mandatory\n",
+			errstr:  "invalid configuration options/flags\n       GitHub token is mandatory\n       JWT token is mandatory",
+		},
+		// lstn ci enable --jwt-token 12345 --gh-token 54321
+		{
+			name:    "lstn ci enable --jwt-token 12345 --gh-token 54321",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
+			cmdline: []string{"ci", "enable", "--jwt-token", "12345", "--gh-token", "54321"},
+			stdout:  "",
+			stderr:  "Error: not running in a CI environment\n",
+			errstr:  "not running in a CI environment",
+		},
 		// lstn in
 		{
 			name:    "lstn in",
