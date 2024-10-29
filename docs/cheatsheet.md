@@ -47,6 +47,35 @@ Enable the CI eavesdropping.
 
 Report the most critical findings into GitHub pull requests.
 
+#### Config Flags
+
+```
+--core-endpoint string   the listen.dev Core API endpoint (default "https://core.listen.dev")
+--loglevel string        set the logging level (default "info")
+--timeout int            set the timeout, in seconds (default 60)
+```
+
+#### Debug Flags
+
+```
+--debug-options   output the options, then exit
+```
+
+#### Reporting Flags
+
+```
+--gh-owner string   set the GitHub owner name (org|user)
+--gh-pull-id int    set the GitHub pull request ID
+--gh-repo string    set the GitHub repository name
+```
+
+#### Token Flags
+
+```
+--gh-token string    set the GitHub token
+--jwt-token string   set the listen.dev auth token
+```
+
 ## `lstn completion <bash|fish|powershell|zsh>`
 
 Generate the autocompletion script for the specified shell.
