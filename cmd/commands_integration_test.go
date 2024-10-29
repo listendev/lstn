@@ -59,7 +59,7 @@ func TestChildCommands(t *testing.T) {
 		},
 		// lstn ci enable --jwt-token 12345 --gh-token 54321
 		{
-			name:    "lstn ci enable --jwt-token 12345 --gh-token 54321",
+			name: "lstn ci enable --jwt-token 12345 --gh-token 54321",
 			envvar: map[string]string{
 				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
 				"GITHUB_ACTIONS": "",
