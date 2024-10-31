@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"runtime"
 
+	"github.com/cli/cli/pkg/iostreams"
 	"github.com/listendev/lstn/internal/project"
 	"github.com/listendev/lstn/pkg/ci"
 	"github.com/listendev/lstn/pkg/cmd/flags"
@@ -81,9 +82,19 @@ func New(ctx context.Context) (*cobra.Command, error) {
 				return nil
 			}
 
-			_, infoErr := ci.NewInfo()
+			info, infoErr := ci.NewInfo()
 			if infoErr != nil {
 				return fmt.Errorf("not running in a CI environment")
+			}
+
+			io := c.Context().Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
+			cs := io.ColorScheme()
+
+			// Block when running on fork pull requests
+			if info.HasReadOnlyGitHubToken() {
+				c.PrintErrln(cs.WarningIcon(), "lstn ci doesn not run on fork pull requests at the moment")
+
+				return nil
 			}
 
 			return nil
