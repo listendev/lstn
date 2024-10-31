@@ -19,12 +19,11 @@ import (
 	"github.com/google/go-github/v53/github"
 	"github.com/listendev/lstn/pkg/ci"
 	"github.com/listendev/lstn/pkg/cmd/flags"
-	"github.com/listendev/lstn/pkg/listen"
 )
 
 type Reporter interface {
 	WithGitHubClient(client *github.Client)
 	WithConfigOptions(opts *flags.ConfigFlags)
 	WithContinuousIntegrationInfo(info *ci.Info)
-	Run(res listen.Response, source *string) error
+	Run(res interface{}, source *string) error
 }

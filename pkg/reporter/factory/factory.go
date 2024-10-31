@@ -25,7 +25,6 @@ import (
 	"github.com/listendev/lstn/pkg/cmd"
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
-	"github.com/listendev/lstn/pkg/listen"
 	"github.com/listendev/lstn/pkg/reporter"
 	ghcomment "github.com/listendev/lstn/pkg/reporter/gh/comment"
 	"github.com/listendev/lstn/pkg/reporter/pro"
@@ -40,7 +39,7 @@ var (
 	ErrReporterOnFork                 = errors.New("the GitHub action is running on a pull request of a fork")
 )
 
-// Make creates a new reporter.Reporter.
+// make creates a new reporter.Reporter.
 //
 // Depending on the input cmd.ReportType and the current context,
 // it ensures that the reporter.Reporter can actually run.
@@ -51,7 +50,7 @@ var (
 //
 // Last but not least, this function takes care of configuring
 // everything the reporter being instantiated needs.
-func Make(ctx context.Context, reportType cmd.ReportType) (r reporter.Reporter, canRun bool, err error) {
+func make(ctx context.Context, reportType cmd.ReportType) (r reporter.Reporter, canRun bool, err error) {
 	switch reportType {
 	case cmd.ListenPro:
 		info, infoErr := ci.NewInfo()
@@ -103,7 +102,7 @@ func Make(ctx context.Context, reportType cmd.ReportType) (r reporter.Reporter, 
 	}
 }
 
-func Exec(c *cobra.Command, reportingOpts flags.Reporting, resp listen.Response, source *string) error {
+func Exec(c *cobra.Command, reportingOpts flags.Reporting, resp interface{}, source *string) error {
 	ctx := c.Context()
 	var cs *iostreams.ColorScheme
 	io, ok := ctx.Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
@@ -123,7 +122,7 @@ func Exec(c *cobra.Command, reportingOpts flags.Reporting, resp listen.Response,
 			fallthrough
 
 		case cmd.GitHubPullCommentReport:
-			rep, runnable, err := Make(c.Context(), r)
+			rep, runnable, err := make(c.Context(), r)
 			if runnable && err != nil {
 				return err
 			}
