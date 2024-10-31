@@ -71,42 +71,47 @@ func New(ctx context.Context, opts ...reporter.Option) (reporter.Reporter, error
 	return ret, nil
 }
 
-func (r *rep) Run(res listen.Response, source *string) error {
-	verdicts := res.Verdicts()
-	if len(verdicts) == 0 {
-		return nil
-	}
-
-	// Spawn API calls in parallel
-	type wrap struct {
-		res *apispec.PostApiV1DependenciesEventResponse
-		err error
-	}
-	cb := func(v listen.Verdict) wrap {
-		res, err := r.proClient.PostApiV1DependenciesEventWithResponse(
-			r.ctx,
-			getDependencyEvent(v, *r.info, source),
-			attachAuthBearer(r),
-		)
-
-		return wrap{res, err}
-	}
-	returns := goneric.ParallelMapSlice(cb, runtime.NumCPU(), verdicts)
-
-	// Check the number of responses matches the number of requests
-	numReturns := len(returns)
-	if numVerdicts := len(verdicts); numReturns != numVerdicts {
-		return pkgcontext.OutputError(r.ctx, fmt.Errorf("wrong number of responses: %d responses for %d verdicts", numReturns, numVerdicts))
-	}
-
-	// Error out if we had one single error
-	for _, ret := range returns {
-		if ret.err != nil {
-			return pkgcontext.OutputError(r.ctx, ret.err)
+func (r *rep) Run(res interface{}, source *string) error {
+	switch response := res.(type) {
+	case listen.Response:
+		verdicts := response.Verdicts()
+		if len(verdicts) == 0 {
+			return nil
 		}
-	}
 
-	return nil
+		// Spawn API calls in parallel
+		type wrap struct {
+			res *apispec.PostApiV1DependenciesEventResponse
+			err error
+		}
+		cb := func(v listen.Verdict) wrap {
+			res, err := r.proClient.PostApiV1DependenciesEventWithResponse(
+				r.ctx,
+				getDependencyEvent(v, *r.info, source),
+				attachAuthBearer(r),
+			)
+
+			return wrap{res, err}
+		}
+		returns := goneric.ParallelMapSlice(cb, runtime.NumCPU(), verdicts)
+
+		// Check the number of responses matches the number of requests
+		numReturns := len(returns)
+		if numVerdicts := len(verdicts); numReturns != numVerdicts {
+			return pkgcontext.OutputError(r.ctx, fmt.Errorf("wrong number of responses: %d responses for %d verdicts", numReturns, numVerdicts))
+		}
+
+		// Error out if we had one single error
+		for _, ret := range returns {
+			if ret.err != nil {
+				return pkgcontext.OutputError(r.ctx, ret.err)
+			}
+		}
+
+		return nil
+	default:
+		return fmt.Errorf("unsupported type: %T", res)
+	}
 }
 
 func (r *rep) WithConfigOptions(opts *flags.ConfigFlags) {
