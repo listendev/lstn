@@ -111,17 +111,27 @@ func (r *rep) stickyComment(owner string, repo string, id int, comment io.Reader
 	return commentFn()
 }
 
-func (r *rep) Run(res listen.Response, _ *string) error {
-	buf := bytes.Buffer{}
-	fullMarkdownReport := report.NewFullMarkdwonReport()
-	fullMarkdownReport.WithOutput(&buf)
-
-	if err := fullMarkdownReport.Render(res); err != nil {
-		return err
-	}
+func (r *rep) Run(res interface{}, _ *string) error {
 	owner := r.opts.Reporting.GitHub.Owner
 	repo := r.opts.Reporting.GitHub.Repo
 	id := r.opts.Reporting.GitHub.Pull.ID
+
+	buf := bytes.Buffer{}
+
+	switch v := res.(type) {
+	case listen.Response:
+		fullMarkdownReport := report.NewFullMarkdwonReport()
+		fullMarkdownReport.WithOutput(&buf)
+
+		if err := fullMarkdownReport.Render(v); err != nil {
+			return err
+		}
+
+	case string:
+		buf.WriteString(v)
+	default:
+		return fmt.Errorf("unsupported type: %T", res)
+	}
 
 	err := r.stickyComment(owner, repo, id, &buf)
 	if err != nil {
