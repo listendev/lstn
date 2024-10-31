@@ -57,6 +57,68 @@ func TestChildCommands(t *testing.T) {
 			stderr:  "Error: invalid configuration options/flags\n       GitHub token is mandatory\n       JWT token is mandatory\n",
 			errstr:  "invalid configuration options/flags\n       GitHub token is mandatory\n       JWT token is mandatory",
 		},
+		// lstn ci report --jwt-token 12345 --gh-token 54321
+		{
+			name: "lstn ci report --jwt-token 12345 --gh-token 54321",
+			envvar: map[string]string{
+				// Temporarily pretend not to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS": "",
+			},
+			cmdline: []string{"ci", "report", "--jwt-token", "12345", "--gh-token", "54321"},
+			stdout:  "Reporting using the \"gh-pull-comment\" reporter...\n",
+			stderr:  "Exiting: the reporter is not running in a supported environment.\n",
+			errstr:  "",
+		},
+		// GITHUB_ACTIONS=true GITHUB_EVENT_PATH="" lstn ci report --jwt-token 12345 --gh-token 54321
+		{
+			name: "lstn ci report --jwt-token 12345 --gh-token 54321",
+			envvar: map[string]string{
+				// Temporarily pretend to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS":    "true",
+				"GITHUB_EVENT_PATH": "",
+			},
+			cmdline: []string{"ci", "report", "--jwt-token", "12345", "--gh-token", "54321"},
+			stdout:  "Reporting using the \"gh-pull-comment\" reporter...\n",
+			stderr:  "Exiting: the reporter is not running in a supported environment.\n",
+			errstr:  "",
+		},
+		// GITHUB_ACTIONS=true GITHUB_EVENT_PATH="../pkg/ci/testdata/github_event_pull_request.json" lstn ci report --jwt-token 12345 --gh-token 54321 --debug-options
+		{
+			name: "lstn ci report --jwt-token 12345 --gh-token 54321",
+			envvar: map[string]string{
+				// Temporarily pretend to be in a GitHub Action (to make test work in a GitHub Action workflow)
+				"GITHUB_ACTIONS":    "true",
+				"GITHUB_EVENT_PATH": path.Join(cwd, "../pkg/ci/testdata/github_event_pull_request.json"),
+			},
+			cmdline: []string{"ci", "report", "--jwt-token", "12345", "--gh-token", "54321", "--debug-options"},
+			stdout: heredoc.Doc(`{
+		"debug-options": true,
+		"endpoint": {
+			"core": "https://core.listen.dev",
+			"npm": "https://npm.listen.dev",
+			"pypi": "https://pypi.listen.dev"
+		},
+		"gh-owner": "reviewdog",
+		"gh-pull-id": 285,
+		"gh-repo": "reviewdog",
+		"gh-token": "54321",
+		"ignore-deptypes": [
+			110
+		],
+		"ignore-packages": null,
+		"jwt-token": "12345",
+		"lockfiles": [
+			"package-lock.json",
+			"poetry.lock"
+		],
+		"loglevel": "info",
+		"npm-registry": "https://registry.npmjs.org",
+		"reporter": [],
+		"select": "",
+		"timeout": 60
+	}
+`),
+		},
 		// lstn ci enable
 		{
 			name:    "lstn ci enable",
@@ -1204,9 +1266,9 @@ Global Flags:
 			stderr: "",
 			errstr: "",
 		},
-		// GITHUB_ACTIONS=true GITHUB_EVENT_PATH=../pkg/ci/testdata/github_event_pul_request.json lstn scan --debug-options
+		// GITHUB_ACTIONS=true GITHUB_EVENT_PATH=../pkg/ci/testdata/github_event_pull_request.json lstn scan --debug-options
 		{
-			name: "GITHUB_ACTIONS=true GITHUB_EVENT_PATH=../pkg/ci/testdata/github_event_pul_request.json lstn scan --debug-options",
+			name: "GITHUB_ACTIONS=true GITHUB_EVENT_PATH=../pkg/ci/testdata/github_event_pull_request.json lstn scan --debug-options",
 			envvar: map[string]string{
 				"GITHUB_ACTIONS":    "true",
 				"GITHUB_EVENT_PATH": path.Join(cwd, "../pkg/ci/testdata/github_event_pull_request.json"),
