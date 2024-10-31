@@ -26,7 +26,6 @@ func main() {
 	jsonReport := report.NewJSONReport()
 
 	// json report
-
 	jsonReportFile, err := os.Create("/tmp/report.json")
 	if err != nil {
 		log.Fatal(err)
@@ -67,5 +66,4 @@ func main() {
 	}
 	rb.Render(packages)
 }
-
 ```
