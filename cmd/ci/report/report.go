@@ -21,6 +21,7 @@ import (
 	"runtime"
 
 	"github.com/listendev/lstn/internal/project"
+	"github.com/listendev/lstn/pkg/ci"
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	"github.com/listendev/lstn/pkg/cmd/options"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
@@ -78,6 +79,11 @@ func New(ctx context.Context) (*cobra.Command, error) {
 				c.Println(opts.AsJSON())
 
 				return nil
+			}
+
+			_, infoErr := ci.NewInfo()
+			if infoErr != nil {
+				return fmt.Errorf("not running in a CI environment")
 			}
 
 			return nil
