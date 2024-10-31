@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"runtime"
 
+	"github.com/MakeNowJust/heredoc"
 	"github.com/listendev/lstn/internal/project"
 	"github.com/listendev/lstn/pkg/cmd"
 	"github.com/listendev/lstn/pkg/cmd/flags"
@@ -56,11 +57,13 @@ func New(ctx context.Context) (*cobra.Command, error) {
 
 			// Token options are mandatory in this case
 			errs := []error{}
+			// GitHub token is mandatory for reporting (posting the comment)
 			if err := validate.Singleton.Var(opts.Token.GitHub, "mandatory"); err != nil {
 				tags, _ := flags.GetFieldTag(opts, "ConfigFlags.Token.GitHub")
 				name, _ := tags.Lookup("name")
 				errs = append(errs, flags.Translate(err, name)...)
 			}
+			// The listen.dev token is mandatory for fetching the data to report
 			if err := validate.Singleton.Var(opts.Token.JWT, "mandatory"); err != nil {
 				tags, _ := flags.GetFieldTag(opts, "ConfigFlags.Token.JWT")
 				name, _ := tags.Lookup("name")
@@ -83,8 +86,14 @@ func New(ctx context.Context) (*cobra.Command, error) {
 			}
 			source := "eavesdrop tool"
 			reportingOpts := flags.Reporting{Types: []cmd.ReportType{cmd.GitHubPullCommentReport}}
+			noFindingsMessage := heredoc.Doc(`
+			The listen.dev eavesdropping engine didn't spot any critical runtime threat.
 
-			return reporterfactory.Exec(c, reportingOpts, "test", &source)
+			Congrats, you're safe!`)
+
+			// TODO: fetch critical findings from Core API
+
+			return reporterfactory.Exec(c, reportingOpts, noFindingsMessage, &source)
 		},
 	}
 
