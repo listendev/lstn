@@ -49,6 +49,14 @@ func TestChildCommands(t *testing.T) {
 			stderr:  "Error: accepts 1 arg(s), received 0\n",
 			errstr:  "accepts 1 arg(s), received 0",
 		},
+		// lstn ci report
+		{
+			name:    "lstn ci report",
+			cmdline: []string{"ci", "report"},
+			stdout:  "",
+			stderr:  "Error: invalid configuration options/flags\n       GitHub token is mandatory\n       JWT token is mandatory\n",
+			errstr:  "invalid configuration options/flags\n       GitHub token is mandatory\n       JWT token is mandatory",
+		},
 		// lstn ci enable
 		{
 			name:    "lstn ci enable",
