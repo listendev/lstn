@@ -20,12 +20,12 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/cli/cli/pkg/iostreams"
 	"github.com/listendev/lstn/internal/project"
-	"github.com/listendev/lstn/pkg/ci"
+	"github.com/listendev/lstn/pkg/cmd"
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	"github.com/listendev/lstn/pkg/cmd/options"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
+	reporterfactory "github.com/listendev/lstn/pkg/reporter/factory"
 	"github.com/listendev/lstn/pkg/validate"
 	"github.com/spf13/cobra"
 )
@@ -81,23 +81,10 @@ func New(ctx context.Context) (*cobra.Command, error) {
 
 				return nil
 			}
+			source := "eavesdrop tool"
+			reportingOpts := flags.Reporting{Types: []cmd.ReportType{cmd.GitHubPullCommentReport}}
 
-			info, infoErr := ci.NewInfo()
-			if infoErr != nil {
-				return fmt.Errorf("not running in a CI environment")
-			}
-
-			io := c.Context().Value(pkgcontext.IOStreamsKey).(*iostreams.IOStreams)
-			cs := io.ColorScheme()
-
-			// Block when running on fork pull requests
-			if info.HasReadOnlyGitHubToken() {
-				c.PrintErrln(cs.WarningIcon(), "lstn ci doesn not run on fork pull requests at the moment")
-
-				return nil
-			}
-
-			return nil
+			return reporterfactory.Exec(c, reportingOpts, "test", &source)
 		},
 	}
 
