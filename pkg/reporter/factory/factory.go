@@ -50,7 +50,7 @@ var (
 //
 // Last but not least, this function takes care of configuring
 // everything the reporter being instantiated needs.
-func make(ctx context.Context, reportType cmd.ReportType) (r reporter.Reporter, canRun bool, err error) {
+func makeReporter(ctx context.Context, reportType cmd.ReportType) (r reporter.Reporter, canRun bool, err error) {
 	switch reportType {
 	case cmd.ListenPro:
 		info, infoErr := ci.NewInfo()
@@ -122,7 +122,7 @@ func Exec(c *cobra.Command, reportingOpts flags.Reporting, resp interface{}, sou
 			fallthrough
 
 		case cmd.GitHubPullCommentReport:
-			rep, runnable, err := make(c.Context(), r)
+			rep, runnable, err := makeReporter(c.Context(), r)
 			if runnable && err != nil {
 				return err
 			}
