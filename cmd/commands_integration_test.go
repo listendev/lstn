@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// Copyright © 2023 The listen.dev team <engineering@garnet.ai>
+// Copyright © 2024 The listen.dev team <engineering@garnet.ai>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ func TestChildCommands(t *testing.T) {
 		{
 			name:    "lstn ci",
 			cmdline: []string{"ci"},
-			stdout:  "",
+			stdout:  "Eavesdrop everything happening under the hoods into your CI.\n\nUsing this set of commands, you can spy network and file activities occurring in your CI, whether it's your dependencies doing something shady or your code.\n\nA listen.dev pro is necessary.\n\nUsage:\n  lstn ci\n  lstn ci [command]\n\nAvailable Commands:\n  enable      Enable the CI eavesdropping\n  report      Report the most critical findings into GitHub pull requests\n\nGlobal Flags:\n      --config string   config file (default is $HOME/.lstn.yaml)\n\nUse \"lstn ci [command] --help\" for more information about a command.\n",
 			stderr:  "Error: accepts 1 arg(s), received 0\n",
 			errstr:  "accepts 1 arg(s), received 0",
 		},
