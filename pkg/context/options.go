@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// Copyright © 2023 The listen.dev team <engineering@garnet.ai>
+// Copyright © 2024 The listen.dev team <engineering@garnet.ai>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ func GetOptionsFromContext(ctx context.Context, key any) (cmd.Options, error) {
 			ret += e.Error()
 		}
 
-		return nil, fmt.Errorf(ret)
+		return nil, fmt.Errorf("%s", ret)
 	}
 
 	// Transform the config options values

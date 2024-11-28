@@ -42,7 +42,7 @@ var EnvPrefix = "lstn"
 
 func Translate(err error, prefix string) []error {
 	all := []error{}
-	for _, e := range err.(v.ValidationErrors) {
+	for _, e := range err.(v.ValidationError) {
 		all = append(all, fmt.Errorf("%s%s", prefix, e.Translate(v.Translator)))
 	}
 
