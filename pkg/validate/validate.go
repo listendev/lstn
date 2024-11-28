@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// Copyright © 2023 The listen.dev team <engineering@garnet.ai>
+// Copyright © 2024 The listen.dev team <engineering@garnet.ai>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import (
 	"github.com/go-playground/validator/v10/non-standard/validators"
 )
 
-type ValidationErrors = validator.ValidationErrors
+type ValidationError = validator.ValidationErrors
 
 // Singleton is the validator singleton instance.
 //

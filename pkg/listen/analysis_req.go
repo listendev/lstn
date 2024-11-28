@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// Copyright © 2023 The listen.dev team <engineering@garnet.ai>
+// Copyright © 2024 The listen.dev team <engineering@garnet.ai>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,8 +32,8 @@ type AnalysisRequest struct {
 func (req *AnalysisRequest) Ok() (bool, error) {
 	err := validate.Singleton.Struct(req)
 	if err != nil {
-		if all, isValidationErrors := err.(validate.ValidationErrors); isValidationErrors {
-			return false, fmt.Errorf(all[0].Translate(validate.Translator))
+		if all, isValidationErrors := err.(validate.ValidationError); isValidationErrors {
+			return false, fmt.Errorf("%s", all[0].Translate(validate.Translator))
 		}
 
 		return false, err

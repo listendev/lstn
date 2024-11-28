@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// Copyright © 2023 The listen.dev team <engineering@garnet.ai>
+// Copyright © 2024 The listen.dev team <engineering@garnet.ai>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -102,7 +102,7 @@ func NewTopic(topic string) *cobra.Command {
 	})
 
 	c.SetUsageFunc(func(c *cobra.Command) error {
-		fmt.Fprintf(os.Stdout, c.Use)
+		fmt.Fprintf(os.Stdout, "%s", c.Use)
 
 		return nil
 	})

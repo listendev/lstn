@@ -50,6 +50,7 @@ A listen.dev pro is necessary.`,
 		Args: func(c *cobra.Command, args []string) error {
 			if err := cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs)(c, args); err != nil {
 				_ = c.Help()
+
 				return err
 			}
 
