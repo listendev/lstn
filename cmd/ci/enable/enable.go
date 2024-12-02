@@ -89,13 +89,7 @@ func New(ctx context.Context) (*cobra.Command, error) {
 				return nil
 			}
 
-			// FIXME: exit if not on linux
-
-			isLocal := false
-			// this means we are running on a local machine, we can skip CI checks
-			if strings.Contains(opts.Endpoint.Core, "localhost") || strings.Contains(opts.Endpoint.Core, "127.0.0.1") {
-				isLocal = true
-			}
+			isLocal := opts.ConfigFlags.Endpoint.IsLocalCore()
 
 			info, infoErr := ci.NewInfo()
 			if !isLocal && infoErr != nil {

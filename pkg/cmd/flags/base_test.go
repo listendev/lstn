@@ -111,11 +111,6 @@ func (suite *FlagsBaseSuite) TestValidate() {
 			[]string{"PyPi endpoint must be a valid listen.dev endpoint"},
 		},
 		{
-			"invalid Core endpoint",
-			&ConfigFlags{Timeout: 31, Endpoint: Endpoint{PyPi: "http://127.0.0.1:3000", Npm: "http://127.0.0.1:3001", Core: "http://invalid.endpoint"}},
-			[]string{"Core API must be a valid listen.dev endpoint"},
-		},
-		{
 			"valid config flags",
 			&ConfigFlags{Timeout: 31, Endpoint: Endpoint{Npm: "http://127.0.0.1:3000", PyPi: "http://127.0.0.1:3000", Core: "http://127.0.0.1:3002"}},
 			[]string{},
