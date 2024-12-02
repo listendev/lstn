@@ -91,8 +91,14 @@ func New(ctx context.Context) (*cobra.Command, error) {
 
 			// FIXME: exit if not on linux
 
+			isLocal := false
+			// this means we are running on a local machine, we can skip CI checks
+			if strings.Contains(opts.Endpoint.Core, "localhost") || strings.Contains(opts.Endpoint.Core, "127.0.0.1") {
+				isLocal = true
+			}
+
 			info, infoErr := ci.NewInfo()
-			if infoErr != nil {
+			if !isLocal && infoErr != nil {
 				return fmt.Errorf("not running in a CI environment")
 			}
 
@@ -100,7 +106,7 @@ func New(ctx context.Context) (*cobra.Command, error) {
 			cs := io.ColorScheme()
 
 			// Block when running on fork pull requests
-			if info.HasReadOnlyGitHubToken() {
+			if !isLocal && info.HasReadOnlyGitHubToken() {
 				c.PrintErrln(cs.WarningIcon(), "lstn ci doesn not run on fork pull requests at the moment")
 
 				return nil
@@ -151,22 +157,16 @@ func New(ctx context.Context) (*cobra.Command, error) {
 
 			// Create configuration for runtime eavesdropping tool
 			io.StartProgressIndicator()
-			envConfig := fmt.Sprintf("%s\n%s\n%s=%s\n%s=%s\n", strings.Join(coreSettings.TokensSlice(), "\n"), info.Dump(), "LISTENDEV_TOKEN", opts.Token.JWT, "GITHUB_TOKEN", opts.Token.GitHub)
-			envDirErr := os.MkdirAll("/var/run/jibril", 0750)
-			if envDirErr != nil {
-				io.StopProgressIndicator()
 
-				return envDirErr
-			}
-
-			envConfigFilename := "/var/run/jibril/default"
-			if err := os.WriteFile(envConfigFilename, []byte(envConfig), 0640); err != nil {
+			jibrilEnvConfigFilename, err := createEnvForJibrill(isLocal, coreSettings, info, opts.Token.JWT, opts.Token.GitHub)
+			if err != nil {
 				io.StopProgressIndicator()
 
 				return err
 			}
+
 			io.StopProgressIndicator()
-			c.Println(cs.SuccessIcon(), "Wrote config", cs.Magenta(envConfigFilename))
+			c.Println(cs.SuccessIcon(), "Wrote config", cs.Magenta(jibrilEnvConfigFilename))
 
 			io.StartProgressIndicator()
 			var jibril *exec.Cmd
@@ -223,4 +223,36 @@ func New(ctx context.Context) (*cobra.Command, error) {
 	c.SetContext(ctx)
 
 	return c, nil
+}
+
+// createEnvForJibrill creates the files that jibril needs to run in the CI environment.
+// It returns the path to the file that contains config for jibril.
+func createEnvForJibrill(isLocal bool, settings apispec.Settings, info *ci.Info, jwt string, ghToken string) (string, error) {
+	var dump string
+	if info != nil {
+		dump = info.Dump()
+	}
+
+	envConfig := fmt.Sprintf("%s\n%s\n%s=%s\n%s=%s\n", strings.Join(settings.TokensSlice(), "\n"), dump, "LISTENDEV_TOKEN", jwt, "GITHUB_TOKEN", ghToken)
+
+	dirPath := "/var/run/jibril"
+	if isLocal {
+		dirPath = "./jibril"
+	}
+
+	envDirErr := os.MkdirAll(dirPath, 0750)
+	if envDirErr != nil {
+		return "", envDirErr
+	}
+
+	envConfigFilename := "/var/run/jibril/default"
+	if isLocal {
+		envConfigFilename = "./jibril/default"
+	}
+
+	if err := os.WriteFile(envConfigFilename, []byte(envConfig), 0640); err != nil {
+		return "", err
+	}
+
+	return envConfigFilename, nil
 }
