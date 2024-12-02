@@ -96,7 +96,7 @@ func New(ctx context.Context) (*Command, error) {
 						c.PrintErrln("Running without a configuration file")
 					} else {
 						// Config file was found but another error was produced
-						c.PrintErrf("Error running with config file: %s\n", viper.ConfigFileUsed())
+						c.PrintErrf("Error running with config file %s: %s\n", viper.ConfigFileUsed(), err.Error())
 					}
 				}
 			}
