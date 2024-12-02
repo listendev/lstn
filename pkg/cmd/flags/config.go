@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/XANi/goneric"
@@ -80,7 +81,34 @@ type Filtering struct {
 type Endpoint struct {
 	Npm  string `default:"https://npm.listen.dev" flag:"npm-endpoint" name:"NPM endpoint" desc:"the listen.dev endpoint emitting the NPM verdicts" validate:"url,endpoint" transform:"tsuffix=/" flagset:"Config" json:"npm"`
 	PyPi string `default:"https://pypi.listen.dev" flag:"pypi-endpoint" name:"PyPi endpoint" desc:"the listen.dev endpoint emitting the PyPi verdicts" validate:"url,endpoint" transform:"tsuffix=/" flagset:"Config" json:"pypi"`
-	Core string `default:"https://core.listen.dev" flag:"core-endpoint" name:"Core API" desc:"the listen.dev Core API endpoint" validate:"url,endpoint" transform:"tsuffix=/" flagset:"Config" json:"core"`
+	Core string `default:"https://core.listen.dev" flag:"core-endpoint" name:"Core API" desc:"the listen.dev Core API endpoint" validate:"url" transform:"tsuffix=/" flagset:"Config" json:"core"`
+}
+
+// IsLocalCore returns true if the Core API endpoint is a local one.
+// It is considered local and endpoint with fixed IP address and http scheme.
+func (e Endpoint) IsLocalCore() bool {
+	isHttp := strings.HasPrefix(e.Core, "http://")
+	fixedIP := false
+
+	address := strings.TrimPrefix(e.Core, "http://")
+
+	nums := strings.Split(address, ".")
+	if len(nums) == 4 {
+		for _, num := range nums {
+			n, err := strconv.Atoi(num)
+			if err != nil {
+				return false
+			}
+
+			if n >= 0 && n <= 255 {
+				fixedIP = true
+			} else {
+				return false
+			}
+		}
+	}
+
+	return isHttp && fixedIP
 }
 
 // ConfigFlags are the options that the CLI also reads from the YAML configuration file.

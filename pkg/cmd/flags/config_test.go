@@ -31,6 +31,57 @@ func TestFlagsConfigSuite(t *testing.T) {
 	suite.Run(t, new(FlagsConfigSuite))
 }
 
+func (suite *FlagsConfigSuite) TestIsLocalCore() {
+	tests := []struct {
+		name     string
+		endpoint Endpoint
+		expected bool
+	}{
+		{
+			name: "Local core with HTTP and fixed IP",
+			endpoint: Endpoint{
+				Core: "http://192.168.1.125",
+			},
+			expected: true,
+		},
+		{
+			name: "Local core with HTTP and non-fixed IP",
+			endpoint: Endpoint{
+				Core: "http://example.com",
+			},
+			expected: false,
+		},
+		{
+			name: "Local core with HTTPS and fixed IP",
+			endpoint: Endpoint{
+				Core: "https://192.168.1.1",
+			},
+			expected: false,
+		},
+		{
+			name: "Local core with HTTPS and non-fixed IP",
+			endpoint: Endpoint{
+				Core: "https://example.com",
+			},
+			expected: false,
+		},
+		{
+			name: "Local core with HTTP and invalid IP",
+			endpoint: Endpoint{
+				Core: "http://999.999.999.999",
+			},
+			expected: false,
+		},
+	}
+
+	for _, tt := range tests {
+		suite.Run(tt.name, func() {
+			result := tt.endpoint.IsLocalCore()
+			assert.Equal(suite.T(), tt.expected, result)
+		})
+	}
+}
+
 func (suite *FlagsConfigSuite) TestNewConfigFlags() {
 	i, err := NewConfigFlags()
 	assert.NoError(suite.T(), err)
