@@ -87,7 +87,7 @@ type Endpoint struct {
 // IsLocalCore returns true if the Core API endpoint is a local one.
 // It is considered local and endpoint with fixed IP address and http scheme.
 func (e Endpoint) IsLocalCore() bool {
-	isHttp := strings.HasPrefix(e.Core, "http://")
+	isHTTP := strings.HasPrefix(e.Core, "http://")
 	fixedIP := false
 
 	address := strings.TrimPrefix(e.Core, "http://")
@@ -108,7 +108,7 @@ func (e Endpoint) IsLocalCore() bool {
 		}
 	}
 
-	return isHttp && fixedIP
+	return isHTTP && fixedIP
 }
 
 // ConfigFlags are the options that the CLI also reads from the YAML configuration file.
