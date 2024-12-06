@@ -35,6 +35,7 @@ import (
 	"github.com/listendev/lstn/pkg/validate"
 	"github.com/listendev/pkg/apispec"
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 )
 
 var (
@@ -106,8 +107,9 @@ func New(ctx context.Context) (*cobra.Command, error) {
 				return nil
 			}
 
-			// Fetch settings from Core API
 			io.StartProgressIndicator()
+
+			// create a client for the Core API
 			coreClient, coreClientErr := apispec.NewClientWithResponses(
 				opts.Endpoint.Core,
 				apispec.WithRequestEditorFn(func(_ context.Context, req *http.Request) error {
@@ -127,18 +129,22 @@ func New(ctx context.Context) (*cobra.Command, error) {
 
 				return coreClientErr
 			}
+
+			// get settings from the Core API
 			coreResponse, coreResponseErr := coreClient.GetApiV1SettingsWithResponse(ctx)
 			if coreResponseErr != nil {
 				io.StopProgressIndicator()
 
 				return coreResponseErr
 			}
+
 			if coreResponse.StatusCode() != http.StatusOK {
 				io.StopProgressIndicator()
 				c.PrintErrln(cs.WarningIcon(), "settings request to Core API didn't work out", cs.Redf("(%d)", coreResponse.StatusCode()))
 
 				return fmt.Errorf("status code is not %d", http.StatusOK)
 			}
+
 			if coreResponse.JSON200 == nil {
 				io.StopProgressIndicator()
 				c.PrintErrln(cs.WarningIcon(), "empty settings response")
@@ -149,7 +155,30 @@ func New(ctx context.Context) (*cobra.Command, error) {
 			io.StopProgressIndicator()
 			c.Println(cs.SuccessIcon(), "Fetch settings")
 
-			// Create configuration for runtime eavesdropping tool
+			io.StartProgressIndicator()
+
+			// get yaml config for jibril
+			config, err := coreClient.GetConfigWithResponse(ctx, &apispec.GetConfigParams{WorkflowId: "1"}) // FIXME: workflow id is hardcoded
+			if err != nil || config.StatusCode() != http.StatusOK {
+				io.StopProgressIndicator()
+
+				c.PrintErrln(cs.WarningIcon(), "couldn't fetch the configuration for jibril", cs.Redf("(%d)", config.StatusCode()))
+
+				return err
+			}
+
+			jibrilConfig := *config.JSON200
+			io.StopProgressIndicator()
+
+			if err := writeToYaml(jibrilConfig); err != nil {
+				c.PrintErrln(cs.WarningIcon(), "couldn't write the configuration YAML for jibril")
+
+				return err
+			}
+
+			c.Println(cs.SuccessIcon(), "Wrote jibril config", cs.Magenta("config.yaml"))
+
+			// Create env file for runtime eavesdropping tool as a systemd service
 			io.StartProgressIndicator()
 
 			jibrilEnvConfigFilename, err := createEnvForJibrill(isLocal, coreSettings, info, opts.Token.JWT, opts.Token.GitHub)
@@ -160,10 +189,12 @@ func New(ctx context.Context) (*cobra.Command, error) {
 			}
 
 			io.StopProgressIndicator()
-			c.Println(cs.SuccessIcon(), "Wrote config", cs.Magenta(jibrilEnvConfigFilename))
+
+			c.Println(cs.SuccessIcon(), "Wrote jibril env config", cs.Magenta(jibrilEnvConfigFilename))
 
 			io.StartProgressIndicator()
 			var jibril *exec.Cmd
+			var jibrilFile string
 			if len(opts.Directory) > 0 {
 				file := filepath.Join(opts.Directory, "jibril")
 				info, err := os.Stat(file)
@@ -177,7 +208,8 @@ func New(ctx context.Context) (*cobra.Command, error) {
 
 					return fmt.Errorf("expecting %s to be an executable file", file)
 				}
-				jibril = exec.CommandContext(ctx, file, "-s", "enable-now")
+
+				jibrilFile = file
 			} else {
 				exe, err := exec.LookPath("jibril")
 				if err != nil {
@@ -185,8 +217,12 @@ func New(ctx context.Context) (*cobra.Command, error) {
 
 					return fmt.Errorf("couldn't find the jibril executable in the PATH")
 				}
-				jibril = exec.CommandContext(ctx, exe, "-s", "enable-now")
+
+				jibrilFile = exe
 			}
+
+			jibril = exec.CommandContext(ctx, jibrilFile, "-s", "enable-now --config ./config.yaml")
+
 			io.StopProgressIndicator()
 			c.Println(cs.Blue("•"), "Install and enable", cs.Magenta(jibril.String()))
 
@@ -249,4 +285,23 @@ func createEnvForJibrill(isLocal bool, settings apispec.Settings, info *ci.Info,
 	}
 
 	return envConfigFilename, nil
+}
+
+func writeToYaml(config apispec.JibrilConfig) error {
+	currentDir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	data, err := yaml.Marshal(config)
+	if err != nil {
+		return err
+	}
+
+	yamlConfig := filepath.Join(currentDir, "config.yaml")
+	if err := os.WriteFile(yamlConfig, data, 0640); err != nil {
+		return err
+	}
+
+	return nil
 }
