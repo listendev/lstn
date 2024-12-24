@@ -38,12 +38,10 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var (
-	_, filename, _, _ = runtime.Caller(0)
-)
+var _, filename, _, _ = runtime.Caller(0)
 
 func New(ctx context.Context) (*cobra.Command, error) {
-	var c = &cobra.Command{
+	c := &cobra.Command{
 		Use:                   "enable",
 		DisableFlagsInUseLine: true,
 		Short:                 "Enable the CI eavesdropping",
@@ -158,7 +156,21 @@ func New(ctx context.Context) (*cobra.Command, error) {
 			io.StartProgressIndicator()
 
 			// get yaml config for jibril
-			config, err := coreClient.GetConfigWithResponse(ctx, &apispec.GetConfigParams{WorkflowId: "1"}) // FIXME: workflow id is hardcoded
+			githubRepository := os.Getenv("GITHUB_REPOSITORY")
+			if githubRepository == "" {
+				c.PrintErrln(cs.WarningIcon(), "GITHUB_REPOSITORY is empty, if you are in a dev machine please set something")
+
+				return fmt.Errorf("missing GITHUB_REPOSITORY var")
+			}
+
+			githubRepositoryID := os.Getenv("GITHUB_REPOSITORY_ID")
+			if githubRepositoryID == "" {
+				c.PrintErrln(cs.WarningIcon(), "GITHUB_REPOSITORY_ID is empty, if you are in a dev machine please set something")
+
+				return fmt.Errorf("missing GITHUB_REPOSITORY_ID var")
+			}
+
+			config, err := coreClient.GetConfigWithResponse(ctx)
 			if err != nil || config.StatusCode() != http.StatusOK {
 				io.StopProgressIndicator()
 
@@ -170,13 +182,40 @@ func New(ctx context.Context) (*cobra.Command, error) {
 			jibrilConfig := *config.JSON200
 			io.StopProgressIndicator()
 
-			if err := writeToYaml(jibrilConfig); err != nil {
+			if err := writeConfigToYaml(jibrilConfig); err != nil {
 				c.PrintErrln(cs.WarningIcon(), "couldn't write the configuration YAML for jibril")
 
 				return err
 			}
 
-			c.Println(cs.SuccessIcon(), "Wrote jibril config", cs.Magenta("config.yaml"))
+			c.Println(cs.SuccessIcon(), "Wrote jibril config", cs.Magenta("/etc/jibril/config.yaml"))
+
+			io.StartProgressIndicator()
+
+			// fetch network policy for this specific workflow
+			policy, err := coreClient.GetNetPolicyWithResponse(ctx, &apispec.GetNetPolicyParams{
+				GithubRepository:   githubRepository,
+				GithubRepositoryId: githubRepositoryID,
+			})
+
+			if err != nil || policy.StatusCode() != http.StatusOK {
+				io.StopProgressIndicator()
+
+				c.PrintErrln(cs.WarningIcon(), "couldn't fetch the network policy for jibril", cs.Redf("(%d)", policy.StatusCode()))
+
+				return err
+			}
+
+			netPolicy := *policy.JSON200
+			io.StopProgressIndicator()
+
+			if err := writeNetworkPolicyToYaml(netPolicy); err != nil {
+				c.PrintErrln(cs.WarningIcon(), "couldn't write the network policy YAML for jibril")
+
+				return err
+			}
+
+			c.Println(cs.SuccessIcon(), "Wrote jibril network policy", cs.Magenta("/etc/jibril/netpolicy.yaml"))
 
 			// Create env file for runtime eavesdropping tool as a systemd service
 			io.StartProgressIndicator()
@@ -221,7 +260,7 @@ func New(ctx context.Context) (*cobra.Command, error) {
 				jibrilFile = exe
 			}
 
-			jibril = exec.CommandContext(ctx, jibrilFile, "-s", "enable-now --config ./config.yaml")
+			jibril = exec.CommandContext(ctx, jibrilFile, "-s", "enable-now")
 
 			io.StopProgressIndicator()
 			c.Println(cs.Blue("•"), "Install and enable", cs.Magenta(jibril.String()))
@@ -270,7 +309,7 @@ func createEnvForJibrill(isLocal bool, settings apispec.Settings, info *ci.Info,
 		dirPath = "./jibril"
 	}
 
-	envDirErr := os.MkdirAll(dirPath, 0750)
+	envDirErr := os.MkdirAll(dirPath, 0o750)
 	if envDirErr != nil {
 		return "", envDirErr
 	}
@@ -280,26 +319,48 @@ func createEnvForJibrill(isLocal bool, settings apispec.Settings, info *ci.Info,
 		envConfigFilename = "./jibril/default"
 	}
 
-	if err := os.WriteFile(envConfigFilename, []byte(envConfig), 0640); err != nil {
+	if err := os.WriteFile(envConfigFilename, []byte(envConfig), 0o640); err != nil {
 		return "", err
 	}
 
 	return envConfigFilename, nil
 }
 
-func writeToYaml(config apispec.JibrilConfig) error {
-	currentDir, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
+// writeConfigToYaml writes the configuration to a YAML file.
+// The path is hardcoded to /etc/jibril/config.yaml because is the where jibril expects it.
+func writeConfigToYaml(config apispec.JibrilConfig) error {
 	data, err := yaml.Marshal(config)
 	if err != nil {
 		return err
 	}
 
-	yamlConfig := filepath.Join(currentDir, "config.yaml")
-	if err := os.WriteFile(yamlConfig, data, 0640); err != nil {
+	if err := os.MkdirAll("/etc/jibril", 0o750); err != nil {
+		return err
+	}
+
+	yamlConfig := "/etc/jibril/config.yaml"
+	if err := os.WriteFile(yamlConfig, data, 0o640); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// writeNetworkPolicyToYaml writes the network policy to a YAML file.
+// The path is hardcoded to /etc/jibril/netpolicy.yaml because is the where jibril expects it, but you can change it
+// putting a different path in the jibril configuration.
+func writeNetworkPolicyToYaml(policy apispec.NetworkPolicy) error {
+	data, err := yaml.Marshal(policy)
+	if err != nil {
+		return err
+	}
+
+	if err := os.MkdirAll("/etc/jibril", 0o750); err != nil {
+		return err
+	}
+
+	yamlConfig := "/etc/jibril/netpolicy.yaml"
+	if err := os.WriteFile(yamlConfig, data, 0o640); err != nil {
 		return err
 	}
 
