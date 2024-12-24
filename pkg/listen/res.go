@@ -19,8 +19,10 @@ import (
 	"github.com/listendev/pkg/models"
 )
 
-type Verdict = models.Verdict
-type Problem = models.Problem
+type (
+	Verdict = models.Verdict
+	Problem = models.Problem
+)
 
 type Package struct {
 	// Name name of the package

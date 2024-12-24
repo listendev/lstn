@@ -35,9 +35,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	_, filename, _, _ = runtime.Caller(0)
-)
+var _, filename, _, _ = runtime.Caller(0)
 
 func New(ctx context.Context) (*cobra.Command, error) {
 	// Obtain the local options
@@ -46,7 +44,7 @@ func New(ctx context.Context) (*cobra.Command, error) {
 		return nil, err
 	}
 
-	var toCmd = &cobra.Command{
+	toCmd := &cobra.Command{
 		Use:                   "to <name> [[version] [shasum] | [version constraint]]",
 		GroupID:               groups.Core.ID,
 		DisableFlagsInUseLine: true,

@@ -31,12 +31,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	_, filename, _, _ = runtime.Caller(0)
-)
+var _, filename, _, _ = runtime.Caller(0)
 
 func New(ctx context.Context) (*cobra.Command, error) {
-	var c = &cobra.Command{
+	c := &cobra.Command{
 		Use:                   "report",
 		DisableFlagsInUseLine: true,
 		Short:                 "Report the most critical findings into GitHub pull requests",

@@ -19,11 +19,10 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/listendev/pkg/validate"
-
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	"github.com/go-playground/validator/v10/non-standard/validators"
+	"github.com/listendev/pkg/validate"
 )
 
 type ValidationError = validator.ValidationErrors

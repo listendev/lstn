@@ -36,12 +36,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	_, filename, _, _ = runtime.Caller(0)
-)
+var _, filename, _, _ = runtime.Caller(0)
 
 func New(ctx context.Context) (*cobra.Command, error) {
-	var scanCmd = &cobra.Command{
+	scanCmd := &cobra.Command{
 		Use:                   "scan [path]",
 		GroupID:               groups.Core.ID,
 		DisableFlagsInUseLine: true,

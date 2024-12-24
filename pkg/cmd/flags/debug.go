@@ -16,5 +16,5 @@
 package flags
 
 type DebugFlags struct {
-	DebugOptions bool `name:"debug options" flag:"debug-options" desc:"output the options, then exit" json:"debug-options"`
+	DebugOptions bool `desc:"output the options, then exit" flag:"debug-options" json:"debug-options" name:"debug options"`
 }

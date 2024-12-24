@@ -26,9 +26,11 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-type commandName string
-type commandsMap map[commandName]*cobra.Command
-type expectedOutsMap map[commandName]string
+type (
+	commandName     string
+	commandsMap     map[commandName]*cobra.Command
+	expectedOutsMap map[commandName]string
+)
 
 type CmdAdditionalHelpSuite struct {
 	suite.Suite

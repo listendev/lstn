@@ -41,13 +41,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	_, filename, _, _ = runtime.Caller(0)
-)
+var _, filename, _, _ = runtime.Caller(0)
 
 //nolint:gocyclo // ignore
 func New(ctx context.Context) (*cobra.Command, error) {
-	var inCmd = &cobra.Command{
+	inCmd := &cobra.Command{
 		Use:                   "in [path]",
 		GroupID:               groups.Core.ID,
 		DisableFlagsInUseLine: true,

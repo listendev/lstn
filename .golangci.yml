@@ -1,37 +1,49 @@
 linters:
-  disable-all: true
-  enable:
-  - bodyclose
-  - durationcheck
-  - errcheck
-  - errname
-  - exportloopref
-  - goconst
-  - gocritic
-  - gocyclo
-  - godot
-  - gofmt
-  - goheader
-  - goimports
-  # - gosec
-  - gosimple
-  - govet
-  - ineffassign
-  - makezero
-  - nakedret
-  - nilerr
-  - nilnil
-  - nlreturn
-  - noctx
-  - nolintlint
-  - predeclared
-  - revive
-  - staticcheck
-  - stylecheck
-  - typecheck
-  - unconvert
-  - unused
-  - whitespace
+  enable-all: true
+  disable:
+    - wsl
+    - wrapcheck
+    - varnamelen
+    - wastedassign
+    - thelper
+    - testpackage
+    - testifylint
+    - tagliatelle
+    - perfsprint
+    - paralleltest
+    - nonamedreturns
+    - recvcheck
+    - mnd
+    - ireturn
+    - intrange
+    - gochecknoglobals
+    - inamedparam
+    - forcetypeassert
+    - fatcontext
+    - exhaustruct
+    - exhaustive
+    - err113
+    - errorlint
+    - errchkjson
+    - depguard
+    - dupword
+    - cyclop
+    - gocyclo
+    - copyloopvar
+    - contextcheck
+    - gomoddirectives
+    - unparam
+    - funlen
+    - godox
+    - gosec
+    - containedctx
+    - lll
+    - nestif
+    - maintidx
+    - gocognit
+    - dupl
+    - forbidigo
+    - gochecknoinits
 
 linters-settings:
   gofmt:

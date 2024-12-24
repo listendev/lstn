@@ -25,7 +25,7 @@ import (
 
 // AnalysisRequest represents the payload for the analysis listen.dev API endpoint.
 type AnalysisRequest struct {
-	Manifest listentype.AnalysisRequester `json:"manifest" name:"manifest" validate:"mandatory"`
+	Manifest listentype.AnalysisRequester `json:"manifest"          name:"manifest" validate:"mandatory"`
 	Context  *Context                     `json:"context,omitempty"`
 }
 

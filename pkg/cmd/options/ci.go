@@ -31,7 +31,7 @@ var _ cmd.CommandOptions = (*CiEnable)(nil)
 type CiEnable struct {
 	flags.DebugFlags `flagset:"Debug"`
 	flags.ConfigFlags
-	Directory string `flag:"dir" name:"dir" desc:"the directory where the jibril binary is" validate:"omitempty,dir" json:"jibrildir"`
+	Directory string `desc:"the directory where the jibril binary is" flag:"dir" json:"jibrildir" name:"dir" validate:"omitempty,dir"`
 }
 
 func NewCiEnable() (*CiEnable, error) {

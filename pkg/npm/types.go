@@ -131,7 +131,7 @@ type PackageLockDependency struct {
 
 type Package struct {
 	Version string `json:"version" name:"version" validate:"semver"`
-	Shasum  string `json:"shasum" name:"shasum" validate:"shasum"`
+	Shasum  string `json:"shasum"  name:"shasum"  validate:"shasum"`
 }
 
 func (p *Package) Ok() bool {

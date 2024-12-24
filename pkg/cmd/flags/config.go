@@ -35,26 +35,26 @@ import (
 var _ cmd.Options = (*ConfigFlags)(nil)
 
 type Token struct {
-	GitHub string `name:"GitHub token" flag:"gh-token" desc:"set the GitHub token" flagset:"Token" json:"gh-token" validate:"omitempty,notblank"`
-	JWT    string `name:"JWT token" flag:"jwt-token" desc:"set the listen.dev auth token" flagset:"Token" json:"jwt-token" validate:"omitempty,notblank"`
+	GitHub string `desc:"set the GitHub token"          flag:"gh-token"  flagset:"Token" json:"gh-token"  name:"GitHub token" validate:"omitempty,notblank"`
+	JWT    string `desc:"set the listen.dev auth token" flag:"jwt-token" flagset:"Token" json:"jwt-token" name:"JWT token"    validate:"omitempty,notblank"`
 }
 
 type TokenMandatory struct {
-	GitHub string `name:"GitHub token" flag:"gh-token" desc:"set the GitHub token" flagset:"Token" json:"gh-token" validate:"mandatory"`
-	JWT    string `name:"JWT token" flag:"jwt-token" desc:"set the listen.dev auth token" flagset:"Token" json:"jwt-token" validate:"mandatory"`
+	GitHub string `desc:"set the GitHub token"          flag:"gh-token"  flagset:"Token" json:"gh-token"  name:"GitHub token" validate:"mandatory"`
+	JWT    string `desc:"set the listen.dev auth token" flag:"jwt-token" flagset:"Token" json:"jwt-token" name:"JWT token"    validate:"mandatory"`
 }
 
 type Registry struct {
-	NPM string `name:"NPM registry" flag:"npm-registry" desc:"set a custom NPM registry" validate:"omitempty,url" default:"https://registry.npmjs.org" transform:"tsuffix=/" flagset:"Registry" json:"npm-registry"`
+	NPM string `default:"https://registry.npmjs.org" desc:"set a custom NPM registry" flag:"npm-registry" flagset:"Registry" json:"npm-registry" name:"NPM registry" transform:"tsuffix=/" validate:"omitempty,url"`
 }
 
 type Pull struct {
-	ID int `name:"github pull request ID" flag:"gh-pull-id" desc:"set the GitHub pull request ID" flagset:"Reporting" json:"gh-pull-id"`
+	ID int `desc:"set the GitHub pull request ID" flag:"gh-pull-id" flagset:"Reporting" json:"gh-pull-id" name:"github pull request ID"`
 }
 
 type GitHub struct {
-	Owner string `name:"github owner" flag:"gh-owner" desc:"set the GitHub owner name (org|user)" flagset:"Reporting" json:"gh-owner"`
-	Repo  string `name:"github repository" flag:"gh-repo" desc:"set the GitHub repository name" flagset:"Reporting" json:"gh-repo"`
+	Owner string `desc:"set the GitHub owner name (org|user)" flag:"gh-owner" flagset:"Reporting" json:"gh-owner" name:"github owner"`
+	Repo  string `desc:"set the GitHub repository name"       flag:"gh-repo"  flagset:"Reporting" json:"gh-repo"  name:"github repository"`
 	Pull
 }
 
@@ -62,26 +62,26 @@ type GitHub struct {
 type Reporting struct {
 	reporter *enumflag.EnumFlagValue[cmd.ReportType]
 
-	Types []cmd.ReportType `json:"reporter" flag:"reporter" shorthand:"r" transform:"unique" desc:"set one or more reporters to use" flagset:"Reporting"`
+	Types []cmd.ReportType `desc:"set one or more reporters to use" flag:"reporter" flagset:"Reporting" json:"reporter" shorthand:"r" transform:"unique"`
 	GitHub
 }
 
 type Ignore struct {
-	Packages []string          `name:"ignore packages" flag:"ignore-packages" desc:"the list of packages to not process" transform:"unique" default:"[]" json:"ignore-packages"`
-	Deptypes []npmdeptype.Enum `name:"ignore dependency types" flag:"ignore-deptypes" desc:"the list of dependencies types to not process" transform:"unique" json:"ignore-deptypes"`
+	Packages []string          `default:"[]"                                         desc:"the list of packages to not process" flag:"ignore-packages" json:"ignore-packages"         name:"ignore packages" transform:"unique"`
+	Deptypes []npmdeptype.Enum `desc:"the list of dependencies types to not process" flag:"ignore-deptypes"                     json:"ignore-deptypes" name:"ignore dependency types" transform:"unique"`
 
 	types *enumflag.EnumFlagValue[npmdeptype.Enum]
 }
 
 type Filtering struct {
 	Ignore     `flagset:"Filtering"`
-	Expression string `flagset:"Filtering" name:"filter verdicts" flag:"select" shorthand:"s" desc:"filter the output verdicts using a jsonpath script expression (server-side)" json:"select"`
+	Expression string `desc:"filter the output verdicts using a jsonpath script expression (server-side)" flag:"select" flagset:"Filtering" json:"select" name:"filter verdicts" shorthand:"s"`
 }
 
 type Endpoint struct {
-	Npm  string `default:"https://npm.listen.dev" flag:"npm-endpoint" name:"NPM endpoint" desc:"the listen.dev endpoint emitting the NPM verdicts" validate:"url,endpoint" transform:"tsuffix=/" flagset:"Config" json:"npm"`
-	PyPi string `default:"https://pypi.listen.dev" flag:"pypi-endpoint" name:"PyPi endpoint" desc:"the listen.dev endpoint emitting the PyPi verdicts" validate:"url,endpoint" transform:"tsuffix=/" flagset:"Config" json:"pypi"`
-	Core string `default:"https://core.listen.dev" flag:"core-endpoint" name:"Core API" desc:"the listen.dev Core API endpoint" validate:"url" transform:"tsuffix=/" flagset:"Config" json:"core"`
+	Npm  string `default:"https://npm.listen.dev"  desc:"the listen.dev endpoint emitting the NPM verdicts"  flag:"npm-endpoint"  flagset:"Config" json:"npm"  name:"NPM endpoint"  transform:"tsuffix=/" validate:"url,endpoint"`
+	PyPi string `default:"https://pypi.listen.dev" desc:"the listen.dev endpoint emitting the PyPi verdicts" flag:"pypi-endpoint" flagset:"Config" json:"pypi" name:"PyPi endpoint" transform:"tsuffix=/" validate:"url,endpoint"`
+	Core string `default:"https://core.listen.dev" desc:"the listen.dev Core API endpoint"                   flag:"core-endpoint" flagset:"Config" json:"core" name:"Core API"      transform:"tsuffix=/" validate:"url"`
 }
 
 // IsLocalCore returns true if the Core API endpoint is a local one.
@@ -113,14 +113,14 @@ func (e Endpoint) IsLocalCore() bool {
 
 // ConfigFlags are the options that the CLI also reads from the YAML configuration file.
 type ConfigFlags struct {
-	LogLevel string   `default:"info" name:"log level" flag:"loglevel" desc:"set the logging level" flagset:"Config" json:"loglevel"`                          // TODO > validator
-	Timeout  int      `default:"60" name:"timeout" flag:"timeout" desc:"set the timeout, in seconds" validate:"number,min=30" flagset:"Config" json:"timeout"` // FIXME: change to time.Duration type
+	LogLevel string   `default:"info"  desc:"set the logging level"       flag:"loglevel" flagset:"Config" json:"loglevel" name:"log level"`                          // TODO > validator
+	Timeout  int      `default:"60"    desc:"set the timeout, in seconds" flag:"timeout"  flagset:"Config" json:"timeout"  name:"timeout"   validate:"number,min=30"` // FIXME: change to time.Duration type
 	Endpoint Endpoint `json:"endpoint"`
 	Token
 	Registry
 	Reporting
 	Filtering
-	Lockfiles []string `json:"lockfiles" flag:"lockfiles" shorthand:"l" transform:"unique" desc:"set one or more lock file paths (relative to the working dir) to lookup for" default:"[\"package-lock.json\",\"poetry.lock\"]"`
+	Lockfiles []string `default:"[\"package-lock.json\",\"poetry.lock\"]" desc:"set one or more lock file paths (relative to the working dir) to lookup for" flag:"lockfiles" json:"lockfiles" shorthand:"l" transform:"unique"`
 }
 
 func NewConfigFlags() (*ConfigFlags, error) {
