@@ -29,8 +29,8 @@ import (
 var _ cmd.CommandOptions = (*Version)(nil)
 
 type Version struct {
-	Verbosity        int  `name:"verbosity" shorthand:"v" desc:"increment the verbosity level" type:"count" validate:"gte=0" json:"verbosity"`
-	Changelog        bool `name:"changelog" flag:"changelog" desc:"output the relase notes URL" json:"changelog"`
+	Verbosity        int  `desc:"increment the verbosity level" json:"verbosity" name:"verbosity" shorthand:"v"    type:"count" validate:"gte=0"`
+	Changelog        bool `desc:"output the relase notes URL"   flag:"changelog" json:"changelog" name:"changelog"`
 	flags.DebugFlags `flagset:"Debug"`
 }
 

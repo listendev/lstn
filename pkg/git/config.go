@@ -153,7 +153,7 @@ func GetConfig(s config.Scope) (*config.Config, error) {
 func GetFinalConfig(repo *git.Repository) (*config.Config, error) {
 	var err error
 	c := config.NewConfig()
-	// Try to retrive and to merge the system Git config
+	// Try to retrieve and to merge the system Git config
 	systemCfg, _ := GetConfig(config.SystemScope)
 	err = mergo.Merge(c, systemCfg, mergo.WithOverride)
 	if err != nil {
@@ -167,7 +167,7 @@ func GetFinalConfig(repo *git.Repository) (*config.Config, error) {
 		return nil, fmt.Errorf("couldn't merge global git config: %#v", err)
 	}
 
-	// Try to retrive the local Git config
+	// Try to retrieve the local Git config
 	localCfg, _ := repo.Config()
 	localCfgOk := localCfg != nil
 	// Fallback to manual reading

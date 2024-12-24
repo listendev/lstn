@@ -559,7 +559,7 @@ func TestRenderContainer(t *testing.T) {
 			}
 
 			if tt.snapshot {
-				assert.Nil(t, os.WriteFile(fmt.Sprintf("./testdata/snapshots/%s.md", tt.name), outBuf.Bytes(), 0644))
+				assert.Nil(t, os.WriteFile(fmt.Sprintf("./testdata/snapshots/%s.md", tt.name), outBuf.Bytes(), 0o644))
 			}
 
 			require.Equal(t, tt.expectedOutput, outBuf.Bytes())

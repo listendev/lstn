@@ -71,7 +71,7 @@ func generatePackageLock(ctx context.Context, dir string) ([]byte, error) {
 
 		return []byte{}, fmt.Errorf("couldn't read the package.json file")
 	}
-	if err := util.WriteFile(fs.Current, filepath.Join(tmp, "package.json"), packageJSON, 0644); err != nil {
+	if err := util.WriteFile(fs.Current, filepath.Join(tmp, "package.json"), packageJSON, 0o644); err != nil {
 		return []byte{}, fmt.Errorf("couldn't copy the package.json file")
 	}
 

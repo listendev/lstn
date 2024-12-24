@@ -109,9 +109,9 @@ func WriteFileContent(fs billy.Filesystem, path string, fileContent string, exec
 	}
 
 	// Set file permissions
-	perms := os.FileMode(0666)
+	perms := os.FileMode(0o666)
 	if executable {
-		perms = os.FileMode(0777)
+		perms = os.FileMode(0o777)
 	}
 
 	// Create the file

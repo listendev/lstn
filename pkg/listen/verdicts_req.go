@@ -31,9 +31,9 @@ type Request interface {
 
 // VerdictsRequest represents the payload for the verdicts listen.dev API endpoint.
 type VerdictsRequest struct {
-	Name    string   `json:"name" name:"name" validate:"mandatory"`
+	Name    string   `json:"name"              name:"name"                 validate:"mandatory"`
 	Version string   `json:"version,omitempty" validate:"omitempty,semver"`
-	Digest  string   `json:"digest,omitempty" validate:"omitempty,digest"`
+	Digest  string   `json:"digest,omitempty"  validate:"omitempty,digest"`
 	Select  string   `json:"select,omitempty"`
 	Context *Context `json:"context,omitempty"`
 }
@@ -106,7 +106,7 @@ func NewBulkVerdictsRequestsFromMap(deps map[string]*semver.Version, selection s
 
 func NewBulkVerdictsRequests(names []string, versions semver.Collection, selection string) ([]*VerdictsRequest, error) {
 	if len(names) != len(versions) {
-		return nil, fmt.Errorf("couldn't create a request set because of mismatching lenghts")
+		return nil, fmt.Errorf("couldn't create a request set because of mismatching lengths")
 	}
 
 	c := NewContext()

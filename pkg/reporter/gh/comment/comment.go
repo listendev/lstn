@@ -74,7 +74,7 @@ func (r *rep) WithContinuousIntegrationInfo(_ *ci.Info) {
 
 func (r *rep) stickyComment(owner string, repo string, id int, comment io.Reader) error {
 	buf := bytes.Buffer{}
-	_, err := buf.Write([]byte(stickyReviewCommentAnnotation))
+	_, err := buf.WriteString(stickyReviewCommentAnnotation)
 	if err != nil {
 		return err
 	}

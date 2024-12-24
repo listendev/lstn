@@ -69,7 +69,7 @@ func New(ctx context.Context) (*Command, error) {
 	}
 
 	// rootCmd represents the base command when called without any subcommands
-	var rootCmd = &cobra.Command{
+	rootCmd := &cobra.Command{
 		Use:               "lstn",
 		SilenceUsage:      true,
 		DisableAutoGenTag: true,

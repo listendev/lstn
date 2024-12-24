@@ -31,8 +31,7 @@ var _ cmd.CommandOptions = (*Empty)(nil)
 // Empty represents an empty options set.
 //
 // Mostly needed to override the inherited options.
-type Empty struct {
-}
+type Empty struct{}
 
 func NewEmpty() (*Empty, error) {
 	o := &Empty{}

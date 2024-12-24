@@ -89,7 +89,6 @@ func TestTablePrinter_printVerdictMetadata(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			outBuf := &bytes.Buffer{}
 			tr := &TablePrinter{
-
 				streams: &iostreams.IOStreams{
 					Out: outBuf,
 				},

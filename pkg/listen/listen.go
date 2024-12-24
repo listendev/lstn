@@ -220,7 +220,7 @@ func BulkPackages(requests []*VerdictsRequest, opts ...func(*options)) (*Respons
 		}
 
 		// It's impossible to have more that one Package in every Response (a list of Package items) in this case
-		// Why? Because every VerdictsRequest contains an exact pacakge version
+		// Why? Because every VerdictsRequest contains an exact package version
 		// So we only grab the first element of the Response
 		return returnWrap{&ret[0], nil}
 	}
