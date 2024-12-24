@@ -6,7 +6,7 @@ require (
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/Masterminds/semver/v3 v3.3.1
 	github.com/XANi/goneric v1.2.0
-	github.com/caarlos0/env/v11 v11.3.0
+	github.com/caarlos0/env/v11 v11.3.1
 	github.com/cli/cli v1.14.0
 	github.com/creasty/defaults v1.8.0
 	github.com/ghetzel/testify v1.4.1
@@ -33,6 +33,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/thediveo/enumflag/v2 v2.0.5
 	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67
+	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
@@ -153,7 +154,6 @@ require (
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/neurosnap/sentences.v1 v1.0.7 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/client-go v0.32.0 // indirect
 )
