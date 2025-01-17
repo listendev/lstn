@@ -104,17 +104,6 @@ func (r *rep) stickyComment(owner string, repo string, id int, comment io.Reader
 	for _, comment := range comments {
 		if strings.HasPrefix(*comment.Body, stickyReviewCommentAnnotation) {
 			commentFn = func() error {
-				// NOTE: workaround here
-				// - get the content of the previous comment
-				// - append the new content
-				// - update the comment with the new content
-				// content, _, err := r.ghClient.Issues.GetComment(r.ctx, owner, repo, *comment.ID)
-				// if err != nil {
-				// 	return err
-				// }
-
-				// *issueComment.Body = trimGithubComment(*content.Body + "\n" + *issueComment.Body)
-
 				_, _, err = r.ghClient.Issues.EditComment(r.ctx, owner, repo, *comment.ID, issueComment)
 
 				return err
@@ -125,21 +114,6 @@ func (r *rep) stickyComment(owner string, repo string, id int, comment io.Reader
 	}
 
 	return commentFn()
-}
-
-// trimGithubComment removes the title from the comment.
-// Right now if multiple pipeline runs on same PRs will post multiple comments, but one edits the previous comment.
-// So now it get the comment and append the new one, in this way we can keep one comment but with all information.
-// Here we remove the title from the comment, this way is easier to read and cleaner from the user prospective.
-func trimGithubComment(body string) string {
-	toRemove := "**listen.dev runtime monitor detected a potential security issue**"
-	lastIndex := strings.LastIndex(body, toRemove)
-	if lastIndex == -1 {
-		return body
-	}
-
-	// Remove the last occurrence by slicing and concatenating the string.
-	return body[:lastIndex] + body[lastIndex+len(toRemove):]
 }
 
 func (r *rep) Run(res interface{}, _ *string) error {
