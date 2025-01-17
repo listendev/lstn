@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// Copyright © 2024 The listen.dev team <engineering@garnet.ai>
+// Copyright © 2025 The listen.dev team <engineering@garnet.ai>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,16 +17,22 @@ package report
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+	"os"
 	"runtime"
+	"time"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/listendev/lstn/internal/project"
+	"github.com/listendev/lstn/pkg/ci"
 	"github.com/listendev/lstn/pkg/cmd"
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	"github.com/listendev/lstn/pkg/cmd/options"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
-	reporterfactory "github.com/listendev/lstn/pkg/reporter/factory"
+	"github.com/listendev/lstn/pkg/reporter/factory"
 	"github.com/listendev/lstn/pkg/validate"
 	"github.com/spf13/cobra"
 )
@@ -84,14 +90,73 @@ func New(ctx context.Context) (*cobra.Command, error) {
 			}
 			source := "eavesdrop tool"
 			reportingOpts := flags.Reporting{Types: []cmd.ReportType{cmd.GitHubPullCommentReport}}
-			noFindingsMessage := heredoc.Doc(`
-			The listen.dev eavesdropping engine didn't spot any critical runtime threat.
 
-			Congrats, you're safe!`)
+			_, infoErr := ci.NewInfo()
+			if infoErr != nil {
+				return factory.ErrReporterUnsupportedEnvironment
+			}
 
-			// TODO: fetch critical findings from Core API
+			githubRepositoryID := os.Getenv("GITHUB_REPOSITORY_ID")
+			githubWorkflow := os.Getenv("GITHUB_WORKFLOW")
+			githubJob := os.Getenv("GITHUB_JOB")
+			githubRunID := os.Getenv("GITHUB_RUN_ID")
+			githubRunNumber := os.Getenv("GITHUB_RUN_NUMBER")
+			githubRunAttempt := os.Getenv("GITHUB_RUN_ATTEMPT")
 
-			return reporterfactory.Exec(c, reportingOpts, noFindingsMessage, &source)
+			ghCxt := GHctx{
+				repositoryID: githubRepositoryID,
+				workflow:     githubWorkflow,
+				job:          githubJob,
+				runID:        githubRunID,
+				runNumber:    githubRunNumber,
+				runAttempt:   githubRunAttempt,
+			}
+
+			evts, err := events(c.Context(), opts.Endpoint.Core, opts.Token.JWT, ghCxt)
+			if err != nil {
+				return err
+			}
+
+			summaries := summary(evts)
+
+			if len(summaries) == 0 { // no dangerous events, so no need to report
+				fmt.Println("No dangerous network events found.")
+
+				commentBody := "✅ **listen.dev** runtime monitor executed successfully! 🎉\n\n"
+				commentBody += "No security issues were detected during the scan.\n\n"
+
+				return factory.Exec(c, reportingOpts, heredoc.Doc(commentBody), &source)
+			}
+
+			link, err := getLinkOfDashboard(c.Context(), opts.Endpoint.Core, opts.Token.JWT, ghCxt)
+			if err != nil {
+				c.Println("Failed to get the link of the dashboard")
+
+				return err
+			}
+
+			commentBody := "# ⚠️ **listen.dev** runtime monitor detected a potential security issue\n"
+
+			domains := "domain"
+			if len(summaries) > 1 {
+				domains = "domains"
+			}
+
+			commentBody += fmt.Sprintf("Suspicious %s detected", domains)
+			commentBody += "\n"
+
+			// Start the markdown table
+			commentBody += "| Domain        | Status   |\n"
+			commentBody += "|--------------|----------|\n"
+
+			for _, s := range summaries {
+				commentBody += fmt.Sprintf("| %s | 🚫 BLOCKED |\n", s)
+			}
+
+			commentBody += fmt.Sprintln("> These connections were automatically blocked by the runtime monitor to protect your workflows.")
+			commentBody += fmt.Sprintf("> [Maybe change the link wording to 'Review and manage these issues in listen.dev dashboard'](%s)", link)
+
+			return factory.Exec(c, reportingOpts, heredoc.Doc(commentBody), &source)
 		},
 	}
 
@@ -108,4 +173,275 @@ func New(ctx context.Context) (*cobra.Command, error) {
 	c.SetContext(ctx)
 
 	return c, nil
+}
+
+type GHctx struct {
+	repositoryID string
+	workflow     string
+	job          string
+	runID        string
+	runNumber    string
+	runAttempt   string
+}
+
+// ContextElement defines model for ContextElement.
+type ContextElement struct {
+	Data any    `json:"data"`
+	Type string `json:"type"`
+}
+
+type NetPolicyEvent struct {
+	Data *struct {
+		Body     *DataBody `json:"body,omitempty"`
+		UniqueID *string   `json:"unique_id,omitempty"`
+	} `json:"data,omitempty"`
+	GithubContext *GitHubContext     `json:"github_context,omitempty"`
+	ProjectID     *string            `bson:"project_id"               json:"project_id,omitempty"`
+	Tags          *map[string]string `json:"tags,omitempty"`
+	Type          *string            `json:"type,omitempty"`
+}
+
+type GitHubContext struct {
+	Action            *string `json:"action,omitempty"`
+	Actor             *string `json:"actor,omitempty"`
+	ActorID           *string `json:"actor_id,omitempty"`
+	EventName         *string `json:"event_name,omitempty"`
+	Job               *string `json:"job,omitempty"`
+	Ref               *string `json:"ref,omitempty"`
+	RefName           *string `json:"ref_name,omitempty"`
+	RefProtected      *bool   `json:"ref_protected,omitempty"`
+	RefType           *string `json:"ref_type,omitempty"`
+	Repository        *string `json:"repository,omitempty"`
+	RepositoryID      *string `json:"repository_id,omitempty"`
+	RepositoryOwner   *string `json:"repository_owner,omitempty"`
+	RepositoryOwnerID *string `json:"repository_owner_id,omitempty"`
+	RunAttempt        *string `json:"run_attempt,omitempty"`
+	RunID             *string `json:"run_id,omitempty"`
+	RunNumber         *string `json:"run_number,omitempty"`
+	RunnerArch        *string `json:"runner_arch,omitempty"`
+	RunnerOs          *string `json:"runner_os,omitempty"`
+	ServerURL         *string `json:"server_url,omitempty"`
+	Sha               *string `json:"sha,omitempty"`
+	TriggeringActor   *string `json:"triggering_actor,omitempty"`
+	Workflow          *string `json:"workflow,omitempty"`
+	WorkflowRef       *string `json:"workflow_ref,omitempty"`
+	WorkflowSha       *string `json:"workflow_sha,omitempty"`
+	Workspace         *string `json:"workspace,omitempty"`
+}
+
+type AncestryInfo struct {
+	Args    *string    `json:"args,omitempty"`
+	Cmd     *string    `json:"cmd,omitempty"`
+	Comm    *string    `json:"comm,omitempty"`
+	Exe     *string    `json:"exe,omitempty"`
+	Exit    *string    `json:"exit,omitempty"`
+	Pid     *int       `json:"pid,omitempty"`
+	Ppid    *int       `json:"ppid,omitempty"`
+	Retcode *int       `json:"retcode,omitempty"`
+	Start   *time.Time `json:"start,omitempty"`
+	UID     *int       `json:"uid,omitempty"`
+}
+
+type DroppedIP struct {
+	Icmp *struct {
+		Code *string `json:"code,omitempty"`
+		Type *string `json:"type,omitempty"`
+	} `json:"icmp,omitempty"`
+	IPVersion   *int            `json:"ip_version,omitempty"`
+	Local       *NetworkInfo    `json:"local,omitempty"`
+	Properties  *FlowProperties `json:"properties,omitempty"`
+	Proto       *string         `json:"proto,omitempty"`
+	Remote      *NetworkInfo    `json:"remote,omitempty"`
+	ServicePort *int            `json:"service_port,omitempty"`
+}
+
+type FlowProperties struct {
+	Egress     *bool `json:"egress,omitempty"`
+	Ended      *bool `json:"ended,omitempty"`
+	Incoming   *bool `json:"incoming,omitempty"`
+	Ingress    *bool `json:"ingress,omitempty"`
+	Ongoing    *bool `json:"ongoing,omitempty"`
+	Outgoing   *bool `json:"outgoing,omitempty"`
+	Started    *bool `json:"started,omitempty"`
+	Terminated *bool `json:"terminated,omitempty"`
+	Terminator *bool `json:"terminator,omitempty"`
+}
+
+type NetworkInfo struct {
+	Address *string   `json:"address,omitempty"`
+	Name    *string   `json:"name,omitempty"`
+	Names   *[]string `json:"names,omitempty"`
+	Port    *int      `json:"port,omitempty"`
+}
+
+type ProcessInfo struct {
+	Args    *string    `json:"args,omitempty"`
+	Cmd     *string    `json:"cmd,omitempty"`
+	Comm    *string    `json:"comm,omitempty"`
+	Exe     *string    `json:"exe,omitempty"`
+	Exit    *string    `json:"exit,omitempty"`
+	Pid     *int       `json:"pid,omitempty"`
+	Ppid    *int       `json:"ppid,omitempty"`
+	Retcode *int       `json:"retcode,omitempty"`
+	Start   *time.Time `json:"start,omitempty"`
+	UIO     *int       `json:"uid,omitempty"`
+}
+
+type ResolveFlow struct {
+	Icmp *struct {
+		Code *string `json:"code,omitempty"`
+		Type *string `json:"type,omitempty"`
+	} `json:"icmp,omitempty"`
+	IPVersion   *int            `json:"ip_version,omitempty"`
+	Local       *NetworkInfo    `json:"local,omitempty"`
+	Properties  *FlowProperties `json:"properties,omitempty"`
+	Proto       *string         `json:"proto,omitempty"`
+	Remote      *NetworkInfo    `json:"remote,omitempty"`
+	ServicePort *int            `json:"service_port,omitempty"`
+}
+
+type DataBody struct {
+	Ancestry    *[]AncestryInfo `json:"ancestry,omitempty"`
+	Dropped     *DroppedIP      `json:"dropped,omitempty"`
+	Parent      *ProcessInfo    `json:"parent,omitempty"`
+	Process     *ProcessInfo    `json:"process,omitempty"`
+	Resolve     *string         `json:"resolve"`
+	ResolveFlow *ResolveFlow    `json:"resolve_flow,omitempty"`
+}
+
+func getLinkOfDashboard(ctx context.Context, baseURL, token string, ghCtx GHctx) (string, error) {
+	url := baseURL + "/api/v1/dashboard/link"
+	request, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return "", err
+	}
+
+	request.Header.Add("Authorization", "Bearer "+token)
+	request.Header.Add("Content-Type", "application/json")
+
+	qp := request.URL.Query()
+	qp.Add("repository_id", ghCtx.repositoryID)
+	qp.Add("workflow", ghCtx.workflow)
+	qp.Add("job", ghCtx.job)
+	qp.Add("run_id", ghCtx.runID)
+	qp.Add("run_number", ghCtx.runNumber)
+	qp.Add("run_attempt", ghCtx.runAttempt)
+	request.URL.RawQuery = qp.Encode()
+
+	client := http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		return "", err
+	}
+
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("unexpected status code: %d", response.StatusCode)
+	}
+
+	data, err := io.ReadAll(response.Body)
+	if err != nil {
+		return "", err
+	}
+
+	var result struct {
+		Link string `json:"link"`
+	}
+
+	if err := json.Unmarshal(data, &result); err != nil {
+		return "", err
+	}
+
+	return result.Link, nil
+}
+
+func events(ctx context.Context, baseURL, token string, ghCtx GHctx) ([]NetPolicyEvent, error) {
+	url := baseURL + "/api/v1/network_events"
+	request, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Add("Authorization", "Bearer "+token)
+	request.Header.Add("Content-Type", "application/json")
+
+	qp := request.URL.Query()
+	qp.Add("repository_id", ghCtx.repositoryID)
+	qp.Add("workflow", ghCtx.workflow)
+	qp.Add("job", ghCtx.job)
+	qp.Add("run_id", ghCtx.runID)
+	qp.Add("run_number", ghCtx.runNumber)
+	qp.Add("run_attempt", ghCtx.runAttempt)
+	request.URL.RawQuery = qp.Encode()
+
+	client := http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		return nil, err
+	}
+
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("unexpected status code: %d", response.StatusCode)
+	}
+
+	data, err := io.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var events []NetPolicyEvent
+	if err := json.Unmarshal(data, &events); err != nil {
+		return nil, err
+	}
+
+	return events, nil
+}
+
+func summary(events []NetPolicyEvent) []string {
+	summaries := make([]string, 0, len(events))
+
+	for _, e := range events {
+		if e.Data == nil {
+			fmt.Println("Data is nil")
+
+			continue
+		}
+
+		if e.Data.Body == nil {
+			fmt.Println("Body is nil")
+
+			continue
+		}
+
+		if e.Data.Body.Dropped == nil {
+			fmt.Println("Dropped is nil")
+
+			if e.Data.Body.Resolve != nil {
+				fmt.Println("Use resolve instead")
+
+				summaries = append(summaries, *e.Data.Body.Resolve)
+			}
+
+			continue
+		}
+
+		if e.Data.Body.Dropped.Remote == nil {
+			fmt.Println("Remote is nil", e.Data.Body.Dropped)
+
+			continue
+		}
+
+		if e.Data.Body.Dropped.Remote.Name == nil {
+			fmt.Println("Name is nil")
+
+			continue
+		}
+
+		summaries = append(summaries, *e.Data.Body.Dropped.Remote.Name)
+	}
+
+	return summaries
 }

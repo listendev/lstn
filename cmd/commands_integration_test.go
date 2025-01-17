@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// Copyright © 2024 The listen.dev team <engineering@garnet.ai>
+// Copyright © 2025 The listen.dev team <engineering@garnet.ai>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -65,8 +65,8 @@ func TestChildCommands(t *testing.T) {
 				"GITHUB_ACTIONS": "",
 			},
 			cmdline: []string{"ci", "report", "--jwt-token", "12345", "--gh-token", "54321"},
-			stdout:  "Reporting using the \"gh-pull-comment\" reporter...\n",
-			stderr:  "Exiting: the reporter is not running in a supported environment.\n",
+			stdout:  "",
+			stderr:  "Error: the reporter is not running in a supported environment\n",
 			errstr:  "",
 		},
 		// GITHUB_ACTIONS=true GITHUB_EVENT_PATH="" lstn ci report --jwt-token 12345 --gh-token 54321
@@ -78,8 +78,8 @@ func TestChildCommands(t *testing.T) {
 				"GITHUB_EVENT_PATH": "",
 			},
 			cmdline: []string{"ci", "report", "--jwt-token", "12345", "--gh-token", "54321"},
-			stdout:  "Reporting using the \"gh-pull-comment\" reporter...\n",
-			stderr:  "Exiting: the reporter is not running in a supported environment.\n",
+			stdout:  "",
+			stderr:  "Error: the reporter is not running in a supported environment\n",
 			errstr:  "",
 		},
 		// GITHUB_ACTIONS=true GITHUB_EVENT_PATH="../pkg/ci/testdata/github_event_pull_request.json" lstn ci report --jwt-token 12345 --gh-token 54321 --debug-options
