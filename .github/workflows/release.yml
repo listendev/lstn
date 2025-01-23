@@ -33,6 +33,11 @@ jobs:
 
       - name: Install syft
         uses: anchore/sbom-action/download-syft@v0.13.3
+        
+      - uses: listendev/action@v0.15.0
+        with:
+          jwt: ${{ secrets.LSTN_API_KEY }}
+          runtime: only
 
       - name: Release
         uses: goreleaser/goreleaser-action@v4

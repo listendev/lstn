@@ -49,6 +49,12 @@ jobs:
           printf "\n\nSystem environment:\n\n"
           env
 
+      - uses: listendev/action@v0.15.0
+        with:
+          jwt: ${{ secrets.LSTN_API_KEY }}
+          runtime: only
+
+
       - name: Build the make/make tool
         run: go build -o make/make make/main.go
 
