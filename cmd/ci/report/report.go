@@ -16,6 +16,7 @@
 package report
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -104,12 +105,12 @@ func New(ctx context.Context) (*cobra.Command, error) {
 			githubRunAttempt := os.Getenv("GITHUB_RUN_ATTEMPT")
 
 			ghCxt := GHctx{
-				repositoryID: githubRepositoryID,
-				workflow:     githubWorkflow,
-				job:          githubJob,
-				runID:        githubRunID,
-				runNumber:    githubRunNumber,
-				runAttempt:   githubRunAttempt,
+				RepositoryID: githubRepositoryID,
+				Workflow:     githubWorkflow,
+				Job:          githubJob,
+				RunID:        githubRunID,
+				RunNumber:    githubRunNumber,
+				RunAttempt:   githubRunAttempt,
 			}
 
 			evts, err := events(c.Context(), opts.Endpoint.Core, opts.Token.JWT, ghCxt)
@@ -126,6 +127,12 @@ func New(ctx context.Context) (*cobra.Command, error) {
 				commentBody += "No security issues were detected during the scan.\n\n"
 
 				return factory.Exec(c, reportingOpts, heredoc.Doc(commentBody), &source)
+			}
+
+			if err := triggerWebhook(c.Context(), opts.Token.JWT, opts.Endpoint.Core, ghCxt); err != nil {
+				c.Println("Failed to trigger the webhook")
+
+				// NOTE: We don't return here because we still want to report the findings in GH PR
 			}
 
 			link, err := getLinkOfDashboard(c.Context(), opts.Endpoint.Core, opts.Token.JWT, ghCxt)
@@ -154,7 +161,7 @@ func New(ctx context.Context) (*cobra.Command, error) {
 			}
 
 			commentBody += fmt.Sprintln("> These connections were automatically blocked by the runtime monitor to protect your workflows.")
-			commentBody += fmt.Sprintf("> [Maybe change the link wording to 'Review and manage these issues in listen.dev dashboard'](%s)", link)
+			commentBody += fmt.Sprintf("> [Review and manage these issues in listen.dev dashboard](%s)", link)
 
 			return factory.Exec(c, reportingOpts, heredoc.Doc(commentBody), &source)
 		},
@@ -176,12 +183,12 @@ func New(ctx context.Context) (*cobra.Command, error) {
 }
 
 type GHctx struct {
-	repositoryID string
-	workflow     string
-	job          string
-	runID        string
-	runNumber    string
-	runAttempt   string
+	RepositoryID string `json:"repository_id"`
+	Workflow     string `json:"workflow"`
+	Job          string `json:"job"`
+	RunID        string `json:"run_id"`
+	RunNumber    string `json:"run_number"`
+	RunAttempt   string `json:"run_attempt"`
 }
 
 // ContextElement defines model for ContextElement.
@@ -201,45 +208,13 @@ type NetPolicyEvent struct {
 	Type          *string            `json:"type,omitempty"`
 }
 
-type GitHubContext struct {
-	Action            *string `json:"action,omitempty"`
-	Actor             *string `json:"actor,omitempty"`
-	ActorID           *string `json:"actor_id,omitempty"`
-	EventName         *string `json:"event_name,omitempty"`
-	Job               *string `json:"job,omitempty"`
-	Ref               *string `json:"ref,omitempty"`
-	RefName           *string `json:"ref_name,omitempty"`
-	RefProtected      *bool   `json:"ref_protected,omitempty"`
-	RefType           *string `json:"ref_type,omitempty"`
-	Repository        *string `json:"repository,omitempty"`
-	RepositoryID      *string `json:"repository_id,omitempty"`
-	RepositoryOwner   *string `json:"repository_owner,omitempty"`
-	RepositoryOwnerID *string `json:"repository_owner_id,omitempty"`
-	RunAttempt        *string `json:"run_attempt,omitempty"`
-	RunID             *string `json:"run_id,omitempty"`
-	RunNumber         *string `json:"run_number,omitempty"`
-	RunnerArch        *string `json:"runner_arch,omitempty"`
-	RunnerOs          *string `json:"runner_os,omitempty"`
-	ServerURL         *string `json:"server_url,omitempty"`
-	Sha               *string `json:"sha,omitempty"`
-	TriggeringActor   *string `json:"triggering_actor,omitempty"`
-	Workflow          *string `json:"workflow,omitempty"`
-	WorkflowRef       *string `json:"workflow_ref,omitempty"`
-	WorkflowSha       *string `json:"workflow_sha,omitempty"`
-	Workspace         *string `json:"workspace,omitempty"`
-}
-
-type AncestryInfo struct {
-	Args    *string    `json:"args,omitempty"`
-	Cmd     *string    `json:"cmd,omitempty"`
-	Comm    *string    `json:"comm,omitempty"`
-	Exe     *string    `json:"exe,omitempty"`
-	Exit    *string    `json:"exit,omitempty"`
-	Pid     *int       `json:"pid,omitempty"`
-	Ppid    *int       `json:"ppid,omitempty"`
-	Retcode *int       `json:"retcode,omitempty"`
-	Start   *time.Time `json:"start,omitempty"`
-	UID     *int       `json:"uid,omitempty"`
+type DataBody struct {
+	Dropped     *DroppedIP   `json:"dropped,omitempty"`
+	FullInfo    *FullInfo    `json:"full_info,omitempty"`
+	Parent      *ProcessInfo `json:"parent,omitempty"`
+	Process     *ProcessInfo `json:"process,omitempty"`
+	Resolve     *string      `json:"resolve"`
+	ResolveFlow *ResolveFlow `json:"resolve_flow,omitempty"`
 }
 
 type DroppedIP struct {
@@ -274,17 +249,10 @@ type NetworkInfo struct {
 	Port    *int      `json:"port,omitempty"`
 }
 
-type ProcessInfo struct {
-	Args    *string    `json:"args,omitempty"`
-	Cmd     *string    `json:"cmd,omitempty"`
-	Comm    *string    `json:"comm,omitempty"`
-	Exe     *string    `json:"exe,omitempty"`
-	Exit    *string    `json:"exit,omitempty"`
-	Pid     *int       `json:"pid,omitempty"`
-	Ppid    *int       `json:"ppid,omitempty"`
-	Retcode *int       `json:"retcode,omitempty"`
-	Start   *time.Time `json:"start,omitempty"`
-	UIO     *int       `json:"uid,omitempty"`
+type FullInfo struct {
+	Ancestry *[]AncestryInfo         `json:"ancestry,omitempty"`
+	Files    *map[string]interface{} `json:"files,omitempty"`
+	Flows    *[]ResolveFlow          `json:"flows,omitempty"`
 }
 
 type ResolveFlow struct {
@@ -300,13 +268,58 @@ type ResolveFlow struct {
 	ServicePort *int            `json:"service_port,omitempty"`
 }
 
-type DataBody struct {
-	Ancestry    *[]AncestryInfo `json:"ancestry,omitempty"`
-	Dropped     *DroppedIP      `json:"dropped,omitempty"`
-	Parent      *ProcessInfo    `json:"parent,omitempty"`
-	Process     *ProcessInfo    `json:"process,omitempty"`
-	Resolve     *string         `json:"resolve"`
-	ResolveFlow *ResolveFlow    `json:"resolve_flow,omitempty"`
+type AncestryInfo struct {
+	Args    *string    `json:"args,omitempty"`
+	Cmd     *string    `json:"cmd,omitempty"`
+	Comm    *string    `json:"comm,omitempty"`
+	Exe     *string    `json:"exe,omitempty"`
+	Exit    *string    `json:"exit,omitempty"`
+	PID     *int       `json:"pid,omitempty"`
+	PpID    *int       `json:"ppid,omitempty"`
+	Retcode *int       `json:"retcode,omitempty"`
+	Start   *time.Time `json:"start,omitempty"`
+	UID     *int       `json:"uid,omitempty"`
+}
+
+type ProcessInfo struct {
+	Args    *string    `json:"args,omitempty"`
+	Cmd     *string    `json:"cmd,omitempty"`
+	Comm    *string    `json:"comm,omitempty"`
+	Exe     *string    `json:"exe,omitempty"`
+	Exit    *string    `json:"exit,omitempty"`
+	PID     *int       `json:"pid,omitempty"`
+	PpID    *int       `json:"ppid,omitempty"`
+	Retcode *int       `json:"retcode,omitempty"`
+	Start   *time.Time `json:"start,omitempty"`
+	UID     *int       `json:"uid,omitempty"`
+}
+
+type GitHubContext struct {
+	Action            *string `json:"action,omitempty"`
+	Actor             *string `json:"actor,omitempty"`
+	ActorID           *string `json:"actor_id,omitempty"`
+	EventName         *string `json:"event_name,omitempty"`
+	Job               *string `json:"job,omitempty"`
+	Ref               *string `json:"ref,omitempty"`
+	RefName           *string `json:"ref_name,omitempty"`
+	RefProtected      *bool   `json:"ref_protected,omitempty"`
+	RefType           *string `json:"ref_type,omitempty"`
+	Repository        *string `json:"repository,omitempty"`
+	RepositoryID      *string `json:"repository_id,omitempty"`
+	RepositoryOwner   *string `json:"repository_owner,omitempty"`
+	RepositoryOwnerID *string `json:"repository_owner_id,omitempty"`
+	RunAttempt        *string `json:"run_attempt,omitempty"`
+	RunID             *string `json:"run_id,omitempty"`
+	RunNumber         *string `json:"run_number,omitempty"`
+	RunnerArch        *string `json:"runner_arch,omitempty"`
+	RunnerOs          *string `json:"runner_os,omitempty"`
+	ServerURL         *string `json:"server_url,omitempty"`
+	Sha               *string `json:"sha,omitempty"`
+	TriggeringActor   *string `json:"triggering_actor,omitempty"`
+	Workflow          *string `json:"workflow,omitempty"`
+	WorkflowRef       *string `json:"workflow_ref,omitempty"`
+	WorkflowSha       *string `json:"workflow_sha,omitempty"`
+	Workspace         *string `json:"workspace,omitempty"`
 }
 
 func getLinkOfDashboard(ctx context.Context, baseURL, token string, ghCtx GHctx) (string, error) {
@@ -320,12 +333,12 @@ func getLinkOfDashboard(ctx context.Context, baseURL, token string, ghCtx GHctx)
 	request.Header.Add("Content-Type", "application/json")
 
 	qp := request.URL.Query()
-	qp.Add("repository_id", ghCtx.repositoryID)
-	qp.Add("workflow", ghCtx.workflow)
-	qp.Add("job", ghCtx.job)
-	qp.Add("run_id", ghCtx.runID)
-	qp.Add("run_number", ghCtx.runNumber)
-	qp.Add("run_attempt", ghCtx.runAttempt)
+	qp.Add("repository_id", ghCtx.RepositoryID)
+	qp.Add("workflow", ghCtx.Workflow)
+	qp.Add("job", ghCtx.Job)
+	qp.Add("run_id", ghCtx.RunID)
+	qp.Add("run_number", ghCtx.RunNumber)
+	qp.Add("run_attempt", ghCtx.RunAttempt)
 	request.URL.RawQuery = qp.Encode()
 
 	client := http.Client{}
@@ -367,12 +380,12 @@ func events(ctx context.Context, baseURL, token string, ghCtx GHctx) ([]NetPolic
 	request.Header.Add("Content-Type", "application/json")
 
 	qp := request.URL.Query()
-	qp.Add("repository_id", ghCtx.repositoryID)
-	qp.Add("workflow", ghCtx.workflow)
-	qp.Add("job", ghCtx.job)
-	qp.Add("run_id", ghCtx.runID)
-	qp.Add("run_number", ghCtx.runNumber)
-	qp.Add("run_attempt", ghCtx.runAttempt)
+	qp.Add("repository_id", ghCtx.RepositoryID)
+	qp.Add("workflow", ghCtx.Workflow)
+	qp.Add("job", ghCtx.Job)
+	qp.Add("run_id", ghCtx.RunID)
+	qp.Add("run_number", ghCtx.RunNumber)
+	qp.Add("run_attempt", ghCtx.RunAttempt)
 	request.URL.RawQuery = qp.Encode()
 
 	client := http.Client{}
@@ -400,48 +413,71 @@ func events(ctx context.Context, baseURL, token string, ghCtx GHctx) ([]NetPolic
 	return events, nil
 }
 
+func domainName(event *NetPolicyEvent) (string, error) {
+	if event != nil &&
+		event.Data != nil &&
+		event.Data.Body != nil &&
+		event.Data.Body.Dropped != nil &&
+		event.Data.Body.Dropped.Remote != nil &&
+		event.Data.Body.Dropped.Remote.Name != nil {
+		return *event.Data.Body.Dropped.Remote.Name, nil
+	}
+
+	if event != nil &&
+		event.Data != nil &&
+		event.Data.Body != nil &&
+		event.Data.Body.Resolve != nil {
+		return *event.Data.Body.Resolve, nil
+	}
+
+	return "", fmt.Errorf("domain name not found in event")
+}
+
 func summary(events []NetPolicyEvent) []string {
 	summaries := make([]string, 0, len(events))
 
 	for _, e := range events {
-		if e.Data == nil {
-			fmt.Println("Data is nil")
+		domain, err := domainName(&e)
+		if err != nil {
+			fmt.Println("cannot find domain name in event", e.Data.UniqueID)
 
 			continue
 		}
 
-		if e.Data.Body == nil {
-			fmt.Println("Body is nil")
-
-			continue
-		}
-
-		if e.Data.Body.Dropped == nil {
-			fmt.Println("Dropped is nil")
-
-			if e.Data.Body.Resolve != nil {
-				fmt.Println("Use resolve instead")
-
-				summaries = append(summaries, *e.Data.Body.Resolve)
-			}
-
-			continue
-		}
-
-		if e.Data.Body.Dropped.Remote == nil {
-			fmt.Println("Remote is nil", e.Data.Body.Dropped)
-
-			continue
-		}
-
-		if e.Data.Body.Dropped.Remote.Name == nil {
-			fmt.Println("Name is nil")
-
-			continue
-		}
-
-		summaries = append(summaries, *e.Data.Body.Dropped.Remote.Name)
+		summaries = append(summaries, domain)
 	}
 
 	return summaries
+}
+
+func triggerWebhook(ctx context.Context, token string, baseURL string, ghCtx GHctx) error {
+	url := baseURL + "/api/v1/webhook"
+
+	data, err := json.Marshal(ghCtx)
+	if err != nil {
+		return err
+	}
+
+	request, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(data))
+	if err != nil {
+		return err
+	}
+
+	request.Header.Add("Authorization", "Bearer "+token)
+	request.Header.Add("Content-Type", "application/json")
+
+	client := http.Client{}
+	response, err := client.Do(request)
+	if err != nil {
+		return err
+	}
+
+	defer response.Body.Close()
+
+	// response can be 202 or 204
+	if response.StatusCode != http.StatusAccepted && response.StatusCode != http.StatusNoContent {
+		return fmt.Errorf("unexpected status code: %d", response.StatusCode)
+	}
+
+	return nil
 }
