@@ -41,6 +41,8 @@ jobs:
 
       - name: Set up Go
         uses: actions/setup-go@v5
+        with:
+          go-version: "^1.23"
 
       - name: Print environment
         id: vars
@@ -82,7 +84,6 @@ jobs:
           push: true
 
       - name: Archive the artifact(s) for ${{ matrix.goos }}
-        if: ${{ matrix.goos != 'windows' }}
         uses: actions/upload-artifact@v4
         with:
           name: artifact-${{ matrix.goos }}
@@ -90,6 +91,7 @@ jobs:
             ./lstn
             ./lstn.exe
           retention-days: 1
+          if-no-files-found: error
 
   version-darwin:
     name: "check version (darwin)"
@@ -166,7 +168,7 @@ jobs:
           .\lstn.exe version
 
   test:
-    name: Run Go tests
+    name: test
     permissions:
       contents: read
     strategy:
@@ -180,6 +182,8 @@ jobs:
 
       - name: Set up Go
         uses: actions/setup-go@v5
+        with:
+          go-version: "^1.23"
 
       - name: Download Go modules
         run: go mod download
@@ -205,6 +209,8 @@ jobs:
 
       - name: Set up Go
         uses: actions/setup-go@v5
+        with:
+          go-version: "^1.23"
 
       - name: Install cosign
         uses: sigstore/cosign-installer@v3.4.0
@@ -242,6 +248,7 @@ jobs:
     if: always()
     needs:
       - build
+      - test
     name: Build checks complete
     runs-on: ubuntu-latest
     permissions: {}

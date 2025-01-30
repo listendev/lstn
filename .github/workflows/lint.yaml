@@ -122,7 +122,6 @@ jobs:
     # if the needed jobs upstream failed.
     if: always()
     needs:
-      - hadolint-pr
       - shellcheck-pr
       - actionlint-pr
       - docslint-pr
