@@ -1,10 +1,16 @@
-name: cross-building
-
+name: Build and test components
 on:
-  push:
-    branches: ["main"]
+  workflow_dispatch:
   pull_request:
-    branches: ["main"]
+  push:
+    branches:
+      - main
+    tags:
+      - v*
+# Cancel any running jobs for PRs on a new commit
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   build:
@@ -17,10 +23,8 @@ jobs:
           - windows
     runs-on: ubuntu-latest
     continue-on-error: true
-
     permissions:
       contents: write
-
     steps:
       - uses: actions/checkout@v4
         with:
@@ -38,7 +42,7 @@ jobs:
       - name: Set up Go ${{ matrix.go }}
         uses: actions/setup-go@v5
         with:
-          go-version-file: 'go.mod'
+          go-version-file: "go.mod"
 
       - name: Print environment
         id: vars
@@ -84,15 +88,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: artifact-${{ matrix.goos }}
-          path: ./lstn
-          retention-days: 1
-
-      - name: Archive the artifact(s) for windows
-        if: ${{ matrix.goos == 'windows' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: artifact-${{ matrix.goos }}
-          path: ./lstn.exe
+          path: |
+            ./lstn
+            ./lstn.exe
           retention-days: 1
 
   version-darwin:
@@ -168,3 +166,90 @@ jobs:
         run: |
           file lstn.exe
           .\lstn.exe version
+
+  test:
+    name: Run Go tests
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out the source code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+
+      - name: Download Go modules
+        run: go mod download
+
+      - name: Run tests
+        run: go test -race ./...
+
+  release:
+    name: Create official release
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Avoid running against a shallow clone
+
+      - name: Force fetch upstream tags
+        run: git fetch --force --tags
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3.4.0
+        with:
+          cosign-release: "v2.2.3"
+
+      - name: Install syft
+        uses: anchore/sbom-action/download-syft@v0.13.3
+
+      - name: Release
+        uses: goreleaser/goreleaser-action@v4
+        with:
+          version: latest
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COSIGN_EXPERIMENTAL: 1
+
+      - name: Create release for tag
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/v')
+        id: release
+        with:
+          generate_release_notes: true
+          make_latest: true
+
+  # this job provides the single required status for PRs to be merged into main.
+  # instead of updating the protected branch status in github, developers can update the needs section below
+  # to require additional status checks to protect main.
+  # the job uses the alls-green action to get around the github issue that treats a "skipped" required status check
+  # as passed. github will skip a job if an upstream needed job fails, which would defeat the purpose of this required
+  # status check.
+  test-required-checks-complete:
+    # note: this step always has to run in order to check if the dependent jobs passed. by default github skips running a job
+    # if the needed jobs upstream failed.
+    if: always()
+    needs:
+      - build
+    name: Build checks complete
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Decide whether the needed jobs succeeded or failed
+        uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}

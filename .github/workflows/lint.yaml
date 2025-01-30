@@ -1,0 +1,146 @@
+name: Lint PRs
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+      - labeled
+  workflow_dispatch:
+
+jobs:
+  hadolint-pr:
+    runs-on: ubuntu-latest
+    name: PR - Hadolint
+    steps:
+      - uses: actions/checkout@v4
+      - uses: reviewdog/action-hadolint@v1
+
+  shellcheck-pr:
+    runs-on: ubuntu-latest
+    name: PR - Shellcheck
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ludeeus/action-shellcheck@master
+      
+      - name: Run shellcheck
+        uses: reviewdog/action-shellcheck@v1.27.0
+        env:
+          reporter: github-pr-review
+          pattern: |
+            *.sh
+            *.bash
+          fail_on_error: true
+
+  actionlint-pr:
+    runs-on: ubuntu-latest
+    name: PR - Actionlint
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          echo "::add-matcher::.github/actionlint-matcher.json"
+          bash <(curl https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+          ./actionlint -color -shellcheck=
+        shell: bash
+
+  docslint-pr:
+    runs-on: ubuntu-latest
+    name: PR - Markdownlint
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run markdownlint
+        uses: actionshub/markdownlint@v3.1.4
+
+  golangci:
+    name: PR - Go lint
+    runs-on: ubuntu-latest
+    permissions:
+      # Required: allow read access to the content for analysis.
+      contents: read
+      # Optional: allow read access to pull request. Use with `only-new-issues` option.
+      pull-requests: read
+      # Optional: allow write access to checks to allow the action to annotate code in the PR.
+      checks: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "^1.23"
+
+      - name: Lint reviewdog
+        if: github.event_name == 'pull_request'
+        uses: reviewdog/action-golangci-lint@v2
+        with:
+          golangci_lint_version: v1.62.0
+          golangci_lint_flags: --timeout=10m0s
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.62.0
+          args: --timeout=10m0s
+
+  prchecker-lint:
+    runs-on: ubuntu-latest
+    # Can only be invoked on PRs
+    if: github.event_name == 'pull_request'
+    name: PR - Check title format
+    steps:
+      - uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Configure which types are allowed (newline-delimited).
+          # Default: https://github.com/commitizen/conventional-commit-types
+          types: |
+            chore
+            fix
+            feat
+            build
+            ci
+            docs
+            perf
+            refactor
+            test
+          # Configure that a scope does not have to be provided.
+          requireScope: false
+          # If the PR contains one of these newline-delimited labels, the
+          # validation is skipped. If you want to rerun the validation when
+          # labels change, you might want to use the `labeled` and `unlabeled`
+          # event triggers in your workflow.
+          ignoreLabels: |
+            ci
+            automerge
+            dependencies
+
+  # this job provides the single required status for PRs to be merged into main.
+  # instead of updating the protected branch status in github, developers can update the needs section below
+  # to require additional status checks to protect main.
+  # the job uses the alls-green action to get around the github issue that treats a "skipped" required status check
+  # as passed. github will skip a job if an upstream needed job fails, which would defeat the purpose of this required
+  # status check.
+  test-required-checks-complete:
+    # note: this step always has to run in order to check if the dependent jobs passed. by default github skips running a job
+    # if the needed jobs upstream failed.
+    if: always()
+    needs:
+      - hadolint-pr
+      - shellcheck-pr
+      - actionlint-pr
+      - docslint-pr
+      - golangci
+      - prchecker-lint
+    name: Linting checks complete
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Decide whether the needed jobs succeeded or failed
+        uses: re-actors/alls-green@release/v1
+        with:
+          allowed-skips: prchecker-lint
+          jobs: ${{ toJSON(needs) }}
