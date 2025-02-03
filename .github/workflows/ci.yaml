@@ -172,7 +172,7 @@ jobs:
     permissions:
       contents: read
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
@@ -185,11 +185,40 @@ jobs:
         with:
           go-version: "^1.23"
 
-      - name: Download Go modules
-        run: go mod download
+      - name: Build code
+        run: go build ./...
+        shell: bash
 
       - name: Run tests
-        run: go test -race ./...
+        run: go test -v -race -cover -covermode=atomic -coverprofile=coverage.txt ./...
+        shell: bash
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-coverage-${{ matrix.os }}
+          path: coverage.txt
+          if-no-files-found: error
+          retention-days: 1
+
+  test-e2e:
+    name: Run e2e tests
+    needs:
+      - build
+    uses: ./.github/workflows/call-run-e2e.yaml
+    with:
+      # The Github ref to checkout for the listen-e2e repo.
+      ref: main
+      # We want to use binaries built here.
+      lstn-use-release: false
+      # The artifact to use we built previously.
+      lstn-binary-artefact: artifact-linux
+      # Once https://github.com/listendev/jibril/pull/369 is merged we can use main.
+      jibril-image: ghcr.io/listendev/jibril:sha-196b297
+    secrets:
+      # We have to use a PAT to ensure we can checkout the other repo and access containers from other repos.
+      github-token: ${{ secrets.CI_PAT }}
+
 
   release:
     name: Create official release
@@ -236,19 +265,18 @@ jobs:
           generate_release_notes: true
           make_latest: true
 
-  # this job provides the single required status for PRs to be merged into main.
-  # instead of updating the protected branch status in github, developers can update the needs section below
-  # to require additional status checks to protect main.
-  # the job uses the alls-green action to get around the github issue that treats a "skipped" required status check
-  # as passed. github will skip a job if an upstream needed job fails, which would defeat the purpose of this required
-  # status check.
+  # This job provides the single required status for PRs to be merged into main.
+  # Instead of updating the protected branch status in github, we can just update the "needs" section below
+  # to require additional/remove existing status checks to protect main via a simple GitOps process.
+  # We can use the alls-green action to get around the github assumption that a "skipped" required status check
+  # counts as passed. 
   test-required-checks-complete:
-    # note: this step always has to run in order to check if the dependent jobs passed. by default github skips running a job
-    # if the needed jobs upstream failed.
+    # This step always has to run in order to check if the dependent jobs passed even if upstream jobs are skipped.
     if: always()
     needs:
       - build
       - test
+      - test-e2e
     name: Build checks complete
     runs-on: ubuntu-latest
     permissions: {}
