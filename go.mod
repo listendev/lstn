@@ -20,7 +20,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/iancoleman/strcase v0.3.0
 	github.com/imdario/mergo v0.3.16
-	github.com/itchyny/gojq v0.12.15
+	github.com/itchyny/gojq v0.12.17
 	github.com/jarcoal/httpmock v1.3.1
 	github.com/listendev/pkg v0.0.0-20250115134853-852fb4db2dd9
 	github.com/matishsiao/goInfo v0.0.0-20241216093258-66a9250504d6
