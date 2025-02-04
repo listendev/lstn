@@ -20,14 +20,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"maps"
 	"net/http"
+	"slices"
 	"sort"
 
 	"github.com/Masterminds/semver/v3"
 	"github.com/listendev/lstn/pkg/cmd/flags"
 	pkgcontext "github.com/listendev/lstn/pkg/context"
 	"github.com/listendev/lstn/pkg/ua"
-	"golang.org/x/exp/maps"
 )
 
 // GetFromRegistry asks to the npm registry for the details of a package
@@ -96,7 +97,7 @@ func GetVersionsFromRegistryResponse(body io.ReadCloser, constraints *semver.Con
 		return nil, fmt.Errorf("couldn't decode the registry response")
 	}
 
-	raw := maps.Keys(res.Versions)
+	raw := slices.Collect(maps.Keys(res.Versions))
 
 	versions := semver.Collection{}
 	for _, r := range raw {

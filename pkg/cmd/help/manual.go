@@ -19,6 +19,8 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"maps"
+	"slices"
 	"sort"
 	"strings"
 
@@ -26,7 +28,6 @@ import (
 	"github.com/listendev/lstn/pkg/text"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"golang.org/x/exp/maps"
 )
 
 func cReference(w io.Writer, c *cobra.Command, depth int) {
@@ -43,7 +44,7 @@ func cReference(w io.Writer, c *cobra.Command, depth int) {
 	// Local flags
 	if c.HasAvailableLocalFlags() {
 		groups := flagusages.Groups(c)
-		groupKeys := maps.Keys(groups)
+		groupKeys := slices.Collect(maps.Keys(groups))
 		sort.Strings(groupKeys)
 
 		if localGroup, found := groups[flagusages.LocalGroup]; found {
