@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 //
-// Copyright © 2023 The listen.dev team <engineering@garnet.ai>
+// Copyright © 2025 The listen.dev team <engineering@garnet.ai>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -129,8 +129,11 @@ func TestReviewReporter_stickyComment(t *testing.T) {
 					httpmock.RegisterResponder("GET", "https://api.github.com/repos/fntlnz/lstnrepotest/issues/1/comments",
 						httpmock.NewBytesResponder(200, issueData))
 
+					httpmock.RegisterResponder("GET", "https://api.github.com/repos/fntlnz/lstnrepotest/issues/comments/1478606628",
+						httpmock.NewBytesResponder(200, issueUpdatedData))
+
 					httpmock.RegisterMatcherResponder("PATCH", "https://api.github.com/repos/fntlnz/lstnrepotest/issues/comments/1478606628",
-						httpmock.BodyContainsString(`<!--@lstn-sticky-review-comment-->hello from listen.dev again`),
+						httpmock.BodyContainsString(`<!--@lstn-sticky-review-comment-->\n\nhello from listen.dev again`),
 						httpmock.NewBytesResponder(200, issueUpdatedData))
 				},
 			},
@@ -155,7 +158,7 @@ func TestReviewReporter_stickyComment(t *testing.T) {
 						httpmock.NewBytesResponder(200, issueData))
 
 					httpmock.RegisterMatcherResponder("POST", "https://api.github.com/repos/fntlnz/lstnrepotest/issues/1/comments",
-						httpmock.BodyContainsString(`<!--@lstn-sticky-review-comment-->hello from listen.dev first time ever`),
+						httpmock.BodyContainsString(`<!--@lstn-sticky-review-comment-->\n\nhello from listen.dev first time ever`),
 						httpmock.NewBytesResponder(200, issueUpdatedData))
 				},
 			},

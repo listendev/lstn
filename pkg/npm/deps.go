@@ -17,14 +17,15 @@ package npm
 
 import (
 	"context"
+	"maps"
 	"reflect"
 	"runtime"
+	"slices"
 	"sort"
 
 	"github.com/Masterminds/semver/v3"
 	"github.com/XANi/goneric"
 	npmdeptype "github.com/listendev/lstn/pkg/npm/deptype"
-	"golang.org/x/exp/maps"
 )
 
 // Deps gets you the package lock dependencies.
@@ -152,7 +153,7 @@ func (p *packageJSON) FilterOutByNames(names ...string) {
 
 		f := reflect.Indirect(r).FieldByName(t.Name())
 		for _, name := range names {
-			if found := goneric.SliceIn(maps.Keys(depsByType), name); found {
+			if found := goneric.SliceIn(slices.Collect(maps.Keys(depsByType)), name); found {
 				switch f.Kind() {
 				case reflect.Map:
 					// Delete element from map

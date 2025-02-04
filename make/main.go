@@ -27,15 +27,16 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"slices"
 	"strings"
 	"time"
 
 	"github.com/listendev/lstn/pkg/validate"
-	"golang.org/x/exp/maps"
 )
 
 const outputPath = "lstn"
@@ -130,7 +131,7 @@ func main() {
 	}
 
 	if len(args) < 1 {
-		fmt.Fprintf(os.Stderr, "specify one command in %s.\n", maps.Keys(commands))
+		fmt.Fprintf(os.Stderr, "specify one command in %s.\n", slices.Collect(maps.Keys(commands)))
 		os.Exit(1)
 	}
 
