@@ -18,6 +18,8 @@ package flags
 import (
 	"context"
 	"fmt"
+	"maps"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -29,7 +31,6 @@ import (
 	npmdeptype "github.com/listendev/lstn/pkg/npm/deptype"
 	"github.com/spf13/cobra"
 	"github.com/thediveo/enumflag/v2"
-	"golang.org/x/exp/maps"
 )
 
 var _ cmd.Options = (*ConfigFlags)(nil)
@@ -167,7 +168,7 @@ func (o *ConfigFlags) SetDefaults() {
 
 				return t, false
 			},
-			maps.Values(npmdeptype.IDs),
+			slices.Collect(maps.Values(npmdeptype.IDs)),
 		)
 		sort.Strings(ignoreValues)
 		o.Filtering.Ignore.types = enumflag.NewSlice(&o.Filtering.Ignore.Deptypes, `(`+strings.Join(ignoreValues, ",")+`)`, npmdeptype.IDs, enumflag.EnumCaseInsensitive)

@@ -114,7 +114,7 @@ The verdicts it returns are listed by the name of each package and its specified
 				// Create list of verdicts requests
 				reqs, bulkErr := listen.NewBulkVerdictsRequestsFromMap(deps, scanOpts.ConfigFlags.Filtering.Expression)
 				if bulkErr != nil {
-					return err
+					return bulkErr
 				}
 
 				// Query for verdicts about the current dependencies set in parallel...
@@ -126,7 +126,7 @@ The verdicts it returns are listed by the name of each package and its specified
 				)
 
 				if resErr != nil {
-					return err
+					return resErr
 				}
 
 				if resJSON != nil {

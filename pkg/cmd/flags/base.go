@@ -19,7 +19,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"maps"
 	"reflect"
+	"slices"
 	"strings"
 	"unsafe"
 
@@ -28,7 +30,6 @@ import (
 	t "github.com/listendev/lstn/pkg/transform"
 	v "github.com/listendev/lstn/pkg/validate"
 	"github.com/spf13/cobra"
-	"golang.org/x/exp/maps"
 )
 
 // EnvSeparator is the separator between the env variable prefix and the global flag name.
@@ -90,7 +91,7 @@ func Define(c *cobra.Command, o interface{}, startingGroup string, exclusions []
 		if fldPtr := getValuePtr(o); fldPtr.IsValid() {
 			fldPtr.MethodByName("Define").Call([]reflect.Value{
 				getValuePtr(c),
-				getValue(maps.Keys(ignore)),
+				getValue(slices.Collect(maps.Keys(ignore))),
 			})
 		}
 	}

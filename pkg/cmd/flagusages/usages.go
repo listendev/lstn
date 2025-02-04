@@ -17,12 +17,13 @@ package flagusages
 
 import (
 	"fmt"
+	"maps"
+	"slices"
 	"sort"
 	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"golang.org/x/exp/maps"
 )
 
 const (
@@ -136,7 +137,7 @@ func Set(c *cobra.Command) {
 		delete(groups, LocalGroup)
 	}
 
-	groupKeys := maps.Keys(groups)
+	groupKeys := slices.Collect(maps.Keys(groups))
 	sort.Strings(groupKeys)
 
 	for _, group := range groupKeys {
