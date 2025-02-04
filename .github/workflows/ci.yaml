@@ -242,7 +242,7 @@ jobs:
           go-version: "^1.23"
 
       - name: Install cosign
-        uses: sigstore/cosign-installer@v3.4.0
+        uses: sigstore/cosign-installer@v3.7.0
         with:
           cosign-release: "v2.2.3"
 
