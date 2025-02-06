@@ -213,8 +213,6 @@ jobs:
       lstn-use-release: false
       # The artifact to use we built previously.
       lstn-binary-artefact: artifact-linux
-      # Once https://github.com/listendev/jibril/pull/369 is merged we can use main.
-      jibril-image: ghcr.io/listendev/jibril:sha-196b297
     secrets:
       # We have to use a PAT to ensure we can checkout the other repo and access containers from other repos.
       github-token: ${{ secrets.CI_PAT }}
