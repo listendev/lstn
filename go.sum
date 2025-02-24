@@ -59,8 +59,8 @@ github.com/PaesslerAG/jsonpath v0.1.1/go.mod h1:lVboNxFGal/VwW6d9JzIy56bUsYAP6tH
 github.com/ProtonMail/go-crypto v1.1.5 h1:eoAQfK2dwL+tFSFpr7TbOaPNUbPiJj4fLYwwGE1FQO4=
 github.com/ProtonMail/go-crypto v1.1.5/go.mod h1:rA3QumHc/FZ8pAHreoekgiAbzpNsfQAosU5td4SnOrE=
 github.com/RaveNoX/go-jsoncommentstrip v1.0.0/go.mod h1:78ihd09MekBnJnxpICcwzCMzGrKSKYe4AqU6PDYYpjk=
-github.com/XANi/goneric v1.2.0 h1:fl0SCFQhoCYRPyT7uUpJP7UhD4XCQ7pCoGYNL/lSTyU=
-github.com/XANi/goneric v1.2.0/go.mod h1:Eu5qL8ajaeJlM6UsMQZIAPYHfnxdPMPLugUtZMHKjVg=
+github.com/XANi/goneric v1.3.0 h1:XoHXkYZc3k9OuhjWZ5OoKcrHrnth2m7DoCmCxURLujs=
+github.com/XANi/goneric v1.3.0/go.mod h1:Eu5qL8ajaeJlM6UsMQZIAPYHfnxdPMPLugUtZMHKjVg=
 github.com/alecthomas/assert v0.0.0-20170929043011-405dbfeb8e38/go.mod h1:r7bzyVFMNntcxPZXK3/+KdruV1H5KSlyVY0gc+NgInI=
 github.com/alecthomas/assert v1.0.0 h1:3XmGh/PSuLzDbK3W2gUbRXwgW5lqPkuqvRgeQ30FI5o=
 github.com/alecthomas/assert v1.0.0/go.mod h1:va/d2JC+M7F6s+80kl/R3G7FUiW6JzUO+hPhLyJ36ZY=
