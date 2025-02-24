@@ -5,7 +5,7 @@ go 1.23.5
 require (
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/Masterminds/semver/v3 v3.3.1
-	github.com/XANi/goneric v1.2.0
+	github.com/XANi/goneric v1.3.0
 	github.com/caarlos0/env/v11 v11.3.1
 	github.com/cli/cli v1.14.0
 	github.com/creasty/defaults v1.8.0
