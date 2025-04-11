@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ludeeus/action-shellcheck@master
-      
+
       - name: Run shellcheck
         uses: reviewdog/action-shellcheck@v1.27.0
         env:
@@ -63,20 +63,18 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "^1.23"
+          go-version-file: go.mod
 
       - name: Lint reviewdog
         if: github.event_name == 'pull_request'
-        uses: reviewdog/action-golangci-lint@v2
+        uses: reviewdog/action-golangci-lint@3dfdce20f5ca12d264c214abb993dbb40834da90 # v2.7.2
         with:
-          golangci_lint_version: v1.62.0
-          golangci_lint_flags: --timeout=10m0s
+          golangci_lint_version: v1.64.5
 
       - name: Lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v7.0.0
         with:
-          version: v1.62.0
-          args: --timeout=10m0s
+          version: v2.0
 
   prchecker-lint:
     runs-on: ubuntu-latest

@@ -87,7 +87,7 @@ func (p *packageLockJSON) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	switch p.LockfileVersion.Value {
+	switch p.Value {
 	case 1:
 		p.packageLockJSONVersion1 = &packageLockJSONVersion1{}
 
@@ -165,7 +165,7 @@ func NewPackageLockJSON() PackageLockJSON {
 }
 
 func (p *packageLockJSON) Version() int {
-	return p.LockfileVersion.Value
+	return p.Value
 }
 
 func (p *packageLockJSON) Ok() bool {

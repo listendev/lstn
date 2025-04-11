@@ -30,7 +30,7 @@ import (
 
 // Deps gets you the package lock dependencies.
 func (p *packageLockJSON) Deps() map[string]PackageLockDependency {
-	switch p.LockfileVersion.Value {
+	switch p.Value {
 	case 1:
 		return p.packageLockJSONVersion1.Dependencies
 	case 2:

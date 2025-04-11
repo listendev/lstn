@@ -138,25 +138,25 @@ func (o *ConfigFlags) SetDefaults() {
 	// Attempt to dynamically set the defaults for the GitHub reporting flags from the environment
 	env, err := ci.NewInfo()
 	if err == nil && env != nil {
-		if defaults.CanUpdate(o.Reporting.GitHub.Owner) {
-			o.Reporting.GitHub.Owner = env.Owner
+		if defaults.CanUpdate(o.Owner) {
+			o.Owner = env.Owner
 		}
-		if defaults.CanUpdate(o.Reporting.GitHub.Repo) {
-			o.Reporting.GitHub.Repo = env.Repo
+		if defaults.CanUpdate(o.Repo) {
+			o.Repo = env.Repo
 		}
-		if defaults.CanUpdate(o.Reporting.GitHub.Pull.ID) && env.IsGitHubPullRequest() {
-			o.Reporting.GitHub.Pull.ID = env.Num
+		if defaults.CanUpdate(o.ID) && env.IsGitHubPullRequest() {
+			o.ID = env.Num
 		}
 	}
-	if defaults.CanUpdate(o.Reporting.Types) {
+	if defaults.CanUpdate(o.Types) {
 		// Create the enum flag value for --reporter
 		enumValues := goneric.MapToSlice(func(_ cmd.ReportType, v []string) string {
 			return v[0]
 		}, cmd.ReporterTypeIDs)
 		sort.Strings(enumValues)
-		o.Reporting.reporter = enumflag.NewSlice(&o.Reporting.Types, `(`+strings.Join(enumValues, ",")+`)`, cmd.ReporterTypeIDs, enumflag.EnumCaseInsensitive)
+		o.reporter = enumflag.NewSlice(&o.Types, `(`+strings.Join(enumValues, ",")+`)`, cmd.ReporterTypeIDs, enumflag.EnumCaseInsensitive)
 	}
-	if defaults.CanUpdate(o.Filtering.Ignore.types) {
+	if defaults.CanUpdate(o.types) {
 		// Create the enum flag value for --ignore-deptypes
 		alwaysInSet := npmdeptype.BundleDependencies
 		ignoreValues := goneric.MapSliceSkip(
@@ -171,8 +171,8 @@ func (o *ConfigFlags) SetDefaults() {
 			slices.Collect(maps.Values(npmdeptype.IDs)),
 		)
 		sort.Strings(ignoreValues)
-		o.Filtering.Ignore.types = enumflag.NewSlice(&o.Filtering.Ignore.Deptypes, `(`+strings.Join(ignoreValues, ",")+`)`, npmdeptype.IDs, enumflag.EnumCaseInsensitive)
-		_ = o.Filtering.Ignore.types.Set(alwaysInSet.String())
+		o.types = enumflag.NewSlice(&o.Deptypes, `(`+strings.Join(ignoreValues, ",")+`)`, npmdeptype.IDs, enumflag.EnumCaseInsensitive)
+		_ = o.types.Set(alwaysInSet.String())
 	}
 }
 
@@ -180,21 +180,21 @@ func (o *ConfigFlags) Define(c *cobra.Command, exclusions []string) {
 	if !goneric.SliceIn(exclusions, "reporter") {
 		// Manually define the --reporter enum flag
 		fld, found := getValue(o.Reporting).Type().FieldByName("Types")
-		if found && o.Reporting.reporter != nil {
+		if found && o.reporter != nil {
 			desc := fld.Tag.Get("desc")
 			flag := fld.Tag.Get("flag")
 			shrt := fld.Tag.Get("shorthand")
-			c.Flags().VarP(o.Reporting.reporter, flag, shrt, desc)
+			c.Flags().VarP(o.reporter, flag, shrt, desc)
 		}
 	}
 	if !goneric.SliceIn(exclusions, "ignore-deptypes") {
 		// Manually define the --ignore-deptypes enum flag
 		fld, found := getValue(o.Filtering.Ignore).Type().FieldByName("Deptypes")
-		if found && o.Filtering.Ignore.types != nil {
+		if found && o.types != nil {
 			desc := fld.Tag.Get("desc")
 			flag := fld.Tag.Get("flag")
 			shrt := fld.Tag.Get("shorthand")
-			c.Flags().VarP(o.Filtering.Ignore.types, flag, shrt, desc)
+			c.Flags().VarP(o.types, flag, shrt, desc)
 		}
 	}
 }

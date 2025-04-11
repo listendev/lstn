@@ -136,7 +136,7 @@ It lists out the verdicts of all the versions of the input package name.`,
 				}
 
 				// Create list of verdicts requests
-				reqs, multipleErr := listen.NewBulkVerdictsRequests(names, versions, toOpts.ConfigFlags.Filtering.Expression)
+				reqs, multipleErr := listen.NewBulkVerdictsRequests(names, versions, toOpts.Expression)
 				if multipleErr != nil {
 					return multipleErr
 				}
@@ -155,7 +155,7 @@ It lists out the verdicts of all the versions of the input package name.`,
 				if reqErr != nil {
 					return reqErr
 				}
-				req.Select = jsonpath.Make(toOpts.ConfigFlags.Filtering.Expression)
+				req.Select = jsonpath.Make(toOpts.Expression)
 
 				res, resJSON, resErr = listen.Packages(
 					req,

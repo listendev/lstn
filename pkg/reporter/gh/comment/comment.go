@@ -117,9 +117,9 @@ func (r *rep) stickyComment(owner string, repo string, id int, comment io.Reader
 }
 
 func (r *rep) Run(res interface{}, _ *string) error {
-	owner := r.opts.Reporting.GitHub.Owner
-	repo := r.opts.Reporting.GitHub.Repo
-	id := r.opts.Reporting.GitHub.Pull.ID
+	owner := r.opts.Owner
+	repo := r.opts.Repo
+	id := r.opts.ID
 
 	buf := bytes.Buffer{}
 
@@ -152,5 +152,5 @@ func (r *rep) Run(res interface{}, _ *string) error {
 func (r *rep) CanRun() bool {
 	ghOpts := r.opts.Reporting.GitHub
 
-	return ghOpts.Owner != "" && ghOpts.Repo != "" && ghOpts.Pull.ID != 0
+	return ghOpts.Owner != "" && ghOpts.Repo != "" && ghOpts.ID != 0
 }
