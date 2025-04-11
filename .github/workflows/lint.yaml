@@ -73,7 +73,7 @@ jobs:
           golangci_lint_flags: --timeout=10m0s
 
       - name: Lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v7
         with:
           version: v1.62.0
           args: --timeout=10m0s
