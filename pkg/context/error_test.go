@@ -107,11 +107,11 @@ func (suite *ErrorSuite) TestContextError() {
 func (suite *ErrorSuite) TestOutputError() {
 	suite.T().Run("returns same error", func(t *testing.T) {
 		input := errors.New("some error")
-		assert.Equal(t, input, OutputError(context.Background(), input))
+		assert.Equal(t, input, OutputError(t.Context(), input))
 	})
 	suite.T().Run("returns context error", func(t *testing.T) {
 		input := errors.New("some error")
-		ctx, cancel := context.WithCancel(context.Background())
+		ctx, cancel := context.WithCancel(t.Context())
 		cancel()
 		assert.NotEqual(t, input, OutputError(ctx, errors.New("some error")))
 	})
@@ -119,16 +119,16 @@ func (suite *ErrorSuite) TestOutputError() {
 
 func (suite *ErrorSuite) TestOutputErrorf() {
 	suite.T().Run("returns same error formatted without args", func(t *testing.T) {
-		err := OutputErrorf(context.Background(), errors.New("some error"), "test")
+		err := OutputErrorf(t.Context(), errors.New("some error"), "test")
 		assert.EqualError(t, err, "test")
 	})
 	suite.T().Run("returns same error formatted with args", func(t *testing.T) {
-		err := OutputErrorf(context.Background(), errors.New("some error"), "test %s and %s", "this", "that")
+		err := OutputErrorf(t.Context(), errors.New("some error"), "test %s and %s", "this", "that")
 		assert.EqualError(t, err, "test this and that")
 	})
 	suite.T().Run("returns context error", func(t *testing.T) {
 		input := errors.New("some error")
-		ctx, cancel := context.WithCancel(context.Background())
+		ctx, cancel := context.WithCancel(t.Context())
 		cancel()
 		assert.NotEqual(t, input, OutputErrorf(ctx, errors.New("some error"), "this won't be used"))
 	})

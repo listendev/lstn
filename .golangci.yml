@@ -1,5 +1,7 @@
+version: "2"
+
 linters:
-  enable-all: true
+  default: all
   disable:
     - wsl
     - wrapcheck
@@ -42,23 +44,21 @@ linters:
     - maintidx
     - gocognit
     - dupl
+    - errcheck
     - forbidigo
     - gochecknoinits
+    - revive
 
-linters-settings:
-  gofmt:
-    simplify: false
-  goconst:
-    ignore-tests: true
-  nolintlint:
-    allow-unused: false # report any unused nolint directives
-    require-explanation: true # require an explanation for nolint directives
-    require-specific: true # require nolint directives to mention the specific linter being suppressed
-  goheader:
-    template-path: '.github/.golangci.goheader.template'
-    values:
-      regexp:
-        copyright-year: 20[2-9]\d
+  settings:
+    nolintlint:
+      allow-unused: false # report any unused nolint directives
+      require-explanation: true # require an explanation for nolint directives
+      require-specific: true # require nolint directives to mention the specific linter being suppressed
+    goheader:
+      template-path: ".github/.golangci.goheader.template"
+      values:
+        regexp:
+          copyright-year: 20[2-9]\d
 
 issues:
   max-issues-per-linter: 0

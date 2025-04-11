@@ -16,7 +16,6 @@
 package npm
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -79,7 +78,7 @@ func TestGetNPMPackageLockOnlyGt6x(t *testing.T) {
 	assert.Nil(t, internaltesting.CopyExecutable(testExe, dstNPM))
 	t.Setenv("TEST_NPM_BEHAVIOR", "npm-gt-6x")
 
-	c, e := getNPMPackageLockOnly(context.Background())
+	c, e := getNPMPackageLockOnly(t.Context())
 	assert.Nil(t, e)
 	assert.Equal(t, fmt.Sprintf("%s install --package-lock-only --no-audit --ignore-scripts", dstNPM), c.String())
 }
@@ -96,7 +95,7 @@ func TestGetNPMPackageLockOnlyLt6x(t *testing.T) {
 	assert.Nil(t, internaltesting.CopyExecutable(testExe, dstNPM))
 	t.Setenv("TEST_NPM_BEHAVIOR", "npm-lt-6x")
 
-	c, e := getNPMPackageLockOnly(context.Background())
+	c, e := getNPMPackageLockOnly(t.Context())
 	if assert.Error(t, e) {
 		assert.Nil(t, c)
 		assert.Equal(t, "the npm version is not >= 6.x", e.Error())
@@ -108,7 +107,7 @@ func TestGetNPMPackageLockOnlyNPMNotInPath(t *testing.T) {
 	newPath := binDir
 	t.Setenv("PATH", newPath)
 
-	c, e := getNPMPackageLockOnly(context.Background())
+	c, e := getNPMPackageLockOnly(t.Context())
 	if assert.Error(t, e) {
 		assert.Nil(t, c)
 		assert.Equal(t, "couldn't find the npm executable in the PATH", e.Error())
@@ -118,7 +117,7 @@ func TestGetNPMPackageLockOnlyNPMNotInPath(t *testing.T) {
 func TestGetNPMPackageLockOnlyFromNVMMissingNVMDir(t *testing.T) {
 	t.Setenv("NVM_DIR", "")
 
-	c, e := getNPMPackageLockOnlyFromNVM(context.Background())
+	c, e := getNPMPackageLockOnlyFromNVM(t.Context())
 	if assert.Error(t, e) {
 		assert.Nil(t, c)
 		assert.Equal(t, "couldn't detect the nvm directory", e.Error())
@@ -139,7 +138,7 @@ func TestGetNPMPackageLockOnlyFromNVMNoUseGt6x(t *testing.T) {
 	assert.Nil(t, internaltesting.CopyExecutable(testExe, dstBash))
 	t.Setenv("TEST_NPM_BEHAVIOR", "nvm-gt-6x-no-use")
 
-	c, e := getNPMPackageLockOnlyFromNVM(context.Background())
+	c, e := getNPMPackageLockOnlyFromNVM(t.Context())
 	assert.Nil(t, e)
 	assert.Len(t, c.Args, 3)
 	assert.True(t, strings.HasSuffix(c.Path, "bash"))
@@ -160,7 +159,7 @@ func TestGetNPMPackageLockOnlyFromNVMGt6x(t *testing.T) {
 	assert.Nil(t, internaltesting.CopyExecutable(testExe, dstBash))
 	t.Setenv("TEST_NPM_BEHAVIOR", "nvm-gt-6x")
 
-	c, e := getNPMPackageLockOnlyFromNVM(context.Background())
+	c, e := getNPMPackageLockOnlyFromNVM(t.Context())
 	assert.Nil(t, e)
 	assert.Len(t, c.Args, 3)
 	assert.True(t, strings.HasSuffix(c.Path, "bash"))
@@ -181,7 +180,7 @@ func TestGetNPMPackageLockOnlyFromNVMLt6x(t *testing.T) {
 	assert.Nil(t, internaltesting.CopyExecutable(testExe, dstBash))
 	t.Setenv("TEST_NPM_BEHAVIOR", "nvm-lt-6x")
 
-	c, e := getNPMPackageLockOnlyFromNVM(context.Background())
+	c, e := getNPMPackageLockOnlyFromNVM(t.Context())
 	if assert.Error(t, e) {
 		assert.Nil(t, c)
 		assert.Equal(t, "the npm version is not >= 6.x", e.Error())

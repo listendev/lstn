@@ -132,7 +132,7 @@ func attachAuthBearer(r *rep) apispec.RequestEditorFn {
 			return fmt.Errorf("request is nil")
 		}
 		// We assume the JWT token is never blank (flag/option gets validated)
-		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", r.opts.Token.JWT))
+		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", r.opts.JWT))
 
 		return nil
 	}
