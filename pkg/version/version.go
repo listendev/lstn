@@ -179,6 +179,7 @@ func Get() Version {
 	return out
 }
 
+// Changelog returns the URL to the changelog for the given version.
 func Changelog(version string) (string, error) {
 	basePath := "https://github.com/listendev/lstn"
 	v := strings.TrimPrefix(version, "v")

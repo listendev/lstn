@@ -98,8 +98,8 @@ The verdicts it returns are listed by the name of each package and its specified
 			}
 
 			// Exclude dependencies
-			packageJSON.FilterOutByTypes(scanOpts.ConfigFlags.Filtering.Ignore.Deptypes...)
-			packageJSON.FilterOutByNames(scanOpts.ConfigFlags.Filtering.Ignore.Packages...)
+			packageJSON.FilterOutByTypes(scanOpts.Deptypes...)
+			packageJSON.FilterOutByNames(scanOpts.Packages...)
 
 			// Retrieve dependencies to process
 			deps := packageJSON.Deps(ctx, npm.DefaultVersionResolutionStrategy)
@@ -112,7 +112,7 @@ The verdicts it returns are listed by the name of each package and its specified
 			combinedResponse := listen.Response{}
 			for _, deps := range deps {
 				// Create list of verdicts requests
-				reqs, bulkErr := listen.NewBulkVerdictsRequestsFromMap(deps, scanOpts.ConfigFlags.Filtering.Expression)
+				reqs, bulkErr := listen.NewBulkVerdictsRequestsFromMap(deps, scanOpts.Expression)
 				if bulkErr != nil {
 					return bulkErr
 				}
