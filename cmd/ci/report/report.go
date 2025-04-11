@@ -69,7 +69,7 @@ func New(ctx context.Context) (*cobra.Command, error) {
 				errs = append(errs, flags.Translate(err, name)...)
 			}
 			// The listen.dev token is mandatory for fetching the data to report
-			if err := validate.Singleton.Var(opts.Token.JWT, "mandatory"); err != nil {
+			if err := validate.Singleton.Var(opts.JWT, "mandatory"); err != nil {
 				tags, _ := flags.GetFieldTag(opts, "ConfigFlags.Token.JWT")
 				name, _ := tags.Lookup("name")
 				errs = append(errs, flags.Translate(err, name)...)
@@ -113,7 +113,7 @@ func New(ctx context.Context) (*cobra.Command, error) {
 				RunAttempt:   githubRunAttempt,
 			}
 
-			evts, err := events(c.Context(), opts.Endpoint.Core, opts.Token.JWT, ghCxt)
+			evts, err := events(c.Context(), opts.Endpoint.Core, opts.JWT, ghCxt)
 			if err != nil {
 				return err
 			}
@@ -129,13 +129,13 @@ func New(ctx context.Context) (*cobra.Command, error) {
 				return factory.Exec(c, reportingOpts, heredoc.Doc(commentBody), &source)
 			}
 
-			if err := triggerWebhook(c.Context(), opts.Token.JWT, opts.Endpoint.Core, ghCxt); err != nil {
+			if err := triggerWebhook(c.Context(), opts.JWT, opts.Endpoint.Core, ghCxt); err != nil {
 				c.Println("Failed to trigger the webhook")
 
 				// NOTE: We don't return here because we still want to report the findings in GH PR
 			}
 
-			link, err := getLinkOfDashboard(c.Context(), opts.Endpoint.Core, opts.Token.JWT, ghCxt)
+			link, err := getLinkOfDashboard(c.Context(), opts.Endpoint.Core, opts.JWT, ghCxt)
 			if err != nil {
 				c.Println("Failed to get the link of the dashboard")
 

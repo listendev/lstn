@@ -16,7 +16,6 @@
 package cmd
 
 import (
-	"context"
 	"os"
 	"path"
 	"strings"
@@ -2161,7 +2160,7 @@ Global Flags:
 			closer := internaltesting.EnvSetter(tc.envvar)
 			t.Cleanup(closer)
 
-			rootC, e := root.New(context.Background())
+			rootC, e := root.New(t.Context())
 			assert.Nil(t, e)
 			c := rootC.Command()
 
