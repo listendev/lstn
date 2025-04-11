@@ -81,7 +81,7 @@ func TestReporterCanRun(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			ctx := context.Background()
+			ctx := t.Context()
 			ctx = context.WithValue(ctx, pkgcontext.ConfigKey, tc.opts)
 
 			r, err := New(ctx, reporter.WithGitHubClient(github.NewClient(nil)))
@@ -174,7 +174,7 @@ func TestReviewReporter_stickyComment(t *testing.T) {
 			ghClient := github.NewClient(nil)
 
 			r := &rep{
-				ctx:      context.TODO(),
+				ctx:      t.Context(),
 				ghClient: ghClient,
 			}
 			err := r.stickyComment(tt.args.owner, tt.args.repo, tt.args.id, tt.args.comment)

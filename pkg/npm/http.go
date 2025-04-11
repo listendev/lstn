@@ -43,7 +43,7 @@ func GetFromRegistry(ctx context.Context, name, version string) (io.ReadCloser, 
 	if !ok {
 		return nil, "", fmt.Errorf("couldn't find the registry configuration")
 	}
-	npmRegistryBaseURL := cfgFlags.Registry.NPM
+	npmRegistryBaseURL := cfgFlags.NPM
 
 	if name == "" {
 		return nil, npmRegistryBaseURL, pkgcontext.OutputError(ctx, fmt.Errorf("the name is mandatory to query the npm registry"))

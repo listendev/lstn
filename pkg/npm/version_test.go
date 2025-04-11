@@ -16,7 +16,6 @@
 package npm
 
 import (
-	"context"
 	"os"
 	"path/filepath"
 	"testing"
@@ -37,7 +36,7 @@ func TestVersionLt6x(t *testing.T) {
 	assert.Nil(t, internaltesting.CopyExecutable(testExe, dstNPM))
 	t.Setenv("TEST_NPM_BEHAVIOR", "npm-lt-6x")
 
-	v, e := Version(context.TODO())
+	v, e := Version(t.Context())
 	assert.Nil(t, e)
 	assert.Equal(t, "4.6.3", v)
 }
@@ -54,7 +53,7 @@ func TestVersionGt6x(t *testing.T) {
 	assert.Nil(t, internaltesting.CopyExecutable(testExe, dstNPM))
 	t.Setenv("TEST_NPM_BEHAVIOR", "npm-gt-6x")
 
-	v, e := Version(context.TODO())
+	v, e := Version(t.Context())
 	assert.Nil(t, e)
 	assert.Equal(t, "8.19.2", v)
 }
@@ -73,7 +72,7 @@ func TestVersionNVMNoUseGt6x(t *testing.T) {
 	assert.Nil(t, internaltesting.CopyExecutable(testExe, dstBash))
 	t.Setenv("TEST_NPM_BEHAVIOR", "nvm-gt-6x-no-use")
 
-	v, e := Version(context.TODO())
+	v, e := Version(t.Context())
 	assert.Nil(t, e)
 	assert.Equal(t, "8.19.2", v)
 }
@@ -91,7 +90,7 @@ func TestVersionNVMGt6x(t *testing.T) {
 	assert.Nil(t, internaltesting.CopyExecutable(testExe, dstBash))
 	t.Setenv("TEST_NPM_BEHAVIOR", "nvm-gt-6x")
 
-	v, e := Version(context.TODO())
+	v, e := Version(t.Context())
 	assert.Nil(t, e)
 	assert.Equal(t, "8.19.1", v)
 }
@@ -109,7 +108,7 @@ func TestVersionNVMLt6x(t *testing.T) {
 	assert.Nil(t, internaltesting.CopyExecutable(testExe, dstBash))
 	t.Setenv("TEST_NPM_BEHAVIOR", "nvm-lt-6x")
 
-	v, e := Version(context.TODO())
+	v, e := Version(t.Context())
 	assert.Nil(t, e)
 	assert.Equal(t, "4.6.0", v)
 }

@@ -80,7 +80,7 @@ func (fr *fakeRequest) IsRequest() bool {
 }
 
 func TestUnsupportedRequestType(t *testing.T) {
-	o, e := newOptions(WithContext(context.Background()))
+	o, e := newOptions(WithContext(t.Context()))
 	assert.Nil(t, e)
 
 	_, err := getEndpointURLFromContext(&fakeRequest{}, o)
@@ -90,7 +90,7 @@ func TestUnsupportedRequestType(t *testing.T) {
 }
 
 func TestMissingConfigurationOptions(t *testing.T) {
-	o, e := newOptions(WithContext(context.Background()))
+	o, e := newOptions(WithContext(t.Context()))
 	require.Nil(t, e)
 
 	if _, err := getEndpointURLFromContext(&AnalysisRequest{}, o); assert.Error(t, err) {

@@ -67,7 +67,7 @@ func New(ctx context.Context) (*cobra.Command, error) {
 				name, _ := tags.Lookup("name")
 				errs = append(errs, flags.Translate(err, name)...)
 			}
-			if err := validate.Singleton.Var(opts.Token.JWT, "mandatory"); err != nil {
+			if err := validate.Singleton.Var(opts.JWT, "mandatory"); err != nil {
 				tags, _ := flags.GetFieldTag(opts, "ConfigFlags.Token.JWT")
 				name, _ := tags.Lookup("name")
 				errs = append(errs, flags.Translate(err, name)...)
@@ -89,7 +89,7 @@ func New(ctx context.Context) (*cobra.Command, error) {
 				return nil
 			}
 
-			isLocal := opts.ConfigFlags.Endpoint.IsLocalCore()
+			isLocal := opts.Endpoint.IsLocalCore()
 
 			info, infoErr := ci.NewInfo()
 			if !isLocal && infoErr != nil {
@@ -234,7 +234,7 @@ func New(ctx context.Context) (*cobra.Command, error) {
 
 			{ // Create env file for runtime eavesdropping tool as a systemd service
 				io.StartProgressIndicator()
-				jibrilEnvConfigFilename, err := createEnvForJibrill(isLocal, coreSettings, info, opts.Token.JWT, opts.Token.GitHub)
+				jibrilEnvConfigFilename, err := createEnvForJibrill(isLocal, coreSettings, info, opts.JWT, opts.Token.GitHub)
 				if err != nil {
 					io.StopProgressIndicator()
 
