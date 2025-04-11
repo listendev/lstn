@@ -17,7 +17,6 @@ package jq
 
 import (
 	"bytes"
-	"context"
 	"io"
 	"strings"
 	"testing"
@@ -273,7 +272,7 @@ func TestEval(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			w := &bytes.Buffer{}
-			c := context.Background()
+			c := t.Context()
 			err := Eval(c, tt.args.json, w, tt.args.expr)
 			if tt.wantE {
 				assert.Error(t, err)
