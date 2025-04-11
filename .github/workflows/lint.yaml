@@ -18,7 +18,7 @@ jobs:
       - uses: ludeeus/action-shellcheck@master
 
       - name: Run shellcheck
-        uses: reviewdog/action-shellcheck@v1.27.0
+        uses: reviewdog/action-shellcheck@v1.30.0
         env:
           reporter: github-pr-review
           pattern: |
