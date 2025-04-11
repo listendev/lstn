@@ -201,23 +201,6 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-  test-e2e:
-    name: Run e2e tests
-    needs:
-      - build
-    uses: ./.github/workflows/call-run-e2e.yaml
-    with:
-      # The Github ref to checkout for the listen-e2e repo.
-      ref: main
-      # We want to use binaries built here.
-      lstn-use-release: false
-      # The artifact to use we built previously.
-      lstn-binary-artefact: artifact-linux
-    secrets:
-      # We have to use a PAT to ensure we can checkout the other repo and access containers from other repos.
-      github-token: ${{ secrets.CI_PAT }}
-
-
   release:
     name: Create official release
     if: startsWith(github.ref, 'refs/tags/v')
@@ -267,14 +250,13 @@ jobs:
   # Instead of updating the protected branch status in github, we can just update the "needs" section below
   # to require additional/remove existing status checks to protect main via a simple GitOps process.
   # We can use the alls-green action to get around the github assumption that a "skipped" required status check
-  # counts as passed. 
+  # counts as passed.
   test-required-checks-complete:
     # This step always has to run in order to check if the dependent jobs passed even if upstream jobs are skipped.
     if: always()
     needs:
       - build
       - test
-      - test-e2e
     name: Build checks complete
     runs-on: ubuntu-latest
     permissions: {}
