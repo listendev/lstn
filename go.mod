@@ -11,7 +11,7 @@ require (
 	github.com/creasty/defaults v1.8.0
 	github.com/ghetzel/testify v1.4.1
 	github.com/go-git/go-billy/v5 v5.6.2
-	github.com/go-git/go-git/v5 v5.15.0
+	github.com/go-git/go-git/v5 v5.16.0
 	github.com/go-playground/mold/v4 v4.5.1
 	github.com/go-playground/universal-translator v0.18.1
 	github.com/go-playground/validator/v10 v10.26.0
