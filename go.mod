@@ -21,7 +21,7 @@ require (
 	github.com/iancoleman/strcase v0.3.0
 	github.com/imdario/mergo v0.3.16
 	github.com/itchyny/gojq v0.12.15
-	github.com/jarcoal/httpmock v1.3.1
+	github.com/jarcoal/httpmock v1.4.0
 	github.com/listendev/pkg v0.0.0-20250206101217-97ed52202693
 	github.com/matishsiao/goInfo v0.0.0-20241216093258-66a9250504d6
 	github.com/mitchellh/mapstructure v1.5.0
