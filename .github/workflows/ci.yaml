@@ -223,12 +223,12 @@ jobs:
           go-version-file: go.mod
 
       - name: Install cosign
-        uses: sigstore/cosign-installer@v3.8.1
+        uses: sigstore/cosign-installer@v3.8.2
         with:
           cosign-release: "v2.2.3"
 
       - name: Install syft
-        uses: anchore/sbom-action/download-syft@v0.18.0
+        uses: anchore/sbom-action/download-syft@v0.19.0
 
       - name: Release
         uses: goreleaser/goreleaser-action@v6
