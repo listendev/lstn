@@ -228,7 +228,7 @@ jobs:
           cosign-release: "v2.2.3"
 
       - name: Install syft
-        uses: anchore/sbom-action/download-syft@v0.19.0
+        uses: anchore/sbom-action/download-syft@v0.20.0
 
       - name: Release
         uses: goreleaser/goreleaser-action@v6
